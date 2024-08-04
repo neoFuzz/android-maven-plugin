@@ -20,7 +20,7 @@
 
   <groupId>com.simpligility.maven.plugins</groupId>
   <artifactId>android-maven-plugin</artifactId>
-  <version>4.6.1-SNAPSHOT</version>
+  <version>4.6.1</version>
   <packaging>maven-plugin</packaging>
 
   <name>Android Maven Plugin - android-maven-plugin</name>
@@ -34,8 +34,8 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <!--  upgrade to 3.4 fails build, see https://github.com/simpligility/android-maven-plugin/issues/554 -->
-    <maven-plugin-plugin.version>3.3</maven-plugin-plugin.version>
-    <maven.api.version>3.0.4</maven.api.version>
+    <maven-plugin-plugin.version>3.6.0</maven-plugin-plugin.version>
+    <maven.api.version>3.6.0</maven.api.version>
     <takari.test.version>2.9.1</takari.test.version>
     <easymock.version>3.4</easymock.version>
     <powermock.version>1.6.6</powermock.version>
@@ -43,9 +43,17 @@
     <asm.version>5.0.4</asm.version>
     <!-- Attention - make sure that the tools version is the versions of 
       the transitive dependencies of the builder version -->
-    <android.builder.version>2.3.3</android.builder.version>
-    <android.tools.version>25.3.3</android.tools.version>
+    <android.builder.version>3.0.1</android.builder.version>
+    <android.tools.version>26.0.1</android.tools.version>
   </properties>
+  <repositories>
+    <repository>
+      <id>android-studio</id>
+      <name>lixo</name>
+      <url>https://maven.google.com</url>
+      <!-- <url>file://C:\Program Files\Android\Android Studio\gradle\m2repository</url> -->
+    </repository>
+  </repositories>
 
   <scm>
     <url>http://github.com/simpligility/android-maven-plugin/tree/${scm.branch}</url>
@@ -274,7 +282,7 @@
       <dependency>
         <groupId>net.sf.proguard</groupId>
         <artifactId>proguard-base</artifactId>
-        <version>5.2.1</version>
+        <version>6.2.2</version>
       </dependency>
 
       <!-- test deps -->

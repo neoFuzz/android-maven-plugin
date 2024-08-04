@@ -436,7 +436,12 @@ public class D8Mojo extends AbstractAndroidMojo
             commands.add( inputFile.getAbsolutePath() );
         }
 
-        getLog().info( "Convert classes to Dex : " + targetDirectory );
+        for ( String c : commands )
+        {
+            getLog().info( "Command: " + c );
+        }
+
+        getLog().info( "[D8] Convert classes to Dex : " + targetDirectory );
         executeJava( commands, executor );
     }
 
