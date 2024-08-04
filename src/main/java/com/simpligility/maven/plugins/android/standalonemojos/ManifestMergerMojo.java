@@ -372,7 +372,7 @@ public class ManifestMergerMojo extends AbstractAndroidMojo
                   androidManifestFile,     // mainManifest
                   new ArrayList<File>(),   // manifestOverlays
                   manifestDependencies,    // libraries
-                  "",                      //featurename
+                  null,                      //featurename
                   "",                      // packageOverride
                   versionCode,             // versionCode
                   parsedVersionName,       // versionName
