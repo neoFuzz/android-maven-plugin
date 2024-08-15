@@ -8,6 +8,7 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.plugin.logging.Log;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -50,7 +51,7 @@ final class ResourceClassGenerator
      *
      * @param libraries AAR libraries for which to generate R java files.
      */
-    public void generateLibraryRs( final Set<Artifact> libraries )
+    public void generateLibraryRs( final Set<Artifact> libraries ) throws IOException
     {
         // list of all the symbol tables
         final List<SymbolTable> symbolTables = new ArrayList<>( libraries.size() );
@@ -72,8 +73,8 @@ final class ResourceClassGenerator
                 }
                 log.info( "Generating R for " + packageName + " at " + rFile );
 
-                SymbolTable libSymbols = SymbolIo.read( rFile );
-                libSymbols = libSymbols.rename( packageName, libSymbols.getTableName() );
+                SymbolTable libSymbols = SymbolIo.read( rFile, rFile.getName() );
+                libSymbols = libSymbols.rename( libSymbols.getTablePackage() );
                 symbolTables.add( libSymbols );
             }
         }
@@ -85,7 +86,7 @@ final class ResourceClassGenerator
 
         // load the full resources values from the R.txt calculated for the project.
         final File projectR = new File( targetDirectory, "R.txt" );
-        final SymbolTable mainSymbols = SymbolIo.read( projectR );
+        final SymbolTable mainSymbols = SymbolIo.read( projectR, projectR.getName() );
 
         // now loop on all the package name, merge all the symbols to write, and write them
         RGeneration.generateRForLibraries( mainSymbols, symbolTables, genDirectory.getAbsoluteFile(), false );

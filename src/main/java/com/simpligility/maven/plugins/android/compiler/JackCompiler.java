@@ -30,6 +30,7 @@ import org.codehaus.plexus.util.cli.CommandLineUtils;
 import org.codehaus.plexus.util.cli.Commandline;
 import org.codehaus.plexus.util.cli.StreamConsumer;
 import org.codehaus.plexus.util.cli.WriterStreamConsumer;
+import javax.annotation.Nullable;
 
 /**
  * @plexus.component role="org.codehaus.plexus.compiler.Compiler"
@@ -207,6 +208,12 @@ public class JackCompiler extends AbstractCompiler
                     public boolean apply( String t ) 
                     {
                         return !Strings.isNullOrEmpty( t );
+                    }
+
+                    @Override
+                    public boolean test( @Nullable String input )
+                    {
+                        return this.apply( input );
                     }
                 }
         );

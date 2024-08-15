@@ -15,6 +15,9 @@ import com.android.builder.model.SyncIssue;
 import com.android.ide.common.blame.Message;
 import com.android.utils.ILogger;
 
+import java.util.Arrays;
+import java.util.List;
+
 /**
  * @author kedzie
  */
@@ -34,6 +37,12 @@ public class MavenErrorReporter extends ErrorReporter
    {
       logger.info( "Sync Error.  Data: " + data + "\tmsg: " + msg );
       return new SyncIssueImpl( 0, type, data, msg );
+   }
+
+   @Override
+   public boolean hasSyncIssue( int i )
+   {
+      return false;
    }
 
   @Override
@@ -82,5 +91,11 @@ class SyncIssueImpl implements SyncIssue
    public String getMessage()
    {
       return message;
+   }
+
+   @Override
+   public List<String> getMultiLineMessage()
+   {
+      return Arrays.asList( message.split( "\\s" ) );
    }
 }

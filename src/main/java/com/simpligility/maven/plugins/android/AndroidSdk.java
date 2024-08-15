@@ -43,7 +43,7 @@ public class AndroidSdk
      * the default API level for the SDK used as a fall back if none is supplied, 
      * should ideally point to the latest available version
      */
-    private static final String DEFAULT_ANDROID_API_LEVEL = "23";
+    private static final String DEFAULT_ANDROID_API_LEVEL = "26";
     /**
      * property file in each platform folder with details about platform.
      */
@@ -103,6 +103,8 @@ public class AndroidSdk
         {
             apiLevel = DEFAULT_ANDROID_API_LEVEL;
         }
+        System.out.println( "API: " + apiLevel + " | SDK Path: " + sdkPath.getPath() + " | Buildtools: "
+                + buildToolsVersion );
 
         androidTarget = findPlatformByApiLevel( apiLevel );
         if ( androidTarget == null )

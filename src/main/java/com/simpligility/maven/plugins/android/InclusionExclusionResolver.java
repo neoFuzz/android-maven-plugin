@@ -66,6 +66,12 @@ public class InclusionExclusionResolver
                                 || includedByType;
                     }
                 }
+
+                @Override
+                public boolean test( @Nullable Artifact input )
+                {
+                    return this.apply( input );
+                }
             } )
             .toSet();
     }
@@ -79,6 +85,12 @@ public class InclusionExclusionResolver
                 public boolean apply( String artifactQualifier )
                 {
                     return match( artifact, artifactQualifier );
+                }
+
+                @Override
+                public boolean test( @Nullable String input )
+                {
+                    return this.apply( input );
                 }
             } );
     }
@@ -133,6 +145,12 @@ public class InclusionExclusionResolver
         public boolean apply( String value )
         {
             return !value.trim().isEmpty();
+        }
+
+        @Override
+        public boolean test( @Nullable String input )
+        {
+            return this.apply( input );
         }
     };
 
