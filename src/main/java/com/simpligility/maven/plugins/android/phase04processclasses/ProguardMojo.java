@@ -11,6 +11,7 @@ import com.simpligility.maven.plugins.android.config.PullParameter;
 import com.simpligility.maven.plugins.android.configuration.Proguard;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.SystemUtils;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -763,6 +764,10 @@ public class ProguardMojo extends AbstractAndroidMojo
     @SuppressWarnings( "unused" ) // NB Used to populate the parsedProguardJarPath attribute via reflection.
     private String getProguardJarPath() throws MojoExecutionException
     {
+        if ( !StringUtils.isEmpty( proguardProguardJarPath ) )
+        {
+            return proguardProguardJarPath;
+        }
         return getProguardJarPathFromDependencies();
     }
 
