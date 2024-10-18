@@ -97,7 +97,16 @@ public class AndroidSdk
                 throw invalidSdkException( sdkPath, apiLevel );
             }
         }
-        loadSDKToolsMajorVersion();
+
+        /**
+         *  Note: The Android SDK Command-Line Tools package, located in cmdline-tools, replaces the SDK Tools package,
+         *  located in tools. With the new package, you can select the version of the command line tools you want to
+         *  install, and you can install multiple versions at a time. With the old package, you can only install the
+         *  latest version of the tools. Thus, the new package lets you depend on specific versions of the command-line
+         *  tools without having your code break when new versions are released. For information about the deprecated
+         *  SDK Tools package, see the SDK Tools release notes. TODO: Android SDK Command-Line Tools
+         */
+        //loadSDKToolsMajorVersion();
 
         if ( apiLevel == null )
         {
