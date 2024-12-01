@@ -1,7 +1,7 @@
 package com.simpligility.maven.plugins.android.common;
 
 /**
- * The file system extension for the Android artifact also used for the packaging type of an Android Maven Project.
+ * The file system extension for the Android artifact also used for the packaging type of Android Maven Project.
  */
 public final class AndroidExtension
 {
@@ -12,7 +12,8 @@ public final class AndroidExtension
 
     /**
      * Android library project as created by Android Maven Plugin.
-     * @deprecated Use {@link AAR} instead.
+     *
+     * @deprecated Use {@link #AAR} instead.
      */
     @Deprecated
     public static final String APKLIB = "apklib";
@@ -23,21 +24,20 @@ public final class AndroidExtension
      */
     public static final String AAR = "aar";
 
-    
-    /**
-     * @deprecated Use {@link APKLIB} instead.
-     */
-    public static final String APKSOURCES = "apksources";
 
+    /**
+     * @deprecated Use {@link #APKLIB} instead.
+     */
+    @Deprecated
+    public static final String APKSOURCES = "apksources";
 
     //No instances
     private AndroidExtension()
     {
     }
 
-
     /**
-     * Determine whether or not a {@link MavenProject}'s packaging is an
+     * Determine whether a {@link org.apache.maven.project.MavenProject MavenProject}'s packaging is an
      * Android project.
      *
      * @param packaging Project packaging.
@@ -45,7 +45,7 @@ public final class AndroidExtension
      */
     public static boolean isAndroidPackaging( String packaging )
     {
-        return APK.equals( packaging ) || APKLIB.equals( packaging ) || APKSOURCES.equals( packaging ) 
+        return APK.equals( packaging ) || APKLIB.equals( packaging ) || APKSOURCES.equals( packaging )
                 || AAR.equalsIgnoreCase( packaging );
     }
 }

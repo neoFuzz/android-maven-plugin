@@ -201,7 +201,7 @@ public final class UnpackedLibHelper
     /**
      * @param artifact  Android dependency that is being referenced.
      * @return Folder where the unpacked native libraries are located.
-     * @see http://tools.android.com/tech-docs/new-build-system/aar-format
+     * @see <a href="http://tools.android.com/tech-docs/new-build-system/aar-format">AAR Format Documentation</a>
      */
     public File getUnpackedLibNativesFolder( Artifact artifact )
     {

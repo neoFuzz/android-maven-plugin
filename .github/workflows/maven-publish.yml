@@ -1,7 +1,6 @@
-# This workflow will build a package using Maven and then publish it to GitHub packages when a release is created
-# For more information see: https://github.com/actions/setup-java/blob/main/docs/advanced-usage.md#apache-maven-with-a-settings-path
+# This workflow will build a package using Maven and then publish it to the release created
 
-name: Maven Package
+name: Publish Maven Package
 
 on:
   release:
@@ -12,23 +11,58 @@ jobs:
 
     runs-on: ubuntu-latest
     permissions:
-      contents: read
+      contents: write
       packages: write
 
     steps:
     - uses: actions/checkout@v4
-    - name: Set up JDK 11
+    - name: Set up JDK 8
       uses: actions/setup-java@v4
       with:
-        java-version: '11'
+        java-version: '8'
         distribution: 'temurin'
         server-id: github # Value of the distributionManagement/repository/id field of the pom.xml
         settings-path: ${{ github.workspace }} # location for the settings.xml file
 
     - name: Build with Maven
-      run: mvn -B package --file pom.xml
+      #run: mvn -B package --file pom.xml
+      run: mvn -B clean install -DskipTests -Dmaven.test.skip=true -e --file pom.xml
 
-    - name: Publish to GitHub Packages Apache Maven
-      run: mvn deploy -s $GITHUB_WORKSPACE/settings.xml
+    - name: Locate Installed Files
+      id: locate_files
+      run: |
+        # Match groupId and artifactId as in Maven project
+        groupId="com.github.Card-Forge"
+        artifactId="android-maven-plugin"
+        version=$(mvn org.apache.maven.plugins:maven-help-plugin:3.2.0:evaluate -Dexpression=project.version -q -DforceStdout)
+
+        # Convert groupId to file path
+        groupPath=$(echo "$groupId" | tr '.' '/')
+
+        # Full path to the JAR and POM files
+        jar_file="$HOME/.m2/repository/$groupPath/$artifactId/$version/$artifactId-$version.jar"
+        pom_file="$HOME/.m2/repository/$groupPath/$artifactId/$version/$artifactId-$version.pom"
+
+        echo "JAR_FILE=$jar_file" >> $GITHUB_ENV
+        echo "POM_FILE=$pom_file" >> $GITHUB_ENV
+
+    - name: Get Latest Release
+      id: get_release
       env:
-        GITHUB_TOKEN: ${{ github.token }}
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        latest_release=$(gh release view --json tagName -q .tagName)
+        echo "latest_release=$latest_release" >> $GITHUB_ENV
+
+    - name: Upload Files to Release
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        release_tag=$latest_release
+        echo "Uploading files from Maven install to release: $release_tag"
+         
+        # Upload the JAR file
+        gh release upload "$release_tag" "$JAR_FILE" --clobber
+          
+        # Upload the POM file
+        gh release upload "$release_tag" "$POM_FILE" --clobber

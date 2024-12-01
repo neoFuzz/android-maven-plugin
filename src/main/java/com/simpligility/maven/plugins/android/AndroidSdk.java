@@ -178,7 +178,7 @@ public class AndroidSdk
     /**
      * Get the aapt tool path.
      *
-     * @return
+     * @return the path to the aapt tool
      */
     public String getAaptPath()
     {
@@ -187,7 +187,7 @@ public class AndroidSdk
 
     /**
      * Get the aild tool path
-     * @return
+     * @return the path to the aidl tool
      */
     public String getAidlPath()
     {
@@ -196,7 +196,7 @@ public class AndroidSdk
 
     /**
      * Get the path for dx.jar
-     * @return
+     * @return the path to the dx.jar
      */
     public String getDxJarPath()
     {
@@ -215,7 +215,7 @@ public class AndroidSdk
 
     /**
      * Get the path for proguard.jar
-     * @return
+     * @return the path to the proguard.jar
      */
     public String getProguardJarPath()
     {
@@ -230,7 +230,7 @@ public class AndroidSdk
     
     /**
      * Get the path for shrinkedAndroid.jar
-     * @return
+     * @return the path to the shrinkedAndroid.jar
      */
     public String getShrinkedAndroidJarPath()
     {
@@ -244,7 +244,7 @@ public class AndroidSdk
     
     /**
      * Get the path for build-tools lib directory
-     * @return
+     * @return the path to the build-tools lib directory
      */
     public String getBuildToolsLibDirectoryPath()
     {
@@ -258,7 +258,7 @@ public class AndroidSdk
     
     /**
      * Get the path for mainDexClasses.rules
-     * @return
+     * @return the path to the mainDexClasses.rules
      */
     public String getMainDexClassesRulesPath()
     {
@@ -285,7 +285,7 @@ public class AndroidSdk
     /**
      * Get the android debug tool path (adb).
      *
-     * @return
+     * @return the path to the adb tool
      */
     public String getAdbPath()
     {
@@ -295,7 +295,7 @@ public class AndroidSdk
     /**
      * Get the android zipalign path.
      *
-     * @return
+     * @return the path to the zipalign tool
      */
     public String getZipalignPath()
     {
@@ -305,7 +305,7 @@ public class AndroidSdk
     /**
      * Get the android lint path.
      * 
-     * @return
+     * @return the path to the lint tool
      */
     public String getLintPath()
     {
@@ -315,7 +315,7 @@ public class AndroidSdk
     /**
      * Get the android monkey runner path.
      * 
-     * @return
+     * @return the path to the monkeyrunner tool
      */
     public String getMonkeyRunnerPath()
     {
@@ -325,7 +325,7 @@ public class AndroidSdk
     /**
      * Get the apkbuilder path.
      *
-     * @return
+     * @return the path to the apkbuilder tool
      */
     public String getApkBuilderPath()
     {
@@ -335,7 +335,7 @@ public class AndroidSdk
     /**
      * Get the android tool path.
      *
-     * @return
+     * @return the path to the android tool
      */
     public String getAndroidPath()
     {
@@ -347,7 +347,7 @@ public class AndroidSdk
 
     /**
      * Get the path to the tools directory.
-     * @return
+     * @return the path to the tools directory
      */
     public File getToolsPath()
     {

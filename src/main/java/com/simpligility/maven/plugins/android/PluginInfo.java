@@ -46,7 +46,7 @@ public class PluginInfo
   
   /**
    * Get the Maven GAV string of the plugin.
-   * @return
+   * @return GAV string
    */
   public static String getGAV()
   {
