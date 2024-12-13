@@ -18,7 +18,7 @@
     <version>6.0.0</version>
   </parent>
 
-  <groupId>com.github.Card-Forge</groupId>
+  <groupId>com.github.cardforge</groupId>
   <artifactId>android-maven-plugin</artifactId>
   <version>4.6.3</version>
   <packaging>maven-plugin</packaging>
@@ -993,9 +993,9 @@
               <execution>
                 <id>sign-artifacts</id>
                 <phase>verify</phase>
-                <goals>
-                  <goal>sign</goal>
-                </goals>
+<!--                <goals>-->
+<!--                  <goal>sign</goal>-->
+<!--                </goals>-->
               </execution>
             </executions>
           </plugin>
