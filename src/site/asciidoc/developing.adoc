@@ -51,7 +51,7 @@ version in the pom files there.
 If you invoke the plugin outside a Maven project specify the version like so e.g.
 
 ----
-mvn com.simpligility.maven.plugins:android-maven-plugin:4.0.0-SNAPSHOT:undeploy -Dparameter=value
+mvn com.github.Card-Forge.maven.plugins:android-maven-plugin:4.0.0-SNAPSHOT:undeploy -Dparameter=value
 ----
 
 
