@@ -18,7 +18,7 @@
     <version>6.0.0</version>
   </parent>
 
-  <groupId>com.github.cardforge</groupId>
+  <groupId>com.github.cardforge.maven.plugins</groupId>
   <artifactId>android-maven-plugin</artifactId>
   <version>4.6.3</version>
   <packaging>maven-plugin</packaging>
@@ -51,7 +51,6 @@
       <id>android-studio</id>
       <name>lixo</name>
       <url>https://maven.google.com</url>
-      <!-- <url>file://C:\Program Files\Android\Android Studio\gradle\m2repository</url> -->
     </repository>
   </repositories>
 
@@ -761,10 +760,7 @@
         <artifactId>maven-plugin-plugin</artifactId>
         <version>${maven-plugin-plugin.version}</version><!--$NO-MVN-MAN-VER$-->
         <configuration>
-          <!-- <packagingTypes>
-            <packaging>takari-maven-plugin</packaging>
-          </packagingTypes>
-           -->
+
            <skipErrorNoDescriptorsFound>true</skipErrorNoDescriptorsFound>
         </configuration>
         <executions>
@@ -776,6 +772,12 @@
           </execution>
           <execution>
             <id>generate-descriptor</id>
+            <goals>
+              <goal>descriptor</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>default-descriptor</id>
             <goals>
               <goal>descriptor</goal>
             </goals>
@@ -993,9 +995,9 @@
               <execution>
                 <id>sign-artifacts</id>
                 <phase>verify</phase>
-<!--                <goals>-->
-<!--                  <goal>sign</goal>-->
-<!--                </goals>-->
+                <goals>
+                  <goal>sign</goal>
+                </goals>
               </execution>
             </executions>
           </plugin>

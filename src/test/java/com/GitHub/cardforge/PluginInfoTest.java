@@ -31,6 +31,6 @@ public class PluginInfoTest {
   public void confirmGav()
   {
     assertTrue( PluginInfo.getGAV()
-        .startsWith( "com.github.CardForge.maven.plugins:android-maven-plugin:" ) );
+        .startsWith( "com.github.cardforge.maven.plugins:android-maven-plugin:" ) );
   }
 }

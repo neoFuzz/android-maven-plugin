@@ -25,27 +25,27 @@
       <implementation>org.apache.maven.lifecycle.mapping.DefaultLifecycleMapping</implementation>
       <configuration>
         <phases>
-          <generate-sources>com.github.CardForge.maven.plugins:android-maven-plugin:generate-sources</generate-sources>
+          <generate-sources>com.github.cardforge.maven.plugins:android-maven-plugin:generate-sources</generate-sources>
           <process-resources>org.apache.maven.plugins:maven-resources-plugin:resources</process-resources>
           <compile>org.apache.maven.plugins:maven-compiler-plugin:compile</compile>
           <process-classes>
-            com.github.CardForge.maven.plugins:android-maven-plugin:emma,
-            com.github.CardForge.maven.plugins:android-maven-plugin:proguard
+            com.github.cardforge.maven.plugins:android-maven-plugin:emma,
+            com.github.cardforge.maven.plugins:android-maven-plugin:proguard
           </process-classes>
           <process-test-resources>org.apache.maven.plugins:maven-resources-plugin:testResources</process-test-resources>
           <test-compile>org.apache.maven.plugins:maven-compiler-plugin:testCompile</test-compile>
           <test>org.apache.maven.plugins:maven-surefire-plugin:test</test>
           <prepare-package>
-            com.github.CardForge.maven.plugins:android-maven-plugin:dex
+            com.github.cardforge.maven.plugins:android-maven-plugin:dex
           </prepare-package>
           <package>
             org.apache.maven.plugins:maven-jar-plugin:jar,
-            com.github.CardForge.maven.plugins:android-maven-plugin:d8,
-            com.github.CardForge.maven.plugins:android-maven-plugin:apk
+            com.github.cardforge.maven.plugins:android-maven-plugin:d8,
+            com.github.cardforge.maven.plugins:android-maven-plugin:apk
           </package>
           <install>org.apache.maven.plugins:maven-install-plugin:install</install>
-          <pre-integration-test>com.github.CardForge.maven.plugins:android-maven-plugin:internal-pre-integration-test</pre-integration-test>
-          <integration-test>com.github.CardForge.maven.plugins:android-maven-plugin:internal-integration-test</integration-test>
+          <pre-integration-test>com.github.cardforge.maven.plugins:android-maven-plugin:internal-pre-integration-test</pre-integration-test>
+          <integration-test>com.github.cardforge.maven.plugins:android-maven-plugin:internal-integration-test</integration-test>
           <deploy>org.apache.maven.plugins:maven-deploy-plugin:deploy</deploy>
         </phases>
       </configuration>
@@ -58,17 +58,17 @@
       <implementation>org.apache.maven.lifecycle.mapping.DefaultLifecycleMapping</implementation>
       <configuration>
         <phases>
-          <generate-sources>com.github.CardForge.maven.plugins:android-maven-plugin:generate-sources</generate-sources>
+          <generate-sources>com.github.cardforge.maven.plugins:android-maven-plugin:generate-sources</generate-sources>
           <process-resources>org.apache.maven.plugins:maven-resources-plugin:resources</process-resources>
           <compile>org.apache.maven.plugins:maven-compiler-plugin:compile</compile>
-          <process-classes>com.github.CardForge.maven.plugins:android-maven-plugin:emma,
-              com.github.CardForge.maven.plugins:android-maven-plugin:proguard</process-classes>
+          <process-classes>com.github.cardforge.maven.plugins:android-maven-plugin:emma,
+              com.github.cardforge.maven.plugins:android-maven-plugin:proguard</process-classes>
           <process-test-resources>org.apache.maven.plugins:maven-resources-plugin:testResources</process-test-resources>
           <test-compile>org.apache.maven.plugins:maven-compiler-plugin:testCompile</test-compile>
           <test>org.apache.maven.plugins:maven-surefire-plugin:test</test>
           <package>
               org.apache.maven.plugins:maven-jar-plugin:jar,
-              com.github.CardForge.maven.plugins:android-maven-plugin:apklib
+              com.github.cardforge.maven.plugins:android-maven-plugin:apklib
           </package>
           <install>org.apache.maven.plugins:maven-install-plugin:install</install>
           <deploy>org.apache.maven.plugins:maven-deploy-plugin:deploy</deploy>
@@ -83,17 +83,17 @@
       <implementation>org.apache.maven.lifecycle.mapping.DefaultLifecycleMapping</implementation>
       <configuration>
           <phases>
-              <generate-sources>com.github.CardForge.maven.plugins:android-maven-plugin:generate-sources</generate-sources>
+              <generate-sources>com.github.cardforge.maven.plugins:android-maven-plugin:generate-sources</generate-sources>
               <process-resources>org.apache.maven.plugins:maven-resources-plugin:resources</process-resources>
               <compile>org.apache.maven.plugins:maven-compiler-plugin:compile</compile>
-              <process-classes>com.github.CardForge.maven.plugins:android-maven-plugin:emma,
-                  com.github.CardForge.maven.plugins:android-maven-plugin:proguard</process-classes>
+              <process-classes>com.github.cardforge.maven.plugins:android-maven-plugin:emma,
+                  com.github.cardforge.maven.plugins:android-maven-plugin:proguard</process-classes>
               <process-test-resources>org.apache.maven.plugins:maven-resources-plugin:testResources</process-test-resources>
               <test-compile>org.apache.maven.plugins:maven-compiler-plugin:testCompile</test-compile>
               <test>org.apache.maven.plugins:maven-surefire-plugin:test</test>
               <package>
                   org.apache.maven.plugins:maven-jar-plugin:jar,
-                  com.github.CardForge.maven.plugins:android-maven-plugin:aar
+                  com.github.cardforge.maven.plugins:android-maven-plugin:aar
               </package>
               <install>org.apache.maven.plugins:maven-install-plugin:install</install>
               <deploy>org.apache.maven.plugins:maven-deploy-plugin:deploy</deploy>

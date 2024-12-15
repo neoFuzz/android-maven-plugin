@@ -32,7 +32,7 @@ jobs:
       id: locate_files
       run: |
         # Match groupId and artifactId as in Maven project
-        groupId="com.github.CardForge"
+        groupId="com.github.cardforge.maven.plugins"
         artifactId="android-maven-plugin"
         version=$(mvn org.apache.maven.plugins:maven-help-plugin:3.2.0:evaluate -Dexpression=project.version -q -DforceStdout)
 
