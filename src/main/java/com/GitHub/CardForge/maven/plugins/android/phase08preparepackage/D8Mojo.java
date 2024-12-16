@@ -16,15 +16,11 @@
  */
 package com.github.cardforge.maven.plugins.android.phase08preparepackage;
 
-import static com.github.cardforge.maven.plugins.android.InclusionExclusionResolver.filterArtifacts;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
+import com.github.cardforge.maven.plugins.android.AbstractAndroidMojo;
+import com.github.cardforge.maven.plugins.android.CommandExecutor;
+import com.github.cardforge.maven.plugins.android.ExecutionException;
+import com.github.cardforge.maven.plugins.android.IncludeExcludeSet;
+import com.github.cardforge.maven.plugins.android.configuration.D8;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.artifact.Artifact;
@@ -39,29 +35,37 @@ import org.codehaus.plexus.archiver.ArchiverException;
 import org.codehaus.plexus.archiver.jar.JarArchiver;
 import org.codehaus.plexus.archiver.util.DefaultFileSet;
 
-import com.github.cardforge.maven.plugins.android.AbstractAndroidMojo;
-import com.github.cardforge.maven.plugins.android.CommandExecutor;
-import com.github.cardforge.maven.plugins.android.ExecutionException;
-import com.github.cardforge.maven.plugins.android.IncludeExcludeSet;
-import com.github.cardforge.maven.plugins.android.configuration.D8;
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+import static com.github.cardforge.maven.plugins.android.InclusionExclusionResolver.filterArtifacts;
 
 /**
  * Converts compiled Java classes (including those containing Java 8 syntax) to the Android dex format.
  * It is a replacement for the {@link DexMojo}.
- *
+ * <p>
  * You should only run one or the other.
- * By default D8 will run and Dex will not. But this is determined by the
+ * By default, D8 will run and Dex will not. But this is determined by the
  *
  * @author william.ferguson@xandar.com.au
  */
 @Mojo(
-    name = "d8",
-    defaultPhase = LifecyclePhase.PREPARE_PACKAGE,
-    requiresDependencyResolution = ResolutionScope.COMPILE
+        name = "d8",
+        defaultPhase = LifecyclePhase.PREPARE_PACKAGE,
+        requiresDependencyResolution = ResolutionScope.COMPILE
 )
-public class D8Mojo extends AbstractAndroidMojo
-{
+public class D8Mojo extends AbstractAndroidMojo {
     private static final String JAR = "jar";
+
+    /**
+     * The dex compiler to use. Allowed values are 'dex' (default) and 'd8'.
+     */
+    @Parameter(property = "android.dex.compiler", defaultValue = "dex")
+    private String dexCompiler;
 
     /**
      * Configuration for the D8 command execution. It can be configured in the plugin configuration like so
@@ -84,66 +88,59 @@ public class D8Mojo extends AbstractAndroidMojo
      *   &lt;/arguments&gt;
      * &lt;/d8&gt;
      * </pre>
-     *
+     * <p>
      * or via properties d8* or command line parameters android.d8.*
      */
-
-    /**
-     * The dex compiler to use. Allowed values are 'dex' (default) and 'd8'.
-     */
-    @Parameter( property = "android.dex.compiler", defaultValue = "dex" )
-    private String dexCompiler;
-
     @Parameter
     private D8 d8;
 
     /**
      * Extra JVM Arguments. Using these you can e.g. increase memory for the jvm running the build.
      */
-    @Parameter( property = "android.d8.jvmArguments", defaultValue = "-Xmx1024M" )
+    @Parameter(property = "android.d8.jvmArguments", defaultValue = "-Xmx1024M")
     private String[] d8JvmArguments;
 
     /**
      * Decides whether to pass the --intermediate flag to d8.
      */
-    @Parameter( property = "android.d8.intermediate", defaultValue = "false" )
+    @Parameter(property = "android.d8.intermediate", defaultValue = "false")
     private boolean d8Intermediate;
 
     /**
      * Full path to class list to multi dex
      */
-    @Parameter( property = "android.d8.mainDexList" )
+    @Parameter(property = "android.d8.mainDexList")
     private String d8MainDexList;
 
     /**
      * Whether to pass the --release flag to d8.
      */
-    @Parameter( property = "android.d8.release", defaultValue = "false" )
+    @Parameter(property = "android.d8.release", defaultValue = "false")
     private boolean d8Release;
 
     /**
      * The minApi (if any) to pass to d8.
      */
-    @Parameter( property = "android.d8.minApi" )
+    @Parameter(property = "android.d8.minApi")
     private Integer d8MinApi;
 
     /**
      * Additional command line parameters passed to d8.
      */
-    @Parameter( property = "android.d8.arguments" )
+    @Parameter(property = "android.d8.arguments")
     private String[] d8Arguments;
 
     /**
      * The name of the obfuscated JAR.
      */
-    @Parameter( property = "android.proguard.obfuscatedJar" )
+    @Parameter(property = "android.proguard.obfuscatedJar")
     private File obfuscatedJar;
 
     /**
      * Skips transitive dependencies. May be useful if the target classes directory is populated with the
      * {@code maven-dependency-plugin} and already contains all dependency classes.
      */
-    @Parameter( property = "skipDependencies", defaultValue = "false" )
+    @Parameter(property = "skipDependencies", defaultValue = "false")
     private boolean skipDependencies;
 
     /**
@@ -161,7 +158,7 @@ public class D8Mojo extends AbstractAndroidMojo
      *     &lt;/artifactTypeSet&gt;
      * </pre>
      */
-    @Parameter( property = "artifactTypeSet" )
+    @Parameter(property = "artifactTypeSet")
     private IncludeExcludeSet artifactTypeSet;
 
     /**
@@ -184,7 +181,7 @@ public class D8Mojo extends AbstractAndroidMojo
      *     &lt;/artifactTypeSet&gt;
      * </pre>
      */
-    @Parameter( property = "artifactSet" )
+    @Parameter(property = "artifactSet")
     private IncludeExcludeSet artifactSet;
 
     private String[] parsedJvmArguments;
@@ -196,54 +193,69 @@ public class D8Mojo extends AbstractAndroidMojo
     private Integer parsedMinApi;
 
     /**
-     * @throws MojoExecutionException
-     * @throws MojoFailureException
+     * Figure out the full path to the current java executable.
+     *
+     * @return the full path to the current java executable.
+     */
+    private static File getJavaExecutable() {
+        final String javaHome = System.getProperty("java.home");
+        final String slash = File.separator;
+        return new File(javaHome + slash + "bin" + slash + "java");
+    }
+
+    /**
+     * Executes the Mojo goal by performing the following tasks:
+     * <ul>
+     *     <li>Parses the configuration settings.</li>
+     *     <li>If the selected DEX compiler is not D8, skips execution with a log message.</li>
+     *     <li>If APK generation is enabled, calls {@link #runD8(CommandExecutor)} to run the D8 compiler.</li>
+     *     <li>If the attachment of JAR is enabled, attaches the generated JAR file to the Maven project.</li>
+     *     <li>If attaching sources is enabled, creates and attaches an APK sources file.</li>
+     * </ul>
+     * <p>
+     * This method is typically invoked during the execution of a Maven build to handle APK compilation and artifact attachment tasks.
+     * </p>
+     *
+     * @throws MojoExecutionException If there is an error executing the Mojo.
+     * @throws MojoFailureException   If the Mojo fails due to a configuration or other critical issue.
      */
     @Override
-    public void execute() throws MojoExecutionException, MojoFailureException
-    {
+    public void execute() throws MojoExecutionException, MojoFailureException {
         parseConfiguration();
 
-        getLog().debug( "DexCompiler set to " + parsedDexCompiler );
-        if ( parsedDexCompiler != DexCompiler.D8 )
-        {
-            getLog().info( "Not executing D8Mojo because DEX compiler is set to " + parsedDexCompiler );
+        getLog().debug("DexCompiler set to " + parsedDexCompiler);
+        if (parsedDexCompiler != DexCompiler.D8) {
+            getLog().info("Not executing D8Mojo because DEX compiler is set to " + parsedDexCompiler);
             return;
         }
 
         CommandExecutor executor = CommandExecutor.Factory.createDefaultCommmandExecutor();
-        executor.setLogger( getLog() );
+        executor.setLogger(getLog());
 
-        if ( generateApk )
-        {
-            runD8( executor );
+        if (generateApk) {
+            runD8(executor);
         }
 
-        if ( attachJar )
-        {
-            File jarFile = new File( targetDirectory + File.separator
-                + finalName + ".jar" );
-            projectHelper.attachArtifact( project, "jar", project.getArtifact().getClassifier(), jarFile );
+        if (attachJar) {
+            File jarFile = new File(targetDirectory + File.separator
+                    + finalName + ".jar");
+            projectHelper.attachArtifact(project, "jar", project.getArtifact().getClassifier(), jarFile);
         }
 
-        if ( attachSources )
-        {
+        if (attachSources) {
             // Also attach an .apksources, containing sources from this project.
             final File apksources = createApkSourcesFile();
-            projectHelper.attachArtifact( project, "apksources", apksources );
+            projectHelper.attachArtifact(project, "apksources", apksources);
         }
     }
 
-    private List<File> getDependencies()
-    {
+    private List<File> getDependencies() {
         final List<File> libraries = new ArrayList<>();
-        for ( Artifact artifact : filterArtifacts( getTransitiveDependencyArtifacts(), skipDependencies,
+        for (Artifact artifact : filterArtifacts(getTransitiveDependencyArtifacts(), skipDependencies,
                 artifactTypeSet.getIncludes(), artifactTypeSet.getExcludes(), artifactSet.getIncludes(),
-                artifactSet.getExcludes() ) )
-        {
-            if ( "jar".equals( artifact.getType() ) )
-            {
-                libraries.add( artifact.getFile() );
+                artifactSet.getExcludes())) {
+            if ("jar".equals(artifact.getType())) {
+                libraries.add(artifact.getFile());
             }
         }
 
@@ -253,31 +265,25 @@ public class D8Mojo extends AbstractAndroidMojo
     /**
      * @return Set of input files for dex. This is a combination of directories and jar files.
      */
-    private Set< File > getD8InputFiles()
-    {
-        final Set< File > inputs = new HashSet< File >();
+    private Set<File> getD8InputFiles() {
+        final Set<File> inputs = new HashSet<>();
 
-        if ( obfuscatedJar != null && obfuscatedJar.exists() )
-        {
+        if (obfuscatedJar != null && obfuscatedJar.exists()) {
             // proguard has been run, use this jar
-            getLog().debug( "Adding dex input (obfuscatedJar) : " + obfuscatedJar );
-            inputs.add( obfuscatedJar );
-        }
-        else
-        {
-            getLog().debug( "Using non-obfuscated input" );
-            final File classesJar = new File( targetDirectory, finalName + ".jar" );
-            inputs.add( classesJar );
-            getLog().debug( "Adding dex input from : " + classesJar );
+            getLog().debug("Adding dex input (obfuscatedJar) : " + obfuscatedJar);
+            inputs.add(obfuscatedJar);
+        } else {
+            getLog().debug("Using non-obfuscated input");
+            final File classesJar = new File(targetDirectory, finalName + ".jar");
+            inputs.add(classesJar);
+            getLog().debug("Adding dex input from : " + classesJar);
 
-            for ( Artifact artifact : filterArtifacts( getTransitiveDependencyArtifacts(), skipDependencies,
+            for (Artifact artifact : filterArtifacts(getTransitiveDependencyArtifacts(), skipDependencies,
                     artifactTypeSet.getIncludes(), artifactTypeSet.getExcludes(), artifactSet.getIncludes(),
-                    artifactSet.getExcludes() ) )
-            {
-                if ( artifact.getType().equals( JAR ) )
-                {
-                    getLog().debug( "Adding dex input : " + artifact.getFile() );
-                    inputs.add( artifact.getFile().getAbsoluteFile() );
+                    artifactSet.getExcludes())) {
+                if (artifact.getType().equals(JAR)) {
+                    getLog().debug("Adding dex input : " + artifact.getFile());
+                    inputs.add(artifact.getFile().getAbsoluteFile());
                 }
             }
         }
@@ -285,223 +291,180 @@ public class D8Mojo extends AbstractAndroidMojo
         return inputs;
     }
 
-    private void parseConfiguration()
-    {
+    private void parseConfiguration() {
         // config in pom found
-        if ( d8 != null )
-        {
+        if (d8 != null) {
             // the if statements make sure that properties/command line
             // parameter overrides configuration
-            // and that the dafaults apply in all cases;
-            if ( d8.getJvmArguments() == null )
-            {
+            // and that the dafaults apply in all cases:
+            if (d8.getJvmArguments() == null) {
                 parsedJvmArguments = d8JvmArguments;
-            }
-            else
-            {
+            } else {
                 parsedJvmArguments = d8.getJvmArguments();
             }
-            if ( d8.isIntermediate() == null )
-            {
+            if (d8.isIntermediate() == null) {
                 parsedIntermediate = d8Intermediate;
-            }
-            else
-            {
+            } else {
                 parsedIntermediate = d8.isIntermediate();
             }
-            if ( d8.getMainDexList() == null )
-            {
+            if (d8.getMainDexList() == null) {
                 parsedMainDexList = d8MainDexList;
-            }
-            else
-            {
+            } else {
                 parsedMainDexList = d8.getMainDexList();
             }
-            if ( d8.getArguments() == null )
-            {
+            if (d8.getArguments() == null) {
                 parsedArguments = d8Arguments;
-            }
-            else
-            {
+            } else {
                 parsedArguments = d8.getArguments();
             }
-            parsedDexCompiler = DexCompiler.valueOfIgnoreCase( dexCompiler );
-            if ( d8.isRelease() == null )
-            {
+            parsedDexCompiler = DexCompiler.valueOfIgnoreCase(dexCompiler);
+            if (d8.isRelease() == null) {
                 parsedRelease = release;
-            }
-            else
-            {
+            } else {
                 parsedRelease = d8.isRelease();
             }
-            if ( d8.getMinApi() == null )
-            {
+            if (d8.getMinApi() == null) {
                 parsedMinApi = d8MinApi;
-            }
-            else
-            {
+            } else {
                 parsedMinApi = d8.getMinApi();
             }
-        }
-        else
-        {
+        } else {
             parsedJvmArguments = d8JvmArguments;
             parsedIntermediate = d8Intermediate;
             parsedMainDexList = d8MainDexList;
             parsedArguments = d8Arguments;
-            parsedDexCompiler = DexCompiler.valueOfIgnoreCase( dexCompiler );
+            parsedDexCompiler = DexCompiler.valueOfIgnoreCase(dexCompiler);
             parsedRelease = d8Release;
             parsedMinApi = d8MinApi;
         }
     }
 
-    private List<String> javaDefaultCommands()
-    {
-        List< String > commands = new ArrayList< String > ();
-        if ( parsedJvmArguments != null )
-        {
-            for ( String jvmArgument : parsedJvmArguments )
-            {
+    private List<String> javaDefaultCommands() {
+        List<String> commands = new ArrayList<>();
+        if (parsedJvmArguments != null) {
+            for (String jvmArgument : parsedJvmArguments) {
                 // preserve backward compatibility allowing argument with or
                 // without dash (e.g. Xmx512m as well as
                 // -Xmx512m should work) (see
                 // http://code.google.com/p/maven-android-plugin/issues/detail?id=153)
-                if ( !jvmArgument.startsWith( "-" ) )
-                {
+                if (!jvmArgument.startsWith("-")) {
                     jvmArgument = "-" + jvmArgument;
                 }
-                getLog().debug( "Adding jvm argument " + jvmArgument );
-                commands.add( jvmArgument );
+                getLog().debug("Adding jvm argument " + jvmArgument);
+                commands.add(jvmArgument);
             }
         }
         return commands;
     }
 
-    private void runD8( CommandExecutor executor )
-        throws MojoExecutionException
-    {
-        final List< String > commands = javaDefaultCommands();
+    private void runD8(CommandExecutor executor) throws MojoExecutionException {
+        final List<String> commands = javaDefaultCommands();
 
         // Add d8 class to be invoked (As of Android 30 the D8 class is not included as a main attribute in the Jar).
-        commands.add( "-classpath" );
-        commands.add( getAndroidSdk().getD8JarPath() );
-        commands.add( "com.android.tools.r8.D8" );
+        commands.add("-classpath");
+        commands.add(getAndroidSdk().getD8JarPath());
+        commands.add("com.android.tools.r8.D8");
 
-        final Set< File > inputFiles = getD8InputFiles();
-        if ( parsedIntermediate )
-        {
-            commands.add( "--intermediate" );
+        final Set<File> inputFiles = getD8InputFiles();
+        if (parsedIntermediate) {
+            commands.add("--intermediate");
         }
-        if ( parsedMainDexList != null )
-        {
-            commands.add( "--main-dex-list" );
-            commands.add( parsedMainDexList );
+        if (parsedMainDexList != null) {
+            commands.add("--main-dex-list");
+            commands.add(parsedMainDexList);
         }
-        if ( parsedArguments != null )
-        {
-            for ( String argument : parsedArguments )
-            {
-                commands.add( argument );
+        if (parsedArguments != null) {
+            for (String argument : parsedArguments) {
+                commands.add(argument);
             }
         }
 
-        if ( parsedRelease )
-        {
-            commands.add( "--release" );
+        if (parsedRelease) {
+            commands.add("--release");
         }
 
-        if ( parsedMinApi != null )
-        {
-            commands.add( "--min-api" );
-            commands.add( parsedMinApi.toString() );
+        if (parsedMinApi != null) {
+            commands.add("--min-api");
+            commands.add(parsedMinApi.toString());
         }
 
-        commands.add( "--output" );
-        commands.add( targetDirectory.getAbsolutePath() );
+        commands.add("--output");
+        commands.add(targetDirectory.getAbsolutePath());
 
         final File androidJar = getAndroidSdk().getAndroidJar();
-        commands.add( "--lib" );
-        commands.add( androidJar.getAbsolutePath() );
+        commands.add("--lib");
+        commands.add(androidJar.getAbsolutePath());
 
         // Add project classpath
         final List<File> dependencies = getDependencies();
-        for ( final File file : dependencies )
-        {
-            commands.add( "--classpath" );
-            commands.add( file.getAbsolutePath() );
+        for (final File file : dependencies) {
+            commands.add("--classpath");
+            commands.add(file.getAbsolutePath());
         }
 
-        for ( File inputFile : inputFiles )
-        {
-            commands.add( inputFile.getAbsolutePath() );
+        for (File inputFile : inputFiles) {
+            commands.add(inputFile.getAbsolutePath());
         }
 
-        for ( String c : commands )
-        {
-            getLog().info( "Command: " + c );
+        for (String c : commands) {
+            getLog().info("Command: " + c);
         }
 
-        getLog().info( "[D8] Convert classes to Dex : " + targetDirectory );
-        executeJava( commands, executor );
+        getLog().info("[D8] Convert classes to Dex : " + targetDirectory);
+        executeJava(commands, executor);
     }
 
-    private String executeJava( final List<String> commands, CommandExecutor executor ) throws MojoExecutionException
-    {
-        final String javaExecutable = getJavaExecutable().getAbsolutePath();
-        getLog().debug( javaExecutable + " " + commands.toString() );
-        try
-        {
-            executor.setCaptureStdOut( true );
-            executor.executeCommand( javaExecutable, commands, project.getBasedir(), false );
+    public String getJavaExecutablePath() {
+        // First, check if 'java' is in the system's PATH
+        String path = System.getenv("PATH");
+
+        // Check if 'java' executable is found in PATH (on Windows, we need to check for 'java.exe')
+        if (path != null && (path.contains("java") || path.contains("java.exe"))) {
+            // If 'java' is in PATH, we can just use "java"
+            return "java";
+        } else {
+            // If not in PATH, fall back to the absolute path derived from java.home
+            return getJavaExecutable().getAbsolutePath();
+        }
+    }
+
+    private String executeJava(final List<String> commands, CommandExecutor executor) throws MojoExecutionException {
+        final String javaExecutable = getJavaExecutablePath();
+        getLog().debug(javaExecutable + " " + commands.toString());
+        try {
+            executor.setCaptureStdOut(true);
+            executor.executeCommand(javaExecutable, commands, project.getBasedir(), false);
             return executor.getStandardOut();
-        }
-        catch ( ExecutionException e )
-        {
-            throw new MojoExecutionException( "", e );
+        } catch (ExecutionException e) {
+            throw new MojoExecutionException("", e);
         }
     }
 
     /**
-     * Figure out the full path to the current java executable.
+     * Creates an .apksource file for the project.
      *
-     * @return the full path to the current java executable.
+     * @return the {@link File} for the .apksource file to attach to the project.
+     * @throws MojoExecutionException if an error occurs while creating the .apksource file.
      */
-    private static File getJavaExecutable()
-    {
-        final String javaHome = System.getProperty( "java.home" );
-        final String slash = File.separator;
-        return new File( javaHome + slash + "bin" + slash + "java" );
-    }
+    protected File createApkSourcesFile() throws MojoExecutionException {
+        final File apksources = new File(targetDirectory, finalName
+                + ".apksources");
+        FileUtils.deleteQuietly(apksources);
 
-    /**
-     * @return
-     * @throws MojoExecutionException
-     */
-    protected File createApkSourcesFile() throws MojoExecutionException
-    {
-        final File apksources = new File( targetDirectory, finalName
-            + ".apksources" );
-        FileUtils.deleteQuietly( apksources );
-
-        try
-        {
+        try {
             JarArchiver jarArchiver = new JarArchiver();
-            jarArchiver.setDestFile( apksources );
+            jarArchiver.setDestFile(apksources);
 
-            addDirectory( jarArchiver, assetsDirectory, "assets" );
-            addDirectory( jarArchiver, resourceDirectory, "res" );
-            addDirectory( jarArchiver, sourceDirectory, "src/main/java" );
-            addJavaResources( jarArchiver, resources );
+            addDirectory(jarArchiver, assetsDirectory, "assets");
+            addDirectory(jarArchiver, resourceDirectory, "res");
+            addDirectory(jarArchiver, sourceDirectory, "src/main/java");
+            addJavaResources(jarArchiver, resources);
 
             jarArchiver.createArchive();
-        }
-        catch ( ArchiverException e )
-        {
-            throw new MojoExecutionException( "ArchiverException while creating .apksource file.", e );
-        }
-        catch ( IOException e )
-        {
-            throw new MojoExecutionException( "IOException while creating .apksource file.", e );
+        } catch (ArchiverException e) {
+            throw new MojoExecutionException("ArchiverException while creating .apksource file.", e);
+        } catch (IOException e) {
+            throw new MojoExecutionException("IOException while creating .apksource file.", e);
         }
 
         return apksources;
@@ -510,15 +473,12 @@ public class D8Mojo extends AbstractAndroidMojo
     /**
      * Makes sure the string ends with "/"
      *
-     * @param prefix
-     *            any string, or null.
+     * @param prefix any string, or null.
      * @return the prefix with a "/" at the end, never null.
      */
-    protected String endWithSlash( String prefix )
-    {
-        prefix = StringUtils.defaultIfEmpty( prefix, "/" );
-        if ( !prefix.endsWith( "/" ) )
-        {
+    protected String endWithSlash(String prefix) {
+        prefix = StringUtils.defaultIfEmpty(prefix, "/");
+        if (!prefix.endsWith("/")) {
             prefix = prefix + "/";
         }
         return prefix;
@@ -527,53 +487,45 @@ public class D8Mojo extends AbstractAndroidMojo
     /**
      * Adds a directory to a {@link JarArchiver} with a directory prefix.
      *
-     * @param jarArchiver
-     * @param directory
-     *            The directory to add.
-     * @param prefix
-     *            An optional prefix for where in the Jar file the directory's contents should go.
+     * @param jarArchiver The {@link JarArchiver} to add the directory to.
+     * @param directory   The directory to add.
+     * @param prefix      An optional prefix for where in the Jar file the directory's contents should go.
      */
-    protected void addDirectory( JarArchiver jarArchiver, File directory, String prefix )
-    {
-        if ( directory != null && directory.exists() )
-        {
+    protected void addDirectory(JarArchiver jarArchiver, File directory, String prefix) {
+        if (directory != null && directory.exists()) {
             final DefaultFileSet fileSet = new DefaultFileSet();
-            fileSet.setPrefix( endWithSlash( prefix ) );
-            fileSet.setDirectory( directory );
-            jarArchiver.addFileSet( fileSet );
+            fileSet.setPrefix(endWithSlash(prefix));
+            fileSet.setDirectory(directory);
+            jarArchiver.addFileSet(fileSet);
         }
     }
 
     /**
-     * @param jarArchiver
-     * @param javaResources
+     * Adds a list of Java resources to a {@link JarArchiver}.
+     *
+     * @param jarArchiver   The {@link JarArchiver} to add the resources to.
+     * @param javaResources The list of Java resources to add.
      */
-    protected void addJavaResources( JarArchiver jarArchiver, List< Resource > javaResources )
-    {
-        for ( Resource javaResource : javaResources )
-        {
-            addJavaResource( jarArchiver, javaResource );
+    protected void addJavaResources(JarArchiver jarArchiver, List<Resource> javaResources) {
+        for (Resource javaResource : javaResources) {
+            addJavaResource(jarArchiver, javaResource);
         }
     }
 
     /**
      * Adds a Java Resources directory (typically "src/main/resources") to a {@link JarArchiver}.
      *
-     * @param jarArchiver
-     * @param javaResource
-     *            The Java resource to add.
+     * @param jarArchiver  The {@link JarArchiver} to add the resources to.
+     * @param javaResource The Java resource to add.
      */
-    protected void addJavaResource( JarArchiver jarArchiver, Resource javaResource )
-    {
-        if ( javaResource != null )
-        {
-            final File javaResourceDirectory = new File( javaResource.getDirectory() );
-            if ( javaResourceDirectory.exists() )
-            {
+    protected void addJavaResource(JarArchiver jarArchiver, Resource javaResource) {
+        if (javaResource != null) {
+            final File javaResourceDirectory = new File(javaResource.getDirectory());
+            if (javaResourceDirectory.exists()) {
                 final DefaultFileSet javaResourceFileSet = new DefaultFileSet();
-                javaResourceFileSet.setDirectory( javaResourceDirectory );
-                javaResourceFileSet.setPrefix( endWithSlash( "src/main/resources" ) );
-                jarArchiver.addFileSet( javaResourceFileSet );
+                javaResourceFileSet.setDirectory(javaResourceDirectory);
+                javaResourceFileSet.setPrefix(endWithSlash("src/main/resources"));
+                jarArchiver.addFileSet(javaResourceFileSet);
             }
         }
     }

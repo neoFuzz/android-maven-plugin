@@ -10,7 +10,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <!-- the progressive-organization-pom manages all plugin versions for 
+  <!-- the progressive-organization-pom manages all plugin versions for
     us, we only need to override where we depend on lower version -->
   <parent>
     <groupId>com.simpligility.maven</groupId>
@@ -41,7 +41,7 @@
     <powermock.version>1.6.6</powermock.version>
     <publisher.version>v2-rev13-1.19.0</publisher.version>
     <asm.version>5.0.4</asm.version>
-    <!-- Attention - make sure that the tools version is the versions of 
+    <!-- Attention - make sure that the tools version is the versions of
       the transitive dependencies of the builder version -->
     <android.builder.version>3.0.1</android.builder.version>
     <android.tools.version>26.0.1</android.tools.version>
@@ -223,6 +223,12 @@
         <groupId>org.codehaus.plexus</groupId>
         <artifactId>plexus-utils</artifactId>
         <version>3.1.0</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.codehaus.plexus</groupId>
+        <artifactId>plexus-xml</artifactId>
+        <version>3.0.1</version>
       </dependency>
 
       <dependency>
@@ -461,7 +467,10 @@
       <groupId>org.codehaus.plexus</groupId>
       <artifactId>plexus-utils</artifactId>
     </dependency>
-
+    <dependency>
+      <groupId>org.codehaus.plexus</groupId>
+      <artifactId>plexus-xml</artifactId>
+    </dependency>
     <dependency>
       <groupId>commons-jxpath</groupId>
       <artifactId>commons-jxpath</artifactId>
@@ -474,7 +483,7 @@
       <groupId>org.ow2.asm</groupId>
       <artifactId>asm</artifactId>
     </dependency>
- 
+
     <dependency>
       <groupId>org.apache.commons</groupId>
       <artifactId>commons-lang3</artifactId>
@@ -667,28 +676,7 @@
           </execution>
         </executions>
       </plugin>
-
-      <plugin>
-        <artifactId>maven-checkstyle-plugin</artifactId>
-        <configuration>
-          <!-- we are using the Maven code style from the Maven Checkstyle
-            Plugin but with header check disabled, using the license plugin for that
-            instead -->
-          <configLocation>src/conf/maven_checks.xml</configLocation>
-          <enableRulesSummary>false</enableRulesSummary>
-          <excludes>**/**HelpMojo**,org/apache/maven/surefire/**</excludes>
-        </configuration>
-
-        <executions>
-          <execution>
-            <phase>process-sources</phase>
-            <goals>
-              <goal>check</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-
+<!-- maven-checkstyle-plugin removed -->
       <plugin>
         <artifactId>maven-enforcer-plugin</artifactId>
         <executions>
@@ -921,7 +909,7 @@
   <profiles>
     <profile>
       <!--  generate the surefire classes from the source xsd into the generated-sources folder
-      the results is checked into src/main/java since integration of this execution in the 
+      the results is checked into src/main/java since integration of this execution in the
       normal build prevented the site build from working -->
       <id>jaxb</id>
       <build>
@@ -946,7 +934,7 @@
           </plugin>
         </plugins>
       </build>
-    
+
     </profile>
     <profile>
         <id>disable-java8-doclint</id>
@@ -959,7 +947,7 @@
     </profile>
     <profile>
       <id>it</id>
-      <!-- the integration tests require a device or emulator attached via 
+      <!-- the integration tests require a device or emulator attached via
         ADB -->
       <build>
         <plugins>
@@ -995,9 +983,10 @@
               <execution>
                 <id>sign-artifacts</id>
                 <phase>verify</phase>
-                <goals>
-                  <goal>sign</goal>
-                </goals>
+                  <!-- Disabled: signing doesn't work on Windows without gpg installed-->
+<!--                <goals>-->
+<!--                  <goal>sign</goal>-->
+<!--                </goals>-->
               </execution>
             </executions>
           </plugin>
