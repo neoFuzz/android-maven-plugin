@@ -46,17 +46,19 @@ public class PwShell extends Shell {
     }
 
     /**
-     * Returns the command line as a list of strings.
+     * Builds a PowerShell string and returns the command as a list of strings.
      *
      * @param executable the executing program
      * @param arguments  the program arguments
      * @return the command line as a list of strings
      */
+    @Override
     public List<String> getCommandLine(String executable, String[] arguments) {
         StringBuilder sb = new StringBuilder();
-        sb.append("'");
-        sb.append(super.getCommandLine(executable, arguments).get(0));
-        sb.append("'");
+        sb.append("\"");
+        // Put an '&' on the front of the executable string and replace the double-quotes (") to single quotes (')
+        sb.append("&").append((super.getCommandLine(executable, arguments).get(0)).replace("\"", "'"));
+        sb.append("\"");
         return Arrays.asList(sb.toString());
     }
 
