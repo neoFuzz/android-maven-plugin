@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.GitHub.cardforge;
+package com.github.cardforge;
 
 import java.io.File;
 import java.io.IOException;
@@ -27,14 +27,14 @@ import org.junit.Before;
 import org.junit.Test;
 
 /**
- * Excercises the {@link AndroidSdk} class.
+ * Exercises the {@link AndroidSdk} class.
  *
  * @author hugo.josefson@jayway.com
  * @author Manfred Moser - manfred@simpligility.com
  */
 public class AndroidSdkTest {
     
-    private SdkTestSupport sdkTestSupport; 
+    private SdkTestSupport sdkTestSupport;
     
     @Before
     public void setUp(){
@@ -44,13 +44,15 @@ public class AndroidSdkTest {
     @Test
     public void givenToolAdbThenPathIsPlatformTools() {
         final String pathForTool =sdkTestSupport.getSdk_with_platform_default().getAdbPath();
-        Assert.assertEquals(new File(sdkTestSupport.getEnv_ANDROID_HOME() + "/platform-tools").getAbsolutePath(), new File(pathForTool).getParentFile().getAbsolutePath());
+        Assert.assertEquals(new File(sdkTestSupport.getEnv_ANDROID_HOME() +
+                "/platform-tools").getAbsolutePath(), new File(pathForTool).getParentFile().getAbsolutePath());
     }
 
     @Test
     public void givenToolAndroidThenPathIsCommon() {
         final String pathForTool = sdkTestSupport.getSdk_with_platform_default().getAndroidPath();
-        Assert.assertEquals(new File(sdkTestSupport.getEnv_ANDROID_HOME() + "/tools").getAbsolutePath(), new File(pathForTool).getParentFile().getAbsolutePath());
+        Assert.assertEquals(new File(sdkTestSupport.getEnv_ANDROID_HOME() +
+                "/tools").getAbsolutePath(), new File(pathForTool).getParentFile().getAbsolutePath());
     }
 
 
@@ -61,7 +63,8 @@ public class AndroidSdkTest {
 
     @Test
     public void givenPlatformNullThenPlatformisSomethingValidLooking() throws IllegalAccessException, URISyntaxException {
-        final File sdkPath = (File) ReflectionUtils.getValueIncludingSuperclasses("sdkPath",sdkTestSupport.getSdk_with_platform_default());
+        final File sdkPath = (File) ReflectionUtils.getValueIncludingSuperclasses(
+                "sdkPath",sdkTestSupport.getSdk_with_platform_default());
         final File platform = sdkTestSupport.getSdk_with_platform_default().getPlatform();
         final String platformPath = platform.getAbsoluteFile().toURI().toString();
         final String regex = "/platforms/android-.*";
@@ -77,7 +80,8 @@ public class AndroidSdkTest {
     @Test
     public void validPlatformsAndApiLevels19() {
         // Remember to add further platforms to .travis.yml if you add more platforms here, otherwise ci build fails
-        final AndroidSdk sdk19 = new AndroidSdk(new File(sdkTestSupport.getEnv_ANDROID_HOME()), "19"); 
+        final AndroidSdk sdk19 = new AndroidSdk(new File(sdkTestSupport.getEnv_ANDROID_HOME()), "19");
+        Assert.assertTrue( sdk19.getAaptPath() != null && !sdk19.getAaptPath().equals( "" ) );
     }
 
     @Test
@@ -106,6 +110,13 @@ public class AndroidSdkTest {
         // Remember to add further platforms to .travis.yml if you add more platforms here, otherwise ci build fails
         final AndroidSdk sdk23 = new AndroidSdk( new File( sdkTestSupport.getEnv_ANDROID_HOME() ), "28" );
         Assert.assertTrue( sdk23.getAaptPath() != null && !sdk23.getAaptPath().equals( "" ) );
+    }
+
+    @Test
+    public void validPlatformsAndApiLevels35() {
+        // Remember to add further platforms to .travis.yml if you add more platforms here, otherwise ci build fails
+        final AndroidSdk sdk35 = new AndroidSdk( new File( sdkTestSupport.getEnv_ANDROID_HOME() ), "35" );
+        Assert.assertTrue( sdk35.getAaptPath() != null && !sdk35.getAaptPath().equals( "" ) );
     }
 
     @Test(expected = InvalidSdkException.class)
@@ -137,6 +148,13 @@ public class AndroidSdkTest {
     public void validPlatformsAndApiLevelsWithDiffBuildTools3() {
         // Remember to add further platforms to .travis.yml if you add more platforms here, otherwise ci build fails
         final AndroidSdk sdk = new AndroidSdk( new File( sdkTestSupport.getEnv_ANDROID_HOME() ), "28", "30.0.2" );
+        Assert.assertTrue( sdk.getAaptPath() != null && !sdk.getAaptPath().equals( "" ) );
+    }
+
+    @Test
+    public void validPlatformsAndApiLevelsWithDiffBuildTools4() {
+        // Remember to add further platforms to .travis.yml if you add more platforms here, otherwise ci build fails
+        final AndroidSdk sdk = new AndroidSdk( new File( sdkTestSupport.getEnv_ANDROID_HOME() ), "35", "35.0.0" );
         Assert.assertTrue( sdk.getAaptPath() != null && !sdk.getAaptPath().equals( "" ) );
     }
 

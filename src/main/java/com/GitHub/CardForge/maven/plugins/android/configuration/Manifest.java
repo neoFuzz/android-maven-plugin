@@ -41,19 +41,19 @@ public class Manifest
     protected Boolean versionCodeUpdateFromVersion;
 
     /**
-     * Mirror of {@link com.GitHub.cardforge.standalonemojos
+     * Mirror of {@link com.github.cardforge.standalonemojos
      * .ManifestUpdateMojo#manifestApplicationIcon}.
      */
     protected String applicationIcon;
 
     /**
-     * Mirror of {@link com.GitHub.cardforge.standalonemojos
+     * Mirror of {@link com.github.cardforge.standalonemojos
      * .ManifestUpdateMojo#manifestApplicationLabel}.
      */
     protected String applicationLabel;    
     
     /**
-     * Mirror of {@link com.GitHub.cardforge.standalonemojos
+     * Mirror of {@link com.github.cardforge.standalonemojos
      * .ManifestUpdateMojo#manifestApplicationTheme}.
      */
     protected String applicationTheme;    

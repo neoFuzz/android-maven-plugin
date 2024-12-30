@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.GitHub.cardforge.standalonemojos;
+package com.github.cardforge.standalonemojos;
 
 import java.io.File;
 import java.io.IOException;
@@ -50,7 +50,7 @@ import com.android.ddmlib.TimeoutException;
 import com.android.ddmlib.log.LogReceiver;
 import com.android.ddmlib.testrunner.RemoteAndroidTestRunner;
 import com.github.cardforge.maven.plugins.android.AbstractAndroidMojo;
-import com.GitHub.cardforge.AbstractAndroidMojoTestCase;
+import com.github.cardforge.AbstractAndroidMojoTestCase;
 import com.github.cardforge.maven.plugins.android.DeviceCallback;
 import com.github.cardforge.maven.plugins.android.phase12integrationtest.InternalIntegrationTestMojo;
 

@@ -1,4 +1,4 @@
-package com.GitHub.cardforge.phase01generatesources;
+package com.github.cardforge.phase01generatesources;
 
 import com.github.cardforge.maven.plugins.android.AbstractAndroidMojo;
 

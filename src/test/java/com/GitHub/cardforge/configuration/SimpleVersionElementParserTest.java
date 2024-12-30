@@ -1,4 +1,4 @@
-package com.GitHub.cardforge.configuration;
+package com.github.cardforge.configuration;
 
 import static org.junit.Assert.assertArrayEquals;
 

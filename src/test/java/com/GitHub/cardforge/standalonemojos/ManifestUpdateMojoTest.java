@@ -1,4 +1,4 @@
-package com.GitHub.cardforge.standalonemojos;
+package com.github.cardforge.standalonemojos;
 
 import java.io.File;
 import java.io.IOException;
@@ -10,7 +10,7 @@ import org.apache.maven.plugin.MojoFailureException;
 import org.junit.Assert;
 import org.junit.Ignore;
 
-import com.GitHub.cardforge.AbstractAndroidMojoTestCase;
+import com.github.cardforge.AbstractAndroidMojoTestCase;
 
 @Ignore("This test has to be migrated to be an IntegrationTest using AbstractAndroidMojoIntegrationTest") 
 public class ManifestUpdateMojoTest extends AbstractAndroidMojoTestCase<ManifestUpdateMojo> {

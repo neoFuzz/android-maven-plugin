@@ -17,7 +17,7 @@
  * Contributors : 
  * JBoss, Home of Professional Open Source
  */
-package com.GitHub.cardforge.sample;
+package com.github.cardforge.sample;
 
 import io.takari.maven.testing.TestResources;
 import io.takari.maven.testing.executor.MavenExecutionResult;

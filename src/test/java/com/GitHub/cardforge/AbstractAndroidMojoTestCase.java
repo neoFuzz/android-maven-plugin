@@ -1,4 +1,4 @@
-package com.GitHub.cardforge;
+package com.github.cardforge;
 
 import static org.easymock.EasyMock.*;
 
@@ -26,7 +26,7 @@ import org.junit.Assert;
 import org.powermock.reflect.Whitebox;
 
 import com.github.cardforge.maven.plugins.android.standalonemojos.ManifestUpdateMojo;
-import com.GitHub.cardforge.standalonemojos.MojoProjectStub;
+import com.github.cardforge.standalonemojos.MojoProjectStub;
 
 public abstract class AbstractAndroidMojoTestCase<T extends AbstractAndroidMojo> extends AbstractMojoTestCase {
 

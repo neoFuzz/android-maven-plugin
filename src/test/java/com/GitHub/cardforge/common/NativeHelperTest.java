@@ -1,4 +1,4 @@
-package com.GitHub.cardforge.common;
+package com.github.cardforge.common;
 
 import com.github.cardforge.maven.plugins.android.AndroidNdk;
 

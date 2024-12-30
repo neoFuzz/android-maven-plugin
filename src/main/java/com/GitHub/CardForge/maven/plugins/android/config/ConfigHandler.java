@@ -13,7 +13,7 @@ import java.util.Collection;
 
 /**
  * ConfigHandler is able to parse the configuration of a Mojo based on the Maven injected parameters as well as a config
- * pojo and annontations for default values on properties named parsed*. See the ProguardMojo for a working
+ * pojo and annotations for default values on properties named parsed*. See the ProguardMojo for a working
  * implementation.
  * 
  * @author Adrian Stabiszewski https://github.com/grundid/

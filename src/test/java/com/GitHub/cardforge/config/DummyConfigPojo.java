@@ -1,4 +1,4 @@
-package com.GitHub.cardforge.config;
+package com.github.cardforge.config;
 
 public class DummyConfigPojo {
 

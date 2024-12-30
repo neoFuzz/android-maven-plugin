@@ -1,4 +1,4 @@
-package com.GitHub.cardforge;
+package com.github.cardforge;
 
 import com.github.cardforge.maven.plugins.android.InstrumentationArgumentParser;
 import com.google.common.collect.Lists;

@@ -1,4 +1,4 @@
-package com.GitHub.cardforge;
+package com.github.cardforge;
 
 import java.util.Collection;
 import java.util.LinkedHashSet;

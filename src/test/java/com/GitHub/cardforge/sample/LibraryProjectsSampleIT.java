@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.GitHub.cardforge.sample;
+package com.github.cardforge.sample;
 
 import io.takari.maven.testing.TestResources;
 import io.takari.maven.testing.executor.MavenExecutionResult;

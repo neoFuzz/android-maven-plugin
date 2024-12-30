@@ -1,7 +1,7 @@
-package com.GitHub.cardforge.standalonemojos;
+package com.github.cardforge.standalonemojos;
 
 import com.github.cardforge.maven.plugins.android.standalonemojos.ZipalignMojo;
-import com.GitHub.cardforge.AbstractAndroidMojoTestCase;
+import com.github.cardforge.AbstractAndroidMojoTestCase;
 import com.github.cardforge.maven.plugins.android.CommandExecutor;
 import com.github.cardforge.maven.plugins.android.common.AndroidExtension;
 import com.github.cardforge.maven.plugins.android.config.ConfigHandler;

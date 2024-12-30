@@ -1,4 +1,4 @@
-package com.GitHub.cardforge;
+package com.github.cardforge;
 
 import static org.easymock.EasyMock.anyObject;
 import static org.easymock.EasyMock.expect;

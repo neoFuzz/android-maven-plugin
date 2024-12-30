@@ -1,4 +1,4 @@
-package com.GitHub.cardforge.maven.plugins.android;
+package com.github.cardforge.maven.plugins.android;
 
 import com.github.cardforge.maven.plugins.android.AndroidTestRunListener;
 import com.android.ddmlib.IDevice;

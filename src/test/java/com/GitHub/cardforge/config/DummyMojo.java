@@ -1,4 +1,4 @@
-package com.GitHub.cardforge.config;
+package com.github.cardforge.config;
 
 import com.github.cardforge.maven.plugins.android.config.ConfigPojo;
 import com.github.cardforge.maven.plugins.android.config.PullParameter;

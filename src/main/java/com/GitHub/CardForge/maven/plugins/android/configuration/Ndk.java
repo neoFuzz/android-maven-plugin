@@ -28,7 +28,7 @@ public class Ndk
      * Directory of the installed Android NDK, for example
      * <code>/usr/local/android-ndk-r4</code>
      * 
-     * @see com.simpligility.maven.plugins.android.phase05compile.NdkBuildMojo#ndkPath
+     * @see com.github.cardforge.maven.plugins.android.phase05compile.NdkBuildMojo#ndkPath
      */
     private File path;
 

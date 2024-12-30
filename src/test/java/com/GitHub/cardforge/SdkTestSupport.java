@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.GitHub.cardforge;
+package com.github.cardforge;
 
 import com.github.cardforge.maven.plugins.android.AndroidSdk;
 import org.junit.Assert;
@@ -40,5 +40,32 @@ public class SdkTestSupport {
 
     public AndroidSdk getSdk_with_platform_default() {
         return sdk_with_platform_default;
+    }
+
+    /**
+     * Dynamically locate Maven home directory using environment variables.
+     */
+    public static File findMavenHome() {
+        // First, check if M2_HOME environment variable is set
+        String m2Home = System.getenv("M2_HOME");
+        if (m2Home != null && !m2Home.isEmpty()) {
+            return new File(m2Home);
+        }
+
+        // Second, try to locate Maven using the PATH environment variable
+        String pathEnv = System.getenv("PATH");
+        if (pathEnv != null) {
+            String[] paths = pathEnv.split(File.pathSeparator);
+            for (String path : paths) {
+                File mavenBinary = new File(path, "mvn");
+                if (mavenBinary.exists() && mavenBinary.canExecute()) {
+                    // Assume Maven home is one level up from the binary's directory
+                    return mavenBinary.getParentFile().getParentFile();
+                }
+            }
+        }
+
+        // Throw exception if Maven cannot be found
+        throw new IllegalStateException("Maven home could not be determined dynamically");
     }
 }

@@ -1,4 +1,4 @@
-package com.GitHub.cardforge;
+package com.github.cardforge;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -12,7 +12,7 @@ public class PluginInfoTest {
   @Test
   public void confirmGroupId()
   {
-    assertEquals( "com.simpligility.maven.plugins", PluginInfo.getGroupId() );
+    assertEquals( "com.github.cardforge.maven.plugins", PluginInfo.getGroupId() );
   }
 
   @Test

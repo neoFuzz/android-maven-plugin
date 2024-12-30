@@ -1,4 +1,4 @@
-package com.GitHub.cardforge.phase09package;
+package com.github.cardforge.phase09package;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,7 +13,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
-import com.GitHub.cardforge.AbstractAndroidMojoTestCase;
+import com.github.cardforge.AbstractAndroidMojoTestCase;
 import com.github.cardforge.maven.plugins.android.config.ConfigHandler;
 
 @Ignore("This test has to be migrated to be an IntegrationTest using AbstractAndroidMojoIntegrationTest") 

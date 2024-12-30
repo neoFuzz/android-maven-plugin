@@ -1,5 +1,5 @@
 
-package com.GitHub.cardforge.configuration;
+package com.github.cardforge.configuration;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;

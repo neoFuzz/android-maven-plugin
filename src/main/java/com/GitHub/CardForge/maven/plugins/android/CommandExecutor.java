@@ -194,17 +194,14 @@ public interface CommandExecutor {
             public void executeCommand(String executable, List<String> commands, File workingDirectory,
                                        boolean failsOnErrorOutput) throws ExecutionException {
                 if (commands == null) {
-                    commands = new ArrayList<String>();
+                    commands = new ArrayList<>();
                 }
                 stdOut = new StreamConsumerImpl(logger, captureStdOut);
                 stdErr = new ErrorStreamConsumer(logger, errorListener, captureStdErr);
                 commandline = new Commandline();
 
                 // Upgrade CmdShell to PwShell (PowerShell)
-                if (commandline.getShell() instanceof CmdShell) {
-                    logger.info("ANDROID-040-000: Upgrading to PowerShell");
-                    commandline.setShell(new PwShell());
-                }
+                usePowerShellIfAvailable();
 
                 if (customShell != null) {
                     commandline.setShell(customShell);
@@ -242,6 +239,34 @@ public interface CommandExecutor {
                             + commandline.toString() + ", Error message = " + e.getMessage());
                 }
                 setPid(commandline.getPid());
+            }
+
+            /**
+             * Check if the OS is Windows and if so, upgrade the shell to use PowerShell.
+             * This can avoid the {@code command too long} error.
+             */
+            private void usePowerShellIfAvailable() {
+                String osName = System.getProperty("os.name").toLowerCase();
+                String osVersion = System.getProperty("os.version");
+
+                if (osName.contains("windows")) {
+                    // Parse the version for Windows 10 or greater
+                    try {
+                        String[] versionParts = osVersion.split("\\.");
+                        int majorVersion = Integer.parseInt(versionParts[0]);
+                        int minorVersion = versionParts.length > 1 ? Integer.parseInt(versionParts[1]) : 0;
+
+                        // When on Windows 10+, upgrade CmdShell to PwShell (PowerShell)
+                        if ((majorVersion > 10 || (majorVersion == 10 && minorVersion >= 0)) &&
+                                commandline.getShell() instanceof CmdShell) {
+                            logger.info("ANDROID-040-000: Upgrading to PowerShell");
+                            commandline.setShell(new PwShell());
+                        }
+
+                    } catch (NumberFormatException e) {
+                        logger.warn("Failed to parse OS version: " + osVersion, e);
+                    }
+                }
             }
 
             @Override

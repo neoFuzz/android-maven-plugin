@@ -1,4 +1,4 @@
-package com.GitHub.cardforge.phase09package;
+package com.github.cardforge.phase09package;
 
 import io.takari.maven.testing.TestResources;
 import io.takari.maven.testing.executor.MavenExecutionResult;

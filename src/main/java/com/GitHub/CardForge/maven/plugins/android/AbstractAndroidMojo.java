@@ -128,18 +128,18 @@ public abstract class AbstractAndroidMojo extends AbstractMojo
     /**
      * The maven project.
      */
-    @Component
+    @Parameter( defaultValue = "${project}", readonly = true )
     protected MavenProject project;
 
     /**
      * The maven session.
      */
-    @Component
+    @Parameter( defaultValue = "${session}", readonly = true )
     protected MavenSession session;
 
     /**
      */
-    @Component
+    @Parameter( defaultValue = "${mojoExecution}", readonly = true )
     protected MojoExecution execution;
 
     /**

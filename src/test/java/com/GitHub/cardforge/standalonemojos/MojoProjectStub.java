@@ -1,4 +1,4 @@
-package com.GitHub.cardforge.standalonemojos;
+package com.github.cardforge.standalonemojos;
 
 import java.io.File;
 import java.io.FileReader;

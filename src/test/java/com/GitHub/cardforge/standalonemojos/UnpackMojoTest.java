@@ -1,5 +1,5 @@
 
-package com.GitHub.cardforge.standalonemojos;
+package com.github.cardforge.standalonemojos;
 
 import com.github.cardforge.maven.plugins.android.standalonemojos.UnpackMojo;
 import org.junit.After;
@@ -13,7 +13,7 @@ import org.junit.runners.MethodSorters;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
-import com.GitHub.cardforge.AbstractAndroidMojoTestCase;
+import com.github.cardforge.AbstractAndroidMojoTestCase;
 import com.github.cardforge.maven.plugins.android.config.ConfigHandler;
 import com.github.cardforge.maven.plugins.android.configuration.MetaInf;
 

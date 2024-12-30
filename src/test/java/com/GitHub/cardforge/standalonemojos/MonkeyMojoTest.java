@@ -1,4 +1,4 @@
-package com.GitHub.cardforge.standalonemojos;
+package com.github.cardforge.standalonemojos;
 
 import java.io.File;
 import java.util.Arrays;
@@ -14,7 +14,7 @@ import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.powermock.reflect.Whitebox;
 
-import com.GitHub.cardforge.AbstractAndroidMojoTestCase;
+import com.github.cardforge.AbstractAndroidMojoTestCase;
 import com.github.cardforge.maven.plugins.android.CommandExecutor;
 import com.github.cardforge.maven.plugins.android.config.ConfigHandler;
 

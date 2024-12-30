@@ -68,7 +68,7 @@
         </executions>
       </plugin>
       <plugin>
-        <groupId>com.simpligility.maven.plugins</groupId>
+        <groupId>com.github.cardforge.maven.plugins</groupId>
 
         <artifactId>android-maven-plugin</artifactId>
         <extensions>true</extensions>
@@ -148,7 +148,7 @@
 					<!-- the signed apk then needs to be zipaligned and we activate proguard 
 						and we run the manifest update -->
           <plugin>
-            <groupId>com.simpligility.maven.plugins</groupId>
+            <groupId>com.github.cardforge.maven.plugins</groupId>
 
             <artifactId>android-maven-plugin</artifactId>
             <inherited>true</inherited>
