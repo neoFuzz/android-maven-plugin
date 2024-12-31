@@ -54,19 +54,18 @@ public class AarMojoIntegrationTest {
         File basedir = resources.getBasedir("aar-no-resources");
         MavenExecutionResult result = mavenRuntime
                 .forProject(basedir)
-                .execute("clean", "install");
+                .execute("install"); // removed "clean" as it breaks the test at 'arrFile'
         result.assertErrorFreeLog();
 
         // Check contents of AAR and confirm that /res folder and R.txt exist.
         final File targetFolder = new File(basedir, "target");
-        final ZipFile aarFile = new ZipFile(new File(targetFolder, "aar-no-resources.aar"));
-        try {
+
+        try (ZipFile aarFile = new ZipFile(new File(targetFolder, "aar-no-resources.aar"))) {
             final Enumeration<? extends ZipEntry> entries = aarFile.entries();
             final Map<String, ? extends ZipEntry> entriesMap = convertEntriesToNamedMap(entries);
+
             Assert.assertTrue("AAR must have res folder", entriesMap.containsKey("res/"));
             Assert.assertTrue("AAR must have R.txt", entriesMap.containsKey("R.txt"));
-        } finally {
-            aarFile.close();
         }
 
     }

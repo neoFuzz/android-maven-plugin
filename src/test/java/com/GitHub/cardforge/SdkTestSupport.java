@@ -24,22 +24,22 @@ import java.io.File;
  * @author hugo.josefson@jayway.com
  */
 public class SdkTestSupport {
-    private final String env_ANDROID_HOME = System.getenv("ANDROID_HOME");
+    private final String envAndroidHome = System.getenv("ANDROID_HOME");
 
-    private final AndroidSdk sdk_with_platform_default;
+    private final AndroidSdk sdkWithPlatformDefault;
 
     public SdkTestSupport() {
-        Assert.assertNotNull("For running the tests, you must have environment variable ANDROID_HOME set to a valid Android SDK 25 directory.", env_ANDROID_HOME);
+        Assert.assertNotNull("For running the tests, you must have environment variable ANDROID_HOME set to a valid Android SDK 25 directory.", envAndroidHome);
 
-        sdk_with_platform_default = new AndroidSdk(new File(env_ANDROID_HOME), "25", "30.0.2" );
+        sdkWithPlatformDefault = new AndroidSdk(new File(envAndroidHome), "25", "30" );
     }
 
-    public String getEnv_ANDROID_HOME() {
-        return env_ANDROID_HOME;
+    public String getenvAndroidHome() {
+        return envAndroidHome;
     }
 
-    public AndroidSdk getSdk_with_platform_default() {
-        return sdk_with_platform_default;
+    public AndroidSdk getSdkWithPlatformDefault() {
+        return sdkWithPlatformDefault;
     }
 
     /**

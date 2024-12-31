@@ -18,6 +18,7 @@ package com.github.cardforge.maven.plugins.android;
 import com.android.SdkConstants;
 import com.android.annotations.Nullable;
 import com.android.repository.Revision;
+import com.android.repository.api.LocalPackage;
 import com.android.sdklib.AndroidTargetHash;
 import com.android.sdklib.AndroidVersion;
 import com.android.sdklib.BuildToolInfo;
@@ -30,17 +31,18 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Properties;
+import java.util.function.Predicate;
 
 /**
  * Represents an Android SDK.
- * 
+ *
  * @author hugo.josefson@jayway.com
  * @author Manfred Moser - manfred@simpligility.com
  */
 public class AndroidSdk
 {
     /**
-     * the default API level for the SDK used as a fall back if none is supplied, 
+     * the default API level for the SDK used as a fall back if none is supplied,
      * should ideally point to the latest available version
      */
     private static final String DEFAULT_ANDROID_API_LEVEL = "26";
@@ -64,6 +66,7 @@ public class AndroidSdk
             + "configuration parameter <sdk><path>...</path></sdk> in the plugin <configuration/>. As an alternative,"
             + " you may add the parameter to commandline: -Dandroid.sdk.path=... or set environment variable "
             + AbstractAndroidMojo.ENV_ANDROID_HOME + ".";
+    public static final String CANNOT_FIND_S = "Cannot find ";
 
     private final File sdkPath;
     private File platformToolsPath;
@@ -72,8 +75,8 @@ public class AndroidSdk
     private final IAndroidTarget androidTarget;
     private AndroidSdkHandler sdkManager;
     private int sdkMajorVersion;
-    private String buildToolsVersion;
-    private ProgressIndicatorImpl progressIndicator;
+    private final String buildToolsVersion;
+    private final ProgressIndicatorImpl progressIndicator;
 
     public AndroidSdk( File sdkPath, String apiLevel )
     {
@@ -98,7 +101,7 @@ public class AndroidSdk
             }
         }
 
-        /**
+        /*
          *  Note: The Android SDK Command-Line Tools package, located in cmdline-tools, replaces the SDK Tools package,
          *  located in tools. With the new package, you can select the version of the command line tools you want to
          *  install, and you can install multiple versions at a time. With the old package, you can only install the
@@ -132,7 +135,7 @@ public class AndroidSdk
     private IAndroidTarget findPlatformByApiLevel( String apiLevel )
     {
         // try find by api level first
-        AndroidVersion version = null;
+        AndroidVersion version;
         try
         {
             version = new AndroidVersion( apiLevel );
@@ -147,9 +150,9 @@ public class AndroidSdk
                 return target;
             }
         }
-        catch ( AndroidVersion.AndroidVersionException ignore )
+        catch ( AndroidVersion.AndroidVersionException e )
         {
-            throw new InvalidSdkException( "Error AndroidVersion: " + ignore.getMessage() );
+            throw new InvalidSdkException( "Error AndroidVersion: " + e.getMessage() );
         }
 
         // fallback to searching for platform on standard Android platforms (isPlatform() is true)
@@ -221,13 +224,13 @@ public class AndroidSdk
     {
         File directory = new File( getToolsPath(), "proguard" + File.separator + "lib" + File.separator );
         File proguardJar = new File( directory, "proguard.jar" );
-        if ( proguardJar.exists() ) 
+        if ( proguardJar.exists() )
         {
             return proguardJar.getAbsolutePath();
         }
-        throw new InvalidSdkException( "Cannot find " + proguardJar );
+        throw new InvalidSdkException( CANNOT_FIND_S + proguardJar );
     }
-    
+
     /**
      * Get the path for shrinkedAndroid.jar
      * @return the path to the shrinkedAndroid.jar
@@ -235,13 +238,13 @@ public class AndroidSdk
     public String getShrinkedAndroidJarPath()
     {
         File shrinkedAndroidJar = new File( getBuildToolsLibDirectoryPath(), "shrinkedAndroid.jar" );
-        if ( shrinkedAndroidJar.exists() ) 
+        if ( shrinkedAndroidJar.exists() )
         {
             return shrinkedAndroidJar.getAbsolutePath();
         }
-        throw new InvalidSdkException( "Cannot find " + shrinkedAndroidJar );
+        throw new InvalidSdkException( CANNOT_FIND_S + shrinkedAndroidJar );
     }
-    
+
     /**
      * Get the path for build-tools lib directory
      * @return the path to the build-tools lib directory
@@ -249,13 +252,13 @@ public class AndroidSdk
     public String getBuildToolsLibDirectoryPath()
     {
         File buildToolsLib = new File( getBuildToolInfo().getLocation(), "lib" );
-        if ( buildToolsLib.exists() ) 
+        if ( buildToolsLib.exists() )
         {
             return buildToolsLib.getAbsolutePath();
         }
-        throw new InvalidSdkException( "Cannot find " + buildToolsLib );
+        throw new InvalidSdkException( CANNOT_FIND_S + buildToolsLib );
     }
-    
+
     /**
      * Get the path for mainDexClasses.rules
      * @return the path to the mainDexClasses.rules
@@ -264,24 +267,24 @@ public class AndroidSdk
     {
         File mainDexClassesRules = new File( getBuildToolInfo().getLocation(),
                 "mainDexClasses.rules" );
-        if ( mainDexClassesRules.exists() ) 
+        if ( mainDexClassesRules.exists() )
         {
             return mainDexClassesRules.getAbsolutePath();
         }
-        throw new InvalidSdkException( "Cannot find " + mainDexClassesRules );
+        throw new InvalidSdkException( CANNOT_FIND_S + mainDexClassesRules );
     }
 
-    public void assertThatBuildToolsVersionIsAtLeast( String version, String feature ) 
-            throws InvalidSdkException, NumberFormatException 
+    public void assertThatBuildToolsVersionIsAtLeast( String version, String feature )
+            throws InvalidSdkException, NumberFormatException
     {
         if ( getBuildToolInfo().getRevision().
                 compareTo( Revision.parseRevision( version ) ) < 0 )
         {
-            throw new InvalidSdkException( "Version of build tools must be at least " 
+            throw new InvalidSdkException( "Version of build tools must be at least "
                     + version + " for " + feature + " to work" );
         }
     }
-    
+
     /**
      * Get the android debug tool path (adb).
      *
@@ -304,7 +307,7 @@ public class AndroidSdk
 
     /**
      * Get the android lint path.
-     * 
+     *
      * @return the path to the lint tool
      */
     public String getLintPath()
@@ -314,7 +317,7 @@ public class AndroidSdk
 
     /**
      * Get the android monkey runner path.
-     * 
+     *
      * @return the path to the monkeyrunner tool
      */
     public String getMonkeyRunnerPath()
@@ -358,7 +361,7 @@ public class AndroidSdk
     {
         return getBuildToolInfo().getPath( pathId );
     }
-    
+
     private BuildToolInfo getBuildToolInfo()
     {
         //First we use the build tools specified in the pom file
@@ -369,6 +372,15 @@ public class AndroidSdk
             if ( buildToolInfo != null )
             {
                 return buildToolInfo;
+            } else {
+                //If the build tools specified by the user is not installed, we try to find the latest
+                //installed revision of the build tools
+                BuildToolInfo latestBuildToolInfo = BuildToolInfo.fromLocalPackage(
+                        getLatestBuildToolForMajorVersion(Integer.parseInt(buildToolsVersion)));
+                if ( latestBuildToolInfo != null )
+                {
+                    return latestBuildToolInfo;
+                }
             }
             //Since we cannot find the build tool specified by the user we make it fail
             // instead of using the latest build tool version
@@ -379,7 +391,7 @@ public class AndroidSdk
         if ( androidTarget != null )
         {
             BuildToolInfo buildToolInfo = androidTarget.getBuildToolInfo();
-            if ( buildToolInfo != null ) 
+            if ( buildToolInfo != null )
             {
                 return buildToolInfo;
             }
@@ -388,9 +400,9 @@ public class AndroidSdk
         BuildToolInfo latestBuildToolInfo = sdkManager.getLatestBuildTool( progressIndicator, true );
         if ( latestBuildToolInfo == null )
         {
-            throw new InvalidSdkException( "Invalid SDK: Build-tools not found. Check the content of '" 
-                + sdkPath.getAbsolutePath() + File.separator + "build-tools', or run '" 
-                + sdkPath.getAbsolutePath() + File.separator + "tools" + File.separator 
+            throw new InvalidSdkException( "Invalid SDK: Build-tools not found. Check the content of '"
+                + sdkPath.getAbsolutePath() + File.separator + "build-tools', or run '"
+                + sdkPath.getAbsolutePath() + File.separator + "tools" + File.separator
                 + "android sdk' to install them" );
         }
         return latestBuildToolInfo;
@@ -418,9 +430,27 @@ public class AndroidSdk
         }
     }
 
+    public LocalPackage getLatestBuildToolForMajorVersion(int majorVersion) {
+        // Define the prefix for build tools
+        String prefix = "build-tools";
+
+        // Define the predicate to match the major version
+        Predicate<Revision> majorVersionFilter = revision -> revision.getMajor() == majorVersion;
+
+        // Fetch the latest local package that matches the prefix and major version
+        LocalPackage latestPackage = sdkManager.getLatestLocalPackageForPrefix(
+                prefix, majorVersionFilter, false, progressIndicator);
+
+        if (latestPackage == null) {
+            throw new IllegalArgumentException("No build-tools found for major version: " + majorVersion);
+        }
+
+        return latestPackage;
+    }
+
     /**
      * Returns the complete path for <code>framework.aidl</code>, based on this SDK.
-     * 
+     *
      * @return the complete path as a <code>String</code>, including the filename.
      */
     public String getPathForFrameworkAidl()
@@ -430,7 +460,7 @@ public class AndroidSdk
 
     /**
      * Resolves the android.jar from this SDK.
-     * 
+     *
      * @return a <code>File</code> pointing to the android.jar file.
      * @throws org.apache.maven.plugin.MojoExecutionException
      *             if the file can not be resolved.
@@ -444,10 +474,10 @@ public class AndroidSdk
         }
         return new File ( androidJarPath );
     }
-  
+
     /**
      * Resolves the path for this SDK.
-     * 
+     *
      * @return a <code>File</code> pointing to the SDk Directory.
      * @throws org.apache.maven.plugin.MojoExecutionException
      *             if the file can not be resolved.
@@ -479,14 +509,12 @@ public class AndroidSdk
             AndroidTargetManager targetManager = sdkManager.getAndroidTargetManager( progressIndicator );
             for ( IAndroidTarget target: targetManager.getTargets( progressIndicator ) )
             {
-                if ( target.isPlatform() )
-                {
-                    if ( latestTarget == null
-                            || target.getVersion().getApiLevel() > latestTarget.getVersion().getApiLevel() )
+                if ( target.isPlatform() && (latestTarget == null
+                            || target.getVersion().getApiLevel() > latestTarget.getVersion().getApiLevel()) )
                     {
                         latestTarget = target;
                     }
-                }
+
             }
             platformDirectory = new File ( latestTarget.getLocation() );
         }
@@ -505,13 +533,11 @@ public class AndroidSdk
     {
         File propFile = new File( sdkPath, "tools/" + SOURCE_PROPERTIES_FILENAME );
         Properties properties = new Properties();
-        try
-        {
-            properties.load( new FileInputStream( propFile ) );
-        }
-        catch ( IOException e )
-        {
-            throw new InvalidSdkException( "Error reading " + propFile.getAbsoluteFile() );
+
+        try (FileInputStream fis = new FileInputStream(propFile)) {
+            properties.load(fis);
+        } catch (IOException ignored) {
+            throw new InvalidSdkException("Error reading " + propFile.getAbsoluteFile());
         }
 
         if ( properties.containsKey( SDK_TOOLS_REVISION_PROPERTY ) )
@@ -542,8 +568,8 @@ public class AndroidSdk
 
     /**
      * Returns the version of the SDK Tools.
-     * 
-     * @return
+     *
+     * @return the version of the SDK Tools as an <code>int</code>.
      */
     public int getSdkMajorVersion()
     {

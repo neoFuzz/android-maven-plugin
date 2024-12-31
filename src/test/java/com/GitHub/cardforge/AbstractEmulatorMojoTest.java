@@ -15,9 +15,7 @@ import java.util.List;
 import com.github.cardforge.maven.plugins.android.AbstractEmulatorMojo;
 import com.github.cardforge.maven.plugins.android.AndroidSdk;
 import com.github.cardforge.maven.plugins.android.CommandExecutor;
-import com.github.cardforge.maven.plugins.android.ExecutionException;
 import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugin.MojoFailureException;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -61,8 +59,7 @@ public class AbstractEmulatorMojoTest
     }
 
     @Test
-    public void testStartAndroidEmulatorWithTimeoutToConnect() throws MojoExecutionException, ExecutionException
-    {
+    public void testStartAndroidEmulatorWithTimeoutToConnect() {
         boolean onlineAtSecondTry = false;
         int extraBootStatusPollCycles = -1;//ignored
         abstractEmulatorMojo.setWait( DEFAULT_TIMEOUT );
@@ -83,8 +80,7 @@ public class AbstractEmulatorMojoTest
     }
 
     @Test
-    public void testStartAndroidEmulatorAlreadyBooted() throws MojoExecutionException, ExecutionException
-    {
+    public void testStartAndroidEmulatorAlreadyBooted() throws MojoExecutionException {
         boolean onlineAtSecondTry = true;
         int extraBootStatusPollCycles = 0;
         abstractEmulatorMojo.setWait( DEFAULT_TIMEOUT );
@@ -98,8 +94,7 @@ public class AbstractEmulatorMojoTest
     }
 
     @Test
-    public void testStartAndroidEmulatorWithOngoingBoot() throws MojoExecutionException, ExecutionException
-    {
+    public void testStartAndroidEmulatorWithOngoingBoot() throws MojoExecutionException {
         boolean onlineAtSecondTry = true;
         int extraBootStatusPollCycles = 1;
         abstractEmulatorMojo.setWait( extraBootStatusPollCycles * 5000 + 500 );
@@ -113,8 +108,7 @@ public class AbstractEmulatorMojoTest
     }
 
     @Test
-    public void testStartAndroidEmulatorWithBootTimeout() throws MojoExecutionException, ExecutionException
-    {
+    public void testStartAndroidEmulatorWithBootTimeout() {
         boolean onlineAtSecondTry = true;
         int extraBootStatusPollCycles = -1;
         abstractEmulatorMojo.setWait( DEFAULT_TIMEOUT );
@@ -211,19 +205,7 @@ public class AbstractEmulatorMojoTest
                             .andReturn( "stopped" ).once(); //to be cached
                 }
             }
-            catch ( TimeoutException e)
-            {
-                throw new RuntimeException( "Unexpected checked exception during mock setup", e );
-            }
-            catch ( AdbCommandRejectedException e)
-            {
-                throw new RuntimeException( "Unexpected checked exception during mock setup", e );
-            }
-            catch ( ShellCommandUnresponsiveException e)
-            {
-                throw new RuntimeException( "Unexpected checked exception during mock setup", e );
-            }
-            catch ( IOException e )
+            catch ( TimeoutException | AdbCommandRejectedException | ShellCommandUnresponsiveException | IOException e)
             {
                 throw new RuntimeException( "Unexpected checked exception during mock setup", e );
             }
@@ -262,17 +244,16 @@ public class AbstractEmulatorMojoTest
         @Override
         public AndroidSdk getAndroidSdk()
         {
-            return new SdkTestSupport().getSdk_with_platform_default();
+            return new SdkTestSupport().getSdkWithPlatformDefault();
         }
 
         @Override
-        public void execute() throws MojoExecutionException, MojoFailureException
-        {
+        public void execute() {
+            // empty by design
         }
 
         @Override
-        public AndroidDebugBridge initAndroidDebugBridge() throws MojoExecutionException
-        {
+        public AndroidDebugBridge initAndroidDebugBridge() {
             return mockAndroidDebugBridge;
         }
 

@@ -20,7 +20,6 @@ import com.github.cardforge.maven.plugins.android.AbstractAndroidMojo;
 import com.github.cardforge.maven.plugins.android.AndroidSdk;
 import org.apache.commons.io.IOUtils;
 import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugin.MojoFailureException;
 import org.fest.reflect.core.Reflection;
 import org.junit.Assert;
 import org.junit.Before;
@@ -29,7 +28,6 @@ import org.junit.Test;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -54,7 +52,7 @@ public class AbstractAndroidMojoTest {
         Reflection.field("sdkPlatform").ofType(String.class).in(androidMojo).set("19");
         AndroidSdk sdk = androidMojo.getAndroidSdk();
         File path = Reflection.field("sdkPath").ofType(File.class).in(sdk).get();
-        Assert.assertEquals(new File(testSupport.getEnv_ANDROID_HOME()).getAbsolutePath(), path.getAbsolutePath());
+        Assert.assertEquals(new File(testSupport.getenvAndroidHome()).getAbsolutePath(), path.getAbsolutePath());
     }
 
     @Test
@@ -122,16 +120,17 @@ public class AbstractAndroidMojoTest {
 
         @Override
         public AndroidSdk getAndroidSdk() {
-            return new SdkTestSupport().getSdk_with_platform_default();
+            return new SdkTestSupport().getSdkWithPlatformDefault();
         }
 
         public void execute() {
-
+            // Empty by design
         }
     }
 
     private class EmptyAndroidMojo extends AbstractAndroidMojo {
         public void execute() {
+            // Empty by design
         }
     }
 }

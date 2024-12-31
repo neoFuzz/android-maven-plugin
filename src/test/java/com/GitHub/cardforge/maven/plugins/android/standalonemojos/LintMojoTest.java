@@ -6,7 +6,6 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.github.cardforge.maven.plugins.android.standalonemojos.LintMojo;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.maven.model.Build;
 import org.apache.maven.plugin.logging.Log;
@@ -314,7 +313,7 @@ public class LintMojoTest extends AbstractAndroidMojoTestCase<LintMojo>
         LintMojo mojo = new LintMojo() {
             @Override
             public AndroidSdk getAndroidSdk() {
-                return new SdkTestSupport().getSdk_with_platform_default();
+                return new SdkTestSupport().getSdkWithPlatformDefault();
             }
         };
         MavenProject project = EasyMock.createNiceMock( MavenProject.class );
