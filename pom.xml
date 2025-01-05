@@ -243,6 +243,12 @@
         <version>2.4</version>
       </dependency>
 
+      <dependency>
+        <groupId>org.apache.commons</groupId>
+        <artifactId>commons-compress</artifactId>
+        <version>1.20</version>
+      </dependency>
+
       <!--  managed since its transitive from SDK and others -->
       <dependency>
         <groupId>org.ow2.asm</groupId>
