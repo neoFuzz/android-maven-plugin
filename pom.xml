@@ -7,7 +7,9 @@
   under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES 
   OR CONDITIONS OF ANY KIND, either express or implied. See the License for 
   the specific language governing permissions and limitations under the License. -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <!-- the progressive-organization-pom manages all plugin versions for
@@ -33,8 +35,7 @@
     <scm.branch>master</scm.branch>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-    <!--  upgrade to 3.4 fails build, see https://github.com/simpligility/android-maven-plugin/issues/554 -->
-    <maven-plugin-plugin.version>3.6.0</maven-plugin-plugin.version>
+    <maven-plugin-plugin.version>3.15.1</maven-plugin-plugin.version>
     <maven.api.version>3.6.0</maven.api.version>
     <takari.test.version>2.9.1</takari.test.version>
     <easymock.version>3.4</easymock.version>
@@ -122,12 +123,11 @@
 
   <prerequisites>
     <!-- define the version need to run this plugin -->
-    <maven>3.0.4</maven>
+    <maven>[3.6.4)</maven>
   </prerequisites>
 
   <dependencyManagement>
     <dependencies>
-
       <dependency>
         <groupId>org.codehaus.plexus</groupId>
         <artifactId>plexus-archiver</artifactId>
@@ -247,6 +247,11 @@
         <groupId>org.apache.commons</groupId>
         <artifactId>commons-compress</artifactId>
         <version>1.20</version>
+      </dependency>
+
+      <dependency>
+        <groupId>jakarta.xml.bind</groupId>
+        <artifactId>jaxb-api</artifactId>
       </dependency>
 
       <!--  managed since its transitive from SDK and others -->
@@ -440,6 +445,7 @@
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-compat</artifactId>
       <version>${maven.api.version}</version>
+      <scope>provided</scope>
     </dependency>
 
     <dependency>
@@ -457,6 +463,30 @@
     <dependency>
       <groupId>org.apache.maven.plugin-tools</groupId>
       <artifactId>maven-plugin-annotations</artifactId>
+    </dependency>
+
+    <!-- Maven Model -->
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-model</artifactId>
+      <version>3.6.0</version>
+      <scope>provided</scope>
+    </dependency>
+
+    <!-- Maven Plugin API -->
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-plugin-api</artifactId>
+      <version>3.6.0</version>
+      <scope>provided</scope>
+    </dependency>
+
+    <!-- Maven Toolchain -->
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-toolchain</artifactId>
+      <version>2.2.1</version>
+      <scope>provided</scope>
     </dependency>
 
     <dependency>
@@ -550,6 +580,19 @@
     <dependency>
       <groupId>net.sf.proguard</groupId>
       <artifactId>proguard-base</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>jakarta.xml.bind</groupId>
+      <artifactId>jakarta.xml.bind-api</artifactId>
+      <version>2.3.3</version>
+    </dependency>
+
+    <dependency>
+      <groupId>com.sun.xml.bind</groupId>
+      <artifactId>jaxb-impl</artifactId>
+      <version>2.3.3</version>
+      <scope>runtime</scope>
     </dependency>
 
     <!-- test deps -->
@@ -650,7 +693,7 @@
         <plugin>
           <groupId>org.codehaus.plexus</groupId>
           <artifactId>plexus-component-metadata</artifactId>
-          <version>1.6</version>
+          <version>2.1.1</version>
         </plugin>
       </plugins>
     </pluginManagement>
@@ -734,8 +777,8 @@
       <plugin>
         <artifactId>maven-compiler-plugin</artifactId>
         <configuration>
-          <source>8</source>
-          <target>8</target>
+          <source>17</source>
+          <target>17</target>
         </configuration>
       </plugin>
 
@@ -744,8 +787,8 @@
         <configuration>
           <archive>
             <manifestEntries>
-              <Build-Source-Version>1.7</Build-Source-Version>
-              <Build-Target-Version>1.7</Build-Target-Version>
+              <Build-Source-Version>17</Build-Source-Version>
+              <Build-Target-Version>17</Build-Target-Version>
             </manifestEntries>
           </archive>
         </configuration>
@@ -818,7 +861,7 @@
         <artifactId>maven-surefire-plugin</artifactId>
         <configuration>
           <!-- prevent PermGen OOM in site build -->
-          <argLine>-Xmx512m -XX:MaxPermSize=128m</argLine>
+          <argLine>-Xmx512m</argLine>
         </configuration>
       </plugin>
 
@@ -838,12 +881,14 @@
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>animal-sniffer-maven-plugin</artifactId>
+        <version>1.24</version>
         <configuration>
           <signature>
             <groupId>org.codehaus.mojo.signature</groupId>
             <artifactId>java17</artifactId>
             <version>1.0</version>
           </signature>
+          <ignores>java.util.function.Predicate</ignores>
         </configuration>
         <executions>
           <execution>
