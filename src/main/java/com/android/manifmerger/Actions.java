@@ -436,10 +436,9 @@ public class Actions {
     static class DecisionTreeRecord {
         // all attributes decisions indexed by attribute name.
         @NonNull
-        final Map<XmlNode.NodeName, List<AttributeRecord>> mAttributeRecords =
-                new HashMap<XmlNode.NodeName, List<AttributeRecord>>();
+        final Map<XmlNode.NodeName, List<AttributeRecord>> mAttributeRecords = new HashMap<>();
         // all other occurrences of the nodes decisions, in order of decisions.
-        private final List<NodeRecord> mNodeRecords = new ArrayList<NodeRecord>();
+        private final List<NodeRecord> mNodeRecords = new ArrayList<>();
 
         DecisionTreeRecord() {
         }

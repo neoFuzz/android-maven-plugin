@@ -164,13 +164,13 @@ public class Testsuite {
     protected String group;
 
     /**
-     * Gets the value of the properties property.
+     * Gets the value of the properties' property.
      *
      * <p>
      * This accessor method returns a reference to the live list,
-     * not a snapshot. Therefore any modification you make to the
+     * not a snapshot. Therefore, any modification you make to the
      * returned list will be present inside the JAXB object.
-     * This is why there is not a <CODE>set</CODE> method for the properties property.
+     * This is why there is not a <CODE>set</CODE> method for the properties' property.
      *
      * <p>
      * For example, to add a new item, do as follows:
@@ -185,7 +185,7 @@ public class Testsuite {
      */
     public List<Testsuite.Properties> getProperties() {
         if (properties == null) {
-            properties = new ArrayList<Testsuite.Properties>();
+            properties = new ArrayList<>();
         }
         return this.properties;
     }
@@ -195,7 +195,7 @@ public class Testsuite {
      *
      * <p>
      * This accessor method returns a reference to the live list,
-     * not a snapshot. Therefore any modification you make to the
+     * not a snapshot. Therefore, any modification you make to the
      * returned list will be present inside the JAXB object.
      * This is why there is not a <CODE>set</CODE> method for the testcase property.
      *
@@ -212,7 +212,7 @@ public class Testsuite {
      */
     public List<Testsuite.Testcase> getTestcase() {
         if (testcase == null) {
-            testcase = new ArrayList<Testsuite.Testcase>();
+            testcase = new ArrayList<>();
         }
         return this.testcase;
     }
@@ -258,7 +258,7 @@ public class Testsuite {
     }
 
     /**
-     * Gets the value of the tests property.
+     * Gets the value of the tests' property.
      *
      * @return possible object is
      * {@link String }
@@ -268,7 +268,7 @@ public class Testsuite {
     }
 
     /**
-     * Sets the value of the tests property.
+     * Sets the value of the tests' property.
      *
      * @param value allowed object is
      *              {@link String }
@@ -278,7 +278,7 @@ public class Testsuite {
     }
 
     /**
-     * Gets the value of the errors property.
+     * Gets the value of the errors' property.
      *
      * @return possible object is
      * {@link String }
@@ -288,7 +288,7 @@ public class Testsuite {
     }
 
     /**
-     * Sets the value of the errors property.
+     * Sets the value of the errors' property.
      *
      * @param value allowed object is
      *              {@link String }
@@ -318,7 +318,7 @@ public class Testsuite {
     }
 
     /**
-     * Gets the value of the failures property.
+     * Gets the value of the failures' property.
      *
      * @return possible object is
      * {@link String }
@@ -328,7 +328,7 @@ public class Testsuite {
     }
 
     /**
-     * Sets the value of the failures property.
+     * Sets the value of the failures' property.
      *
      * @param value allowed object is
      *              {@link String }
@@ -393,13 +393,13 @@ public class Testsuite {
         protected List<Testsuite.Properties.Property> property;
 
         /**
-         * Gets the value of the property property.
+         * Gets the value of the property's property.
          *
          * <p>
          * This accessor method returns a reference to the live list,
-         * not a snapshot. Therefore any modification you make to the
+         * not a snapshot. Therefore, any modification you make to the
          * returned list will be present inside the JAXB object.
-         * This is why there is not a <CODE>set</CODE> method for the property property.
+         * This is why there is not a <CODE>set</CODE> method for the property's property.
          *
          * <p>
          * For example, to add a new item, do as follows:
@@ -414,7 +414,7 @@ public class Testsuite {
          */
         public List<Testsuite.Properties.Property> getProperty() {
             if (property == null) {
-                property = new ArrayList<Testsuite.Properties.Property>();
+                property = new ArrayList<>();
             }
             return this.property;
         }
@@ -584,16 +584,10 @@ public class Testsuite {
 
         @XmlElement(nillable = true)
         protected List<Testsuite.Testcase.Failure> failure;
-        @XmlElement(nillable = true)
-        protected List<Testsuite.Testcase.RerunFailure> rerunFailure;
         @XmlElementRef(name = "skipped", type = JAXBElement.class, required = false)
         protected JAXBElement<Testsuite.Testcase.Skipped> skipped;
         @XmlElementRef(name = "error", type = JAXBElement.class, required = false)
         protected JAXBElement<Testsuite.Testcase.Error> error;
-        @XmlElementRef(name = "system-out", type = JAXBElement.class, required = false)
-        protected JAXBElement<Object> systemOut;
-        @XmlElementRef(name = "system-err", type = JAXBElement.class, required = false)
-        protected JAXBElement<Object> systemErr;
         @XmlAttribute(name = "name", required = true)
         protected String name;
         @XmlAttribute(name = "classname")
@@ -608,7 +602,7 @@ public class Testsuite {
          *
          * <p>
          * This accessor method returns a reference to the live list,
-         * not a snapshot. Therefore any modification you make to the
+         * not a snapshot. Therefore, any modification you make to the
          * returned list will be present inside the JAXB object.
          * This is why there is not a <CODE>set</CODE> method for the failure property.
          *
@@ -625,36 +619,9 @@ public class Testsuite {
          */
         public List<Testsuite.Testcase.Failure> getFailure() {
             if (failure == null) {
-                failure = new ArrayList<Testsuite.Testcase.Failure>();
+                failure = new ArrayList<>();
             }
             return this.failure;
-        }
-
-        /**
-         * Gets the value of the rerunFailure property.
-         *
-         * <p>
-         * This accessor method returns a reference to the live list,
-         * not a snapshot. Therefore any modification you make to the
-         * returned list will be present inside the JAXB object.
-         * This is why there is not a <CODE>set</CODE> method for the rerunFailure property.
-         *
-         * <p>
-         * For example, to add a new item, do as follows:
-         * <pre>
-         *    getRerunFailure().add(newItem);
-         * </pre>
-         *
-         *
-         * <p>
-         * Objects of the following type(s) are allowed in the list
-         * {@link Testsuite.Testcase.RerunFailure }
-         */
-        public List<Testsuite.Testcase.RerunFailure> getRerunFailure() {
-            if (rerunFailure == null) {
-                rerunFailure = new ArrayList<Testsuite.Testcase.RerunFailure>();
-            }
-            return this.rerunFailure;
         }
 
         /**
@@ -695,46 +662,6 @@ public class Testsuite {
          */
         public void setError(JAXBElement<Testsuite.Testcase.Error> value) {
             this.error = value;
-        }
-
-        /**
-         * Gets the value of the systemOut property.
-         *
-         * @return possible object is
-         * {@link JAXBElement }{@code <}{@link Object }{@code >}
-         */
-        public JAXBElement<Object> getSystemOut() {
-            return systemOut;
-        }
-
-        /**
-         * Sets the value of the systemOut property.
-         *
-         * @param value allowed object is
-         *              {@link JAXBElement }{@code <}{@link Object }{@code >}
-         */
-        public void setSystemOut(JAXBElement<Object> value) {
-            this.systemOut = value;
-        }
-
-        /**
-         * Gets the value of the systemErr property.
-         *
-         * @return possible object is
-         * {@link JAXBElement }{@code <}{@link Object }{@code >}
-         */
-        public JAXBElement<Object> getSystemErr() {
-            return systemErr;
-        }
-
-        /**
-         * Sets the value of the systemErr property.
-         *
-         * @param value allowed object is
-         *              {@link JAXBElement }{@code <}{@link Object }{@code >}
-         */
-        public void setSystemErr(JAXBElement<Object> value) {
-            this.systemErr = value;
         }
 
         /**

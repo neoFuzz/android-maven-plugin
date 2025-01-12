@@ -412,8 +412,8 @@ public class AaptPackageProcessBuilder extends ProcessEnvBuilder<AaptPackageProc
         // separate the density and language resource configs, since starting in 21, the
         // density resource configs should be passed with --preferred-density to ensure packaging
         // of scalable resources when no resource for the preferred density is present.
-        List<String> otherResourceConfigs = new ArrayList<String>();
-        List<String> densityResourceConfigs = new ArrayList<String>();
+        List<String> otherResourceConfigs = new ArrayList<>();
+        List<String> densityResourceConfigs = new ArrayList<>();
         if (!resourceConfigs.isEmpty()) {
             if (buildToolInfo.getRevision().getMajor() >= 21) {
                 for (String resourceConfig : resourceConfigs) {

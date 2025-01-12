@@ -23,11 +23,12 @@ import com.android.annotations.concurrency.Immutable;
 import com.android.ide.common.blame.SourceFile;
 import com.android.ide.common.blame.SourceFilePosition;
 import com.android.ide.common.blame.SourcePosition;
-import com.google.common.base.Function;
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
+
+import com.google.common.base.Function;
 
 /**
  * Common behavior of any xml declaration.
@@ -35,11 +36,9 @@ import org.w3c.dom.Node;
 public abstract class XmlNode {
 
     protected static final Function<Node, String> NODE_TO_NAME =
-            new Function<Node, String>() {
-                @Override
-                public String apply(Node input) {
-                    return input.getNodeName();
-                }
+            input -> {
+                assert input != null;
+                return input.getNodeName();
             };
 
     @Nullable

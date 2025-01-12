@@ -35,7 +35,7 @@ import static com.android.manifmerger.XmlNode.NodeKey;
  * Records all the actions taken by the merging tool.
  * <p>
  * Each action generates at least one {@link com.android.manifmerger.Actions.Record}
- * containing enough information to generate a machine or human readable report.
+ * containing enough information to generate a machine or human-readable report.
  * <p>
  * <p>
  * The records are not organized in a temporal structure as the merging tool takes such decisions
@@ -86,16 +86,16 @@ public class ActionRecorder {
      * Defines all the records for the merging tool activity, indexed by element name+key. Iterator
      * should be ordered by the key insertion order.
      *
-     * <p>This is not a concurrent map, so we will need to guard multi-threaded access when
+     * <p>This is not a concurrent map, so we will need to guard multithreaded access when
      * adding/removing elements.
      */
     @GuardedBy("this")
     @NonNull
     private final Map<NodeKey, Actions.DecisionTreeRecord> mRecords =
-            new LinkedHashMap<NodeKey, Actions.DecisionTreeRecord>();
+            new LinkedHashMap<>();
 
     /**
-     * Record an {@link com.android.manifmerger.Actions.ActionType.ADDED} action for an unrecorded
+     * Record an {@link Actions.ActionType#ADDED} action for an unrecorded
      * XmlElement and its unrecorded descendants. If exhaustiveSearch is true, we check all the
      * XmlElement's descendants; if it's false, we stop searching through an XmlElement's
      * descendants if that XmlElement has already been recorded.
@@ -138,7 +138,7 @@ public class ActionRecorder {
      */
     synchronized void recordImpliedNodeAction(@NonNull XmlElement xmlElement, @Nullable String reason) {
         Actions.DecisionTreeRecord nodeDecisionTree = getDecisionTreeRecord(xmlElement);
-        Actions.NodeRecord record = new Actions.NodeRecord(Actions.ActionType.IMPLIED,
+        Actions.NodeRecord record1 = new Actions.NodeRecord(Actions.ActionType.IMPLIED,
                 new SourceFilePosition(
                         xmlElement.getDocument().getSourceFile(),
                         xmlElement.getDocument().getRootNode().getPosition()),
@@ -146,7 +146,7 @@ public class ActionRecorder {
                 reason,
                 xmlElement.getOperationType()
         );
-        nodeDecisionTree.addNodeRecord(record);
+        nodeDecisionTree.addNodeRecord(record1);
     }
 
     /**
@@ -174,7 +174,7 @@ public class ActionRecorder {
             @NonNull Actions.ActionType actionType,
             @NonNull XmlElement targetElement) {
 
-        Actions.NodeRecord record = new Actions.NodeRecord(actionType,
+        Actions.NodeRecord record1 = new Actions.NodeRecord(actionType,
                 new SourceFilePosition(
                         targetElement.getDocument().getSourceFile(),
                         targetElement.getPosition()),
@@ -182,7 +182,7 @@ public class ActionRecorder {
                 null, /* reason */
                 mergedElement.getOperationType()
         );
-        recordNodeAction(mergedElement, record);
+        recordNodeAction(mergedElement, record1);
     }
 
     /**
@@ -203,7 +203,7 @@ public class ActionRecorder {
     private synchronized Actions.DecisionTreeRecord getDecisionTreeRecord(
             @NonNull XmlElement xmlElement) {
         return mRecords.computeIfAbsent(
-                xmlElement.getOriginalId(), k -> new Actions.DecisionTreeRecord());
+                xmlElement.getOriginalId(),  k -> new Actions.DecisionTreeRecord());
     }
 
     /**
@@ -253,7 +253,7 @@ public class ActionRecorder {
 
     /**
      * Record a {@link com.android.manifmerger.Actions.AttributeRecord} action for an attribute of
-     * an xml element.
+     * a xml element.
      *
      * @param attribute       the attribute in question.
      * @param attributeRecord the record of the action.
@@ -327,10 +327,8 @@ public class ActionRecorder {
         @Nullable Actions.DecisionTreeRecord nodeDecisionTree = mRecords.get(storageKey);
         // by now the node should have been added for this element.
         Preconditions.checkNotNull(nodeDecisionTree, "No record for key [%s]", storageKey);
-        List<Actions.AttributeRecord> attributeRecords =
-                nodeDecisionTree.mAttributeRecords.computeIfAbsent(
+        return nodeDecisionTree.mAttributeRecords.computeIfAbsent(
                         attribute.getName(), k -> new ArrayList<>());
-        return attributeRecords;
     }
 
     @NonNull

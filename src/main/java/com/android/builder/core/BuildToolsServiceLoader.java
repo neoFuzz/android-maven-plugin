@@ -69,7 +69,7 @@ public enum BuildToolsServiceLoader {
     public synchronized BuildToolServiceLoader forVersion(BuildToolInfo buildToolInfo) {
 
         Optional<LoadedBuildTool> loadedBuildToolOptional =
-                findVersion((FullRevision) buildToolInfo.getRevision());
+                findVersion(buildToolInfo.getRevision());
 
         if (loadedBuildToolOptional.isPresent()) {
             return loadedBuildToolOptional.get().serviceLoader;

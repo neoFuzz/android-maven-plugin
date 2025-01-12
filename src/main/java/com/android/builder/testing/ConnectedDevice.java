@@ -25,6 +25,7 @@ import com.android.ddmlib.*;
 import com.android.utils.ILogger;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.IOException;
@@ -96,7 +97,7 @@ public class ConnectedDevice extends DeviceConnector {
         List<String> apkFileNames = Lists.transform(splitApkFiles, input -> input != null ? input.getAbsolutePath() : null);
         try {
             iDevice.installPackages(splitApkFiles, true /*reinstall*/,
-                    options.isEmpty() ? new ArrayList<String>() : List.copyOf(options), timeoutInMs, TimeUnit.MILLISECONDS);
+                    options.isEmpty() ? new ArrayList<>() : (List<String>) options, timeoutInMs, TimeUnit.MILLISECONDS);
         } catch (Exception e) {
             logger.error(e, "Unable to install " + Joiner.on(',').join(apkFileNames));
             throw new DeviceException(e);
@@ -218,8 +219,77 @@ public class ConnectedDevice extends DeviceConnector {
 
     @Override
     public Set<String> getLanguageSplits() throws TimeoutException, AdbCommandRejectedException, ShellCommandUnresponsiveException, IOException {
-        return Set.of();
+        return new Set<String>() {
+            @Override
+            public int size() {
+                return 0;
+            }
+
+            @Override
+            public boolean isEmpty() {
+                return false;
+            }
+
+            @Override
+            public boolean contains(Object o) {
+                return false;
+            }
+
+            @NotNull
+            @Override
+            public Iterator<String> iterator() {
+                return null;
+            }
+
+            @NotNull
+            @Override
+            public Object[] toArray() {
+                return new Object[0];
+            }
+
+            @NotNull
+            @Override
+            public <T> T[] toArray(@NotNull T[] a) {
+                return null;
+            }
+
+            @Override
+            public boolean add(String s) {
+                return false;
+            }
+
+            @Override
+            public boolean remove(Object o) {
+                return false;
+            }
+
+            @Override
+            public boolean containsAll(@NotNull Collection<?> c) {
+                return false;
+            }
+
+            @Override
+            public boolean addAll(@NotNull Collection<? extends String> c) {
+                return false;
+            }
+
+            @Override
+            public boolean retainAll(@NotNull Collection<?> c) {
+                return false;
+            }
+
+            @Override
+            public boolean removeAll(@NotNull Collection<?> c) {
+                return false;
+            }
+
+            @Override
+            public void clear() {
+
+            }
+        };
     }
+
 
     @Override
     public String getRegion() {

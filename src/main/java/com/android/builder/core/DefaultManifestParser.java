@@ -24,7 +24,6 @@ import com.android.utils.XmlUtils;
 import com.android.xml.AndroidManifest;
 import com.android.xml.AndroidXPathFactory;
 import com.google.common.base.Optional;
-import org.apache.http.annotation.ThreadSafe;
 import org.xml.sax.InputSource;
 
 import javax.xml.xpath.XPath;
@@ -32,7 +31,6 @@ import javax.xml.xpath.XPathExpressionException;
 import java.io.File;
 import java.io.IOException;
 
-@ThreadSafe
 public class DefaultManifestParser implements ManifestParser {
 
     Optional<Object> mMinSdkVersion;

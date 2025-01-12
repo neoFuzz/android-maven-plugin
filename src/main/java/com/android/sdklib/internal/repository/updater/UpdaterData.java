@@ -426,7 +426,7 @@ public class UpdaterData implements IUpdaterData {
         final boolean forceHttp = getSettingsController().getSettings().getForceHttp();
 
         // sort all archives based on their dependency level.
-        archives.sort(new InstallOrderComparator());
+        Collections.sort(archives, new InstallOrderComparator()); // NOSONAR : DO NOT List.sort()
 
         mTaskFactory.start("Installing Archives", monitor -> {
 

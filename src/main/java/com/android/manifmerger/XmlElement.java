@@ -35,6 +35,7 @@ import com.google.common.collect.Lists;
 import org.w3c.dom.*;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Xml {@link org.w3c.dom.Element} which is mergeable.
@@ -756,7 +757,6 @@ public class XmlElement extends OrphanXmlElement {
      */
     @NonNull
     public Optional<String> compareTo(Object other) {
-
         if (!(other instanceof XmlElement)) {
             return Optional.of("Wrong type");
         }
@@ -807,8 +807,12 @@ public class XmlElement extends OrphanXmlElement {
             if (expectedChildrenSize > actualChildrenSize) {
                 // missing some.
                 @NonNull List<String> missingChildrenNames =
-                        Lists.transform(expectedChildren, NODE_TO_NAME);
-                Lists.transform(actualChildren, NODE_TO_NAME).forEach(missingChildrenNames::remove);
+                        expectedChildren.stream()
+                                .map(NODE_TO_NAME)
+                                .collect(Collectors.toList());
+                missingChildrenNames.removeAll(actualChildren.stream()
+                        .map(NODE_TO_NAME)
+                        .collect(Collectors.toList()));
                 return Optional.of(
                         String.format(
                                 "%1$s: Number of children do not match up: "
@@ -820,8 +824,13 @@ public class XmlElement extends OrphanXmlElement {
                                 Joiner.on(",").join(missingChildrenNames)));
             } else {
                 // extra ones.
-                @NonNull List<String> extraChildrenNames = Lists.transform(actualChildren, NODE_TO_NAME);
-                Lists.transform(expectedChildren, NODE_TO_NAME).forEach(extraChildrenNames::remove);
+                @NonNull List<String> extraChildrenNames =
+                        actualChildren.stream()
+                                .map(NODE_TO_NAME)
+                                .collect(Collectors.toList());
+                extraChildrenNames.removeAll(expectedChildren.stream()
+                        .map(NODE_TO_NAME)
+                        .collect(Collectors.toList()));
                 return Optional.of(
                         String.format(
                                 "%1$s: Number of children do not match up: "

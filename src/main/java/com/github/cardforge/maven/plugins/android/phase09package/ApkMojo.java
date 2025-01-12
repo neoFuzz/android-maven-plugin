@@ -16,6 +16,9 @@
  */
 package com.github.cardforge.maven.plugins.android.phase09package;
 
+import com.android.annotations.NonNull;
+
+import com.google.common.graph.*;
 import com.android.sdklib.build.ApkBuilder;
 import com.android.sdklib.build.ApkCreationException;
 import com.android.sdklib.build.DuplicateFileException;
@@ -489,19 +492,37 @@ public class ApkMojo extends AbstractAndroidMojo {
         }
     }
 
+
     private void computeDuplicateFilesInSource(File folder) {
         String rPath = folder.getAbsolutePath();
-        for (File file : Files.fileTreeTraverser().breadthFirstTraversal(folder).toList()) {
-            String lPath = file.getAbsolutePath();
-            if (lPath.equals(rPath)) {
-                continue; //skip the root
-            }
-            lPath = lPath.substring(rPath.length() + 1); //strip root folder to make relative path
 
+        // Create a traverser for the file tree
+        Traverser<File> traverser = Traverser.forTree(file -> {
+            // Return the children of the current file (if it's a directory)
+            if (file.isDirectory()) {
+                return List.of(file.listFiles()); // list the contents of the directory
+            } else {
+                return List.of(); // leaf nodes (files) don't have children
+            }
+        });
+
+        // Traverse the file tree breadth-first
+        for (File file : traverser.breadthFirst(folder)) {
+            String lPath = file.getAbsolutePath();
+
+            // Skip the root directory
+            if (lPath.equals(rPath)) {
+                continue;
+            }
+
+            // Make the relative path
+            lPath = lPath.substring(rPath.length() + 1);
+
+            // Store files by relative path in the `jars` map
             if (jars.get(lPath) == null) {
                 jars.put(lPath, new ArrayList<File>());
             }
-            jars.get(lPath).add(folder);
+            jars.get(lPath).add(file);
         }
     }
 

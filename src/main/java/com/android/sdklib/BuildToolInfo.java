@@ -168,7 +168,8 @@ public class BuildToolInfo {
     public static BuildToolInfo fromStandardDirectoryLayout(
             @NonNull Revision revision,
             @NonNull File path) {
-        return new BuildToolInfo((FullRevision) revision, path);
+        FullRevision fr = FullRevision.parseRevision(revision.toString());
+        return new BuildToolInfo(fr, path);
     }
 
     private void add(PathId id, String leaf) {
