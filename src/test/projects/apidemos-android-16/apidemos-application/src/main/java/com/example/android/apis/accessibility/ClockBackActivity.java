@@ -31,9 +31,11 @@ import com.example.android.apis.R;
  */
 public class ClockBackActivity extends Activity {
 
-    /** An intent for launching the system settings. */
+    /**
+     * An intent for launching the system settings.
+     */
     private static final Intent sSettingsIntent =
-        new Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS);
+            new Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS);
 
     /**
      * {@inheritDoc}

@@ -18,6 +18,7 @@ package com.example.android.apis.view;
 
 // Need the following import to get access to the app resources, since this
 // class is in a sub-package.
+
 import com.example.android.apis.R;
 
 import android.app.Activity;
@@ -56,7 +57,7 @@ public class Animation3 extends Activity implements AdapterView.OnItemSelectedLi
 
         Animation a = new TranslateAnimation(0.0f,
                 targetParent.getWidth() - target.getWidth() - targetParent.getPaddingLeft() -
-                targetParent.getPaddingRight(), 0.0f, 0.0f);
+                        targetParent.getPaddingRight(), 0.0f, 0.0f);
         a.setDuration(1000);
         a.setStartOffset(300);
         a.setRepeatMode(Animation.RESTART);

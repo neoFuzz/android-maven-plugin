@@ -1,8 +1,6 @@
 package com.github.cardforge.maven.plugins.android.configuration;
 
 
-
-
 /**
  * Configuration for the emma test execution. This class is only the definition of the parameters that are
  * shadowed in
@@ -10,8 +8,7 @@ package com.github.cardforge.maven.plugins.android.configuration;
  *
  * @author Mariusz Saramak mariusz@saramak.eu
  */
-public class Emma
-{
+public class Emma {
 
     /**
      * Mirror of {@link EmmaMojo#emmaEnable}
@@ -33,23 +30,19 @@ public class Emma
      */
     private String filters;
 
-    public String getFilters()
-    {
+    public String getFilters() {
         return filters;
     }
 
-    public Boolean isEnable()
-    {
+    public Boolean isEnable() {
         return enable;
     }
 
-    public String getClassFolders()
-    {
+    public String getClassFolders() {
         return classFolders;
     }
 
-    public String getOutputMetaFile()
-    {
+    public String getOutputMetaFile() {
         return outputMetaFile;
     }
 }

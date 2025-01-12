@@ -18,6 +18,7 @@ package com.example.android.apis.app;
 
 // Need the following import to get access to the app resources, since this
 // class is in a sub-package.
+
 import android.app.Activity;
 import android.content.ComponentName;
 import android.os.Bundle;
@@ -39,7 +40,7 @@ public class LocalSample extends Activity {
         setContentView(R.layout.local_sample);
 
         // Watch for button clicks.
-        Button button = (Button)findViewById(R.id.go);
+        Button button = (Button) findViewById(R.id.go);
         button.setOnClickListener(mGoListener);
     }
 

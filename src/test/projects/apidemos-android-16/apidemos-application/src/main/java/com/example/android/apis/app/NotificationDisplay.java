@@ -18,6 +18,7 @@ package com.example.android.apis.app;
 
 // Need the following import to get access to the app resources, since this
 // class is in a sub-package.
+
 import com.example.android.apis.R;
 
 import android.app.Activity;
@@ -46,20 +47,20 @@ public class NotificationDisplay extends Activity implements View.OnClickListene
         // Have the system blur any windows behind this one.
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_BLUR_BEHIND,
                 WindowManager.LayoutParams.FLAG_BLUR_BEHIND);
-        
+
         RelativeLayout container = new RelativeLayout(this);
-        
+
         ImageButton button = new ImageButton(this);
         button.setImageResource(getIntent().getIntExtra("moodimg", 0));
         button.setOnClickListener(this);
-        
+
         RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(
                 RelativeLayout.LayoutParams.WRAP_CONTENT,
                 RelativeLayout.LayoutParams.WRAP_CONTENT);
         lp.addRule(RelativeLayout.CENTER_IN_PARENT);
-        
+
         container.addView(button, lp);
-        
+
         setContentView(container);
     }
 
@@ -67,7 +68,7 @@ public class NotificationDisplay extends Activity implements View.OnClickListene
         // The user has confirmed this notification, so remove it.
         ((NotificationManager) getSystemService(NOTIFICATION_SERVICE))
                 .cancel(R.layout.status_bar_notifications);
-        
+
         // Pressing on the button brings the user back to our mood ring,
         // as part of the api demos app.  Note the use of NEW_TASK here,
         // since the notification display activity is run as a separate task.
@@ -75,7 +76,7 @@ public class NotificationDisplay extends Activity implements View.OnClickListene
         intent.setAction(Intent.ACTION_MAIN);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(intent);
-        
+
         // We're done.
         finish();
     }

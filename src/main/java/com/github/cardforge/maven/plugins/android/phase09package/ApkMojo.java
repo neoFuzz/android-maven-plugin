@@ -1017,7 +1017,7 @@ public class ApkMojo extends AbstractAndroidMojo {
         File androidJar = getAndroidSdk().getAndroidJar();
         File outputFile = new File(targetDirectory, finalName + ".ap_");
 
-        List<File> dependencyArtifactResDirectoryList = new ArrayList<File>();
+        List<File> dependencyArtifactResDirectoryList = new ArrayList<>();
         for (Artifact libraryArtifact : getTransitiveDependencyArtifacts(APKLIB, AAR)) {
             final File libraryResDir = getUnpackedLibResourceFolder(libraryArtifact);
             if (libraryResDir.exists()) {
@@ -1063,7 +1063,7 @@ public class ApkMojo extends AbstractAndroidMojo {
     }
 
     /**
-     * Used to populated the {@link #apkMetaInf} attribute via reflection.
+     * Used to populate the {@link #apkMetaInf} attribute via reflection.
      */
     private MetaInf getDefaultMetaInf() {
         // check for deprecated first

@@ -48,9 +48,9 @@ public class MeasureText extends GraphicsActivity {
     }
 
     private static class SampleView extends View {
-        private Paint   mPaint;
-        private float   mOriginX = 10;
-        private float   mOriginY = 80;
+        private Paint mPaint;
+        private float mOriginX = 10;
+        private float mOriginY = 80;
 
         public SampleView(Context context) {
             super(context);
@@ -62,13 +62,13 @@ public class MeasureText extends GraphicsActivity {
             mPaint.setStrokeCap(Paint.Cap.ROUND);
             mPaint.setTextSize(64);
             mPaint.setTypeface(Typeface.create(Typeface.SERIF,
-                                               Typeface.ITALIC));
+                    Typeface.ITALIC));
         }
 
         private void showText(Canvas canvas, String text, Paint.Align align) {
-         //   mPaint.setTextAlign(align);
+            //   mPaint.setTextAlign(align);
 
-            Rect    bounds = new Rect();
+            Rect bounds = new Rect();
             float[] widths = new float[text.length()];
 
             int count = mPaint.getTextWidths(text, 0, text.length(), widths);
@@ -80,15 +80,15 @@ public class MeasureText extends GraphicsActivity {
             mPaint.setColor(Color.BLACK);
             canvas.drawText(text, 0, 0, mPaint);
 
-            float[] pts = new float[2 + count*2];
+            float[] pts = new float[2 + count * 2];
             float x = 0;
             float y = 0;
             pts[0] = x;
             pts[1] = y;
             for (int i = 0; i < count; i++) {
                 x += widths[i];
-                pts[2 + i*2] = x;
-                pts[2 + i*2 + 1] = y;
+                pts[2 + i * 2] = x;
+                pts[2 + i * 2 + 1] = y;
             }
             mPaint.setColor(Color.RED);
             mPaint.setStrokeWidth(0);
@@ -97,7 +97,8 @@ public class MeasureText extends GraphicsActivity {
             canvas.drawPoints(pts, 0, (count + 1) << 1, mPaint);
         }
 
-        @Override protected void onDraw(Canvas canvas) {
+        @Override
+        protected void onDraw(Canvas canvas) {
             canvas.drawColor(Color.WHITE);
 
             canvas.translate(mOriginX, mOriginY);

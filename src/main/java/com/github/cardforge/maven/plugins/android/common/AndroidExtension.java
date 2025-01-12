@@ -3,8 +3,7 @@ package com.github.cardforge.maven.plugins.android.common;
 /**
  * The file system extension for the Android artifact also used for the packaging type of Android Maven Project.
  */
-public final class AndroidExtension
-{
+public final class AndroidExtension {
     /**
      * Android application.
      */
@@ -15,7 +14,7 @@ public final class AndroidExtension
      *
      * @deprecated Use {@link #AAR} instead.
      */
-    @Deprecated
+    @Deprecated(since = "4.8", forRemoval = false)
     public static final String APKLIB = "apklib";
 
     /**
@@ -28,12 +27,11 @@ public final class AndroidExtension
     /**
      * @deprecated Use {@link #APKLIB} instead.
      */
-    @Deprecated
+    @Deprecated(since = "4.8", forRemoval = false)
     public static final String APKSOURCES = "apksources";
 
     //No instances
-    private AndroidExtension()
-    {
+    private AndroidExtension() {
     }
 
     /**
@@ -43,9 +41,8 @@ public final class AndroidExtension
      * @param packaging Project packaging.
      * @return True if an Android project.
      */
-    public static boolean isAndroidPackaging( String packaging )
-    {
-        return APK.equals( packaging ) || APKLIB.equals( packaging ) || APKSOURCES.equals( packaging )
-                || AAR.equalsIgnoreCase( packaging );
+    public static boolean isAndroidPackaging(String packaging) {
+        return APK.equals(packaging) || APKLIB.equals(packaging) || APKSOURCES.equals(packaging)
+                || AAR.equalsIgnoreCase(packaging);
     }
 }

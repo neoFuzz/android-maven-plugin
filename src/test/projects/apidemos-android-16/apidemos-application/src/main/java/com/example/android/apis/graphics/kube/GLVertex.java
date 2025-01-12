@@ -37,20 +37,20 @@ public class GLVertex {
         this.x = x;
         this.y = y;
         this.z = z;
-        this.index = (short)index;
+        this.index = (short) index;
     }
 
     @Override
     public boolean equals(Object other) {
         if (other instanceof GLVertex) {
-            GLVertex v = (GLVertex)other;
+            GLVertex v = (GLVertex) other;
             return (x == v.x && y == v.y && z == v.z);
         }
         return false;
     }
 
     static public int toFixed(float x) {
-        return (int)(x * 65536.0f);
+        return (int) (x * 65536.0f);
     }
 
     public void put(IntBuffer vertexBuffer, IntBuffer colorBuffer) {

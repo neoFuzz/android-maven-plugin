@@ -25,9 +25,9 @@ public class IntentActivityFlags extends Activity {
         setContentView(R.layout.intent_activity_flags);
 
         // Watch for button clicks.
-        Button button = (Button)findViewById(R.id.flag_activity_clear_task);
+        Button button = (Button) findViewById(R.id.flag_activity_clear_task);
         button.setOnClickListener(mFlagActivityClearTaskListener);
-        button = (Button)findViewById(R.id.flag_activity_clear_task_pi);
+        button = (Button) findViewById(R.id.flag_activity_clear_task_pi);
         button.setOnClickListener(mFlagActivityClearTaskPIListener);
     }
 

@@ -31,13 +31,13 @@ import com.example.android.apis.R;
 /**
  * Example of how to use a custom title {@link android.view.Window#FEATURE_CUSTOM_TITLE}.
  * <h3>CustomTitle</h3>
-
-<p>This demonstrates how a custom title can be used.</p>
-
-<h4>Demo</h4>
-App/Title/Custom Title
- 
-<h4>Source files</h4>
+ *
+ * <p>This demonstrates how a custom title can be used.</p>
+ *
+ * <h4>Demo</h4>
+ * App/Title/Custom Title
+ *
+ * <h4>Source files</h4>
  * <table class="LinkTable">
  *         <tr>
  *             <td >src/com.example.android.apis/app/CustomTitle.java</td>
@@ -47,30 +47,30 @@ App/Title/Custom Title
  *             <td >/res/any/layout/custom_title.xml</td>
  *             <td >Defines contents of the screen</td>
  *         </tr>
- * </table> 
+ * </table>
  */
 public class CustomTitle extends Activity {
-    
+
     /**
      * Initialization of the Activity after it is first created.  Must at least
      * call {@link android.app.Activity#setContentView(int)} to
      * describe what is to be displayed in the screen.
      */
     @Override
-	protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         requestWindowFeature(Window.FEATURE_CUSTOM_TITLE);
         setContentView(R.layout.custom_title);
         getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE, R.layout.custom_title_1);
-        
+
         final TextView leftText = (TextView) findViewById(R.id.left_text);
         final TextView rightText = (TextView) findViewById(R.id.right_text);
         final EditText leftTextEdit = (EditText) findViewById(R.id.left_text_edit);
         final EditText rightTextEdit = (EditText) findViewById(R.id.right_text_edit);
         Button leftButton = (Button) findViewById(R.id.left_text_button);
         Button rightButton = (Button) findViewById(R.id.right_text_button);
-        
+
         leftButton.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
                 leftText.setText(leftTextEdit.getText());

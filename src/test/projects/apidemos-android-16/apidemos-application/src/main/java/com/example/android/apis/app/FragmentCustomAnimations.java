@@ -42,7 +42,7 @@ public class FragmentCustomAnimations extends Activity {
         setContentView(R.layout.fragment_stack);
 
         // Watch for button clicks.
-        Button button = (Button)findViewById(R.id.new_fragment);
+        Button button = (Button) findViewById(R.id.new_fragment);
         button.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
                 addFragmentToStack();
@@ -85,7 +85,6 @@ public class FragmentCustomAnimations extends Activity {
     }
 
 
-
     public static class CountingFragment extends Fragment {
         int mNum;
 
@@ -119,10 +118,10 @@ public class FragmentCustomAnimations extends Activity {
          */
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                Bundle savedInstanceState) {
+                                 Bundle savedInstanceState) {
             View v = inflater.inflate(R.layout.hello_world, container, false);
             View tv = v.findViewById(R.id.text);
-            ((TextView)tv).setText("Fragment #" + mNum);
+            ((TextView) tv).setText("Fragment #" + mNum);
             tv.setBackgroundDrawable(getResources().getDrawable(android.R.drawable.gallery_thumb));
             return v;
         }

@@ -37,7 +37,7 @@ import java.util.ArrayList;
  */
 public class FragmentTabsPager extends FragmentActivity {
     TabHost mTabHost;
-    ViewPager  mViewPager;
+    ViewPager mViewPager;
     TabsAdapter mTabsAdapter;
 
     @Override
@@ -45,10 +45,10 @@ public class FragmentTabsPager extends FragmentActivity {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.fragment_tabs_pager);
-        mTabHost = (TabHost)findViewById(android.R.id.tabhost);
+        mTabHost = (TabHost) findViewById(android.R.id.tabhost);
         mTabHost.setup();
 
-        mViewPager = (ViewPager)findViewById(R.id.pager);
+        mViewPager = (ViewPager) findViewById(R.id.pager);
 
         mTabsAdapter = new TabsAdapter(this, mTabHost, mViewPager);
 

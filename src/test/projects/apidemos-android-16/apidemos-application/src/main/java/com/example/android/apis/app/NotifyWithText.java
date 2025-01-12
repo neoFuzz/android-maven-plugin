@@ -27,9 +27,10 @@ import android.widget.Toast;
 /**
  * When you push the button on this Activity, it creates a {@link Toast} object and
  * using the Toast method.
+ *
  * @see Toast
- * @see Toast#makeText(android.content.Context,int,int)
- * @see Toast#makeText(android.content.Context,java.lang.CharSequence,int)
+ * @see Toast#makeText(android.content.Context, int, int)
+ * @see Toast#makeText(android.content.Context, java.lang.CharSequence, int)
  * @see Toast#LENGTH_SHORT
  * @see Toast#LENGTH_LONG
  */
@@ -56,7 +57,7 @@ public class NotifyWithText extends Activity {
                 // a version that takes a CharSequence if you must construct
                 // the text yourself.
                 Toast.makeText(NotifyWithText.this, R.string.short_notification_text,
-                    Toast.LENGTH_SHORT).show();
+                        Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -68,12 +69,9 @@ public class NotifyWithText extends Activity {
         button.setOnClickListener(new Button.OnClickListener() {
             public void onClick(View v) {
                 Toast.makeText(NotifyWithText.this, R.string.long_notification_text,
-                    Toast.LENGTH_LONG).show();
+                        Toast.LENGTH_LONG).show();
             }
         });
-
-
-
 
 
     }

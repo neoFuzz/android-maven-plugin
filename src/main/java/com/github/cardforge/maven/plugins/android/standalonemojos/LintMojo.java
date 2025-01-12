@@ -1,22 +1,11 @@
 package com.github.cardforge.maven.plugins.android.standalonemojos;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-
 import com.android.tools.lint.LintCliClient;
 import com.android.tools.lint.LintCliFlags;
 import com.android.tools.lint.MultiProjectHtmlReporter;
 import com.android.tools.lint.XmlReporter;
 import com.android.tools.lint.checks.BuiltinIssueRegistry;
 import com.android.tools.lint.client.api.IssueRegistry;
-
-import org.apache.maven.artifact.Artifact;
-import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugin.MojoFailureException;
-
 import com.github.cardforge.maven.plugins.android.AbstractAndroidMojo;
 import com.github.cardforge.maven.plugins.android.CommandExecutor;
 import com.github.cardforge.maven.plugins.android.ExecutionException;
@@ -24,9 +13,17 @@ import com.github.cardforge.maven.plugins.android.config.ConfigHandler;
 import com.github.cardforge.maven.plugins.android.config.ConfigPojo;
 import com.github.cardforge.maven.plugins.android.config.PullParameter;
 import com.github.cardforge.maven.plugins.android.configuration.Lint;
-
+import org.apache.maven.artifact.Artifact;
+import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 
 /**
  * LintMojo can run the lint command against the project. Implements parsing parameters from pom or command line
@@ -37,10 +34,9 @@ import org.apache.maven.plugins.annotations.Parameter;
  * @author Stéphane Nicolas - snicolas@octo.com
  * @author Manfred Moser - manfred@simpligility.com
  */
-@SuppressWarnings( "unused" )
-@Mojo( name = "lint", requiresProject = false )
-public class LintMojo extends AbstractAndroidMojo
-{
+@SuppressWarnings("unused")
+@Mojo(name = "lint", requiresProject = false)
+public class LintMojo extends AbstractAndroidMojo {
 
     /**
      * The configuration for the lint goal. As soon as a lint goal is invoked the command will be executed unless the
@@ -52,7 +48,7 @@ public class LintMojo extends AbstractAndroidMojo
      *     &lt;skip&gt;false&lt;/skip&gt;
      * &lt;/lint&gt;
      * </pre>
-     *
+     * <p>
      * Full configuration can use these parameters.
      *
      * <pre>
@@ -82,8 +78,8 @@ public class LintMojo extends AbstractAndroidMojo
      *     &lt;libraries&gt;&lt;/libraries&gt;
      * &lt;/lint&gt;
      * </pre>
-     *
-     *
+     * <p>
+     * <p>
      * Alternatively to the plugin configuration values can also be configured as properties on the command line as
      * android.lint.* or in pom or settings file as properties like lint*.
      */
@@ -96,10 +92,10 @@ public class LintMojo extends AbstractAndroidMojo
      *
      * @see Lint#failOnError
      */
-    @Parameter( property = "android.lint.failOnError" )
+    @Parameter(property = "android.lint.failOnError")
     private Boolean lintFailOnError;
 
-    @PullParameter( defaultValue = "false" )
+    @PullParameter(defaultValue = "false")
     private Boolean parsedFailOnError;
 
     /**
@@ -107,10 +103,10 @@ public class LintMojo extends AbstractAndroidMojo
      *
      * @see Lint#skip
      */
-    @Parameter( property = "android.lint.skip" )
+    @Parameter(property = "android.lint.skip")
     private Boolean lintSkip;
 
-    @PullParameter( defaultValue = "true" )
+    @PullParameter(defaultValue = "true")
     private Boolean parsedSkip;
 
     // ---------------
@@ -122,10 +118,10 @@ public class LintMojo extends AbstractAndroidMojo
      *
      * @see Lint#ignoreWarnings
      */
-    @Parameter( property = "android.lint.ignoreWarning" )
+    @Parameter(property = "android.lint.ignoreWarning")
     private Boolean lintIgnoreWarnings;
 
-    @PullParameter( defaultValue = "false" )
+    @PullParameter(defaultValue = "false")
     private Boolean parsedIgnoreWarnings;
 
     /**
@@ -133,10 +129,10 @@ public class LintMojo extends AbstractAndroidMojo
      *
      * @see Lint#warnAll
      */
-    @Parameter( property = "android.lint.warnAll" )
+    @Parameter(property = "android.lint.warnAll")
     private Boolean lintWarnAll;
 
-    @PullParameter( defaultValue = "false" )
+    @PullParameter(defaultValue = "false")
     private Boolean parsedWarnAll;
 
     /**
@@ -144,10 +140,10 @@ public class LintMojo extends AbstractAndroidMojo
      *
      * @see Lint#warningsAsErrors
      */
-    @Parameter( property = "android.lint.warningsAsErrors" )
+    @Parameter(property = "android.lint.warningsAsErrors")
     private Boolean lintWarningsAsErrors;
 
-    @PullParameter( defaultValue = "false" )
+    @PullParameter(defaultValue = "false")
     private Boolean parsedWarningsAsErrors;
 
     /**
@@ -157,10 +153,10 @@ public class LintMojo extends AbstractAndroidMojo
      *
      * @see Lint#config
      */
-    @Parameter( property = "android.lint.config" )
+    @Parameter(property = "android.lint.config")
     private String lintConfig;
 
-    @PullParameter( defaultValue = "null" )
+    @PullParameter(defaultValue = "null")
     private String parsedConfig;
 
     // ---------------
@@ -172,10 +168,10 @@ public class LintMojo extends AbstractAndroidMojo
      *
      * @see Lint#fullPath
      */
-    @Parameter( property = "android.lint.fullPath" )
+    @Parameter(property = "android.lint.fullPath")
     private Boolean lintFullPath;
 
-    @PullParameter( defaultValue = "false" )
+    @PullParameter(defaultValue = "false")
     private Boolean parsedFullPath;
 
     /**
@@ -183,10 +179,10 @@ public class LintMojo extends AbstractAndroidMojo
      *
      * @see Lint#showAll
      */
-    @Parameter( property = "android.lint.showAll" )
+    @Parameter(property = "android.lint.showAll")
     private Boolean lintShowAll;
 
-    @PullParameter( defaultValue = "true" )
+    @PullParameter(defaultValue = "true")
     private Boolean parsedShowAll;
 
     /**
@@ -195,10 +191,10 @@ public class LintMojo extends AbstractAndroidMojo
      *
      * @see Lint#disableSourceLines
      */
-    @Parameter( property = "android.lint.disableSourceLines" )
+    @Parameter(property = "android.lint.disableSourceLines")
     private Boolean lintDisableSourceLines;
 
-    @PullParameter( defaultValue = "false" )
+    @PullParameter(defaultValue = "false")
     private Boolean parsedDisableSourceLines;
 
     /**
@@ -208,10 +204,10 @@ public class LintMojo extends AbstractAndroidMojo
      *
      * @see Lint#url
      */
-    @Parameter( property = "android.lint.url" )
+    @Parameter(property = "android.lint.url")
     private String lintUrl;
 
-    @PullParameter( defaultValue = "none" )
+    @PullParameter(defaultValue = "none")
     private String parsedUrl;
 
     /**
@@ -219,10 +215,10 @@ public class LintMojo extends AbstractAndroidMojo
      *
      * @see Lint#enableHtml
      */
-    @Parameter( property = "android.lint.enableHtml" )
+    @Parameter(property = "android.lint.enableHtml")
     private Boolean lintEnableHtml;
 
-    @PullParameter( defaultValue = "false" )
+    @PullParameter(defaultValue = "false")
     private Boolean parsedEnableHtml;
 
     /**
@@ -231,10 +227,10 @@ public class LintMojo extends AbstractAndroidMojo
      *
      * @see Lint#htmlOutputPath
      */
-    @Parameter( property = "android.lint.htmlOutputPath" )
+    @Parameter(property = "android.lint.htmlOutputPath")
     private String lintHtmlOutputPath;
 
-    @PullParameter( defaultValueGetterMethod = "getHtmlOutputPath" )
+    @PullParameter(defaultValueGetterMethod = "getHtmlOutputPath")
     private String parsedHtmlOutputPath;
 
     /**
@@ -242,10 +238,10 @@ public class LintMojo extends AbstractAndroidMojo
      *
      * @see Lint#enableSimpleHtml
      */
-    @Parameter( property = "android.lint.enableSimpleHtml" )
+    @Parameter(property = "android.lint.enableSimpleHtml")
     private Boolean lintEnableSimpleHtml;
 
-    @PullParameter( defaultValue = "false" )
+    @PullParameter(defaultValue = "false")
     private Boolean parsedEnableSimpleHtml;
 
     /**
@@ -254,10 +250,10 @@ public class LintMojo extends AbstractAndroidMojo
      *
      * @see Lint#simpleHtmlOutputPath
      */
-    @Parameter( property = "android.lint.simpleHtmlOutputPath" )
+    @Parameter(property = "android.lint.simpleHtmlOutputPath")
     private String lintSimpleHtmlOutputPath;
 
-    @PullParameter( defaultValueGetterMethod = "getSimpleHtmlOutputPath" )
+    @PullParameter(defaultValueGetterMethod = "getSimpleHtmlOutputPath")
     private String parsedSimpleHtmlOutputPath;
 
     /**
@@ -265,10 +261,10 @@ public class LintMojo extends AbstractAndroidMojo
      *
      * @see Lint#enableXml
      */
-    @Parameter( property = "android.lint.enableXml" )
+    @Parameter(property = "android.lint.enableXml")
     private Boolean lintEnableXml;
 
-    @PullParameter( defaultValue = "true" )
+    @PullParameter(defaultValue = "true")
     private Boolean parsedEnableXml;
 
     /**
@@ -277,10 +273,10 @@ public class LintMojo extends AbstractAndroidMojo
      *
      * @see Lint#xmlOutputPath
      */
-    @Parameter( property = "android.lint.xmlOutputPath" )
+    @Parameter(property = "android.lint.xmlOutputPath")
     private String lintXmlOutputPath;
 
-    @PullParameter( defaultValueGetterMethod = "getXmlOutputPath" )
+    @PullParameter(defaultValueGetterMethod = "getXmlOutputPath")
     private String parsedXmlOutputPath;
 
     // ---------------
@@ -292,10 +288,10 @@ public class LintMojo extends AbstractAndroidMojo
      *
      * @see Lint#enableSources
      */
-    @Parameter( property = "android.lint.enableSources" )
+    @Parameter(property = "android.lint.enableSources")
     private Boolean lintEnableSource;
 
-    @PullParameter( defaultValue = "true" )
+    @PullParameter(defaultValue = "true")
     private Boolean parsedEnableSources;
 
     /**
@@ -304,10 +300,10 @@ public class LintMojo extends AbstractAndroidMojo
      *
      * @see Lint#sources
      */
-    @Parameter( property = "android.lint.sources" )
+    @Parameter(property = "android.lint.sources")
     private String lintSources;
 
-    @PullParameter( defaultValueGetterMethod = "getSources" )
+    @PullParameter(defaultValueGetterMethod = "getSources")
     private String parsedSources;
 
     /**
@@ -316,10 +312,10 @@ public class LintMojo extends AbstractAndroidMojo
      * @see Lint#enableClasspath
      * @see Lint#classpath
      */
-    @Parameter( property = "android.lint.enableSources" )
+    @Parameter(property = "android.lint.enableSources")
     private Boolean lintEnableClasspath;
 
-    @PullParameter( defaultValue = "false" )
+    @PullParameter(defaultValue = "false")
     private Boolean parsedEnableClasspath;
 
     /**
@@ -329,10 +325,10 @@ public class LintMojo extends AbstractAndroidMojo
      *
      * @see Lint#classpath
      */
-    @Parameter( property = "android.lint.classpath" )
+    @Parameter(property = "android.lint.classpath")
     private String lintClasspath;
 
-    @PullParameter( defaultValueGetterMethod = "getClasspath" )
+    @PullParameter(defaultValueGetterMethod = "getClasspath")
     private String parsedClasspath;
 
     /**
@@ -341,10 +337,10 @@ public class LintMojo extends AbstractAndroidMojo
      * @see Lint#enableLibraries
      * @see Lint#libraries
      */
-    @Parameter( property = "android.lint.enableSources" )
+    @Parameter(property = "android.lint.enableSources")
     private Boolean lintEnableLibraries;
 
-    @PullParameter( defaultValue = "false" )
+    @PullParameter(defaultValue = "false")
     private Boolean parsedEnableLibraries;
 
     /**
@@ -354,23 +350,23 @@ public class LintMojo extends AbstractAndroidMojo
      *
      * @see Lint#libraries
      */
-    @Parameter( property = "android.lint.libraries" )
+    @Parameter(property = "android.lint.libraries")
     private String lintLibraries;
 
-    @PullParameter( defaultValueGetterMethod = "getLibraries" )
+    @PullParameter(defaultValueGetterMethod = "getLibraries")
     private String parsedLibraries;
 
 
-    @Parameter( property = "android.lint.legacy" )
+    @Parameter(property = "android.lint.legacy")
     private Boolean legacy;
 
-    @PullParameter( defaultValue = "true" )
+    @PullParameter(defaultValue = "true")
     private Boolean parsedLegacy;
 
-    @Parameter( property = "android.lint.quiet" )
+    @Parameter(property = "android.lint.quiet")
     private Boolean quiet;
 
-    @PullParameter( defaultValue = "true" )
+    @PullParameter(defaultValue = "true")
     private Boolean parsedQuiet;
 
 
@@ -380,365 +376,299 @@ public class LintMojo extends AbstractAndroidMojo
      * @throws MojoExecutionException
      */
     @Override
-    public void execute() throws MojoExecutionException, MojoFailureException
-    {
-        ConfigHandler configHandler = new ConfigHandler( this, this.session, this.execution );
+    public void execute() throws MojoExecutionException, MojoFailureException {
+        ConfigHandler configHandler = new ConfigHandler(this, this.session, this.execution);
         configHandler.parseConfiguration();
-        getLog().debug( "Parsed values for Android Lint invocation: " );
-        getLog().debug( "failOnError:" + parsedFailOnError );
-        getLog().debug( "skip:" + parsedSkip );
-        getLog().debug( "legacy:" + parsedLegacy );
-        getLog().debug( "quiet:" + parsedQuiet );
-        getLog().debug( "ignoreWarnings:" + parsedIgnoreWarnings );
-        getLog().debug( "warnAll:" + parsedWarnAll );
-        getLog().debug( "warningsAsErrors:" + parsedWarningsAsErrors );
-        getLog().debug( "config2:" + parsedConfig );
+        getLog().debug("Parsed values for Android Lint invocation: ");
+        getLog().debug("failOnError:" + parsedFailOnError);
+        getLog().debug("skip:" + parsedSkip);
+        getLog().debug("legacy:" + parsedLegacy);
+        getLog().debug("quiet:" + parsedQuiet);
+        getLog().debug("ignoreWarnings:" + parsedIgnoreWarnings);
+        getLog().debug("warnAll:" + parsedWarnAll);
+        getLog().debug("warningsAsErrors:" + parsedWarningsAsErrors);
+        getLog().debug("config2:" + parsedConfig);
 
-        getLog().debug( "fullPath:" + parsedFullPath );
-        getLog().debug( "showAll:" + parsedShowAll );
-        getLog().debug( "disableSourceLines:" + parsedDisableSourceLines );
+        getLog().debug("fullPath:" + parsedFullPath);
+        getLog().debug("showAll:" + parsedShowAll);
+        getLog().debug("disableSourceLines:" + parsedDisableSourceLines);
 
-        getLog().debug( "enablehtml: " + parsedEnableHtml );
-        getLog().debug( "htmlOutputPath:" + parsedHtmlOutputPath );
+        getLog().debug("enablehtml: " + parsedEnableHtml);
+        getLog().debug("htmlOutputPath:" + parsedHtmlOutputPath);
 
-        getLog().debug( "enableSimpleHtml: " + parsedEnableSimpleHtml );
-        getLog().debug( "simpleHtmlOutputPath:" + parsedSimpleHtmlOutputPath );
+        getLog().debug("enableSimpleHtml: " + parsedEnableSimpleHtml);
+        getLog().debug("simpleHtmlOutputPath:" + parsedSimpleHtmlOutputPath);
 
-        getLog().debug( "enableXml: " + parsedEnableXml );
-        getLog().debug( "xmlOutputPath:" + parsedXmlOutputPath );
+        getLog().debug("enableXml: " + parsedEnableXml);
+        getLog().debug("xmlOutputPath:" + parsedXmlOutputPath);
 
-        getLog().debug( "sources:" + parsedSources );
-        getLog().debug( "classpath:" + parsedClasspath );
-        getLog().debug( "libraries:" + parsedLibraries );
+        getLog().debug("sources:" + parsedSources);
+        getLog().debug("classpath:" + parsedClasspath);
+        getLog().debug("libraries:" + parsedLibraries);
 
-        if ( parsedSkip )
-        {
-            getLog().info( "Skipping lint analysis." );
-        }
-        else
-        {
-            getLog().info( "Performing lint analysis." );
+        if (parsedSkip) {
+            getLog().info("Skipping lint analysis.");
+        } else {
+            getLog().info("Performing lint analysis.");
 
-            if ( parsedLegacy )
-            {
-                getLog().info( "Using Lint from the Android SDK." );
+            if (parsedLegacy) {
+                getLog().info("Using Lint from the Android SDK.");
                 executeWhenConfigured();
-            }
-            else
-            {
-                getLog().info( "Using Lint dependency library." );
+            } else {
+                getLog().info("Using Lint dependency library.");
                 runLint();
             }
         }
     }
 
-    private void executeWhenConfigured() throws MojoExecutionException
-    {
+    private void executeWhenConfigured() throws MojoExecutionException {
         CommandExecutor executor = CommandExecutor.Factory.createDefaultCommmandExecutor();
-        executor.setLogger( this.getLog() );
+        executor.setLogger(this.getLog());
 
         String command = getAndroidSdk().getLintPath();
 
-        List< String > parameters = new ArrayList< String >();
+        List<String> parameters = new ArrayList<String>();
 
-        if ( isNotNullAndTrue( parsedIgnoreWarnings ) )
-        {
-            parameters.add( "-w" );
+        if (isNotNullAndTrue(parsedIgnoreWarnings)) {
+            parameters.add("-w");
         }
-        if ( isNotNullAndTrue( parsedWarnAll ) )
-        {
-            parameters.add( "-Wall" );
+        if (isNotNullAndTrue(parsedWarnAll)) {
+            parameters.add("-Wall");
         }
-        if ( isNotNullAndTrue( parsedWarningsAsErrors ) )
-        {
-            parameters.add( "-Werror" );
+        if (isNotNullAndTrue(parsedWarningsAsErrors)) {
+            parameters.add("-Werror");
         }
 
-        if ( isNotNullAndNotEquals( parsedConfig, "null" ) )
-        {
-            parameters.add( "--config" );
-            parameters.add( parsedConfig );
+        if (isNotNullAndNotEquals(parsedConfig, "null")) {
+            parameters.add("--config");
+            parameters.add(parsedConfig);
         }
 
-        if ( isNotNullAndTrue( parsedFullPath ) )
-        {
-            parameters.add( "--fullpath" );
+        if (isNotNullAndTrue(parsedFullPath)) {
+            parameters.add("--fullpath");
         }
-        if ( isNotNullAndTrue( parsedShowAll ) )
-        {
-            parameters.add( "--showall" );
+        if (isNotNullAndTrue(parsedShowAll)) {
+            parameters.add("--showall");
         }
-        if ( isNotNullAndTrue( parsedDisableSourceLines ) )
-        {
-            parameters.add( "--nolines" );
+        if (isNotNullAndTrue(parsedDisableSourceLines)) {
+            parameters.add("--nolines");
         }
-        if ( isNotNullAndTrue( parsedEnableHtml ) )
-        {
-            parameters.add( "--html" );
-            parameters.add( parsedHtmlOutputPath );
-            getLog().info( "Writing Lint HTML report in " + parsedHtmlOutputPath );
+        if (isNotNullAndTrue(parsedEnableHtml)) {
+            parameters.add("--html");
+            parameters.add(parsedHtmlOutputPath);
+            getLog().info("Writing Lint HTML report in " + parsedHtmlOutputPath);
         }
-        if ( isNotNullAndNotEquals( parsedUrl, "none" ) )
-        {
-            parameters.add( "--url" );
-            parameters.add( parsedUrl );
+        if (isNotNullAndNotEquals(parsedUrl, "none")) {
+            parameters.add("--url");
+            parameters.add(parsedUrl);
         }
-        if ( isNotNullAndTrue( parsedEnableSimpleHtml ) )
-        {
-            parameters.add( "--simplehtml" );
-            parameters.add( parsedSimpleHtmlOutputPath );
-            getLog().info( "Writing Lint simple HTML report in " + parsedSimpleHtmlOutputPath );
+        if (isNotNullAndTrue(parsedEnableSimpleHtml)) {
+            parameters.add("--simplehtml");
+            parameters.add(parsedSimpleHtmlOutputPath);
+            getLog().info("Writing Lint simple HTML report in " + parsedSimpleHtmlOutputPath);
         }
-        if ( isNotNullAndTrue( parsedEnableXml ) )
-        {
-            parameters.add( "--xml" );
-            parameters.add( parsedXmlOutputPath );
-            getLog().info( "Writing Lint XML report in " + parsedXmlOutputPath );
+        if (isNotNullAndTrue(parsedEnableXml)) {
+            parameters.add("--xml");
+            parameters.add(parsedXmlOutputPath);
+            getLog().info("Writing Lint XML report in " + parsedXmlOutputPath);
         }
-        if ( isNotNullAndTrue( parsedEnableSources ) )
-        {
-            parameters.add( "--sources" );
-            parameters.add( parsedSources );
+        if (isNotNullAndTrue(parsedEnableSources)) {
+            parameters.add("--sources");
+            parameters.add(parsedSources);
         }
-        if ( isNotNullAndTrue( parsedEnableClasspath ) )
-        {
-            parameters.add( "--classpath" );
-            parameters.add( parsedClasspath );
+        if (isNotNullAndTrue(parsedEnableClasspath)) {
+            parameters.add("--classpath");
+            parameters.add(parsedClasspath);
         }
-        if ( isNotNullAndTrue( parsedEnableLibraries ) )
-        {
-            parameters.add( "--libraries" );
-            parameters.add( parsedLibraries );
+        if (isNotNullAndTrue(parsedEnableLibraries)) {
+            parameters.add("--libraries");
+            parameters.add(parsedLibraries);
         }
 
-        parameters.add( project.getBasedir().getAbsolutePath() );
+        parameters.add(project.getBasedir().getAbsolutePath());
 
         // change return code if errors
         // see http://developer.android.com/tools/help/lint.html
         // option not provided by lint --help
-        parameters.add( "--exitcode" );
-        try
-        {
-            getLog().info( "Running command: " + command );
-            getLog().info( "with parameters: " + parameters );
-            executor.executeCommand( command, parameters, false );
-        }
-        catch ( ExecutionException e )
-        {
-            if ( isNotNullAndTrue( parsedFailOnError ) )
-            {
-                getLog().info( "Lint analysis produced errors and project is configured to fail on error." );
-                getLog().info( "Inspect lint reports or re-run with -X to see lint errors in log" );
-                getLog().info( "Failing build as configured. Ignore following error message." );
-                throw new MojoExecutionException( "", e );
+        parameters.add("--exitcode");
+        try {
+            getLog().info("Running command: " + command);
+            getLog().info("with parameters: " + parameters);
+            executor.executeCommand(command, parameters, false);
+        } catch (ExecutionException e) {
+            if (isNotNullAndTrue(parsedFailOnError)) {
+                getLog().info("Lint analysis produced errors and project is configured to fail on error.");
+                getLog().info("Inspect lint reports or re-run with -X to see lint errors in log");
+                getLog().info("Failing build as configured. Ignore following error message.");
+                throw new MojoExecutionException("", e);
             }
         }
-        getLog().info( "Lint analysis completed successfully." );
+        getLog().info("Lint analysis completed successfully.");
     }
 
-    private void runLint() throws MojoExecutionException
-    {
+    private void runLint() throws MojoExecutionException {
         IssueRegistry registry = new BuiltinIssueRegistry();
 
         LintCliFlags flags = new LintCliFlags();
 
-        LintCliClient client = new LintCliClient( flags, "AndroidMaven" );
+        LintCliClient client = new LintCliClient(flags, "AndroidMaven");
 
-        try
-        {
-            if ( isNotNull( parsedQuiet ) )
-            {
-                flags.setQuiet( parsedQuiet );
+        try {
+            if (isNotNull(parsedQuiet)) {
+                flags.setQuiet(parsedQuiet);
             }
-            if ( isNotNull( parsedIgnoreWarnings ) )
-            {
-                flags.setIgnoreWarnings( parsedIgnoreWarnings );
+            if (isNotNull(parsedIgnoreWarnings)) {
+                flags.setIgnoreWarnings(parsedIgnoreWarnings);
             }
-            if ( isNotNull( parsedWarnAll ) )
-            {
-                flags.setCheckAllWarnings( parsedWarnAll );
+            if (isNotNull(parsedWarnAll)) {
+                flags.setCheckAllWarnings(parsedWarnAll);
             }
-            if ( isNotNull( parsedWarningsAsErrors ) )
-            {
-                flags.setWarningsAsErrors( parsedWarningsAsErrors );
+            if (isNotNull(parsedWarningsAsErrors)) {
+                flags.setWarningsAsErrors(parsedWarningsAsErrors);
             }
 
-            if ( isNotNullAndNotEquals( parsedConfig, "null" ) )
-            {
-                flags.setDefaultConfiguration( new File( parsedConfig ) );
+            if (isNotNullAndNotEquals(parsedConfig, "null")) {
+                flags.setDefaultConfiguration(new File(parsedConfig));
             }
 
-            if ( isNotNull( parsedFullPath ) )
-            {
-                flags.setFullPath( parsedFullPath );
+            if (isNotNull(parsedFullPath)) {
+                flags.setFullPath(parsedFullPath);
             }
-            if ( isNotNull( parsedShowAll ) )
-            {
-                flags.setShowEverything( parsedShowAll );
+            if (isNotNull(parsedShowAll)) {
+                flags.setShowEverything(parsedShowAll);
             }
-            if ( isNotNull( parsedDisableSourceLines ) )
-            {
-                flags.setShowSourceLines( !parsedDisableSourceLines );
+            if (isNotNull(parsedDisableSourceLines)) {
+                flags.setShowSourceLines(!parsedDisableSourceLines);
             }
-            if ( isNotNullAndTrue( parsedEnableHtml ) )
-            {
-                File outHtml = new File( parsedHtmlOutputPath );
-                flags.getReporters().add( new MultiProjectHtmlReporter( client, outHtml, flags ) );
+            if (isNotNullAndTrue(parsedEnableHtml)) {
+                File outHtml = new File(parsedHtmlOutputPath);
+                flags.getReporters().add(new MultiProjectHtmlReporter(client, outHtml, flags));
 
-                getLog().info( "Writing Lint HTML report in " + parsedHtmlOutputPath );
+                getLog().info("Writing Lint HTML report in " + parsedHtmlOutputPath);
             }
-            if ( isNotNullAndNotEquals( parsedUrl, "none" ) )
-            {
+            if (isNotNullAndNotEquals(parsedUrl, "none")) {
 //                TODO what is this?
 //                parameters.add( "--url" );
 //                parameters.add( parsedUrl );
             }
-            if ( isNotNullAndTrue( parsedEnableSimpleHtml ) )
-            {
-                File outSimpleHtml = new File( parsedSimpleHtmlOutputPath );
-                flags.getReporters().add( new MultiProjectHtmlReporter( client, outSimpleHtml, flags ) );
+            if (isNotNullAndTrue(parsedEnableSimpleHtml)) {
+                File outSimpleHtml = new File(parsedSimpleHtmlOutputPath);
+                flags.getReporters().add(new MultiProjectHtmlReporter(client, outSimpleHtml, flags));
 
-                getLog().info( "Writing Lint simple HTML report in " + parsedSimpleHtmlOutputPath );
+                getLog().info("Writing Lint simple HTML report in " + parsedSimpleHtmlOutputPath);
             }
-            if ( isNotNullAndTrue( parsedEnableXml ) )
-            {
-                flags.getReporters().add( new XmlReporter( client, new File( parsedXmlOutputPath ) ) );
+            if (isNotNullAndTrue(parsedEnableXml)) {
+                flags.getReporters().add(new XmlReporter(client, new File(parsedXmlOutputPath)));
 
-                getLog().info( "Writing Lint XML report in " + parsedXmlOutputPath );
+                getLog().info("Writing Lint XML report in " + parsedXmlOutputPath);
             }
-            if ( isNotNullAndTrue( parsedEnableSources ) )
-            {
+            if (isNotNullAndTrue(parsedEnableSources)) {
 //                TODO what is this?
 //                parameters.add( "--sources" );
 //                parameters.add( parsedSources );
             }
-            if ( isNotNullAndTrue( parsedEnableClasspath ) )
-            {
+            if (isNotNullAndTrue(parsedEnableClasspath)) {
 //                TODO what is this?
 //                parameters.add( "--classpath" );
 //                parameters.add( parsedClasspath );
             }
-            if ( isNotNullAndTrue( parsedEnableLibraries ) )
-            {
+            if (isNotNullAndTrue(parsedEnableLibraries)) {
 //              TODO libraries
 //                parameters.add( "--libraries" );
 //                parameters.add( parsedLibraries );
             }
 
-            List< File > files = new ArrayList< File >();
-            files.add( resourceDirectory );
-            files.add( destinationManifestFile );
-            files.add( sourceDirectory );
-            files.add( assetsDirectory );
+            List<File> files = new ArrayList<File>();
+            files.add(resourceDirectory);
+            files.add(destinationManifestFile);
+            files.add(sourceDirectory);
+            files.add(assetsDirectory);
 
-            client.run( registry, files );
-        }
-        catch ( IOException ex )
-        {
-            throw new MojoExecutionException( ex.getMessage(), ex );
+            client.run(registry, files);
+        } catch (IOException ex) {
+            throw new MojoExecutionException(ex.getMessage(), ex);
         }
     }
 
-    private boolean isNotNull( Boolean b )
-    {
+    private boolean isNotNull(Boolean b) {
         return b != null;
     }
 
-    private boolean isNotNullAndTrue( Boolean b )
-    {
+    private boolean isNotNullAndTrue(Boolean b) {
         return b != null && b;
     }
 
-    private boolean isNotNullAndNotEquals( String underTest, String compared )
-    {
-        return underTest != null && !underTest.equals( compared );
+    private boolean isNotNullAndNotEquals(String underTest, String compared) {
+        return underTest != null && !underTest.equals(compared);
     }
 
     // used via PullParameter annotation - do not remove
-    private String getHtmlOutputPath()
-    {
-        if ( parsedHtmlOutputPath == null )
-        {
-            File reportPath = new File( targetDirectory, "lint-results/lint-results-html" );
-            createReportDirIfNeeded( reportPath );
+    private String getHtmlOutputPath() {
+        if (parsedHtmlOutputPath == null) {
+            File reportPath = new File(targetDirectory, "lint-results/lint-results-html");
+            createReportDirIfNeeded(reportPath);
             return reportPath.getAbsolutePath();
         }
         return parsedHtmlOutputPath;
     }
 
     // used via PullParameter annotation - do not remove
-    private String getSimpleHtmlOutputPath()
-    {
-        if ( parsedSimpleHtmlOutputPath == null )
-        {
-            File reportPath = new File( targetDirectory, "lint-results/lint-results-simple-html" );
-            createReportDirIfNeeded( reportPath );
+    private String getSimpleHtmlOutputPath() {
+        if (parsedSimpleHtmlOutputPath == null) {
+            File reportPath = new File(targetDirectory, "lint-results/lint-results-simple-html");
+            createReportDirIfNeeded(reportPath);
             return reportPath.getAbsolutePath();
         }
         return parsedSimpleHtmlOutputPath;
     }
 
     // used via PullParameter annotation - do not remove
-    private String getXmlOutputPath()
-    {
-        getLog().debug( "get parsed xml output path:" + parsedXmlOutputPath );
+    private String getXmlOutputPath() {
+        getLog().debug("get parsed xml output path:" + parsedXmlOutputPath);
 
-        if ( parsedXmlOutputPath == null )
-        {
-            File reportPath = new File( targetDirectory, "lint-results/lint-results.xml" );
-            createReportDirIfNeeded( reportPath );
+        if (parsedXmlOutputPath == null) {
+            File reportPath = new File(targetDirectory, "lint-results/lint-results.xml");
+            createReportDirIfNeeded(reportPath);
             return reportPath.getAbsolutePath();
         }
         return parsedXmlOutputPath;
     }
 
-    private void createReportDirIfNeeded( File reportPath )
-    {
-        if ( !reportPath.getParentFile().exists() )
-        {
+    private void createReportDirIfNeeded(File reportPath) {
+        if (!reportPath.getParentFile().exists()) {
             reportPath.getParentFile().mkdirs();
         }
     }
 
     // used via PullParameter annotation - do not remove
-    private String getSources()
-    {
-        if ( parsedSources == null )
-        {
+    private String getSources() {
+        if (parsedSources == null) {
             parsedSources = sourceDirectory.getAbsolutePath();
         }
         return parsedSources;
     }
 
     // used via PullParameter annotation - do not remove
-    private String getClasspath()
-    {
-        if ( parsedClasspath == null )
-        {
+    private String getClasspath() {
+        if (parsedClasspath == null) {
             parsedClasspath = projectOutputDirectory.getAbsolutePath();
         }
         return parsedClasspath;
     }
 
-    private String getLibraries()
-    {
-        if ( parsedLibraries == null )
-        {
+    private String getLibraries() {
+        if (parsedLibraries == null) {
             StringBuilder defaultClasspathBuilder = new StringBuilder();
-            Set< Artifact > artifacts = project.getDependencyArtifacts();
-            if ( artifacts != null )
-            {
-                for ( Artifact artifact : artifacts )
-                {
-                    if ( !Artifact.SCOPE_PROVIDED.equals( artifact.getScope() ) && artifact.isResolved() )
-                    {
-                        defaultClasspathBuilder.append( artifact.getFile().getPath() );
-                        defaultClasspathBuilder.append( File.pathSeparator );
+            Set<Artifact> artifacts = project.getDependencyArtifacts();
+            if (artifacts != null) {
+                for (Artifact artifact : artifacts) {
+                    if (!Artifact.SCOPE_PROVIDED.equals(artifact.getScope()) && artifact.isResolved()) {
+                        defaultClasspathBuilder.append(artifact.getFile().getPath());
+                        defaultClasspathBuilder.append(File.pathSeparator);
                     }
                 }
-                if ( defaultClasspathBuilder.length() > 0 )
-                {
-                    defaultClasspathBuilder.deleteCharAt( defaultClasspathBuilder.length() - 1 );
+                if (defaultClasspathBuilder.length() > 0) {
+                    defaultClasspathBuilder.deleteCharAt(defaultClasspathBuilder.length() - 1);
                     parsedLibraries = defaultClasspathBuilder.toString();
                 }
             }

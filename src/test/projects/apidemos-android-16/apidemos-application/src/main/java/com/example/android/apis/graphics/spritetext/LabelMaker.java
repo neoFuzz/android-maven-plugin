@@ -32,20 +32,19 @@ import javax.microedition.khronos.opengles.GL11Ext;
 
 /**
  * An OpenGL text label maker.
- *
- *
+ * <p>
+ * <p>
  * OpenGL labels are implemented by creating a Bitmap, drawing all the labels
  * into the Bitmap, converting the Bitmap into an Alpha texture, and drawing
  * portions of the texture using glDrawTexiOES.
- *
+ * <p>
  * The benefits of this approach are that the labels are drawn using the high
  * quality anti-aliased font rasterizer, full character set support, and all the
  * text labels are stored on a single texture, which makes it faster to use.
- *
+ * <p>
  * The drawbacks are that you can only have as many labels as will fit onto one
  * texture, and you have to recreate the whole texture if any label text
  * changes.
- *
  */
 public class LabelMaker {
     /**
@@ -54,9 +53,9 @@ public class LabelMaker {
      * the strike width and height must be powers of two,
      * We want the strike width to be at least as wide as the widest window.
      *
-     * @param fullColor true if we want a full color backing store (4444),
-     * otherwise we generate a grey L8 backing store.
-     * @param strikeWidth width of strike
+     * @param fullColor    true if we want a full color backing store (4444),
+     *                     otherwise we generate a grey L8 backing store.
+     * @param strikeWidth  width of strike
      * @param strikeHeight height of strike
      */
     public LabelMaker(boolean fullColor, int strikeWidth, int strikeHeight) {
@@ -103,7 +102,7 @@ public class LabelMaker {
      * Call when the surface has been destroyed
      */
     public void shutdown(GL10 gl) {
-        if ( gl != null) {
+        if (gl != null) {
             if (mState > STATE_NEW) {
                 int[] textures = new int[1];
                 textures[0] = mTextureID;
@@ -135,7 +134,7 @@ public class LabelMaker {
      * Call to add a label
      *
      * @param gl
-     * @param text the text of the label
+     * @param text      the text of the label
      * @param textPaint the paint of the label
      * @return the id of the label, used to measure and draw the label
      */
@@ -147,7 +146,7 @@ public class LabelMaker {
      * Call to add a label
      *
      * @param gl
-     * @param text the text of the label
+     * @param text      the text of the label
      * @param textPaint the paint of the label
      * @return the id of the label, used to measure and draw the label
      */
@@ -157,6 +156,7 @@ public class LabelMaker {
 
     /**
      * Call to add a label
+     *
      * @return the id of the label, used to measure and draw the label
      */
     public int add(GL10 gl, Drawable drawable, int minWidth, int minHeight) {
@@ -167,12 +167,12 @@ public class LabelMaker {
      * Call to add a label
      *
      * @param gl
-     * @param text the text of the label
+     * @param text      the text of the label
      * @param textPaint the paint of the label
      * @return the id of the label, used to measure and draw the label
      */
     public int add(GL10 gl, Drawable background, String text, Paint textPaint,
-            int minWidth, int minHeight) {
+                   int minWidth, int minHeight) {
         checkState(STATE_ADDING, STATE_ADDING);
         boolean drawBackground = background != null;
         boolean drawText = (text != null) && (textPaint != null);
@@ -194,7 +194,7 @@ public class LabelMaker {
             measuredTextWidth = (int) Math.ceil(textPaint.measureText(text));
         }
         int textHeight = ascent + descent;
-        int textWidth = Math.min(mStrikeWidth,measuredTextWidth);
+        int textWidth = Math.min(mStrikeWidth, measuredTextWidth);
 
         int padHeight = padding.top + padding.bottom;
         int padWidth = padding.left + padding.right;
@@ -340,9 +340,9 @@ public class LabelMaker {
         checkState(STATE_DRAWING, STATE_DRAWING);
         Label label = mLabels.get(labelID);
         gl.glEnable(GL10.GL_TEXTURE_2D);
-        ((GL11)gl).glTexParameteriv(GL10.GL_TEXTURE_2D,
+        ((GL11) gl).glTexParameteriv(GL10.GL_TEXTURE_2D,
                 GL11Ext.GL_TEXTURE_CROP_RECT_OES, label.mCrop, 0);
-        ((GL11Ext)gl).glDrawTexiOES((int) x, (int) y, 0,
+        ((GL11Ext) gl).glDrawTexiOES((int) x, (int) y, 0,
                 (int) label.width, (int) label.height);
     }
 
@@ -369,7 +369,7 @@ public class LabelMaker {
 
     private static class Label {
         public Label(float width, float height, float baseLine,
-                int cropU, int cropV, int cropW, int cropH) {
+                     int cropU, int cropV, int cropW, int cropH) {
             this.width = width;
             this.height = height;
             this.baseline = baseLine;

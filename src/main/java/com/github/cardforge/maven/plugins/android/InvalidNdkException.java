@@ -20,10 +20,8 @@ package com.github.cardforge.maven.plugins.android;
  *
  * @author hugo.josefson@jayway.com
  */
-public class InvalidNdkException extends RuntimeException
-{
-    public InvalidNdkException( String message )
-    {
-        super( message );
+public class InvalidNdkException extends RuntimeException {
+    public InvalidNdkException(String message) {
+        super(message);
     }
 }

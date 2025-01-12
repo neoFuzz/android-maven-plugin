@@ -18,6 +18,7 @@ package com.example.android.apis.app;
 
 // Need the following import to get access to the app resources, since this
 // class is in a sub-package.
+
 import com.example.android.apis.R;
 
 import android.app.Activity;
@@ -27,13 +28,13 @@ import android.os.Bundle;
 /**
  * Simple example of writing an application Activity.
  * Hello World</a></h3>
-
-<p>This demonstrates the basic code needed to write a Screen activity.</p>
-
-<h4>Demo</h4>
-App/Activity/Hello World
- 
-<h4>Source files</h4>
+ *
+ * <p>This demonstrates the basic code needed to write a Screen activity.</p>
+ *
+ * <h4>Demo</h4>
+ * App/Activity/Hello World
+ *
+ * <h4>Source files</h4>
  * <table class="LinkTable">
  *         <tr>
  *             <td >src/com.example.android.apis/app/HelloWorld.java</td>
@@ -43,18 +44,16 @@ App/Activity/Hello World
  *             <td >/res/any/layout/hello_world.xml</td>
  *             <td >Defines contents of the screen</td>
  *         </tr>
- * </table> 
+ * </table>
  */
-public class HelloWorld extends Activity
-{
+public class HelloWorld extends Activity {
     /**
      * Initialization of the Activity after it is first created.  Must at least
      * call {@link android.app.Activity#setContentView setContentView()} to
      * describe what is to be displayed in the screen.
      */
     @Override
-	protected void onCreate(Bundle savedInstanceState)
-    {
+    protected void onCreate(Bundle savedInstanceState) {
         // Be sure to call the super class.
         super.onCreate(savedInstanceState);
 

@@ -26,9 +26,8 @@ import android.widget.TextView;
 
 /**
  * Example of using a tab content factory for the content via {@link TabHost.TabSpec#setContent(android.widget.TabHost.TabContentFactory)}
- *
+ * <p>
  * It also demonstrates using an icon on one of the tabs via {@link TabHost.TabSpec#setIndicator(CharSequence, android.graphics.drawable.Drawable)}
- *
  */
 public class Tabs2 extends TabActivity implements TabHost.TabContentFactory {
 
@@ -48,7 +47,9 @@ public class Tabs2 extends TabActivity implements TabHost.TabContentFactory {
                 .setContent(this));
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     public View createTabContent(String tag) {
         final TextView tv = new TextView(this);
         tv.setText("Content for tab with tag " + tag);

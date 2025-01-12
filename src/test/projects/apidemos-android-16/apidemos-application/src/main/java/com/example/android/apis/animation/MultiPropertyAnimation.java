@@ -18,6 +18,7 @@ package com.example.android.apis.animation;
 
 // Need the following import to get access to the app resources, since this
 // class is in a sub-package.
+
 import android.animation.*;
 import android.view.animation.AccelerateInterpolator;
 import com.example.android.apis.R;
@@ -96,7 +97,7 @@ public class MultiPropertyAnimation extends Activity {
                         getHeight() - BALL_SIZE);
                 PropertyValuesHolder pvhAlpha = PropertyValuesHolder.ofFloat("alpha", 1.0f, 0f);
                 ObjectAnimator yAlphaBouncer = ObjectAnimator.ofPropertyValuesHolder(ball,
-                        pvhY, pvhAlpha).setDuration(DURATION/2);
+                        pvhY, pvhAlpha).setDuration(DURATION / 2);
                 yAlphaBouncer.setInterpolator(new AccelerateInterpolator());
                 yAlphaBouncer.setRepeatCount(1);
                 yAlphaBouncer.setRepeatMode(ValueAnimator.REVERSE);
@@ -108,11 +109,11 @@ public class MultiPropertyAnimation extends Activity {
                 PropertyValuesHolder pvhH = PropertyValuesHolder.ofFloat("height", ball.getHeight(),
                         ball.getHeight() * 2);
                 PropertyValuesHolder pvTX = PropertyValuesHolder.ofFloat("x", ball.getX(),
-                        ball.getX() - BALL_SIZE/2f);
+                        ball.getX() - BALL_SIZE / 2f);
                 PropertyValuesHolder pvTY = PropertyValuesHolder.ofFloat("y", ball.getY(),
-                        ball.getY() - BALL_SIZE/2f);
+                        ball.getY() - BALL_SIZE / 2f);
                 ObjectAnimator whxyBouncer = ObjectAnimator.ofPropertyValuesHolder(ball, pvhW, pvhH,
-                        pvTX, pvTY).setDuration(DURATION/2);
+                        pvTX, pvTY).setDuration(DURATION / 2);
                 whxyBouncer.setRepeatCount(1);
                 whxyBouncer.setRepeatMode(ValueAnimator.REVERSE);
 
@@ -124,13 +125,13 @@ public class MultiPropertyAnimation extends Activity {
                 Keyframe kf2 = Keyframe.ofFloat(1f, ballX + 50f);
                 PropertyValuesHolder pvhX = PropertyValuesHolder.ofKeyframe("x", kf0, kf1, kf2);
                 ObjectAnimator yxBouncer = ObjectAnimator.ofPropertyValuesHolder(ball, pvhY,
-                        pvhX).setDuration(DURATION/2);
+                        pvhX).setDuration(DURATION / 2);
                 yxBouncer.setRepeatCount(1);
                 yxBouncer.setRepeatMode(ValueAnimator.REVERSE);
 
 
                 bounceAnim = new AnimatorSet();
-                ((AnimatorSet)bounceAnim).playTogether(yBouncer, yAlphaBouncer, whxyBouncer,
+                ((AnimatorSet) bounceAnim).playTogether(yBouncer, yAlphaBouncer, whxyBouncer,
                         yxBouncer);
             }
         }
@@ -147,12 +148,12 @@ public class MultiPropertyAnimation extends Activity {
             ShapeHolder shapeHolder = new ShapeHolder(drawable);
             shapeHolder.setX(x);
             shapeHolder.setY(y);
-            int red = (int)(100 + Math.random() * 155);
-            int green = (int)(100 + Math.random() * 155);
-            int blue = (int)(100 + Math.random() * 155);
+            int red = (int) (100 + Math.random() * 155);
+            int green = (int) (100 + Math.random() * 155);
+            int blue = (int) (100 + Math.random() * 155);
             int color = 0xff000000 | red << 16 | green << 8 | blue;
             Paint paint = drawable.getPaint();
-            int darkColor = 0xff000000 | red/4 << 16 | green/4 << 8 | blue/4;
+            int darkColor = 0xff000000 | red / 4 << 16 | green / 4 << 8 | blue / 4;
             RadialGradient gradient = new RadialGradient(37.5f, 12.5f,
                     50f, color, darkColor, Shader.TileMode.CLAMP);
             paint.setShader(gradient);

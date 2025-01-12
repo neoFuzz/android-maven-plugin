@@ -118,7 +118,8 @@ public class LoaderCustom extends Activity {
                     android.R.drawable.sym_def_app_icon);
         }
 
-        @Override public String toString() {
+        @Override
+        public String toString() {
             return mLabel;
         }
 
@@ -148,6 +149,7 @@ public class LoaderCustom extends Activity {
      */
     public static final Comparator<AppEntry> ALPHA_COMPARATOR = new Comparator<AppEntry>() {
         private final Collator sCollator = Collator.getInstance();
+
         @Override
         public int compare(AppEntry object1, AppEntry object2) {
             return sCollator.compare(object1.getLabel(), object2.getLabel());
@@ -165,8 +167,8 @@ public class LoaderCustom extends Activity {
         boolean applyNewConfig(Resources res) {
             int configChanges = mLastConfiguration.updateFrom(res.getConfiguration());
             boolean densityChanged = mLastDensity != res.getDisplayMetrics().densityDpi;
-            if (densityChanged || (configChanges&(ActivityInfo.CONFIG_LOCALE
-                    |ActivityInfo.CONFIG_UI_MODE|ActivityInfo.CONFIG_SCREEN_LAYOUT)) != 0) {
+            if (densityChanged || (configChanges & (ActivityInfo.CONFIG_LOCALE
+                    | ActivityInfo.CONFIG_UI_MODE | ActivityInfo.CONFIG_SCREEN_LAYOUT)) != 0) {
                 mLastDensity = res.getDisplayMetrics().densityDpi;
                 return true;
             }
@@ -195,7 +197,8 @@ public class LoaderCustom extends Activity {
             mLoader.getContext().registerReceiver(this, sdFilter);
         }
 
-        @Override public void onReceive(Context context, Intent intent) {
+        @Override
+        public void onReceive(Context context, Intent intent) {
             // Tell the loader about the change.
             mLoader.onContentChanged();
         }
@@ -225,11 +228,12 @@ public class LoaderCustom extends Activity {
          * called in a background thread and should generate a new set of
          * data to be published by the loader.
          */
-        @Override public List<AppEntry> loadInBackground() {
+        @Override
+        public List<AppEntry> loadInBackground() {
             // Retrieve all known applications.
             List<ApplicationInfo> apps = mPm.getInstalledApplications(
                     PackageManager.GET_UNINSTALLED_PACKAGES |
-                    PackageManager.GET_DISABLED_COMPONENTS);
+                            PackageManager.GET_DISABLED_COMPONENTS);
             if (apps == null) {
                 apps = new ArrayList<ApplicationInfo>();
             }
@@ -238,7 +242,7 @@ public class LoaderCustom extends Activity {
 
             // Create corresponding array of entries and load their labels.
             List<AppEntry> entries = new ArrayList<AppEntry>(apps.size());
-            for (int i=0; i<apps.size(); i++) {
+            for (int i = 0; i < apps.size(); i++) {
                 AppEntry entry = new AppEntry(this, apps.get(i));
                 entry.loadLabel(context);
                 entries.add(entry);
@@ -256,7 +260,8 @@ public class LoaderCustom extends Activity {
          * super class will take care of delivering it; the implementation
          * here just adds a little more logic.
          */
-        @Override public void deliverResult(List<AppEntry> apps) {
+        @Override
+        public void deliverResult(List<AppEntry> apps) {
             if (isReset()) {
                 // An async query came in while the loader is stopped.  We
                 // don't need the result.
@@ -284,7 +289,8 @@ public class LoaderCustom extends Activity {
         /**
          * Handles a request to start the Loader.
          */
-        @Override protected void onStartLoading() {
+        @Override
+        protected void onStartLoading() {
             if (mApps != null) {
                 // If we currently have a result available, deliver it
                 // immediately.
@@ -310,7 +316,8 @@ public class LoaderCustom extends Activity {
         /**
          * Handles a request to stop the Loader.
          */
-        @Override protected void onStopLoading() {
+        @Override
+        protected void onStopLoading() {
             // Attempt to cancel the current load task if possible.
             cancelLoad();
         }
@@ -318,7 +325,8 @@ public class LoaderCustom extends Activity {
         /**
          * Handles a request to cancel a load.
          */
-        @Override public void onCanceled(List<AppEntry> apps) {
+        @Override
+        public void onCanceled(List<AppEntry> apps) {
             super.onCanceled(apps);
 
             // At this point we can release the resources associated with 'apps'
@@ -329,7 +337,8 @@ public class LoaderCustom extends Activity {
         /**
          * Handles a request to completely reset the Loader.
          */
-        @Override protected void onReset() {
+        @Override
+        protected void onReset() {
             super.onReset();
 
             // Ensure the loader is stopped
@@ -360,13 +369,12 @@ public class LoaderCustom extends Activity {
     }
 
 
-
     public static class AppListAdapter extends ArrayAdapter<AppEntry> {
         private final LayoutInflater mInflater;
 
         public AppListAdapter(Context context) {
             super(context, android.R.layout.simple_list_item_2);
-            mInflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         }
 
         public void setData(List<AppEntry> data) {
@@ -379,7 +387,8 @@ public class LoaderCustom extends Activity {
         /**
          * Populate new items in the list.
          */
-        @Override public View getView(int position, View convertView, ViewGroup parent) {
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
             View view;
 
             if (convertView == null) {
@@ -389,8 +398,8 @@ public class LoaderCustom extends Activity {
             }
 
             AppEntry item = getItem(position);
-            ((ImageView)view.findViewById(R.id.icon)).setImageDrawable(item.getIcon());
-            ((TextView)view.findViewById(R.id.text)).setText(item.getLabel());
+            ((ImageView) view.findViewById(R.id.icon)).setImageDrawable(item.getIcon());
+            ((TextView) view.findViewById(R.id.text)).setText(item.getLabel());
 
             return view;
         }
@@ -405,7 +414,8 @@ public class LoaderCustom extends Activity {
         // If non-null, this is the current filter the user has provided.
         String mCurFilter;
 
-        @Override public void onActivityCreated(Bundle savedInstanceState) {
+        @Override
+        public void onActivityCreated(Bundle savedInstanceState) {
             super.onActivityCreated(savedInstanceState);
 
             // Give some text to display if there is no data.  In a real
@@ -427,7 +437,8 @@ public class LoaderCustom extends Activity {
             getLoaderManager().initLoader(0, null, this);
         }
 
-        @Override public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        @Override
+        public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
             // Place an action bar item for searching.
             MenuItem item = menu.add("Search");
             item.setIcon(android.R.drawable.ic_menu_search);
@@ -438,7 +449,8 @@ public class LoaderCustom extends Activity {
             item.setActionView(sv);
         }
 
-        @Override public boolean onQueryTextChange(String newText) {
+        @Override
+        public boolean onQueryTextChange(String newText) {
             // Called when the action bar search text has changed.  Since this
             // is a simple array adapter, we can just have it do the filtering.
             mCurFilter = !TextUtils.isEmpty(newText) ? newText : null;
@@ -446,23 +458,27 @@ public class LoaderCustom extends Activity {
             return true;
         }
 
-        @Override public boolean onQueryTextSubmit(String query) {
+        @Override
+        public boolean onQueryTextSubmit(String query) {
             // Don't care about this.
             return true;
         }
 
-        @Override public void onListItemClick(ListView l, View v, int position, long id) {
+        @Override
+        public void onListItemClick(ListView l, View v, int position, long id) {
             // Insert desired behavior here.
             Log.i("LoaderCustom", "Item clicked: " + id);
         }
 
-        @Override public Loader<List<AppEntry>> onCreateLoader(int id, Bundle args) {
+        @Override
+        public Loader<List<AppEntry>> onCreateLoader(int id, Bundle args) {
             // This is called when a new Loader needs to be created.  This
             // sample only has one Loader with no arguments, so it is simple.
             return new AppListLoader(getActivity());
         }
 
-        @Override public void onLoadFinished(Loader<List<AppEntry>> loader, List<AppEntry> data) {
+        @Override
+        public void onLoadFinished(Loader<List<AppEntry>> loader, List<AppEntry> data) {
             // Set the new data in the adapter.
             mAdapter.setData(data);
 
@@ -474,7 +490,8 @@ public class LoaderCustom extends Activity {
             }
         }
 
-        @Override public void onLoaderReset(Loader<List<AppEntry>> loader) {
+        @Override
+        public void onLoaderReset(Loader<List<AppEntry>> loader) {
             // Clear the data in the adapter.
             mAdapter.setData(null);
         }

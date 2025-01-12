@@ -3,52 +3,43 @@ package com.github.cardforge.maven.plugins.android.standalonemojos;
 /**
  * CompatibleScreen abstracts the AndroidManifest element.
  */
-public class CompatibleScreen
-{
+public class CompatibleScreen {
 
     private String screenSize;
     private String screenDensity;
 
-    public String getScreenSize()
-    {
+    public String getScreenSize() {
         return screenSize;
     }
 
-    public void setScreenSize( String screenSize )
-    {
+    public void setScreenSize(String screenSize) {
         this.screenSize = screenSize;
     }
 
-    public String getScreenDensity()
-    {
+    public String getScreenDensity() {
         return screenDensity;
     }
 
-    public void setScreenDensity( String screenDensity )
-    {
+    public void setScreenDensity(String screenDensity) {
         this.screenDensity = screenDensity;
     }
 
     @Override
-    public boolean equals( Object obj )
-    {
-        if ( obj instanceof CompatibleScreen )
-        {
-            CompatibleScreen that = ( CompatibleScreen ) obj;
-            return this.screenDensity.equals( that.screenDensity ) && this.screenSize.equals( that.screenSize );
+    public boolean equals(Object obj) {
+        if (obj instanceof CompatibleScreen) {
+            CompatibleScreen that = (CompatibleScreen) obj;
+            return this.screenDensity.equals(that.screenDensity) && this.screenSize.equals(that.screenSize);
         }
         return false;
     }
 
     @Override
-    public int hashCode()
-    {
-        return ( screenDensity + screenSize ).hashCode();
+    public int hashCode() {
+        return (screenDensity + screenSize).hashCode();
     }
 
     @Override
-    public String toString()
-    {
+    public String toString() {
         return screenSize + ":" + screenDensity;
     }
 }

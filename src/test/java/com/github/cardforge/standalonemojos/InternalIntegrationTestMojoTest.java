@@ -16,16 +16,14 @@
 
 package com.github.cardforge.standalonemojos;
 
-import java.io.File;
-import java.io.IOException;
-import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.Method;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
-
+import com.android.ddmlib.*;
+import com.android.ddmlib.log.LogReceiver;
+import com.android.ddmlib.testrunner.RemoteAndroidTestRunner;
 import com.android.sdklib.AndroidVersion;
+import com.github.cardforge.AbstractAndroidMojoTestCase;
+import com.github.cardforge.maven.plugins.android.AbstractAndroidMojo;
+import com.github.cardforge.maven.plugins.android.DeviceCallback;
+import com.github.cardforge.maven.plugins.android.phase12integrationtest.InternalIntegrationTestMojo;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -35,35 +33,24 @@ import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.powermock.reflect.Whitebox;
 
-import com.android.ddmlib.AdbCommandRejectedException;
-import com.android.ddmlib.Client;
-import com.android.ddmlib.FileListingService;
-import com.android.ddmlib.IDevice;
-import com.android.ddmlib.IShellOutputReceiver;
-import com.android.ddmlib.InstallException;
-import com.android.ddmlib.RawImage;
-import com.android.ddmlib.ScreenRecorderOptions;
-import com.android.ddmlib.ShellCommandUnresponsiveException;
-import com.android.ddmlib.SyncException;
-import com.android.ddmlib.SyncService;
-import com.android.ddmlib.TimeoutException;
-import com.android.ddmlib.log.LogReceiver;
-import com.android.ddmlib.testrunner.RemoteAndroidTestRunner;
-import com.github.cardforge.maven.plugins.android.AbstractAndroidMojo;
-import com.github.cardforge.AbstractAndroidMojoTestCase;
-import com.github.cardforge.maven.plugins.android.DeviceCallback;
-import com.github.cardforge.maven.plugins.android.phase12integrationtest.InternalIntegrationTestMojo;
+import java.io.File;
+import java.io.IOException;
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Tests the {@link InternalIntegrationTestMojo} mojo, as far as possible without actually
  * connecting and communicating with a device.
- * 
+ *
  * @author Erik Ogenvik
- * 
  */
-@Ignore("This test has to be migrated to be an IntegrationTest using AbstractAndroidMojoIntegrationTest") 
+@Ignore("This test has to be migrated to be an IntegrationTest using AbstractAndroidMojoIntegrationTest")
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({ RemoteAndroidTestRunner.class, AbstractAndroidMojo.class })
+@PrepareForTest({RemoteAndroidTestRunner.class, AbstractAndroidMojo.class})
 public class InternalIntegrationTestMojoTest extends AbstractAndroidMojoTestCase<InternalIntegrationTestMojo> {
 
     @Override
@@ -287,8 +274,7 @@ public class InternalIntegrationTestMojoTest extends AbstractAndroidMojoTestCase
                     }
 
                     @Override
-                    public void installPackages (List<File> list, boolean b, List<String> list1, long l, TimeUnit timeUnit ) throws InstallException
-                    {
+                    public void installPackages(List<File> list, boolean b, List<String> list1, long l, TimeUnit timeUnit) throws InstallException {
 
                     }
 
@@ -318,26 +304,22 @@ public class InternalIntegrationTestMojoTest extends AbstractAndroidMojoTestCase
 
                     @Override
                     public void createForward(int arg0, String arg1, DeviceUnixSocketNamespace arg2)
-                            throws TimeoutException, AdbCommandRejectedException, IOException
-                    {
+                            throws TimeoutException, AdbCommandRejectedException, IOException {
                     }
 
                     @Override
-                    public String getName()
-                    {
+                    public String getName() {
                         return null;
                     }
 
                     @Override
                     public void executeShellCommand(String s, IShellOutputReceiver iShellOutputReceiver, long l, TimeUnit timeUnit)
-                        throws TimeoutException, AdbCommandRejectedException, ShellCommandUnresponsiveException, IOException
-                    {
+                            throws TimeoutException, AdbCommandRejectedException, ShellCommandUnresponsiveException, IOException {
                     }
 
                     @Override
                     public void executeShellCommand(String s, IShellOutputReceiver iShellOutputReceiver, long l, long l1, TimeUnit timeUnit)
-                            throws TimeoutException, AdbCommandRejectedException, ShellCommandUnresponsiveException, IOException
-                    {
+                            throws TimeoutException, AdbCommandRejectedException, ShellCommandUnresponsiveException, IOException {
                     }
 
                     @Override
@@ -347,8 +329,7 @@ public class InternalIntegrationTestMojoTest extends AbstractAndroidMojoTestCase
 
                     @Override
                     public void removeForward(int arg0, String arg1, DeviceUnixSocketNamespace arg2)
-                            throws TimeoutException, AdbCommandRejectedException, IOException
-                    {
+                            throws TimeoutException, AdbCommandRejectedException, IOException {
                     }
 
                     @Override
@@ -358,8 +339,8 @@ public class InternalIntegrationTestMojoTest extends AbstractAndroidMojoTestCase
 
                     @Override
                     public void startScreenRecorder(String remoteFilePath,
-                            ScreenRecorderOptions options,
-                            IShellOutputReceiver receiver)
+                                                    ScreenRecorderOptions options,
+                                                    IShellOutputReceiver receiver)
                             throws TimeoutException,
                             AdbCommandRejectedException, IOException,
                             ShellCommandUnresponsiveException {
@@ -367,17 +348,17 @@ public class InternalIntegrationTestMojoTest extends AbstractAndroidMojoTestCase
 
                     @Override
                     public boolean supportsFeature(HardwareFeature arg0) {
-                      return false;
+                        return false;
                     }
 
                     @Override
                     public List<String> getAbis() {
-                      return null;
+                        return null;
                     }
 
                     @Override
                     public int getDensity() {
-                      return 0;
+                        return 0;
                     }
 
                     @Override
@@ -397,14 +378,14 @@ public class InternalIntegrationTestMojoTest extends AbstractAndroidMojoTestCase
 
                     @Override
                     public boolean root() throws TimeoutException, AdbCommandRejectedException, IOException,
-                        ShellCommandUnresponsiveException {
-                      return false;
+                            ShellCommandUnresponsiveException {
+                        return false;
                     }
 
                     @Override
                     public boolean isRoot() throws TimeoutException, AdbCommandRejectedException, IOException,
-                        ShellCommandUnresponsiveException {
-                      return false;
+                            ShellCommandUnresponsiveException {
+                        return false;
                     }
 
                 });

@@ -68,14 +68,15 @@ public class ContentBrowserActivity extends Activity
         int mLastSystemUiVis;
 
         Runnable mNavHider = new Runnable() {
-            @Override public void run() {
+            @Override
+            public void run() {
                 setNavVisibility(false);
             }
         };
 
         public Content(Context context, AttributeSet attrs) {
             super(context, attrs);
-    
+
             mText = new TextView(context);
             mText.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 16);
             mText.setText(context.getString(R.string.alert_dialog_two_buttons2ultra_msg));
@@ -96,19 +97,21 @@ public class ContentBrowserActivity extends Activity
             setNavVisibility(true);
         }
 
-        @Override public void onSystemUiVisibilityChange(int visibility) {
+        @Override
+        public void onSystemUiVisibilityChange(int visibility) {
             // Detect when we go out of low-profile mode, to also go out
             // of full screen.  We only do this when the low profile mode
             // is changing from its last state, and turning off.
             int diff = mLastSystemUiVis ^ visibility;
             mLastSystemUiVis = visibility;
-            if ((diff&SYSTEM_UI_FLAG_LOW_PROFILE) != 0
-                    && (visibility&SYSTEM_UI_FLAG_LOW_PROFILE) == 0) {
+            if ((diff & SYSTEM_UI_FLAG_LOW_PROFILE) != 0
+                    && (visibility & SYSTEM_UI_FLAG_LOW_PROFILE) == 0) {
                 setNavVisibility(true);
             }
         }
 
-        @Override protected void onWindowVisibilityChanged(int visibility) {
+        @Override
+        protected void onWindowVisibilityChanged(int visibility) {
             super.onWindowVisibilityChanged(visibility);
 
             // When we become visible, we show our navigation elements briefly
@@ -117,17 +120,19 @@ public class ContentBrowserActivity extends Activity
             getHandler().postDelayed(mNavHider, 2000);
         }
 
-        @Override protected void onScrollChanged(int l, int t, int oldl, int oldt) {
+        @Override
+        protected void onScrollChanged(int l, int t, int oldl, int oldt) {
             super.onScrollChanged(l, t, oldl, oldt);
 
             // When the user scrolls, we hide navigation elements.
             setNavVisibility(false);
         }
 
-        @Override public void onClick(View v) {
+        @Override
+        public void onClick(View v) {
             // When the user clicks, we toggle the visibility of navigation elements.
             int curVis = getSystemUiVisibility();
-            setNavVisibility((curVis&SYSTEM_UI_FLAG_LOW_PROFILE) != 0);
+            setNavVisibility((curVis & SYSTEM_UI_FLAG_LOW_PROFILE) != 0);
         }
 
         void setBaseSystemUiVisibility(int visibility) {
@@ -170,9 +175,9 @@ public class ContentBrowserActivity extends Activity
         getWindow().requestFeature(Window.FEATURE_ACTION_BAR_OVERLAY);
 
         setContentView(R.layout.content_browser);
-        mContent = (Content)findViewById(R.id.content);
-        mContent.init((TextView)findViewById(R.id.title),
-                (SeekBar)findViewById(R.id.seekbar));
+        mContent = (Content) findViewById(R.id.content);
+        mContent.init((TextView) findViewById(R.id.title),
+                (SeekBar) findViewById(R.id.seekbar));
 
         ActionBar bar = getActionBar();
         bar.addTab(bar.newTab().setText("Tab 1").setTabListener(this));
@@ -232,7 +237,7 @@ public class ContentBrowserActivity extends Activity
                 item.setChecked(!item.isChecked());
                 mContent.setBaseSystemUiVisibility(item.isChecked()
                         ? View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-                                | View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                        | View.SYSTEM_UI_FLAG_LAYOUT_STABLE
                         : View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
                 return true;
         }

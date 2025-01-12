@@ -72,7 +72,7 @@ public class FrameBufferObjectActivity extends Activity {
             } else {
                 // Current context doesn't support frame buffer objects.
                 // Indicate this by drawing a red background.
-                gl.glClearColor(1,0,0,0);
+                gl.glClearColor(1, 0, 0, 0);
                 gl.glClear(GL10.GL_COLOR_BUFFER_BIT | GL10.GL_DEPTH_BUFFER_BIT);
             }
         }
@@ -102,7 +102,7 @@ public class FrameBufferObjectActivity extends Activity {
             gl.glLoadIdentity();
             gl.glFrustumf(-ratio, ratio, -1, 1, 3, 7);
 
-            gl.glClearColor(0,0,1,0);
+            gl.glClearColor(0, 0, 1, 0);
             gl.glClear(GL10.GL_COLOR_BUFFER_BIT | GL10.GL_DEPTH_BUFFER_BIT);
             gl.glBindTexture(GL10.GL_TEXTURE_2D, mTargetTexture);
 
@@ -143,20 +143,20 @@ public class FrameBufferObjectActivity extends Activity {
             gl.glEnable(GL10.GL_CULL_FACE);
             gl.glEnable(GL10.GL_DEPTH_TEST);
 
-            gl.glClearColor(0,0.5f,1,0);
+            gl.glClearColor(0, 0.5f, 1, 0);
             gl.glClear(GL10.GL_COLOR_BUFFER_BIT | GL10.GL_DEPTH_BUFFER_BIT);
             gl.glMatrixMode(GL10.GL_MODELVIEW);
             gl.glLoadIdentity();
             gl.glTranslatef(0, 0, -3.0f);
-            gl.glRotatef(mAngle,        0, 1, 0);
-            gl.glRotatef(mAngle*0.25f,  1, 0, 0);
+            gl.glRotatef(mAngle, 0, 1, 0);
+            gl.glRotatef(mAngle * 0.25f, 1, 0, 0);
 
             gl.glEnableClientState(GL10.GL_VERTEX_ARRAY);
             gl.glEnableClientState(GL10.GL_COLOR_ARRAY);
 
             mCube.draw(gl);
 
-            gl.glRotatef(mAngle*2.0f, 0, 1, 1);
+            gl.glRotatef(mAngle * 2.0f, 0, 1, 1);
             gl.glTranslatef(0.5f, 0.5f, 0.5f);
 
             mCube.draw(gl);
@@ -188,7 +188,8 @@ public class FrameBufferObjectActivity extends Activity {
                     GL10.GL_REPEAT);
             gl.glTexParameterx(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_WRAP_T,
                     GL10.GL_REPEAT);
-;            return texture;
+            ;
+            return texture;
         }
 
         private int createFrameBuffer(GL10 gl, int width, int height, int targetTextureId) {
@@ -230,6 +231,7 @@ public class FrameBufferObjectActivity extends Activity {
         /**
          * This is not the fastest way to check for an extension, but fine if
          * we are only checking for a few extensions each time a context is created.
+         *
          * @param gl
          * @param extension
          * @return true if the extension is present in the current context.

@@ -17,15 +17,14 @@
  */
 package com.github.cardforge.maven.plugins.android.standalonemojos;
 
-import static com.github.cardforge.maven.plugins.android.common.AndroidExtension.APK;
-
 import com.github.cardforge.maven.plugins.android.AbstractAndroidMojo;
-
 import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.ResolutionScope;
+
+import static com.github.cardforge.maven.plugins.android.common.AndroidExtension.APK;
 
 /**
  * Undeploys and the deploys (= redeploys) the apk(s) of the current project(s) to all
@@ -35,26 +34,20 @@ import org.apache.maven.plugins.annotations.ResolutionScope;
  * @author clement.escoffier@akquinet.de
  * @author Manfred Moser - manfred@simpligility.com
  */
-@Mojo( name = "redeploy", requiresDependencyResolution = ResolutionScope.RUNTIME )
-public class RedeployMojo extends AbstractAndroidMojo
-{
+@Mojo(name = "redeploy", requiresDependencyResolution = ResolutionScope.RUNTIME)
+public class RedeployMojo extends AbstractAndroidMojo {
 
-    public void execute() throws MojoExecutionException, MojoFailureException
-    {
-        if ( project.getPackaging().equals( APK ) )
-        {
+    public void execute() throws MojoExecutionException, MojoFailureException {
+        if (project.getPackaging().equals(APK)) {
             String packageToUndeploy = renameManifestPackage != null
                     ? renameManifestPackage
-                    : extractPackageNameFromAndroidManifest( destinationManifestFile );
-            if ( StringUtils.isNotBlank( packageToUndeploy ) ) 
-            {
-                undeployApk( packageToUndeploy );
+                    : extractPackageNameFromAndroidManifest(destinationManifestFile);
+            if (StringUtils.isNotBlank(packageToUndeploy)) {
+                undeployApk(packageToUndeploy);
             }
             deployBuiltApk();
-        } 
-        else 
-        {
-            getLog().info( "Project packaging is not apk, skipping redeployment" );
+        } else {
+            getLog().info("Project packaging is not apk, skipping redeployment");
         }
     }
 

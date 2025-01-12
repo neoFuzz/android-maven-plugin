@@ -39,7 +39,7 @@ public class Tabs3 extends TabActivity {
         tabHost.addTab(tabHost.newTabSpec("tab2")
                 .setIndicator("photo list")
                 .setContent(new Intent(this, List8.class)));
-        
+
         // This tab sets the intent flag so that it is recreated each time
         // the tab is clicked.
         tabHost.addTab(tabHost.newTabSpec("tab3")

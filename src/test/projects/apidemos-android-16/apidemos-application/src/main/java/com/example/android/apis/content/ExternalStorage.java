@@ -18,6 +18,7 @@ package com.example.android.apis.content;
 
 //Need the following import to get access to the app resources, since this
 //class is in a sub-package.
+
 import com.example.android.apis.R;
 
 import android.app.Activity;
@@ -44,8 +45,8 @@ import java.io.OutputStream;
 
 
 /**
-* Demonstration of styled text resources.
-*/
+ * Demonstration of styled text resources.
+ */
 public class ExternalStorage extends Activity {
     ViewGroup mLayout;
 
@@ -64,7 +65,7 @@ public class ExternalStorage extends Activity {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.external_storage);
-        mLayout = (ViewGroup)findViewById(R.id.layout);
+        mLayout = (ViewGroup) findViewById(R.id.layout);
         mExternalStoragePublicPicture = createStorageControls(
                 "Picture: getExternalStoragePublicDirectory",
                 Environment.getExternalStoragePublicDirectory(
@@ -175,7 +176,6 @@ public class ExternalStorage extends Activity {
     }
 
 
-
     void createExternalStoragePublicPicture() {
         // Create a path where we will place our picture in the user's
         // public pictures directory.  Note that you should be careful about
@@ -206,13 +206,13 @@ public class ExternalStorage extends Activity {
             // Tell the media scanner about the new file so that it is
             // immediately available to the user.
             MediaScannerConnection.scanFile(this,
-                    new String[] { file.toString() }, null,
+                    new String[]{file.toString()}, null,
                     new MediaScannerConnection.OnScanCompletedListener() {
-                public void onScanCompleted(String path, Uri uri) {
-                    Log.i("ExternalStorage", "Scanned " + path + ":");
-                    Log.i("ExternalStorage", "-> uri=" + uri);
-                }
-            });
+                        public void onScanCompleted(String path, Uri uri) {
+                            Log.i("ExternalStorage", "Scanned " + path + ":");
+                            Log.i("ExternalStorage", "-> uri=" + uri);
+                        }
+                    });
         } catch (IOException e) {
             // Unable to create file, likely because external storage is
             // not currently mounted.
@@ -242,7 +242,6 @@ public class ExternalStorage extends Activity {
     }
 
 
-
     void createExternalStoragePrivatePicture() {
         // Create a path where we will place our picture in our own private
         // pictures directory.  Note that we don't really need to place a
@@ -270,13 +269,13 @@ public class ExternalStorage extends Activity {
             // Tell the media scanner about the new file so that it is
             // immediately available to the user.
             MediaScannerConnection.scanFile(this,
-                    new String[] { file.toString() }, null,
+                    new String[]{file.toString()}, null,
                     new MediaScannerConnection.OnScanCompletedListener() {
-                public void onScanCompleted(String path, Uri uri) {
-                    Log.i("ExternalStorage", "Scanned " + path + ":");
-                    Log.i("ExternalStorage", "-> uri=" + uri);
-                }
-            });
+                        public void onScanCompleted(String path, Uri uri) {
+                            Log.i("ExternalStorage", "Scanned " + path + ":");
+                            Log.i("ExternalStorage", "-> uri=" + uri);
+                        }
+                    });
         } catch (IOException e) {
             // Unable to create file, likely because external storage is
             // not currently mounted.
@@ -309,67 +308,66 @@ public class ExternalStorage extends Activity {
     }
 
 
+    void createExternalStoragePrivateFile() {
+        // Create a path where we will place our private file on external
+        // storage.
+        File file = new File(getExternalFilesDir(null), "DemoFile.jpg");
 
-     void createExternalStoragePrivateFile() {
-         // Create a path where we will place our private file on external
-         // storage.
-         File file = new File(getExternalFilesDir(null), "DemoFile.jpg");
+        try {
+            // Very simple code to copy a picture from the application's
+            // resource into the external file.  Note that this code does
+            // no error checking, and assumes the picture is small (does not
+            // try to copy it in chunks).  Note that if external storage is
+            // not currently mounted this will silently fail.
+            InputStream is = getResources().openRawResource(R.drawable.balloons);
+            OutputStream os = new FileOutputStream(file);
+            byte[] data = new byte[is.available()];
+            is.read(data);
+            os.write(data);
+            is.close();
+            os.close();
+        } catch (IOException e) {
+            // Unable to create file, likely because external storage is
+            // not currently mounted.
+            Log.w("ExternalStorage", "Error writing " + file, e);
+        }
+    }
 
-         try {
-             // Very simple code to copy a picture from the application's
-             // resource into the external file.  Note that this code does
-             // no error checking, and assumes the picture is small (does not
-             // try to copy it in chunks).  Note that if external storage is
-             // not currently mounted this will silently fail.
-             InputStream is = getResources().openRawResource(R.drawable.balloons);
-             OutputStream os = new FileOutputStream(file);
-             byte[] data = new byte[is.available()];
-             is.read(data);
-             os.write(data);
-             is.close();
-             os.close();
-         } catch (IOException e) {
-             // Unable to create file, likely because external storage is
-             // not currently mounted.
-             Log.w("ExternalStorage", "Error writing " + file, e);
-         }
-     }
+    void deleteExternalStoragePrivateFile() {
+        // Get path for the file on external storage.  If external
+        // storage is not currently mounted this will fail.
+        File file = new File(getExternalFilesDir(null), "DemoFile.jpg");
+        if (file != null) {
+            file.delete();
+        }
+    }
 
-     void deleteExternalStoragePrivateFile() {
-         // Get path for the file on external storage.  If external
-         // storage is not currently mounted this will fail.
-         File file = new File(getExternalFilesDir(null), "DemoFile.jpg");
-         if (file != null) {
-             file.delete();
-         }
-     }
-
-     boolean hasExternalStoragePrivateFile() {
-         // Get path for the file on external storage.  If external
-         // storage is not currently mounted this will fail.
-         File file = new File(getExternalFilesDir(null), "DemoFile.jpg");
-         if (file != null) {
-             return file.exists();
-         }
-         return false;
-     }
+    boolean hasExternalStoragePrivateFile() {
+        // Get path for the file on external storage.  If external
+        // storage is not currently mounted this will fail.
+        File file = new File(getExternalFilesDir(null), "DemoFile.jpg");
+        if (file != null) {
+            return file.exists();
+        }
+        return false;
+    }
 
 
     Item createStorageControls(CharSequence label, File path,
-            View.OnClickListener createClick,
-            View.OnClickListener deleteClick) {
-        LayoutInflater inflater = (LayoutInflater)getSystemService(LAYOUT_INFLATER_SERVICE);
+                               View.OnClickListener createClick,
+                               View.OnClickListener deleteClick) {
+        LayoutInflater inflater = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
         Item item = new Item();
         item.mRoot = inflater.inflate(R.layout.external_storage_item, null);
-        TextView tv = (TextView)item.mRoot.findViewById(R.id.label);
+        TextView tv = (TextView) item.mRoot.findViewById(R.id.label);
         tv.setText(label);
         if (path != null) {
-            tv = (TextView)item.mRoot.findViewById(R.id.path);
+            tv = (TextView) item.mRoot.findViewById(R.id.path);
             tv.setText(path.toString());
         }
-        item.mCreate = (Button)item.mRoot.findViewById(R.id.create);
+        item.mCreate = (Button) item.mRoot.findViewById(R.id.create);
         item.mCreate.setOnClickListener(createClick);
-        item.mDelete = (Button)item.mRoot.findViewById(R.id.delete);
+        item.mDelete = (Button) item.mRoot.findViewById(R.id.delete);
         item.mDelete.setOnClickListener(deleteClick);
         return item;
     }

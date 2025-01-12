@@ -18,6 +18,7 @@ package com.example.android.apis.app;
 
 // Need the following import to get access to the app resources, since this
 // class is in a sub-package.
+
 import com.example.android.apis.R;
 
 import android.app.Activity;
@@ -49,18 +50,17 @@ import android.widget.TextView;
  * App/Activity/Save &amp; Restore State
  * <h4>Source files</h4>
  * <table class="LinkTable">
-        <tr>
-            <td class="LinkColumn">src/com.example.android.apis/app/SaveRestoreState.java</td>
-            <td class="DescrColumn">The Save/Restore Screen implementation</td>
-        </tr>
-        <tr>
-            <td class="LinkColumn">/res/any/layout/save_restore_state.xml</td>
-            <td class="DescrColumn">Defines contents of the screen</td>
-        </tr>
-</table>
+ * <tr>
+ * <td class="LinkColumn">src/com.example.android.apis/app/SaveRestoreState.java</td>
+ * <td class="DescrColumn">The Save/Restore Screen implementation</td>
+ * </tr>
+ * <tr>
+ * <td class="LinkColumn">/res/any/layout/save_restore_state.xml</td>
+ * <td class="DescrColumn">Defines contents of the screen</td>
+ * </tr>
+ * </table>
  */
-public class SaveRestoreState extends Activity
-{
+public class SaveRestoreState extends Activity {
     /**
      * Initialization of the Activity after it is first created.  Here we use
      * {@link android.app.Activity#setContentView setContentView()} to set up
@@ -68,7 +68,7 @@ public class SaveRestoreState extends Activity
      * will save/restore.
      */
     @Override
-	protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState) {
         // Be sure to call the super class.
         super.onCreate(savedInstanceState);
 
@@ -78,21 +78,21 @@ public class SaveRestoreState extends Activity
         setContentView(R.layout.save_restore_state);
 
         // Set message to be appropriate for this screen.
-        ((TextView)findViewById(R.id.msg)).setText(R.string.save_restore_msg);
+        ((TextView) findViewById(R.id.msg)).setText(R.string.save_restore_msg);
     }
 
     /**
      * Retrieve the text that is currently in the "saved" editor.
      */
     CharSequence getSavedText() {
-        return ((EditText)findViewById(R.id.saved)).getText();
+        return ((EditText) findViewById(R.id.saved)).getText();
     }
 
     /**
      * Change the text that is currently in the "saved" editor.
      */
     void setSavedText(CharSequence text) {
-        ((EditText)findViewById(R.id.saved)).setText(text);
+        ((EditText) findViewById(R.id.saved)).setText(text);
     }
 }
 

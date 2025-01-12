@@ -58,7 +58,8 @@ public class PathFillTypes extends GraphicsActivity {
             canvas.restore();
         }
 
-        @Override protected void onDraw(Canvas canvas) {
+        @Override
+        protected void onDraw(Canvas canvas) {
             Paint paint = mPaint;
 
             canvas.drawColor(0xFFCCCCCC);

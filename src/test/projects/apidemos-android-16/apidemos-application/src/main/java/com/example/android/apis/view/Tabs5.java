@@ -37,7 +37,7 @@ public class Tabs5 extends TabActivity implements TabHost.TabContentFactory {
 
         final TabHost tabHost = getTabHost();
 
-        for (int i=1; i <= 30; i++) {
+        for (int i = 1; i <= 30; i++) {
             String name = "Tab " + i;
             tabHost.addTab(tabHost.newTabSpec(name)
                     .setIndicator(name)
@@ -45,7 +45,9 @@ public class Tabs5 extends TabActivity implements TabHost.TabContentFactory {
         }
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     public View createTabContent(String tag) {
         final TextView tv = new TextView(this);
         tv.setText("Content for tab with tag " + tag);

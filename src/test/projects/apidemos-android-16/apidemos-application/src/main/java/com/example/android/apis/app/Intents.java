@@ -33,7 +33,7 @@ public class Intents extends Activity {
         setContentView(R.layout.intents);
 
         // Watch for button clicks.
-        Button button = (Button)findViewById(R.id.get_music);
+        Button button = (Button) findViewById(R.id.get_music);
         button.setOnClickListener(mGetMusicListener);
     }
 

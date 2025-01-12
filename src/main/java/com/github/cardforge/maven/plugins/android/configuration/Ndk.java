@@ -19,26 +19,23 @@ import java.io.File;
  * Configuration for an Android NDK. Only receives config parameter values, and
  * there is no logic in here. Logic is in
  * {@link AndroidNdk}.
- * 
+ *
  * @author Johan Lindquist - johanlindquist@gmail.com
  */
-public class Ndk
-{
+public class Ndk {
     /**
      * Directory of the installed Android NDK, for example
      * <code>/usr/local/android-ndk-r4</code>
-     * 
+     *
      * @see com.github.cardforge.maven.plugins.android.phase05compile.NdkBuildMojo#ndkPath
      */
     private File path;
 
-    public File getPath()
-    {
+    public File getPath() {
         return path;
     }
 
-    public void setPath( File path )
-    {
+    public void setPath(File path) {
         this.path = path;
     }
 }

@@ -13,51 +13,48 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
- * Contributors : 
+ *
+ * Contributors :
  * JBoss, Home of Professional Open Source
  */
 package com.github.cardforge.sample;
 
-    
+
+import com.github.cardforge.maven.plugins.android.PluginInfo;
 import io.takari.maven.testing.TestResources;
 import io.takari.maven.testing.executor.MavenExecutionResult;
 import io.takari.maven.testing.executor.MavenRuntime;
-import io.takari.maven.testing.executor.MavenVersions;
 import io.takari.maven.testing.executor.MavenRuntime.MavenRuntimeBuilder;
+import io.takari.maven.testing.executor.MavenVersions;
 import io.takari.maven.testing.executor.junit.MavenJUnitTestRunner;
-
-import java.io.File;
-
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import com.github.cardforge.maven.plugins.android.PluginInfo;
-
+import java.io.File;
 
 
 @RunWith(MavenJUnitTestRunner.class)
 @MavenVersions({"3.6.1"})
 public class Junit4TestBuildExampleIT {
 
-  @Rule
-  public final TestResources resources = new TestResources();
-  
-  public final MavenRuntime mavenRuntime;
-  
-  public Junit4TestBuildExampleIT(MavenRuntimeBuilder builder) throws Exception {
-    this.mavenRuntime = builder.build();
-  }
-  
-  @Test
-  public void buildInstall() throws Exception {
-    File basedir = resources.getBasedir( "aar-child-junit-tests" );
-    MavenExecutionResult result = mavenRuntime
-          .forProject(basedir)
-          .withCliOptions("-Psupport_test")
-          .execute( "clean", PluginInfo.getQualifiedGoal( "undeploy" ), "install" );
-    result.assertErrorFreeLog();
-    result.assertLogText( "Tests run: 1,  Failures: 0,  Errors: 0" );
-  }
+    @Rule
+    public final TestResources resources = new TestResources();
+
+    public final MavenRuntime mavenRuntime;
+
+    public Junit4TestBuildExampleIT(MavenRuntimeBuilder builder) throws Exception {
+        this.mavenRuntime = builder.build();
+    }
+
+    @Test
+    public void buildInstall() throws Exception {
+        File basedir = resources.getBasedir("aar-child-junit-tests");
+        MavenExecutionResult result = mavenRuntime
+                .forProject(basedir)
+                .withCliOptions("-Psupport_test")
+                .execute("clean", PluginInfo.getQualifiedGoal("undeploy"), "install");
+        result.assertErrorFreeLog();
+        result.assertLogText("Tests run: 1,  Failures: 0,  Errors: 0");
+    }
 }

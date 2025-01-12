@@ -18,6 +18,7 @@ package com.example.android.apis.app;
 
 // Need the following import to get access to the app resources, since this
 // class is in a sub-package.
+
 import com.example.android.apis.R;
 
 import android.app.Activity;
@@ -42,18 +43,18 @@ public class Animation extends Activity {
         setContentView(R.layout.activity_animation);
 
         // Watch for button clicks.
-        Button button = (Button)findViewById(R.id.fade_animation);
+        Button button = (Button) findViewById(R.id.fade_animation);
         button.setOnClickListener(mFadeListener);
-        button = (Button)findViewById(R.id.zoom_animation);
+        button = (Button) findViewById(R.id.zoom_animation);
         button.setOnClickListener(mZoomListener);
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN) {
-            button = (Button)findViewById(R.id.modern_fade_animation);
+            button = (Button) findViewById(R.id.modern_fade_animation);
             button.setOnClickListener(mModernFadeListener);
-            button = (Button)findViewById(R.id.modern_zoom_animation);
+            button = (Button) findViewById(R.id.modern_zoom_animation);
             button.setOnClickListener(mModernZoomListener);
-            button = (Button)findViewById(R.id.scale_up_animation);
+            button = (Button) findViewById(R.id.scale_up_animation);
             button.setOnClickListener(mScaleUpListener);
-            button = (Button)findViewById(R.id.zoom_thumbnail_animation);
+            button = (Button) findViewById(R.id.zoom_thumbnail_animation);
             button.setOnClickListener(mZoomThumbnailListener);
         } else {
             findViewById(R.id.modern_fade_animation).setEnabled(false);

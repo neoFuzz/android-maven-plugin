@@ -25,14 +25,20 @@ import android.provider.Settings;
 import android.view.View;
 import android.widget.ImageButton;
 
-/** Starts up the task list that will interact with the AccessibilityService sample. */
+/**
+ * Starts up the task list that will interact with the AccessibilityService sample.
+ */
 public class TaskListActivity extends ListActivity {
 
-    /** An intent for launching the system settings. */
+    /**
+     * An intent for launching the system settings.
+     */
     private static final Intent sSettingsIntent =
-        new Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS);
+            new Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS);
 
-    /** Called when the activity is first created. */
+    /**
+     * Called when the activity is first created.
+     */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -41,8 +47,8 @@ public class TaskListActivity extends ListActivity {
         // Hard-coded hand-waving here.
         boolean[] checkboxes = {true, true, false, true, false, false, false};
         String[] labels = {"Take out Trash", "Do Laundry",
-                           "Conquer World", "Nap", "Do Taxes",
-                           "Abolish IRS", "Tea with Aunt Sharon" };
+                "Conquer World", "Nap", "Do Taxes",
+                "Abolish IRS", "Tea with Aunt Sharon"};
 
         TaskAdapter myAdapter = new TaskAdapter(this, labels, checkboxes);
         this.setListAdapter(myAdapter);

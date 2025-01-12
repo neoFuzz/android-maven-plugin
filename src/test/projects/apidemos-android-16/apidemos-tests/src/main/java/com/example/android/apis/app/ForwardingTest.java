@@ -30,16 +30,16 @@ import android.widget.Button;
  *
  * <p>This model for testing creates the entire Activity (like {@link Focus2ActivityTest}) but does
  * not attach it to the system (for example, it cannot launch another Activity).  It allows you to
- * inject additional behaviors via the 
- * {@link android.test.ActivityUnitTestCase#setActivityContext(Context)} and 
- * {@link android.test.ActivityUnitTestCase#setApplication(android.app.Application)} methods.  
- * It also allows you to more carefully test your Activity's performance 
+ * inject additional behaviors via the
+ * {@link android.test.ActivityUnitTestCase#setActivityContext(Context)} and
+ * {@link android.test.ActivityUnitTestCase#setApplication(android.app.Application)} methods.
+ * It also allows you to more carefully test your Activity's performance
  * Writing unit tests in this manner requires more care and attention, but allows you to test
  * very specific behaviors, and can also be an easier way to test error conditions.
- * 
+ *
  * <p>Because ActivityUnitTestCase creates the Activity under test completely outside of
  * the usual system, tests of layout and point-click UI interaction are much less useful
- * in this configuration.  It's more useful here to concentrate on tests that involve the 
+ * in this configuration.  It's more useful here to concentrate on tests that involve the
  * underlying data model, internal business logic, or exercising your Activity's life cycle.
  *
  * <p>See {@link com.example.android.apis.AllTests} for documentation on running
@@ -52,7 +52,7 @@ public class ForwardingTest extends ActivityUnitTestCase<Forwarding> {
 
     public ForwardingTest() {
         super(Forwarding.class);
-      }
+    }
 
     @Override
     protected void setUp() throws Exception {
@@ -73,51 +73,51 @@ public class ForwardingTest extends ActivityUnitTestCase<Forwarding> {
     public void testPreconditions() {
         startActivity(mStartIntent, null, null);
         mButton = (Button) getActivity().findViewById(R.id.go);
-        
+
         assertNotNull(getActivity());
         assertNotNull(mButton);
     }
-    
+
     /**
-     * This test demonstrates examining the way that activity calls startActivity() to launch 
+     * This test demonstrates examining the way that activity calls startActivity() to launch
      * other activities.
      */
     @MediumTest
     public void testSubLaunch() {
         Forwarding activity = startActivity(mStartIntent, null, null);
         mButton = (Button) activity.findViewById(R.id.go);
-        
+
         // This test confirms that when you click the button, the activity attempts to open
         // another activity (by calling startActivity) and close itself (by calling finish()).
         mButton.performClick();
-        
+
         assertNotNull(getStartedActivityIntent());
         assertTrue(isFinishCalled());
     }
-    
+
     /**
      * This test demonstrates ways to exercise the Activity's life cycle.
      */
     @MediumTest
     public void testLifeCycleCreate() {
         Forwarding activity = startActivity(mStartIntent, null, null);
-        
+
         // At this point, onCreate() has been called, but nothing else
         // Complete the startup of the activity
         getInstrumentation().callActivityOnStart(activity);
         getInstrumentation().callActivityOnResume(activity);
-        
+
         // At this point you could test for various configuration aspects, or you could 
         // use a Mock Context to confirm that your activity has made certain calls to the system
         // and set itself up properly.
-        
+
         getInstrumentation().callActivityOnPause(activity);
-        
+
         // At this point you could confirm that the activity has paused properly, as if it is
         // no longer the topmost activity on screen.
-        
+
         getInstrumentation().callActivityOnStop(activity);
-        
+
         // At this point, you could confirm that the activity has shut itself down appropriately,
         // or you could use a Mock Context to confirm that your activity has released any system
         // resources it should no longer be holding.

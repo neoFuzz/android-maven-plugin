@@ -34,8 +34,8 @@ public class PolyToPoly extends GraphicsActivity {
     }
 
     private static class SampleView extends View {
-        private Paint   mPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        private Matrix  mMatrix = new Matrix();
+        private Paint mPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        private Matrix mMatrix = new Matrix();
         private Paint.FontMetrics mFontMetrics;
 
         private void doDraw(Canvas canvas, float src[], float dst[]) {
@@ -53,10 +53,10 @@ public class PolyToPoly extends GraphicsActivity {
             mPaint.setStyle(Paint.Style.FILL);
             // how to draw the text center on our square
             // centering in X is easy... use alignment (and X at midpoint)
-            float x = 64/2;
+            float x = 64 / 2;
             // centering in Y, we need to measure ascent/descent first
-            float y = 64/2 - (mFontMetrics.ascent + mFontMetrics.descent)/2;
-            canvas.drawText(src.length/2 + "", x, y, mPaint);
+            float y = 64 / 2 - (mFontMetrics.ascent + mFontMetrics.descent) / 2;
+            canvas.drawText(src.length / 2 + "", x, y, mPaint);
 
             canvas.restore();
         }
@@ -79,28 +79,28 @@ public class PolyToPoly extends GraphicsActivity {
             canvas.save();
             canvas.translate(10, 10);
             // translate (1 point)
-            doDraw(canvas, new float[] { 0, 0 }, new float[] { 5, 5 });
+            doDraw(canvas, new float[]{0, 0}, new float[]{5, 5});
             canvas.restore();
 
             canvas.save();
             canvas.translate(160, 10);
             // rotate/uniform-scale (2 points)
-            doDraw(canvas, new float[] { 32, 32, 64, 32 },
-                           new float[] { 32, 32, 64, 48 });
+            doDraw(canvas, new float[]{32, 32, 64, 32},
+                    new float[]{32, 32, 64, 48});
             canvas.restore();
 
             canvas.save();
             canvas.translate(10, 110);
             // rotate/skew (3 points)
-            doDraw(canvas, new float[] { 0, 0, 64, 0, 0, 64 },
-                           new float[] { 0, 0, 96, 0, 24, 64 });
+            doDraw(canvas, new float[]{0, 0, 64, 0, 0, 64},
+                    new float[]{0, 0, 96, 0, 24, 64});
             canvas.restore();
 
             canvas.save();
             canvas.translate(160, 110);
             // perspective (4 points)
-            doDraw(canvas, new float[] { 0, 0, 64, 0, 64, 64, 0, 64 },
-                           new float[] { 0, 0, 96, 0, 64, 96, 0, 64 });
+            doDraw(canvas, new float[]{0, 0, 64, 0, 64, 64, 0, 64},
+                    new float[]{0, 0, 96, 0, 64, 96, 0, 64});
             canvas.restore();
         }
     }

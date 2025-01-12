@@ -18,6 +18,7 @@ package com.example.android.apis.view;
 
 // Need the following import to get access to the app resources, since this
 // class is in a sub-package.
+
 import com.example.android.apis.R;
 
 
@@ -39,12 +40,12 @@ public class List7 extends ListActivity implements OnItemSelectedListener {
 
     private TextView mPhone;
 
-    private static final String[] PHONE_PROJECTION = new String[] {
-        Phone._ID,
-        Phone.TYPE,
-        Phone.LABEL,
-        Phone.NUMBER,
-        Phone.DISPLAY_NAME
+    private static final String[] PHONE_PROJECTION = new String[]{
+            Phone._ID,
+            Phone.TYPE,
+            Phone.LABEL,
+            Phone.NUMBER,
+            Phone.DISPLAY_NAME
     };
 
     private static final int COLUMN_PHONE_TYPE = 1;
@@ -70,9 +71,9 @@ public class List7 extends ListActivity implements OnItemSelectedListener {
                 // Give the cursor to the list adapter
                 c,
                 // Map the DISPLAY_NAME column to...
-                new String[] {Phone.DISPLAY_NAME},
+                new String[]{Phone.DISPLAY_NAME},
                 // The "text1" view defined in the XML template
-                new int[] {android.R.id.text1});
+                new int[]{android.R.id.text1});
         setListAdapter(adapter);
     }
 

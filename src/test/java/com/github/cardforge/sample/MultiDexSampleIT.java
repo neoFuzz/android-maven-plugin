@@ -19,11 +19,9 @@ import com.github.cardforge.maven.plugins.android.PluginInfo;
 import io.takari.maven.testing.TestResources;
 import io.takari.maven.testing.executor.MavenExecutionResult;
 import io.takari.maven.testing.executor.MavenRuntime;
-import io.takari.maven.testing.executor.MavenVersions;
 import io.takari.maven.testing.executor.MavenRuntime.MavenRuntimeBuilder;
+import io.takari.maven.testing.executor.MavenVersions;
 import io.takari.maven.testing.executor.junit.MavenJUnitTestRunner;
-
-
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -45,16 +43,16 @@ public class MultiDexSampleIT {
 
     @Test
     public void buildDeployAndRun() throws Exception {
-        File basedir = resources.getBasedir( "multidexsample" );
+        File basedir = resources.getBasedir("multidexsample");
         MavenExecutionResult result = mavenRuntime
-            .forProject(basedir)
-            .execute( "clean", PluginInfo.getQualifiedGoal( "undeploy" ),
-                "install", PluginInfo.getQualifiedGoal( "deploy" ),
-                PluginInfo.getQualifiedGoal( "run" ) );
+                .forProject(basedir)
+                .execute("clean", PluginInfo.getQualifiedGoal("undeploy"),
+                        "install", PluginInfo.getQualifiedGoal("deploy"),
+                        PluginInfo.getQualifiedGoal("run"));
 
         result.assertErrorFreeLog();
-        result.assertLogText( "Successfully installed" );
-        result.assertLogText( "Attempting to start com.simpligility.android.multidexsample/com.simpligility.android.multidexsample.MultiDexSampleActivity" );
+        result.assertLogText("Successfully installed");
+        result.assertLogText("Attempting to start com.simpligility.android.multidexsample/com.simpligility.android.multidexsample.MultiDexSampleActivity");
     }
 
 }

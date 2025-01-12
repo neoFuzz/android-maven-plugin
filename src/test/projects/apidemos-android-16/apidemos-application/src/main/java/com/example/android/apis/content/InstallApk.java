@@ -18,6 +18,7 @@ package com.example.android.apis.content;
 
 // Need the following import to get access to the app resources, since this
 // class is in a sub-package.
+
 import com.example.android.apis.R;
 
 import android.app.Activity;
@@ -59,15 +60,15 @@ public class InstallApk extends Activity {
         setContentView(R.layout.install_apk);
 
         // Watch for button clicks.
-        Button button = (Button)findViewById(R.id.unknown_source);
+        Button button = (Button) findViewById(R.id.unknown_source);
         button.setOnClickListener(mUnknownSourceListener);
-        button = (Button)findViewById(R.id.my_source);
+        button = (Button) findViewById(R.id.my_source);
         button.setOnClickListener(mMySourceListener);
-        button = (Button)findViewById(R.id.replace);
+        button = (Button) findViewById(R.id.replace);
         button.setOnClickListener(mReplaceListener);
-        button = (Button)findViewById(R.id.uninstall);
+        button = (Button) findViewById(R.id.uninstall);
         button.setOnClickListener(mUninstallListener);
-        button = (Button)findViewById(R.id.uninstall_result);
+        button = (Button) findViewById(R.id.uninstall_result);
         button.setOnClickListener(mUninstallResultListener);
     }
 
@@ -154,7 +155,7 @@ public class InstallApk extends Activity {
             is = getAssets().open(assetName);
             fout = openFileOutput("tmp.apk", Context.MODE_WORLD_READABLE);
             int n;
-            while ((n=is.read(buffer)) >= 0) {
+            while ((n = is.read(buffer)) >= 0) {
                 fout.write(buffer, 0, n);
             }
         } catch (IOException e) {

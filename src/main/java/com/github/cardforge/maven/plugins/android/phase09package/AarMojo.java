@@ -16,19 +16,15 @@
  */
 package com.github.cardforge.maven.plugins.android.phase09package;
 
-import static com.github.cardforge.maven.plugins.android.InclusionExclusionResolver.filterArtifacts;
-import static com.github.cardforge.maven.plugins.android.common.AndroidExtension.AAR;
-import static com.github.cardforge.maven.plugins.android.common.AndroidExtension.APKLIB;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.FilenameFilter;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-
+import com.android.SdkConstants;
+import com.github.cardforge.maven.plugins.android.AbstractAndroidMojo;
+import com.github.cardforge.maven.plugins.android.CommandExecutor;
+import com.github.cardforge.maven.plugins.android.ExecutionException;
 import com.github.cardforge.maven.plugins.android.IncludeExcludeSet;
+import com.github.cardforge.maven.plugins.android.common.AaptCommandBuilder;
+import com.github.cardforge.maven.plugins.android.common.AndroidExtension;
+import com.github.cardforge.maven.plugins.android.common.NativeHelper;
+import com.github.cardforge.maven.plugins.android.config.PullParameter;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -45,14 +41,13 @@ import org.codehaus.plexus.archiver.jar.JarArchiver;
 import org.codehaus.plexus.archiver.util.DefaultFileSet;
 import org.codehaus.plexus.archiver.zip.ZipArchiver;
 
-import com.android.SdkConstants;
-import com.github.cardforge.maven.plugins.android.AbstractAndroidMojo;
-import com.github.cardforge.maven.plugins.android.CommandExecutor;
-import com.github.cardforge.maven.plugins.android.ExecutionException;
-import com.github.cardforge.maven.plugins.android.common.AaptCommandBuilder;
-import com.github.cardforge.maven.plugins.android.common.AndroidExtension;
-import com.github.cardforge.maven.plugins.android.common.NativeHelper;
-import com.github.cardforge.maven.plugins.android.config.PullParameter;
+import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
+
+import static com.github.cardforge.maven.plugins.android.InclusionExclusionResolver.filterArtifacts;
+import static com.github.cardforge.maven.plugins.android.common.AndroidExtension.AAR;
+import static com.github.cardforge.maven.plugins.android.common.AndroidExtension.APKLIB;
 
 
 /**
@@ -63,8 +58,7 @@ import com.github.cardforge.maven.plugins.android.config.PullParameter;
         defaultPhase = LifecyclePhase.VERIFY,
         requiresDependencyResolution = ResolutionScope.COMPILE
 )
-public class AarMojo extends AbstractAndroidMojo
-{
+public class AarMojo extends AbstractAndroidMojo {
     /**
      * The name of the top level folder in the AAR where native libraries are found.
      * NOTE: This is inconsistent with APK where the folder is called "lib", and does not match APKLIB
@@ -93,14 +87,14 @@ public class AarMojo extends AbstractAndroidMojo
     /**
      * Defines the architecture for the NDK build
      */
-    @Parameter( property = "android.ndk.build.architecture" )
+    @Parameter(property = "android.ndk.build.architecture")
     @PullParameter
     private String ndkArchitecture;
 
     /**
      * Specifies the classifier with which the artifact should be stored in the repository
      */
-    @Parameter( property = "android.ndk.build.native-classifier" )
+    @Parameter(property = "android.ndk.build.native-classifier")
     @PullParameter
     private String ndkClassifier;
 
@@ -138,7 +132,7 @@ public class AarMojo extends AbstractAndroidMojo
      * (default), only those JARs explicitly selected by the {@code artifactSet} and {@code artifactTypeSet} parameters
      * will be included.
      */
-    @Parameter( property = "skipDependencies", defaultValue = "true" )
+    @Parameter(property = "skipDependencies", defaultValue = "true")
     private boolean skipDependencies;
 
     /**
@@ -156,7 +150,7 @@ public class AarMojo extends AbstractAndroidMojo
      *     &lt;/artifactTypeSet&gt;
      * </pre>
      */
-    @Parameter( property = "artifactTypeSet" )
+    @Parameter(property = "artifactTypeSet")
     private IncludeExcludeSet artifactTypeSet;
 
     /**
@@ -179,7 +173,7 @@ public class AarMojo extends AbstractAndroidMojo
      *     &lt;/artifactTypeSet&gt;
      * </pre>
      */
-    @Parameter( property = "artifactSet" )
+    @Parameter(property = "artifactSet")
     private IncludeExcludeSet artifactSet;
 
     private List<String> sourceFolders = new ArrayList<String>();
@@ -188,31 +182,25 @@ public class AarMojo extends AbstractAndroidMojo
      * @throws MojoExecutionException
      * @throws MojoFailureException
      */
-    public void execute() throws MojoExecutionException, MojoFailureException
-    {
+    public void execute() throws MojoExecutionException, MojoFailureException {
         String out = targetDirectory.getPath();
-        for ( String src : project.getCompileSourceRoots() )
-        {
-            if ( !src.startsWith( out ) )
-            {
-                sourceFolders.add( src );
+        for (String src : project.getCompileSourceRoots()) {
+            if (!src.startsWith(out)) {
+                sourceFolders.add(src);
             }
         }
 
-        getLog().info( "Generating AAR file : " + project.getArtifactId() );
+        getLog().info("Generating AAR file : " + project.getArtifactId());
         generateIntermediateApk();
 
-        final File outputFile = createAarLibraryFile( createAarClassesJar() );
+        final File outputFile = createAarLibraryFile(createAarClassesJar());
 
-        if ( classifier == null )
-        {
+        if (classifier == null) {
             // Set the generated file as the main artifact (because the pom states <packaging>aar</packaging>)
-            project.getArtifact().setFile( outputFile );
-        }
-        else
-        {
+            project.getArtifact().setFile(outputFile);
+        } else {
             // If there is a classifier specified, attach the artifact using that
-            projectHelper.attachArtifact( project, AndroidExtension.AAR, classifier, outputFile );
+            projectHelper.attachArtifact(project, AndroidExtension.AAR, classifier, outputFile);
         }
     }
 
@@ -222,43 +210,34 @@ public class AarMojo extends AbstractAndroidMojo
      * @return File which is the AAR classes jar.
      * @throws MojoExecutionException
      */
-    protected File createAarClassesJar() throws MojoExecutionException
-    {
-        final File obfuscatedJarFile = new File( obfuscatedJar );
-        if ( obfuscatedJarFile.exists() )
-        {
-            attachJar( obfuscatedJarFile );
+    protected File createAarClassesJar() throws MojoExecutionException {
+        final File obfuscatedJarFile = new File(obfuscatedJar);
+        if (obfuscatedJarFile.exists()) {
+            attachJar(obfuscatedJarFile);
             return obfuscatedJarFile;
         }
 
-        final File classesJar = new File( targetDirectory, finalName + ".aar.classes.jar" );
-        try
-        {
+        final File classesJar = new File(targetDirectory, finalName + ".aar.classes.jar");
+        try {
             JarArchiver jarArchiver = new JarArchiver();
-            jarArchiver.setDestFile( classesJar );
-            jarArchiver.addDirectory( projectOutputDirectory,
+            jarArchiver.setDestFile(classesJar);
+            jarArchiver.addDirectory(projectOutputDirectory,
                     classesJarIncludes,
-                    classesJarExcludes );
+                    classesJarExcludes);
             jarArchiver.createArchive();
-            attachJar( classesJar );
+            attachJar(classesJar);
             return classesJar;
-        }
-        catch ( ArchiverException e )
-        {
-            throw new MojoExecutionException( "ArchiverException while creating ." + classesJar + " file.", e );
-        }
-        catch ( IOException e )
-        {
-            throw new MojoExecutionException( "IOException while creating ." + classesJar + " file.", e );
+        } catch (ArchiverException e) {
+            throw new MojoExecutionException("ArchiverException while creating ." + classesJar + " file.", e);
+        } catch (IOException e) {
+            throw new MojoExecutionException("IOException while creating ." + classesJar + " file.", e);
         }
 
     }
 
-    private void attachJar( File jarFile )
-    {
-        if ( attachJar )
-        {
-            projectHelper.attachArtifact( project, "jar", project.getArtifact().getClassifier(), jarFile );
+    private void attachJar(File jarFile) {
+        if (attachJar) {
+            projectHelper.attachArtifact(project, "jar", project.getArtifact().getClassifier(), jarFile);
         }
     }
 
@@ -266,146 +245,114 @@ public class AarMojo extends AbstractAndroidMojo
      * @return AAR file.
      * @throws MojoExecutionException
      */
-    protected File createAarLibraryFile( File classesJar ) throws MojoExecutionException
-    {
-        final File aarLibrary = new File( targetDirectory,
-                finalName + "." + AAR );
-        FileUtils.deleteQuietly( aarLibrary );
+    protected File createAarLibraryFile(File classesJar) throws MojoExecutionException {
+        final File aarLibrary = new File(targetDirectory,
+                finalName + "." + AAR);
+        FileUtils.deleteQuietly(aarLibrary);
 
-        try
-        {
+        try {
             final ZipArchiver zipArchiver = new ZipArchiver();
-            zipArchiver.setDestFile( aarLibrary );
+            zipArchiver.setDestFile(aarLibrary);
 
-            zipArchiver.addFile( destinationManifestFile, "AndroidManifest.xml" );
-            addDirectory( zipArchiver, assetsDirectory, "assets", false );
+            zipArchiver.addFile(destinationManifestFile, "AndroidManifest.xml");
+            addDirectory(zipArchiver, assetsDirectory, "assets", false);
 
             // res folder must be included in the archive even if empty or non-existent.
-            if ( !resourceDirectory.exists() )
-            {
+            if (!resourceDirectory.exists()) {
                 resourceDirectory.mkdir();
             }
-            addDirectory( zipArchiver, resourceDirectory, "res", true );
+            addDirectory(zipArchiver, resourceDirectory, "res", true);
 
-            zipArchiver.addFile( classesJar, SdkConstants.FN_CLASSES_JAR );
+            zipArchiver.addFile(classesJar, SdkConstants.FN_CLASSES_JAR);
 
             final File[] overlayDirectories = getResourceOverlayDirectories();
-            for ( final File resOverlayDir : overlayDirectories )
-            {
-                if ( resOverlayDir != null && resOverlayDir.exists() )
-                {
-                    addDirectory( zipArchiver, resOverlayDir, "res", false );
+            for (final File resOverlayDir : overlayDirectories) {
+                if (resOverlayDir != null && resOverlayDir.exists()) {
+                    addDirectory(zipArchiver, resOverlayDir, "res", false);
                 }
             }
 
-            if ( consumerProguardFiles != null )
-            {
-                final File mergedConsumerProguardFile = new File( targetDirectory, "consumer-proguard.txt" );
-                if ( mergedConsumerProguardFile.exists() )
-                {
-                    FileUtils.forceDelete( mergedConsumerProguardFile );
+            if (consumerProguardFiles != null) {
+                final File mergedConsumerProguardFile = new File(targetDirectory, "consumer-proguard.txt");
+                if (mergedConsumerProguardFile.exists()) {
+                    FileUtils.forceDelete(mergedConsumerProguardFile);
                 }
                 mergedConsumerProguardFile.createNewFile();
                 StringBuilder mergedConsumerProguardFileBuilder = new StringBuilder();
-                for ( File consumerProguardFile : consumerProguardFiles )
-                {
-                    if ( consumerProguardFile.exists() )
-                    {
-                        getLog().info( "Adding consumer proguard file " + consumerProguardFile );
+                for (File consumerProguardFile : consumerProguardFiles) {
+                    if (consumerProguardFile.exists()) {
+                        getLog().info("Adding consumer proguard file " + consumerProguardFile);
                         FileInputStream consumerProguardFileInputStream = null;
-                        try
-                        {
-                            consumerProguardFileInputStream = new FileInputStream( consumerProguardFile );
+                        try {
+                            consumerProguardFileInputStream = new FileInputStream(consumerProguardFile);
                             mergedConsumerProguardFileBuilder.append(
-                                IOUtils.toString( consumerProguardFileInputStream ) );
-                            mergedConsumerProguardFileBuilder.append( SystemUtils.LINE_SEPARATOR );
-                        }
-                        catch ( IOException e )
-                        {
-                            throw new MojoExecutionException( "Error writing consumer proguard file ", e );
-                        }
-                        finally
-                        {
-                            IOUtils.closeQuietly( consumerProguardFileInputStream );
+                                    IOUtils.toString(consumerProguardFileInputStream));
+                            mergedConsumerProguardFileBuilder.append(SystemUtils.LINE_SEPARATOR);
+                        } catch (IOException e) {
+                            throw new MojoExecutionException("Error writing consumer proguard file ", e);
+                        } finally {
+                            IOUtils.closeQuietly(consumerProguardFileInputStream);
                         }
                     }
                 }
                 FileOutputStream mergedConsumerProguardFileOutputStream = null;
-                try
-                {
-                    mergedConsumerProguardFileOutputStream = new FileOutputStream( mergedConsumerProguardFile );
-                    IOUtils.write( mergedConsumerProguardFileBuilder, mergedConsumerProguardFileOutputStream );
-                }
-                catch ( IOException e )
-                {
-                    throw new MojoExecutionException( "Error writing consumer proguard file ", e );
-                }
-                finally
-                {
-                    IOUtils.closeQuietly( mergedConsumerProguardFileOutputStream );
+                try {
+                    mergedConsumerProguardFileOutputStream = new FileOutputStream(mergedConsumerProguardFile);
+                    IOUtils.write(mergedConsumerProguardFileBuilder, mergedConsumerProguardFileOutputStream);
+                } catch (IOException e) {
+                    throw new MojoExecutionException("Error writing consumer proguard file ", e);
+                } finally {
+                    IOUtils.closeQuietly(mergedConsumerProguardFileOutputStream);
                 }
 
-                zipArchiver.addFile( mergedConsumerProguardFile, "proguard.txt" );
+                zipArchiver.addFile(mergedConsumerProguardFile, "proguard.txt");
             }
 
-            addR( zipArchiver );
+            addR(zipArchiver);
 
             // Lastly, add any native libraries
-            addNativeLibraries( zipArchiver );
+            addNativeLibraries(zipArchiver);
 
             // ... and JAR libraries
-            addLibraries( zipArchiver );
+            addLibraries(zipArchiver);
 
             zipArchiver.createArchive();
-        }
-        catch ( ArchiverException e )
-        {
-            throw new MojoExecutionException( "ArchiverException while creating ." + AAR + " file.", e );
-        }
-        catch ( IOException e )
-        {
-            throw new MojoExecutionException( "IOException while creating ." + AAR + " file.", e );
+        } catch (ArchiverException e) {
+            throw new MojoExecutionException("ArchiverException while creating ." + AAR + " file.", e);
+        } catch (IOException e) {
+            throw new MojoExecutionException("IOException while creating ." + AAR + " file.", e);
         }
 
         return aarLibrary;
     }
 
-    private void addR( ZipArchiver zipArchiver ) throws MojoExecutionException, IOException
-    {
-        final File rFile = new File( targetDirectory, "R.txt" );
-        if ( !rFile.exists() )
-        {
-            getLog().debug( "No resources - creating empty R.txt" );
-            if ( !rFile.createNewFile() )
-            {
-                getLog().warn( "Unable to create R.txt in AAR" );
+    private void addR(ZipArchiver zipArchiver) throws MojoExecutionException, IOException {
+        final File rFile = new File(targetDirectory, "R.txt");
+        if (!rFile.exists()) {
+            getLog().debug("No resources - creating empty R.txt");
+            if (!rFile.createNewFile()) {
+                getLog().warn("Unable to create R.txt in AAR");
             }
         }
-        zipArchiver.addFile( rFile, "R.txt" );
-        getLog().debug( "Packaging R.txt in AAR" );
+        zipArchiver.addFile(rFile, "R.txt");
+        getLog().debug("Packaging R.txt in AAR");
     }
 
-    private void addNativeLibraries( final ZipArchiver zipArchiver ) throws MojoExecutionException
-    {
-        try
-        {
-            if ( nativeLibrariesDirectory.exists() )
-            {
-                getLog().info( nativeLibrariesDirectory + " exists, adding libraries." );
-                addDirectory( zipArchiver, nativeLibrariesDirectory, NATIVE_LIBRARIES_FOLDER, false );
-            }
-            else
-            {
-                getLog().info( nativeLibrariesDirectory
-                        + " does not exist, looking for libraries in target directory." );
+    private void addNativeLibraries(final ZipArchiver zipArchiver) throws MojoExecutionException {
+        try {
+            if (nativeLibrariesDirectory.exists()) {
+                getLog().info(nativeLibrariesDirectory + " exists, adding libraries.");
+                addDirectory(zipArchiver, nativeLibrariesDirectory, NATIVE_LIBRARIES_FOLDER, false);
+            } else {
+                getLog().info(nativeLibrariesDirectory
+                        + " does not exist, looking for libraries in target directory.");
                 // Add native libraries built and attached in this build
-                String[] ndkArchitectures = NativeHelper.getNdkArchitectures( ndkArchitecture,
-                                                                              applicationMakefile,
-                                                                              project.getBasedir() );
-                for ( String architecture : ndkArchitectures )
-                {
-                    final File ndkLibsDirectory = new File( ndkOutputDirectory, architecture );
-                    addSharedLibraries( zipArchiver, ndkLibsDirectory, architecture );
+                String[] ndkArchitectures = NativeHelper.getNdkArchitectures(ndkArchitecture,
+                        applicationMakefile,
+                        project.getBasedir());
+                for (String architecture : ndkArchitectures) {
+                    final File ndkLibsDirectory = new File(ndkOutputDirectory, architecture);
+                    addSharedLibraries(zipArchiver, ndkLibsDirectory, architecture);
 
                     // Add native library dependencies
                     // FIXME: Remove as causes duplicate libraries when building final APK if this set includes
@@ -414,10 +361,8 @@ public class AarMojo extends AbstractAndroidMojo
                     //addSharedLibraries( jarArchiver, dependentLibs, prefix );
                 }
             }
-        }
-        catch ( ArchiverException e )
-        {
-            throw new MojoExecutionException( "IOException while creating ." + AAR + " file.", e );
+        } catch (ArchiverException e) {
+            throw new MojoExecutionException("IOException while creating ." + AAR + " file.", e);
         }
         // TODO: Next is to check for any:
         // TODO: - compiled in (as part of this build) libs
@@ -426,15 +371,13 @@ public class AarMojo extends AbstractAndroidMojo
         // TODO:        - But where is that directory configured?
     }
 
-    private void addLibraries( final ZipArchiver zipArchiver ) throws MojoExecutionException
-    {
-        for ( Artifact artifact : filterArtifacts( getRelevantCompileArtifacts(), skipDependencies,
+    private void addLibraries(final ZipArchiver zipArchiver) throws MojoExecutionException {
+        for (Artifact artifact : filterArtifacts(getRelevantCompileArtifacts(), skipDependencies,
                 artifactTypeSet.getIncludes(), artifactTypeSet.getExcludes(), artifactSet.getIncludes(),
-                artifactSet.getExcludes() ) )
-        {
-            getLog().debug( "Include library in AAR :" + artifact );
+                artifactSet.getExcludes())) {
+            getLog().debug("Include library in AAR :" + artifact);
 
-            zipArchiver.addFile( artifact.getFile(), LIBRARIES_FOLDER + "/" + artifact.getFile().getName() );
+            zipArchiver.addFile(artifact.getFile(), LIBRARIES_FOLDER + "/" + artifact.getFile().getName());
         }
     }
 
@@ -444,11 +387,9 @@ public class AarMojo extends AbstractAndroidMojo
      * @param prefix any string, or null.
      * @return the prefix with a "/" at the end, never null.
      */
-    protected String endWithSlash( String prefix )
-    {
-        prefix = StringUtils.defaultIfEmpty( prefix, "/" );
-        if ( ! prefix.endsWith( "/" ) )
-        {
+    protected String endWithSlash(String prefix) {
+        prefix = StringUtils.defaultIfEmpty(prefix, "/");
+        if (!prefix.endsWith("/")) {
             prefix = prefix + "/";
         }
         return prefix;
@@ -457,49 +398,42 @@ public class AarMojo extends AbstractAndroidMojo
     /**
      * Adds a directory to a {@link JarArchiver} with a directory prefix.
      *
-     * @param zipArchiver   ZipArchiver to use to archive the file.
-     * @param directory     The directory to add.
-     * @param prefix        An optional prefix for where in the Jar file the directory's contents should go.
-     * @param includeEmptyFolders   Whether to include an entry for empty folder in the archive.
+     * @param zipArchiver         ZipArchiver to use to archive the file.
+     * @param directory           The directory to add.
+     * @param prefix              An optional prefix for where in the Jar file the directory's contents should go.
+     * @param includeEmptyFolders Whether to include an entry for empty folder in the archive.
      */
-    protected void addDirectory( ZipArchiver zipArchiver, File directory, String prefix, boolean includeEmptyFolders )
-    {
-        if ( directory != null && directory.exists() )
-        {
+    protected void addDirectory(ZipArchiver zipArchiver, File directory, String prefix, boolean includeEmptyFolders) {
+        if (directory != null && directory.exists()) {
             final DefaultFileSet fileSet = new DefaultFileSet();
-            fileSet.setPrefix( endWithSlash( prefix ) );
-            fileSet.setDirectory( directory );
-            fileSet.setIncludingEmptyDirectories( includeEmptyFolders );
-            zipArchiver.addFileSet( fileSet );
-            getLog().debug( "Added files from " + directory );
+            fileSet.setPrefix(endWithSlash(prefix));
+            fileSet.setDirectory(directory);
+            fileSet.setIncludingEmptyDirectories(includeEmptyFolders);
+            zipArchiver.addFileSet(fileSet);
+            getLog().debug("Added files from " + directory);
         }
     }
 
     /**
      * Adds all shared libraries (.so) to a {@link JarArchiver} under 'jni'.
      *
-     * @param zipArchiver The jarArchiver to add files to
-     * @param directory   The directory to scan for .so files
-     * @param architecture      The prefix for where in the jar the .so files will go.
+     * @param zipArchiver  The jarArchiver to add files to
+     * @param directory    The directory to scan for .so files
+     * @param architecture The prefix for where in the jar the .so files will go.
      */
-    protected void addSharedLibraries( ZipArchiver zipArchiver, File directory, String architecture )
-    {
-        getLog().debug( "Searching for shared libraries in " + directory );
-        File[] libFiles = directory.listFiles( new FilenameFilter()
-        {
-            public boolean accept( final File dir, final String name )
-            {
-                return name.startsWith( "lib" ) && name.endsWith( ".so" );
+    protected void addSharedLibraries(ZipArchiver zipArchiver, File directory, String architecture) {
+        getLog().debug("Searching for shared libraries in " + directory);
+        File[] libFiles = directory.listFiles(new FilenameFilter() {
+            public boolean accept(final File dir, final String name) {
+                return name.startsWith("lib") && name.endsWith(".so");
             }
-        } );
+        });
 
-        if ( libFiles != null )
-        {
-            for ( File libFile : libFiles )
-            {
+        if (libFiles != null) {
+            for (File libFile : libFiles) {
                 String dest = NATIVE_LIBRARIES_FOLDER + "/" + architecture + "/" + libFile.getName();
-                getLog().debug( "Adding " + libFile + " as " + dest );
-                zipArchiver.addFile( libFile, dest );
+                getLog().debug("Adding " + libFile + " as " + dest);
+                zipArchiver.addFile(libFile, dest);
             }
         }
     }
@@ -509,54 +443,48 @@ public class AarMojo extends AbstractAndroidMojo
      *
      * @throws MojoExecutionException
      */
-    private void generateIntermediateApk() throws MojoExecutionException
-    {
+    private void generateIntermediateApk() throws MojoExecutionException {
         // Have to generate the AAR against the dependent resources or build will fail if any local resources
         // directly reference any of the dependent resources. NB this does NOT include the dep resources in the AAR.
         List<File> dependenciesResDirectories = new ArrayList<File>();
-        for ( Artifact libraryArtifact : getTransitiveDependencyArtifacts( APKLIB, AAR ) )
-        {
-            final File apkLibResDir = getUnpackedLibResourceFolder( libraryArtifact );
-            if ( apkLibResDir.exists() )
-            {
-                dependenciesResDirectories.add( apkLibResDir );
+        for (Artifact libraryArtifact : getTransitiveDependencyArtifacts(APKLIB, AAR)) {
+            final File apkLibResDir = getUnpackedLibResourceFolder(libraryArtifact);
+            if (apkLibResDir.exists()) {
+                dependenciesResDirectories.add(apkLibResDir);
             }
         }
 
         final CommandExecutor executor = CommandExecutor.Factory.createDefaultCommmandExecutor();
-        executor.setLogger( this.getLog() );
+        executor.setLogger(this.getLog());
 
-        File outputFile = new File( targetDirectory, finalName + ".ap_" );
+        File outputFile = new File(targetDirectory, finalName + ".ap_");
 
         final AaptCommandBuilder commandBuilder = AaptCommandBuilder
-                .packageResources( getLog() )
+                .packageResources(getLog())
                 .makePackageDirectories()
                 .forceOverwriteExistingFiles()
-                .setPathToAndroidManifest( destinationManifestFile )
-                .addResourceDirectoriesIfExists( getResourceOverlayDirectories() )
-                .addResourceDirectoryIfExists( resourceDirectory )
-                .addResourceDirectoriesIfExists( dependenciesResDirectories )
+                .setPathToAndroidManifest(destinationManifestFile)
+                .addResourceDirectoriesIfExists(getResourceOverlayDirectories())
+                .addResourceDirectoryIfExists(resourceDirectory)
+                .addResourceDirectoriesIfExists(dependenciesResDirectories)
                 .autoAddOverlay()
-                .addRawAssetsDirectoryIfExists( combinedAssets )
-                .addExistingPackageToBaseIncludeSet( getAndroidSdk().getAndroidJar() )
-                .setOutputApkFile( outputFile )
-                .addConfigurations( configurations )
-                .setResourceConstantsFolder( genDirectory )
+                .addRawAssetsDirectoryIfExists(combinedAssets)
+                .addExistingPackageToBaseIncludeSet(getAndroidSdk().getAndroidJar())
+                .setOutputApkFile(outputFile)
+                .addConfigurations(configurations)
+                .setResourceConstantsFolder(genDirectory)
                 .makeResourcesNonConstant()
-                .generateRTextFile( targetDirectory )
-                .setVerbose( aaptVerbose );
+                .generateRTextFile(targetDirectory)
+                .setVerbose(aaptVerbose);
 
-        getLog().debug( getAndroidSdk().getAaptPath() + " " + commandBuilder.toString() );
-        getLog().info( "Generating aar" );
-        try
-        {
-            executor.setCaptureStdOut( true );
+        getLog().debug(getAndroidSdk().getAaptPath() + " " + commandBuilder.toString());
+        getLog().info("Generating aar");
+        try {
+            executor.setCaptureStdOut(true);
             final List<String> commands = commandBuilder.build();
-            executor.executeCommand( getAndroidSdk().getAaptPath(), commands, project.getBasedir(), false );
-        }
-        catch ( ExecutionException e )
-        {
-            throw new MojoExecutionException( "", e );
+            executor.executeCommand(getAndroidSdk().getAaptPath(), commands, project.getBasedir(), false);
+        } catch (ExecutionException e) {
+            throw new MojoExecutionException("", e);
         }
     }
 }

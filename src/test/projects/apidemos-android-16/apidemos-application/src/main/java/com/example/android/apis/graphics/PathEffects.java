@@ -38,15 +38,15 @@ public class PathEffects extends GraphicsActivity {
         private float mPhase;
 
         private static PathEffect makeDash(float phase) {
-            return new DashPathEffect(new float[] { 15, 5, 8, 5 }, phase);
+            return new DashPathEffect(new float[]{15, 5, 8, 5}, phase);
         }
 
         private static void makeEffects(PathEffect[] e, float phase) {
             e[0] = null;     // no effect
             e[1] = new CornerPathEffect(10);
-            e[2] = new DashPathEffect(new float[] {10, 5, 5, 5}, phase);
+            e[2] = new DashPathEffect(new float[]{10, 5, 5, 5}, phase);
             e[3] = new PathDashPathEffect(makePathDash(), 12, phase,
-                                          PathDashPathEffect.Style.ROTATE);
+                    PathDashPathEffect.Style.ROTATE);
             e[4] = new ComposePathEffect(e[2], e[1]);
             e[5] = new ComposePathEffect(e[3], e[1]);
         }
@@ -64,12 +64,13 @@ public class PathEffects extends GraphicsActivity {
 
             mEffects = new PathEffect[6];
 
-            mColors = new int[] { Color.BLACK, Color.RED, Color.BLUE,
-                                  Color.GREEN, Color.MAGENTA, Color.BLACK
-                                };
+            mColors = new int[]{Color.BLACK, Color.RED, Color.BLUE,
+                    Color.GREEN, Color.MAGENTA, Color.BLACK
+            };
         }
 
-        @Override protected void onDraw(Canvas canvas) {
+        @Override
+        protected void onDraw(Canvas canvas) {
             canvas.drawColor(Color.WHITE);
 
             RectF bounds = new RectF();
@@ -88,7 +89,8 @@ public class PathEffects extends GraphicsActivity {
             }
         }
 
-        @Override public boolean onKeyDown(int keyCode, KeyEvent event) {
+        @Override
+        public boolean onKeyDown(int keyCode, KeyEvent event) {
             switch (keyCode) {
                 case KeyEvent.KEYCODE_DPAD_CENTER:
                     mPath = makeFollowPath();
@@ -101,7 +103,7 @@ public class PathEffects extends GraphicsActivity {
             Path p = new Path();
             p.moveTo(0, 0);
             for (int i = 1; i <= 15; i++) {
-                p.lineTo(i*20, (float)Math.random() * 35);
+                p.lineTo(i * 20, (float) Math.random() * 35);
             }
             return p;
         }

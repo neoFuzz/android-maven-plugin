@@ -30,15 +30,15 @@ import android.widget.Button;
  * {@link android.test.InstrumentationTestCase}, which provides
  * access to methods for sending events to the target activity, such as key and
  * touch events.  See {@link #sendKeys}.
- *
+ * <p>
  * In general, {@link android.test.InstrumentationTestCase}s and {@link ActivityInstrumentationTestCase}s
  * are heavier weight functional tests available for end to end testing of your
  * user interface.  When run via a {@link android.test.InstrumentationTestRunner},
  * the necessary {@link android.app.Instrumentation} will be injected for you to
  * user via {@link #getInstrumentation} in your tests.
- *
+ * <p>
  * See {@link com.example.android.apis.app.ForwardingTest} for an example of an Activity unit test.
- *
+ * <p>
  * See {@link com.example.android.apis.AllTests} for documentation on running
  * all tests and individual tests in this application.
  */
@@ -88,7 +88,7 @@ public class Focus2ActivityTest extends ActivityInstrumentationTestCase2<Focus2>
     }
 
     @MediumTest
-    public void testGoingLeftFromRightButtonGoesToCenter()  {
+    public void testGoingLeftFromRightButtonGoesToCenter() {
         // Give right button focus by having it request focus.  We post it
         // to the UI thread because we are not running on the same thread, and
         // any direct api calls that change state must be made from the UI thread.

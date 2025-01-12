@@ -15,12 +15,7 @@
  */
 package com.github.cardforge.maven.plugins.android.standalonemojos;
 
-import com.android.ddmlib.AdbCommandRejectedException;
-import com.android.ddmlib.AndroidDebugBridge;
-import com.android.ddmlib.CollectingOutputReceiver;
-import com.android.ddmlib.IDevice;
-import com.android.ddmlib.ShellCommandUnresponsiveException;
-import com.android.ddmlib.TimeoutException;
+import com.android.ddmlib.*;
 import com.github.cardforge.maven.plugins.android.AbstractAndroidMojo;
 import com.github.cardforge.maven.plugins.android.DeviceCallback;
 import com.github.cardforge.maven.plugins.android.common.DeviceHelper;
@@ -28,7 +23,6 @@ import com.github.cardforge.maven.plugins.android.config.ConfigHandler;
 import com.github.cardforge.maven.plugins.android.config.ConfigPojo;
 import com.github.cardforge.maven.plugins.android.config.PullParameter;
 import com.github.cardforge.maven.plugins.android.configuration.Run;
-
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Mojo;
@@ -40,21 +34,15 @@ import org.xml.sax.SAXException;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.xpath.XPath;
-import javax.xml.xpath.XPathConstants;
-import javax.xml.xpath.XPathExpression;
-import javax.xml.xpath.XPathExpressionException;
-import javax.xml.xpath.XPathFactory;
-
-import java.io.IOException;
-
-import static com.github.cardforge.maven.plugins.android.common.AndroidExtension.APK;
-
+import javax.xml.xpath.*;
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.StringReader;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.InetSocketAddress;
+
+import static com.github.cardforge.maven.plugins.android.common.AndroidExtension.APK;
 
 /**
  * Runs the first Activity shown in the top-level launcher as determined by its Intent filters.
@@ -96,10 +84,17 @@ import java.net.InetSocketAddress;
  * @see "http://developer.android.com/guide/topics/fundamentals.html"
  * @see "http://developer.android.com/guide/topics/intents/intents-filters.html"
  */
-@Mojo( name = "run" )
-public class RunMojo extends AbstractAndroidMojo
-{
+@Mojo(name = "run")
+public class RunMojo extends AbstractAndroidMojo {
 
+    /**
+     * Debug parameter for the the run goal. If true, the device or emulator will pause execution of the process at
+     * startup to wait for a debugger to connect. Also see the "run" parameter documentation. Default value is false.
+     * If the value is numeric, it is treated as a port number to forward the JDWP protocol
+     * of the launched process to.
+     */
+    @Parameter(property = "android.run.debug")
+    protected String runDebug;
     /**
      * <p>The configuration for the run goal can be set up in the plugin configuration in the pom file as:</p>
      * <pre>
@@ -107,8 +102,8 @@ public class RunMojo extends AbstractAndroidMojo
      *     &lt;debug&gt;true|false|portnumber&lt;/debug&gt;
      * &lt;/run&gt;
      * </pre>
-     * <p>The <code>&lt;debug&gt;</code> parameter is optional and defaults to false. Numeric values like 5432 are 
-     * parsed as port number. 
+     * <p>The <code>&lt;debug&gt;</code> parameter is optional and defaults to false. Numeric values like 5432 are
+     * parsed as port number.
      * <p>The debug parameter can also be configured as property in the pom or settings file
      * <pre>
      * &lt;properties&gt;
@@ -120,50 +115,22 @@ public class RunMojo extends AbstractAndroidMojo
     @Parameter
     @ConfigPojo
     private Run run;
-
-    /**
-     * Debug parameter for the the run goal. If true, the device or emulator will pause execution of the process at
-     * startup to wait for a debugger to connect. Also see the "run" parameter documentation. Default value is false.
-     * If the value is numeric, it is treated as a port number to forward the JDWP protocol
-     * of the launched process to.
-     */
-    @Parameter( property = "android.run.debug" )
-    protected String runDebug;
-
     /* the value for the debug flag after parsing pom and parameter */
-    @PullParameter( defaultValue = "false" )
+    @PullParameter(defaultValue = "false")
     private String parsedDebug;
 
-    /**
-     * Holds information about the "Launcher" activity.
-     *
-     * @author Lorenzo Villani
-     */
-    private static class LauncherInfo
-    {
-        private String packageName;
-
-        private String activity;
-
-        public String getPackageName()
-        {
-            return packageName;
-        }
-
-        public void setPackageName( String packageName )
-        {
-            this.packageName = packageName;
-        }
-
-        public String getActivity()
-        {
-            return activity;
-        }
-
-        public void setActivity( String activity )
-        {
-            this.activity = activity;
-        }
+    private static void createForward(IDevice device, int debugPort, int pid)
+            throws ClassNotFoundException, NoSuchMethodException, IllegalAccessException, InvocationTargetException {
+        Method m = Class.forName("com.android.ddmlib.AdbHelper").
+                getDeclaredMethod(
+                        "createForward", InetSocketAddress.class,
+                        device.getClass(), String.class, String.class
+                );
+        m.setAccessible(true);
+        m.invoke(
+                null, AndroidDebugBridge.getSocketAddress(), device,
+                String.format("tcp:%d", debugPort), String.format("jdwp:%d", pid)
+        );
     }
 
     // ----------------------------------------------------------------------
@@ -174,30 +141,23 @@ public class RunMojo extends AbstractAndroidMojo
      * {@inheritDoc}
      */
     @Override
-    public void execute() throws MojoExecutionException, MojoFailureException
-    {
-        if ( project.getPackaging().equals( APK ) )
-        {
-            try
-            {
+    public void execute() throws MojoExecutionException, MojoFailureException {
+        if (project.getPackaging().equals(APK)) {
+            try {
                 LauncherInfo launcherInfo;
 
                 launcherInfo = getLauncherActivity();
 
-                ConfigHandler configHandler = new ConfigHandler( this, this.session, this.execution );
+                ConfigHandler configHandler = new ConfigHandler(this, this.session, this.execution);
                 configHandler.parseConfiguration();
 
-                launch( launcherInfo );
+                launch(launcherInfo);
+            } catch (Exception ex) {
+                getLog().info("Unable to run launcher Activity");
+                getLog().debug(ex);
             }
-            catch ( Exception ex )
-            {
-                getLog().info( "Unable to run launcher Activity" );
-                getLog().debug( ex );
-            }
-        }
-        else
-        {
-            getLog().info( "Project packaging is not apk, skipping run action." );
+        } else {
+            getLog().info("Project packaging is not apk, skipping run action.");
         }
     }
 
@@ -217,8 +177,7 @@ public class RunMojo extends AbstractAndroidMojo
      */
     private LauncherInfo getLauncherActivity()
             throws ParserConfigurationException, SAXException, IOException, XPathExpressionException,
-            MojoFailureException
-    {
+            MojoFailureException {
         Document document;
         DocumentBuilder documentBuilder;
         DocumentBuilderFactory documentBuilderFactory;
@@ -234,7 +193,7 @@ public class RunMojo extends AbstractAndroidMojo
 
         documentBuilder = documentBuilderFactory.newDocumentBuilder();
 
-        document = documentBuilder.parse( destinationManifestFile );
+        document = documentBuilder.parse(destinationManifestFile);
 
         xPathFactory = XPathFactory.newInstance();
 
@@ -242,58 +201,50 @@ public class RunMojo extends AbstractAndroidMojo
 
         xPathExpression = xPath.compile(
                 "//manifest/application/activity/intent-filter[action[@name=\"android.intent.action.MAIN\"] "
-                + "and category[@name=\"android.intent.category.LAUNCHER\"]]/.." );
+                        + "and category[@name=\"android.intent.category.LAUNCHER\"]]/..");
 
         //
         // Run XPath query
         //
-        result = xPathExpression.evaluate( document, XPathConstants.NODESET );
+        result = xPathExpression.evaluate(document, XPathConstants.NODESET);
 
-        if ( result instanceof NodeList )
-        {
+        if (result instanceof NodeList) {
             NodeList activities;
 
-            activities = ( NodeList ) result;
+            activities = (NodeList) result;
 
-            if ( activities.getLength() > 0 )
-            {
+            if (activities.getLength() > 0) {
                 // Grab the first declared Activity
                 LauncherInfo launcherInfo;
 
                 launcherInfo = new LauncherInfo();
-                String activityName = activities.item( 0 ).getAttributes().getNamedItem( "android:name" )
+                String activityName = activities.item(0).getAttributes().getNamedItem("android:name")
                         .getNodeValue();
 
-                if ( ! activityName.contains( "." ) )
-                {
+                if (!activityName.contains(".")) {
                     activityName = "." + activityName;
                 }
 
-                if ( activityName.startsWith( "." ) )
-                {
-                    String packageName = document.getElementsByTagName( "manifest" ).item( 0 ).getAttributes()
-                            .getNamedItem( "package" ).getNodeValue();
+                if (activityName.startsWith(".")) {
+                    String packageName = document.getElementsByTagName("manifest").item(0).getAttributes()
+                            .getNamedItem("package").getNodeValue();
                     activityName = packageName + activityName;
                 }
 
                 launcherInfo.activity = activityName;
 
                 launcherInfo.packageName = renameManifestPackage != null
-                    ? renameManifestPackage
-                    : document.getDocumentElement().getAttribute( "package" ).toString();
+                        ? renameManifestPackage
+                        : document.getDocumentElement().getAttribute("package").toString();
 
                 return launcherInfo;
-            }
-            else
-            {
+            } else {
                 // If we get here, we couldn't find a launcher activity.
-                throw new MojoFailureException( "Could not find a launcher activity in manifest" );
+                throw new MojoFailureException("Could not find a launcher activity in manifest");
             }
-        }
-        else
-        {
+        } else {
             // If we get here we couldn't find any Activity
-            throw new MojoFailureException( "Could not find any activity in manifest" );
+            throw new MojoFailureException("Could not find any activity in manifest");
         }
     }
 
@@ -304,100 +255,76 @@ public class RunMojo extends AbstractAndroidMojo
      * @throws MojoFailureException
      * @throws MojoExecutionException
      */
-    private void launch( final LauncherInfo info ) throws MojoExecutionException, MojoFailureException
-    {
+    private void launch(final LauncherInfo info) throws MojoExecutionException, MojoFailureException {
         final String command;
-        
+
         final int debugPort = findDebugPort();
 
-        command = String.format( "am start %s-n %s/%s", debugPort >= 0 ? "-D " : "", info.packageName, info.activity );
+        command = String.format("am start %s-n %s/%s", debugPort >= 0 ? "-D " : "", info.packageName, info.activity);
 
-        doWithDevices( new DeviceCallback()
-        {
+        doWithDevices(new DeviceCallback() {
             @Override
-            public void doWithDevice( IDevice device ) throws MojoExecutionException, MojoFailureException
-            {
-                String deviceLogLinePrefix = DeviceHelper.getDeviceLogLinePrefix( device );
+            public void doWithDevice(IDevice device) throws MojoExecutionException, MojoFailureException {
+                String deviceLogLinePrefix = DeviceHelper.getDeviceLogLinePrefix(device);
 
-                try
-                {
-                    getLog().info( deviceLogLinePrefix + "Attempting to start " + info.packageName + "/" 
-                            + info.activity );
+                try {
+                    getLog().info(deviceLogLinePrefix + "Attempting to start " + info.packageName + "/"
+                            + info.activity);
 
                     CollectingOutputReceiver shellOutput = new CollectingOutputReceiver();
-                    device.executeShellCommand( command, shellOutput );
-                    if ( shellOutput.getOutput().contains( "Error" ) )
-                    {
-                        throw new MojoFailureException( shellOutput.getOutput() );
+                    device.executeShellCommand(command, shellOutput);
+                    if (shellOutput.getOutput().contains("Error")) {
+                        throw new MojoFailureException(shellOutput.getOutput());
                     }
-                    if ( debugPort > 0 ) 
-                    {
-                        int pid = findPid( device, "ps" );
-                        if ( pid == -1 )
-                        {
-                            pid = findPid( device, "ps -Af" );
+                    if (debugPort > 0) {
+                        int pid = findPid(device, "ps");
+                        if (pid == -1) {
+                            pid = findPid(device, "ps -Af");
                         }
-                        if ( pid == -1 )
-                        {
-                            throw new MojoFailureException( "Cannot find stated process " + info.packageName );
+                        if (pid == -1) {
+                            throw new MojoFailureException("Cannot find stated process " + info.packageName);
                         }
                         getLog().info(
-                            deviceLogLinePrefix + "Process " + debugPort + " launched"
+                                deviceLogLinePrefix + "Process " + debugPort + " launched"
                         );
-                        try 
-                        {
-                            createForward( device, debugPort, pid );
+                        try {
+                            createForward(device, debugPort, pid);
                             getLog().info(
-                                deviceLogLinePrefix + "Debugger listening on " + debugPort
+                                    deviceLogLinePrefix + "Debugger listening on " + debugPort
                             );
-                        } 
-                        catch ( Exception ex ) 
-                        {
-                            throw new MojoFailureException( 
-                                "Cannot create forward tcp: " + debugPort 
-                                    + " jdwp: " + pid, ex 
+                        } catch (Exception ex) {
+                            throw new MojoFailureException(
+                                    "Cannot create forward tcp: " + debugPort
+                                            + " jdwp: " + pid, ex
                             );
                         }
                     }
-                }
-                catch ( IOException ex )
-                {
-                    throw new MojoFailureException( deviceLogLinePrefix + "Input/Output error", ex );
-                }
-                catch ( TimeoutException ex )
-                {
-                    throw new MojoFailureException( deviceLogLinePrefix + "Command timeout", ex );
-                }
-                catch ( AdbCommandRejectedException ex )
-                {
-                    throw new MojoFailureException( deviceLogLinePrefix + "ADB rejected the command", ex );
-                }
-                catch ( ShellCommandUnresponsiveException ex )
-                {
-                    throw new MojoFailureException( deviceLogLinePrefix + "Unresponsive command", ex );
+                } catch (IOException ex) {
+                    throw new MojoFailureException(deviceLogLinePrefix + "Input/Output error", ex);
+                } catch (TimeoutException ex) {
+                    throw new MojoFailureException(deviceLogLinePrefix + "Command timeout", ex);
+                } catch (AdbCommandRejectedException ex) {
+                    throw new MojoFailureException(deviceLogLinePrefix + "ADB rejected the command", ex);
+                } catch (ShellCommandUnresponsiveException ex) {
+                    throw new MojoFailureException(deviceLogLinePrefix + "Unresponsive command", ex);
                 }
             }
 
-            private int findPid( IDevice device, final String cmd )
-            throws IOException, TimeoutException, AdbCommandRejectedException, ShellCommandUnresponsiveException
-            {
+            private int findPid(IDevice device, final String cmd)
+                    throws IOException, TimeoutException, AdbCommandRejectedException, ShellCommandUnresponsiveException {
                 CollectingOutputReceiver processOutput = new CollectingOutputReceiver();
-                device.executeShellCommand( cmd, processOutput );
-                BufferedReader r = new BufferedReader( new StringReader( processOutput.getOutput() ) );
+                device.executeShellCommand(cmd, processOutput);
+                BufferedReader r = new BufferedReader(new StringReader(processOutput.getOutput()));
                 int pid = -1;
-                for ( ;; )
-                {
+                for (; ; ) {
                     String line = r.readLine();
-                    if ( line == null )
-                    {
+                    if (line == null) {
                         break;
                     }
-                    if ( line.endsWith( info.packageName ) )
-                    {
-                        String[] values = line.split( " +" );
-                        if ( values.length > 2 )
-                        {
-                            pid = Integer.valueOf( values[1] );
+                    if (line.endsWith(info.packageName)) {
+                        String[] values = line.split(" +");
+                        if (values.length > 2) {
+                            pid = Integer.valueOf(values[1]);
                             break;
                         }
                     }
@@ -405,42 +332,47 @@ public class RunMojo extends AbstractAndroidMojo
                 r.close();
                 return pid;
             }
-        } );
-    }
-    
-    private static void createForward( IDevice device, int debugPort, int pid ) 
-    throws ClassNotFoundException, NoSuchMethodException, IllegalAccessException, InvocationTargetException
-    {
-        Method m = Class.forName( "com.android.ddmlib.AdbHelper" ).
-            getDeclaredMethod(
-                "createForward", InetSocketAddress.class, 
-                device.getClass(), String.class, String.class
-            );
-        m.setAccessible( true );
-        m.invoke(
-            null, AndroidDebugBridge.getSocketAddress(), device,
-            String.format( "tcp:%d", debugPort ), String.format( "jdwp:%d", pid )
-        );
+        });
     }
 
-    private int findDebugPort()
-    {
+    private int findDebugPort() {
         int debugPort;
-        if ( "true".equals( parsedDebug ) )
-        {
+        if ("true".equals(parsedDebug)) {
             debugPort = 0;
-        }
-        else
-        {
-            try
-            {
-                debugPort = Integer.parseInt( parsedDebug );
-            }
-            catch ( NumberFormatException ex )
-            {
+        } else {
+            try {
+                debugPort = Integer.parseInt(parsedDebug);
+            } catch (NumberFormatException ex) {
                 debugPort = -1;
             }
         }
         return debugPort;
+    }
+
+    /**
+     * Holds information about the "Launcher" activity.
+     *
+     * @author Lorenzo Villani
+     */
+    private static class LauncherInfo {
+        private String packageName;
+
+        private String activity;
+
+        public String getPackageName() {
+            return packageName;
+        }
+
+        public void setPackageName(String packageName) {
+            this.packageName = packageName;
+        }
+
+        public String getActivity() {
+            return activity;
+        }
+
+        public void setActivity(String activity) {
+            this.activity = activity;
+        }
     }
 }

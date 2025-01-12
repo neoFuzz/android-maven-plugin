@@ -18,6 +18,7 @@ package com.example.android.apis.app;
 
 // Need the following import to get access to the app resources, since this
 // class is in a sub-package.
+
 import com.example.android.apis.R;
 
 import android.app.Notification;
@@ -32,18 +33,17 @@ import android.os.Parcel;
 import android.os.RemoteException;
 
 /**
- * This is an example of service that will update its status bar balloon 
+ * This is an example of service that will update its status bar balloon
  * every 5 seconds for a minute.
- * 
  */
 public class NotifyingService extends Service {
-    
+
     // Use a layout id for a unique identifier
     private static int MOOD_NOTIFICATIONS = R.layout.status_bar_notifications;
 
     // variable which controls the notification thread 
     private ConditionVariable mCondition;
- 
+
     @Override
     public void onCreate() {
         mNM = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
@@ -69,15 +69,15 @@ public class NotifyingService extends Service {
             for (int i = 0; i < 4; ++i) {
                 showNotification(R.drawable.stat_happy,
                         R.string.status_bar_notifications_happy_message);
-                if (mCondition.block(5 * 1000)) 
+                if (mCondition.block(5 * 1000))
                     break;
                 showNotification(R.drawable.stat_neutral,
                         R.string.status_bar_notifications_ok_message);
-                if (mCondition.block(5 * 1000)) 
+                if (mCondition.block(5 * 1000))
                     break;
                 showNotification(R.drawable.stat_sad,
                         R.string.status_bar_notifications_sad_message);
-                if (mCondition.block(5 * 1000)) 
+                if (mCondition.block(5 * 1000))
                     break;
             }
             // Done with our work...  stop the service!
@@ -89,7 +89,7 @@ public class NotifyingService extends Service {
     public IBinder onBind(Intent intent) {
         return mBinder;
     }
-    
+
     private void showNotification(int moodId, int textId) {
         // In this sample, we'll use the same text for the ticker and the expanded notification
         CharSequence text = getText(textId);
@@ -107,7 +107,7 @@ public class NotifyingService extends Service {
 
         // Set the info for the views that show in the notification panel.
         notification.setLatestEventInfo(this, getText(R.string.status_bar_notifications_mood_title),
-                       text, contentIntent);
+                text, contentIntent);
 
         // Send the notification.
         // We use a layout id because it is a unique number.  We use it later to cancel.
@@ -119,7 +119,7 @@ public class NotifyingService extends Service {
     private final IBinder mBinder = new Binder() {
         @Override
         protected boolean onTransact(int code, Parcel data, Parcel reply,
-                int flags) throws RemoteException {
+                                     int flags) throws RemoteException {
             return super.onTransact(code, data, reply, flags);
         }
     };

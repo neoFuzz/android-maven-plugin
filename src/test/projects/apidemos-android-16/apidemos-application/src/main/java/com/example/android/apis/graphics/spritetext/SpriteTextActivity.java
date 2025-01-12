@@ -31,7 +31,8 @@ public class SpriteTextActivity extends Activity {
         mGLSurfaceView.setGLWrapper(new GLSurfaceView.GLWrapper() {
             public GL wrap(GL gl) {
                 return new MatrixTrackingGL(gl);
-            }});
+            }
+        });
         mGLSurfaceView.setRenderer(new SpriteTextRenderer(this));
         setContentView(mGLSurfaceView);
     }

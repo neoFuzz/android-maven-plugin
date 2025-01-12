@@ -42,7 +42,7 @@ public class FragmentTabs extends FragmentActivity {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.fragment_tabs);
-        mTabHost = (TabHost)findViewById(android.R.id.tabhost);
+        mTabHost = (TabHost) findViewById(android.R.id.tabhost);
         mTabHost.setup();
 
         mTabManager = new TabManager(this, mTabHost, R.id.realtabcontent);

@@ -18,7 +18,8 @@ import java.io.InputStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 @RunWith(MavenJUnitTestRunner.class)
 @MavenVersions({"3.2.3"})
@@ -30,23 +31,23 @@ public class ExtractDuplicatesIT {
     public final MavenRuntime mavenRuntime;
 
     public ExtractDuplicatesIT(MavenRuntimeBuilder builder) throws Exception {
-        this.mavenRuntime = builder.withCliOptions( "-X" ).build();
+        this.mavenRuntime = builder.withCliOptions("-X").build();
     }
 
-    @Ignore 
+    @Ignore
     @Test
     public void buildDeployAndRun() throws Exception {
-        File basedir = resources.getBasedir( "duplicates" );
+        File basedir = resources.getBasedir("duplicates");
         MavenExecutionResult result = mavenRuntime
                 .forProject(basedir)
-                .execute( "clean",
-                        "install" );
+                .execute("clean",
+                        "install");
 
         result.assertErrorFreeLog();
-        result.assertLogText( "Duplicate file resourceA" );
-        result.assertLogText( "Duplicate file resourceB" );
-        result.assertLogText( "Duplicate file resourceC" );
-        File apk = new File(result.getBasedir().getAbsolutePath()+"/duplicates-app/target", "duplicates-app.apk");
+        result.assertLogText("Duplicate file resourceA");
+        result.assertLogText("Duplicate file resourceB");
+        result.assertLogText("Duplicate file resourceC");
+        File apk = new File(result.getBasedir().getAbsolutePath() + "/duplicates-app/target", "duplicates-app.apk");
         assertNotNull("APK Not Null", apk);
         ZipFile apkFile = new ZipFile(apk);
         assertNotNull(apkFile.getEntry("resourceA"));
@@ -58,21 +59,19 @@ public class ExtractDuplicatesIT {
                 "ImplementationA\nImplementationB\nImplementationC\nImplementationApp");
 
         //test xpath xml
-        assertEntryContents( apkFile, "META-INF/kmodule.xml", expectedKmodule );
-        assertEntryContents( apkFile, "kmodule.info", expectedInfo );
+        assertEntryContents(apkFile, "META-INF/kmodule.xml", expectedKmodule);
+        assertEntryContents(apkFile, "kmodule.info", expectedInfo);
     }
 
-    private void assertEntryContents( ZipFile zip, String name, String expected ) throws IOException {
-        ZipEntry ze = zip.getEntry( name );
-        assertNotNull( ze );
+    private void assertEntryContents(ZipFile zip, String name, String expected) throws IOException {
+        ZipEntry ze = zip.getEntry(name);
+        assertNotNull(ze);
         InputStream is = null;
         try {
-            is = zip.getInputStream( ze );
-            assertEquals(name, expected.replaceAll( "\\s","" ), IOUtil.toString( is ).trim().replaceAll( "\\s","" ));
-        }
-        finally
-        {
-            if( is != null ) is.close();
+            is = zip.getInputStream(ze);
+            assertEquals(name, expected.replaceAll("\\s", ""), IOUtil.toString(is).trim().replaceAll("\\s", ""));
+        } finally {
+            if (is != null) is.close();
         }
     }
 

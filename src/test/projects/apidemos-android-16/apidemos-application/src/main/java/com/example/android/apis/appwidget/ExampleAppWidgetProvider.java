@@ -56,19 +56,19 @@ public class ExampleAppWidgetProvider extends AppWidgetProvider {
         //   - Set the text in the RemoteViews object
         //   - Tell the AppWidgetManager to show that views object for the widget.
         final int N = appWidgetIds.length;
-        for (int i=0; i<N; i++) {
+        for (int i = 0; i < N; i++) {
             int appWidgetId = appWidgetIds[i];
             String titlePrefix = ExampleAppWidgetConfigure.loadTitlePref(context, appWidgetId);
             updateAppWidget(context, appWidgetManager, appWidgetId, titlePrefix);
         }
     }
-    
+
     @Override
     public void onDeleted(Context context, int[] appWidgetIds) {
         Log.d(TAG, "onDeleted");
         // When the user deletes the widget, delete the preference associated with it.
         final int N = appWidgetIds.length;
-        for (int i=0; i<N; i++) {
+        for (int i = 0; i < N; i++) {
             ExampleAppWidgetConfigure.deleteTitlePref(context, appWidgetIds[i]);
         }
     }
@@ -100,7 +100,7 @@ public class ExampleAppWidgetProvider extends AppWidgetProvider {
     }
 
     static void updateAppWidget(Context context, AppWidgetManager appWidgetManager,
-            int appWidgetId, String titlePrefix) {
+                                int appWidgetId, String titlePrefix) {
         Log.d(TAG, "updateAppWidget appWidgetId=" + appWidgetId + " titlePrefix=" + titlePrefix);
         // Getting the string this way allows the string to be localized.  The format
         // string is filled in using java.util.Formatter-style format strings.

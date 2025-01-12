@@ -23,7 +23,7 @@ import android.test.suitebuilder.annotation.SmallTest;
  * An example of a true unit test that tests the utility class {@link MorseCodeConverter}.
  * Since this test doesn't need a {@link android.content.Context}, or any other
  * dependencies injected, it simply extends the standard {@link TestCase}.
- *
+ * <p>
  * See {@link com.example.android.apis.AllTests} for documentation on running
  * all tests and individual tests in this application.
  */

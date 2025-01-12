@@ -14,12 +14,11 @@ import java.lang.annotation.Target;
  * @author Manfred Moser - manfred@simpligility.com
  * @see ConfigHandler
  */
-@Target( { ElementType.FIELD } )
-@Retention( RetentionPolicy.RUNTIME )
-public @interface PullParameter
-{
+@Target({ElementType.FIELD})
+@Retention(RetentionPolicy.RUNTIME)
+public @interface PullParameter {
 
-    String[] defaultValue() default { };
+    String[] defaultValue() default {};
 
     String defaultValueGetterMethod() default "";
 

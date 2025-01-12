@@ -15,18 +15,17 @@ import javax.xml.namespace.QName;
 
 
 /**
- * This object contains factory methods for each 
- * Java content interface and Java element interface 
- * generated in the org.apache.maven.surefire package. 
- * <p>An ObjectFactory allows you to programatically 
- * construct new instances of the Java representation 
- * for XML content. The Java representation of XML 
- * content can consist of schema derived interfaces 
- * and classes representing the binding of schema 
- * type definitions, element declarations and model 
- * groups.  Factory methods for each of these are 
+ * This object contains factory methods for each
+ * Java content interface and Java element interface
+ * generated in the org.apache.maven.surefire package.
+ * <p>An ObjectFactory allows you to programatically
+ * construct new instances of the Java representation
+ * for XML content. The Java representation of XML
+ * content can consist of schema derived interfaces
+ * and classes representing the binding of schema
+ * type definitions, element declarations and model
+ * groups.  Factory methods for each of these are
  * provided in this class.
- * 
  */
 @XmlRegistry
 public class ObjectFactory {
@@ -38,14 +37,12 @@ public class ObjectFactory {
 
     /**
      * Create a new ObjectFactory that can be used to create new instances of schema derived classes for package: org.apache.maven.surefire
-     * 
      */
     public ObjectFactory() {
     }
 
     /**
      * Create an instance of {@link Testsuite }
-     * 
      */
     public Testsuite createTestsuite() {
         return new Testsuite();
@@ -53,7 +50,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link Testsuite.Testcase }
-     * 
      */
     public Testsuite.Testcase createTestsuiteTestcase() {
         return new Testsuite.Testcase();
@@ -61,7 +57,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link Testsuite.Properties }
-     * 
      */
     public Testsuite.Properties createTestsuiteProperties() {
         return new Testsuite.Properties();
@@ -69,7 +64,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link Testsuite.Testcase.Failure }
-     * 
      */
     public Testsuite.Testcase.Failure createTestsuiteTestcaseFailure() {
         return new Testsuite.Testcase.Failure();
@@ -77,7 +71,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link Testsuite.Testcase.RerunFailure }
-     * 
      */
     public Testsuite.Testcase.RerunFailure createTestsuiteTestcaseRerunFailure() {
         return new Testsuite.Testcase.RerunFailure();
@@ -85,7 +78,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link Testsuite.Testcase.Skipped }
-     * 
      */
     public Testsuite.Testcase.Skipped createTestsuiteTestcaseSkipped() {
         return new Testsuite.Testcase.Skipped();
@@ -93,7 +85,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link Testsuite.Testcase.Error }
-     * 
      */
     public Testsuite.Testcase.Error createTestsuiteTestcaseError() {
         return new Testsuite.Testcase.Error();
@@ -101,7 +92,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link Testsuite.Properties.Property }
-     * 
      */
     public Testsuite.Properties.Property createTestsuitePropertiesProperty() {
         return new Testsuite.Properties.Property();
@@ -109,7 +99,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link JAXBElement }{@code <}{@link Testsuite.Testcase.Skipped }{@code >}}
-     * 
      */
     @XmlElementDecl(namespace = "", name = "skipped", scope = Testsuite.Testcase.class)
     public JAXBElement<Testsuite.Testcase.Skipped> createTestsuiteTestcaseSkipped(Testsuite.Testcase.Skipped value) {
@@ -118,7 +107,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link JAXBElement }{@code <}{@link Testsuite.Testcase.Error }{@code >}}
-     * 
      */
     @XmlElementDecl(namespace = "", name = "error", scope = Testsuite.Testcase.class)
     public JAXBElement<Testsuite.Testcase.Error> createTestsuiteTestcaseError(Testsuite.Testcase.Error value) {
@@ -127,7 +115,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link JAXBElement }{@code <}{@link Object }{@code >}}
-     * 
      */
     @XmlElementDecl(namespace = "", name = "system-out", scope = Testsuite.Testcase.class)
     public JAXBElement<Object> createTestsuiteTestcaseSystemOut(Object value) {
@@ -136,7 +123,6 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link JAXBElement }{@code <}{@link Object }{@code >}}
-     * 
      */
     @XmlElementDecl(namespace = "", name = "system-err", scope = Testsuite.Testcase.class)
     public JAXBElement<Object> createTestsuiteTestcaseSystemErr(Object value) {

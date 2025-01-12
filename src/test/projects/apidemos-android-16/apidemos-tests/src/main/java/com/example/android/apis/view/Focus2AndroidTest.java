@@ -31,7 +31,7 @@ import android.widget.Button;
  * This exercises the same logic as {@link Focus2ActivityTest} but in a lighter
  * weight manner; it doesn't need to launch the activity, and it can test the
  * focus behavior by calling {@link FocusFinder} methods directly.
- *
+ * <p>
  * {@link Focus2ActivityTest} is still useful to verify that, at an end to end
  * level, key events actually translate to focus transitioning in the way we expect.
  * A good complementary way to use both types of tests might be to have more exhaustive
@@ -39,16 +39,16 @@ import android.widget.Button;
  * functional {@link android.test.ActivityInstrumentationTestCase}.  This would provide reasonable
  * assurance that the end to end system is working, while avoiding the overhead of
  * having every corner case exercised in the slower, heavier weight way.
- *
+ * <p>
  * Even as a lighter weight test, this test still needs access to a {@link Context}
  * to inflate the file, which is why it extends {@link AndroidTestCase}.
- * 
+ * <p>
  * If you ever need a context to do your work in tests, you can extend
  * {@link AndroidTestCase}, and when run via an {@link android.test.InstrumentationTestRunner},
  * the context will be injected for you.
- * 
+ * <p>
  * See {@link com.example.android.apis.app.ForwardingTest} for an example of an Activity unit test.
- *
+ * <p>
  * See {@link com.example.android.apis.AllTests} for documentation on running
  * all tests and individual tests in this application.
  */

@@ -48,9 +48,9 @@ public class IsolatedService extends Service {
      */
     final RemoteCallbackList<IRemoteServiceCallback> mCallbacks
             = new RemoteCallbackList<IRemoteServiceCallback>();
-    
+
     int mValue = 0;
-    
+
     @Override
     public void onCreate() {
         Log.i("IsolatedService", "Creating IsolatedService: " + this);
@@ -75,11 +75,12 @@ public class IsolatedService extends Service {
         public void registerCallback(IRemoteServiceCallback cb) {
             if (cb != null) mCallbacks.register(cb);
         }
+
         public void unregisterCallback(IRemoteServiceCallback cb) {
             if (cb != null) mCallbacks.unregister(cb);
         }
     };
-    
+
     @Override
     public void onTaskRemoved(Intent rootIntent) {
         Log.i("IsolatedService", "Task removed in " + this + ": " + rootIntent);
@@ -89,7 +90,7 @@ public class IsolatedService extends Service {
     private void broadcastValue(int value) {
         // Broadcast to all clients the new value.
         final int N = mCallbacks.beginBroadcast();
-        for (int i=0; i<N; i++) {
+        for (int i = 0; i < N; i++) {
             try {
                 mCallbacks.getBroadcastItem(i).valueChanged(value);
             } catch (RemoteException e) {
@@ -99,9 +100,9 @@ public class IsolatedService extends Service {
         }
         mCallbacks.finishBroadcast();
     }
-    
+
     // ----------------------------------------------------------------------
-    
+
     public static class Controller extends Activity {
         static class ServiceInfo {
             final Activity mActivity;
@@ -111,16 +112,16 @@ public class IsolatedService extends Service {
             IRemoteService mService;
 
             ServiceInfo(Activity activity, Class<?> clz,
-                    int start, int stop, int bind, int status) {
+                        int start, int stop, int bind, int status) {
                 mActivity = activity;
                 mClz = clz;
-                Button button = (Button)mActivity.findViewById(start);
+                Button button = (Button) mActivity.findViewById(start);
                 button.setOnClickListener(mStartListener);
-                button = (Button)mActivity.findViewById(stop);
+                button = (Button) mActivity.findViewById(stop);
                 button.setOnClickListener(mStopListener);
-                CheckBox cb = (CheckBox)mActivity.findViewById(bind);
+                CheckBox cb = (CheckBox) mActivity.findViewById(bind);
                 cb.setOnClickListener(mBindListener);
-                mStatus = (TextView)mActivity.findViewById(status);
+                mStatus = (TextView) mActivity.findViewById(status);
             }
 
             void destroy() {
@@ -143,7 +144,7 @@ public class IsolatedService extends Service {
 
             private OnClickListener mBindListener = new OnClickListener() {
                 public void onClick(View v) {
-                    if (((CheckBox)v).isChecked()) {
+                    if (((CheckBox) v).isChecked()) {
                         if (!mServiceBound) {
                             if (mActivity.bindService(new Intent(mActivity, mClz),
                                     mConnection, Context.BIND_AUTO_CREATE)) {
@@ -163,7 +164,7 @@ public class IsolatedService extends Service {
 
             private ServiceConnection mConnection = new ServiceConnection() {
                 public void onServiceConnected(ComponentName className,
-                        IBinder service) {
+                                               IBinder service) {
                     mService = IRemoteService.Stub.asInterface(service);
                     if (mServiceBound) {
                         mStatus.setText("CONNECTED");

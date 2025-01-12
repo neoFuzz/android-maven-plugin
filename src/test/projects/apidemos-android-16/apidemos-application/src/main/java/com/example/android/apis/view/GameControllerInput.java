@@ -46,10 +46,10 @@ import java.util.List;
 /**
  * Demonstrates how to process input events received from game controllers.
  * It also shows how to detect when input devices are added, removed or reconfigured.
- *
+ * <p>
  * This activity displays button states and joystick positions.
  * Also writes detailed information about relevant input events to the log.
- *
+ * <p>
  * The game controller is also uses to control a very simple game.  See {@link GameView}
  * for the game itself.
  */
@@ -67,7 +67,7 @@ public class GameControllerInput extends Activity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        mInputManager = (InputManager)getSystemService(Context.INPUT_SERVICE);
+        mInputManager = (InputManager) getSystemService(Context.INPUT_SERVICE);
 
         mInputDeviceStates = new SparseArray<InputDeviceState>();
         mSummaryAdapter = new SummaryAdapter(this, getResources());

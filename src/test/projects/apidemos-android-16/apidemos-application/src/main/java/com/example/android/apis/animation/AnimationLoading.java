@@ -18,6 +18,7 @@ package com.example.android.apis.animation;
 
 // Need the following import to get access to the app resources, since this
 // class is in a sub-package.
+
 import android.animation.AnimatorInflater;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
@@ -48,7 +49,9 @@ public class AnimationLoading extends Activity {
 
     private static final int DURATION = 1500;
 
-    /** Called when the activity is first created. */
+    /**
+     * Called when the activity is first created.
+     */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -99,7 +102,7 @@ public class AnimationLoading extends Activity {
 
                 AnimatorSet seq =
                         (AnimatorSet) AnimatorInflater.loadAnimator(appContext,
-                        R.anim.animator_set);
+                                R.anim.animator_set);
                 seq.setTarget(balls.get(2));
 
                 ObjectAnimator colorizer = (ObjectAnimator) AnimatorInflater.
@@ -134,12 +137,12 @@ public class AnimationLoading extends Activity {
 
         private void addBall(float x, float y) {
             ShapeHolder shapeHolder = createBall(x, y);
-            int red = (int)(100 + Math.random() * 155);
-            int green = (int)(100 + Math.random() * 155);
-            int blue = (int)(100 + Math.random() * 155);
+            int red = (int) (100 + Math.random() * 155);
+            int green = (int) (100 + Math.random() * 155);
+            int blue = (int) (100 + Math.random() * 155);
             int color = 0xff000000 | red << 16 | green << 8 | blue;
             Paint paint = shapeHolder.getShape().getPaint();
-            int darkColor = 0xff000000 | red/4 << 16 | green/4 << 8 | blue/4;
+            int darkColor = 0xff000000 | red / 4 << 16 | green / 4 << 8 | blue / 4;
             RadialGradient gradient = new RadialGradient(37.5f, 12.5f,
                     50f, color, darkColor, Shader.TileMode.CLAMP);
             paint.setShader(gradient);
@@ -159,7 +162,7 @@ public class AnimationLoading extends Activity {
 
             invalidate();
             ShapeHolder ball = balls.get(0);
-            ball.setY((Float)animation.getAnimatedValue());
+            ball.setY((Float) animation.getAnimatedValue());
         }
     }
 }

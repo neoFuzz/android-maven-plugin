@@ -9,8 +9,15 @@ import java.util.List;
  *
  * @author Manfred Moser - manfred@simpligility.com
  */
-public class Test
-{
+public class Test {
+    /**
+     * Mirror of {@link AbstractInstrumentationMojo#testPackages}
+     */
+    protected List<String> packages;
+    /**
+     * Mirror of {@link AbstractInstrumentationMojo#testClasses}
+     */
+    protected List<String> classes;
     /**
      * Mirror of {@link AbstractInstrumentationMojo#testSkip}
      */
@@ -48,14 +55,6 @@ public class Test
      */
     private Boolean createReport;
     /**
-     * Mirror of {@link AbstractInstrumentationMojo#testPackages}
-     */
-    protected List<String> packages;
-    /**
-     * Mirror of {@link AbstractInstrumentationMojo#testClasses}
-     */
-    protected List<String> classes;
-    /**
      * Mirror of {@link AbstractInstrumentationMojo#testAnnotations}
      */
     private List<String> annotations;
@@ -73,78 +72,63 @@ public class Test
     private Boolean failSafe;
 
 
-    public String getSkip()
-    {
+    public String getSkip() {
         return skip;
     }
 
-    public String getInstrumentationPackage()
-    {
+    public String getInstrumentationPackage() {
         return instrumentationPackage;
     }
 
-    public String getInstrumentationRunner()
-    {
+    public String getInstrumentationRunner() {
         return instrumentationRunner;
     }
 
-    public Boolean isDebug()
-    {
+    public Boolean isDebug() {
         return debug;
     }
 
-    public Boolean isCoverage()
-    {
+    public Boolean isCoverage() {
         return coverage;
     }
 
-    public String getCoverageFile()
-    {
+    public String getCoverageFile() {
         return coverageFile;
     }
 
-    public Boolean isLogOnly()
-    {
+    public Boolean isLogOnly() {
         return logOnly;
     }
 
-    public String getTestSize()
-    {
+    public String getTestSize() {
         return testSize;
     }
 
-    public Boolean isCreateReport()
-    {
+    public Boolean isCreateReport() {
         return createReport;
     }
 
-    public List<String> getPackages()
-    {
+    public List<String> getPackages() {
         return packages;
     }
 
-    public List<String> getClasses()
-    {
+    public List<String> getClasses() {
         return classes;
     }
 
-    public List<String> getAnnotations()
-    {
+    public List<String> getAnnotations() {
         return annotations;
     }
 
-    public List<String> getExcludeAnnotations()
-    {
+    public List<String> getExcludeAnnotations() {
         return excludeAnnotations;
     }
 
-    public List<String> getInstrumentationArgs()
-    {
+    public List<String> getInstrumentationArgs() {
         return instrumentationArgs;
     }
 
-    public Boolean isFailSafe()
-    {
+    public Boolean isFailSafe() {
         return failSafe;
     }
 }

@@ -26,11 +26,11 @@ import android.widget.TextView;
 
 /**
  * Part of the {@link Hover} demo activity.
- * 
+ * <p>
  * The Interceptor view is a simple subclass of LinearLayout whose sole purpose
  * is to override {@link #onInterceptHoverEvent}.  When the checkbox in the
  * hover activity is checked, the interceptor view will intercept hover events.
- *
+ * <p>
  * When this view intercepts hover events, its children will not receive
  * hover events.  This can be useful in some cases when implementing a custom
  * view group that would like to prevent its children from being hovered

@@ -67,7 +67,7 @@ public class AbstractAndroidMojoTest {
     @Test
     public void givenAndroidManifestThenInstrumentationRunnerIsFound()
             throws URISyntaxException, MojoExecutionException {
-        final URL url = this.getClass().getResource( BASE_PATH + "AndroidManifest.xml");
+        final URL url = this.getClass().getResource(BASE_PATH + "AndroidManifest.xml");
         final URI uri = url.toURI();
         final File file = new File(uri);
         final String foundInstrumentationRunner = androidMojo.extractInstrumentationRunnerFromAndroidManifest(file);

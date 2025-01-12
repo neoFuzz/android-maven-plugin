@@ -47,15 +47,15 @@ import com.example.android.apis.R;
 public class ForegroundService extends Service {
     static final String ACTION_FOREGROUND = "com.example.android.apis.FOREGROUND";
     static final String ACTION_BACKGROUND = "com.example.android.apis.BACKGROUND";
-    
 
-    private static final Class<?>[] mSetForegroundSignature = new Class[] {
-        boolean.class};
-    private static final Class<?>[] mStartForegroundSignature = new Class[] {
-        int.class, Notification.class};
-    private static final Class<?>[] mStopForegroundSignature = new Class[] {
-        boolean.class};
-    
+
+    private static final Class<?>[] mSetForegroundSignature = new Class[]{
+            boolean.class};
+    private static final Class<?>[] mStartForegroundSignature = new Class[]{
+            int.class, Notification.class};
+    private static final Class<?>[] mStopForegroundSignature = new Class[]{
+            boolean.class};
+
     private NotificationManager mNM;
     private Method mSetForeground;
     private Method mStartForeground;
@@ -63,7 +63,7 @@ public class ForegroundService extends Service {
     private Object[] mSetForegroundArgs = new Object[1];
     private Object[] mStartForegroundArgs = new Object[2];
     private Object[] mStopForegroundArgs = new Object[1];
-    
+
     void invokeMethod(Method method, Object[] args) {
         try {
             method.invoke(this, args);
@@ -75,7 +75,7 @@ public class ForegroundService extends Service {
             Log.w("ApiDemos", "Unable to invoke method", e);
         }
     }
-    
+
     /**
      * This is a wrapper around the new startForeground method, using the older
      * APIs if it is not available.
@@ -88,13 +88,13 @@ public class ForegroundService extends Service {
             invokeMethod(mStartForeground, mStartForegroundArgs);
             return;
         }
-        
+
         // Fall back on the old API.
         mSetForegroundArgs[0] = Boolean.TRUE;
         invokeMethod(mSetForeground, mSetForegroundArgs);
         mNM.notify(id, notification);
     }
-    
+
     /**
      * This is a wrapper around the new stopForeground method, using the older
      * APIs if it is not available.
@@ -106,17 +106,17 @@ public class ForegroundService extends Service {
             invokeMethod(mStopForeground, mStopForegroundArgs);
             return;
         }
-        
+
         // Fall back on the old API.  Note to cancel BEFORE changing the
         // foreground state, since we could be killed at that point.
         mNM.cancel(id);
         mSetForegroundArgs[0] = Boolean.FALSE;
         invokeMethod(mSetForeground, mSetForegroundArgs);
     }
-    
+
     @Override
     public void onCreate() {
-        mNM = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
+        mNM = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
         try {
             mStartForeground = getClass().getMethod("startForeground",
                     mStartForegroundSignature);
@@ -141,7 +141,6 @@ public class ForegroundService extends Service {
         // Make sure our notification is gone.
         stopForegroundCompat(R.string.foreground_service_started);
     }
-
 
 
     // This is the old onStart method that will be called on the pre-2.0
@@ -176,25 +175,25 @@ public class ForegroundService extends Service {
 
             // Set the info for the views that show in the notification panel.
             notification.setLatestEventInfo(this, getText(R.string.local_service_label),
-                           text, contentIntent);
-            
+                    text, contentIntent);
+
             startForegroundCompat(R.string.foreground_service_started, notification);
-            
+
         } else if (ACTION_BACKGROUND.equals(intent.getAction())) {
             stopForegroundCompat(R.string.foreground_service_started);
         }
     }
-    
+
     @Override
     public IBinder onBind(Intent intent) {
         return null;
     }
-    
+
     // ----------------------------------------------------------------------
 
     /**
      * <p>Example of explicitly starting and stopping the {@link ForegroundService}.
-     * 
+     *
      * <p>Note that this is implemented as an inner class only keep the sample
      * all together; typically this code would appear in some separate class.
      */
@@ -206,11 +205,11 @@ public class ForegroundService extends Service {
             setContentView(R.layout.foreground_service_controller);
 
             // Watch for button clicks.
-            Button button = (Button)findViewById(R.id.start_foreground);
+            Button button = (Button) findViewById(R.id.start_foreground);
             button.setOnClickListener(mForegroundListener);
-            button = (Button)findViewById(R.id.start_background);
+            button = (Button) findViewById(R.id.start_background);
             button.setOnClickListener(mBackgroundListener);
-            button = (Button)findViewById(R.id.stop);
+            button = (Button) findViewById(R.id.stop);
             button.setOnClickListener(mStopListener);
         }
 

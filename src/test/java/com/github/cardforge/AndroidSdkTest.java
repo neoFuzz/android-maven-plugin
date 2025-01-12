@@ -15,9 +15,6 @@
  */
 package com.github.cardforge;
 
-import java.io.File;
-import java.net.URISyntaxException;
-
 import com.github.cardforge.maven.plugins.android.AndroidSdk;
 import com.github.cardforge.maven.plugins.android.InvalidSdkException;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -26,6 +23,9 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.io.File;
+import java.net.URISyntaxException;
+
 /**
  * Exercises the {@link AndroidSdk} class.
  *
@@ -33,17 +33,17 @@ import org.junit.Test;
  * @author Manfred Moser - manfred@simpligility.com
  */
 public class AndroidSdkTest {
-    
+
     private SdkTestSupport sdkTestSupport;
-    
+
     @Before
-    public void setUp(){
+    public void setUp() {
         sdkTestSupport = new SdkTestSupport();
     }
 
     @Test
     public void givenToolAdbThenPathIsPlatformTools() {
-        final String pathForTool =sdkTestSupport.getSdkWithPlatformDefault().getAdbPath();
+        final String pathForTool = sdkTestSupport.getSdkWithPlatformDefault().getAdbPath();
         Assert.assertEquals(new File(sdkTestSupport.getenvAndroidHome() +
                 "/platform-tools").getAbsolutePath(), new File(pathForTool).getParentFile().getAbsolutePath());
     }
@@ -65,13 +65,13 @@ public class AndroidSdkTest {
     @Test
     public void givenPlatformNullThenPlatformisSomethingValidLooking() throws IllegalAccessException, URISyntaxException {
         final File sdkPath = (File) ReflectionUtils.getValueIncludingSuperclasses(
-                "sdkPath",sdkTestSupport.getSdkWithPlatformDefault());
+                "sdkPath", sdkTestSupport.getSdkWithPlatformDefault());
         final File platform = sdkTestSupport.getSdkWithPlatformDefault().getPlatform();
         final String platformPath = platform.getAbsoluteFile().toURI().toString();
         final String regex = "/platforms/android-.*";
         //Strip off the sdkPath part  
-        String matcher = platformPath.substring( sdkPath.toURI().toString().length() -1 );
-        Assert.assertTrue(String.format("Platform [%s] does not match regex: [%s]", matcher,regex), matcher.matches(regex));
+        String matcher = platformPath.substring(sdkPath.toURI().toString().length() - 1);
+        Assert.assertTrue(String.format("Platform [%s] does not match regex: [%s]", matcher, regex), matcher.matches(regex));
     }
 
     /**
@@ -82,82 +82,82 @@ public class AndroidSdkTest {
     public void validPlatformsAndApiLevels19() {
         // Remember to add further platforms to .travis.yml if you add more platforms here, otherwise ci build fails
         final AndroidSdk sdk19 = new AndroidSdk(new File(sdkTestSupport.getenvAndroidHome()), "19");
-        Assert.assertTrue( sdk19.getAaptPath() != null && !sdk19.getAaptPath().equals( "" ) );
+        Assert.assertTrue(sdk19.getAaptPath() != null && !sdk19.getAaptPath().equals(""));
     }
 
     @Test
     public void validPlatformsAndApiLevels22() {
         // Remember to add further platforms to .travis.yml if you add more platforms here, otherwise ci build fails
-        final AndroidSdk sdk22 = new AndroidSdk(new File(sdkTestSupport.getenvAndroidHome()), "22" );
-        Assert.assertTrue( sdk22.getAaptPath() != null && !sdk22.getAaptPath().equals( "" ) );
+        final AndroidSdk sdk22 = new AndroidSdk(new File(sdkTestSupport.getenvAndroidHome()), "22");
+        Assert.assertTrue(sdk22.getAaptPath() != null && !sdk22.getAaptPath().equals(""));
     }
 
     @Test
     public void validPlatformsAndApiLevels25() {
         // Remember to add further platforms to .travis.yml if you add more platforms here, otherwise ci build fails
-        final AndroidSdk sdk25 = new AndroidSdk( new File( sdkTestSupport.getenvAndroidHome()), "25" );
-        Assert.assertTrue( sdk25.getAaptPath() != null && !sdk25.getAaptPath().equals( "" ) );
+        final AndroidSdk sdk25 = new AndroidSdk(new File(sdkTestSupport.getenvAndroidHome()), "25");
+        Assert.assertTrue(sdk25.getAaptPath() != null && !sdk25.getAaptPath().equals(""));
     }
 
     @Test
     public void validPlatformsAndApiLevels23() {
         // Remember to add further platforms to .travis.yml if you add more platforms here, otherwise ci build fails
-        final AndroidSdk sdk23 = new AndroidSdk( new File( sdkTestSupport.getenvAndroidHome() ), "23" );
-        Assert.assertTrue( sdk23.getAaptPath() != null && !sdk23.getAaptPath().equals( "" ) );
+        final AndroidSdk sdk23 = new AndroidSdk(new File(sdkTestSupport.getenvAndroidHome()), "23");
+        Assert.assertTrue(sdk23.getAaptPath() != null && !sdk23.getAaptPath().equals(""));
     }
 
     @Test
     public void validPlatformsAndApiLevels28() {
         // Remember to add further platforms to .travis.yml if you add more platforms here, otherwise ci build fails
-        final AndroidSdk sdk23 = new AndroidSdk( new File( sdkTestSupport.getenvAndroidHome() ), "28" );
-        Assert.assertTrue( sdk23.getAaptPath() != null && !sdk23.getAaptPath().equals( "" ) );
+        final AndroidSdk sdk23 = new AndroidSdk(new File(sdkTestSupport.getenvAndroidHome()), "28");
+        Assert.assertTrue(sdk23.getAaptPath() != null && !sdk23.getAaptPath().equals(""));
     }
 
     @Test
     public void validPlatformsAndApiLevels35() {
         // Remember to add further platforms to .travis.yml if you add more platforms here, otherwise ci build fails
-        final AndroidSdk sdk35 = new AndroidSdk( new File( sdkTestSupport.getenvAndroidHome() ), "35" );
-        Assert.assertTrue( sdk35.getAaptPath() != null && !sdk35.getAaptPath().equals( "" ) );
+        final AndroidSdk sdk35 = new AndroidSdk(new File(sdkTestSupport.getenvAndroidHome()), "35");
+        Assert.assertTrue(sdk35.getAaptPath() != null && !sdk35.getAaptPath().equals(""));
     }
 
     @Test(expected = InvalidSdkException.class)
     public void invalidPlatformAndApiLevels() {
-        final AndroidSdk invalid = new AndroidSdk (new File( sdkTestSupport.getenvAndroidHome() ), "invalid" );
+        final AndroidSdk invalid = new AndroidSdk(new File(sdkTestSupport.getenvAndroidHome()), "invalid");
         System.out.println(invalid.getAaptPath());
     }
 
     @Test(expected = NumberFormatException.class)
     public void invalidBuildTools() {
-        final AndroidSdk invalid = new AndroidSdk (new File( sdkTestSupport.getenvAndroidHome() ), "19", "invalid" );
+        final AndroidSdk invalid = new AndroidSdk(new File(sdkTestSupport.getenvAndroidHome()), "19", "invalid");
         invalid.getAaptPath();
     }
 
     @Test
     public void validPlatformsAndApiLevelsWithDiffBuildTools1() {
         // Remember to add further platforms to .travis.yml if you add more platforms here, otherwise ci build fails
-        final AndroidSdk sdk = new AndroidSdk( new File( sdkTestSupport.getenvAndroidHome() ), "19", "28.0.3" );
-        Assert.assertTrue( sdk.getAaptPath() != null && !sdk.getAaptPath().equals( "" ) );
+        final AndroidSdk sdk = new AndroidSdk(new File(sdkTestSupport.getenvAndroidHome()), "19", "28.0.3");
+        Assert.assertTrue(sdk.getAaptPath() != null && !sdk.getAaptPath().equals(""));
     }
 
     @Test
     public void validPlatformsAndApiLevelsWithDiffBuildTools2() {
         // Remember to add further platforms to .travis.yml if you add more platforms here, otherwise ci build fails
-        final AndroidSdk sdk = new AndroidSdk( new File( sdkTestSupport.getenvAndroidHome() ), "19", "28" );
-        Assert.assertTrue( sdk.getAaptPath() != null && !sdk.getAaptPath().equals( "" ) );
+        final AndroidSdk sdk = new AndroidSdk(new File(sdkTestSupport.getenvAndroidHome()), "19", "28");
+        Assert.assertTrue(sdk.getAaptPath() != null && !sdk.getAaptPath().equals(""));
     }
 
     @Test
     public void validPlatformsAndApiLevelsWithDiffBuildTools3() {
         // Remember to add further platforms to .travis.yml if you add more platforms here, otherwise ci build fails
-        final AndroidSdk sdk = new AndroidSdk( new File( sdkTestSupport.getenvAndroidHome() ), "28", "30" );
-        Assert.assertTrue( sdk.getAaptPath() != null && !sdk.getAaptPath().equals( "" ) );
+        final AndroidSdk sdk = new AndroidSdk(new File(sdkTestSupport.getenvAndroidHome()), "28", "30");
+        Assert.assertTrue(sdk.getAaptPath() != null && !sdk.getAaptPath().equals(""));
     }
 
     @Test
     public void validPlatformsAndApiLevelsWithDiffBuildTools4() {
         // Remember to add further platforms to .travis.yml if you add more platforms here, otherwise ci build fails
-        final AndroidSdk sdk = new AndroidSdk( new File( sdkTestSupport.getenvAndroidHome() ), "35", "35.0.0" );
-        Assert.assertTrue( sdk.getAaptPath() != null && !sdk.getAaptPath().equals( "" ) );
+        final AndroidSdk sdk = new AndroidSdk(new File(sdkTestSupport.getenvAndroidHome()), "35", "35.0.0");
+        Assert.assertTrue(sdk.getAaptPath() != null && !sdk.getAaptPath().equals(""));
     }
 
 }

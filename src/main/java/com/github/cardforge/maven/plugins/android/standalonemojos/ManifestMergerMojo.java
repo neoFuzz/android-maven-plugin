@@ -2,7 +2,6 @@ package com.github.cardforge.maven.plugins.android.standalonemojos;
 
 import com.android.SdkConstants;
 import com.android.builder.core.AndroidBuilder;
-import com.android.builder.core.ErrorReporter;
 import com.android.builder.dependency.level2.AndroidDependency;
 import com.android.ide.common.process.DefaultProcessExecutor;
 import com.android.manifmerger.ManifestMerger2;
@@ -15,7 +14,6 @@ import com.github.cardforge.maven.plugins.android.configuration.ManifestMerger;
 import com.github.cardforge.maven.plugins.android.configuration.UsesSdk;
 import com.github.cardforge.maven.plugins.android.configuration.VersionGenerator;
 import com.github.cardforge.maven.plugins.android.phase01generatesources.MavenILogger;
-
 import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -36,10 +34,73 @@ import java.util.Set;
  *
  * @author Benoit Billington - benoit.billington@gmail.com
  */
-@Mojo( name = "manifest-merger", defaultPhase = LifecyclePhase.PROCESS_RESOURCES )
-public class ManifestMergerMojo extends AbstractAndroidMojo
-{
+@Mojo(name = "manifest-merger", defaultPhase = LifecyclePhase.PROCESS_RESOURCES)
+public class ManifestMergerMojo extends AbstractAndroidMojo {
 
+    /**
+     * Update the <code>android:versionName</code> with the specified parameter. If left empty it
+     * will use the version number of the project. Exposed via the project property
+     * <code>android.manifestMerger.versionName</code>.
+     */
+    @Parameter(property = "android.manifestMerger.versionName", defaultValue = "${project.version}")
+    protected String manifestVersionName;
+    /**
+     * Update the <code>android:versionCode</code> attribute with the specified parameter. Exposed via
+     * the project property <code>android.manifestMerger.versionCode</code>.
+     */
+    @Parameter(property = "android.manifestMerger.versionCode", defaultValue = "1")
+    protected Integer manifestVersionCode;
+    /**
+     * Update the <code>android:versionCode</code> attribute automatically from the project version
+     * e.g 3.2.1 will become version code 3002001. As described in this blog post
+     * http://www.simpligility.com/2010/11/release-version-management-for-your-android-application/
+     * but done without using resource filtering. The value is exposed via the project property
+     * property <code>android.manifest.versionCodeUpdateFromVersion</code> and the resulting value
+     * as <code>android.manifest.versionCode</code>.
+     * For the purpose of generating the versionCode, if a version element is missing it is presumed to be 0.
+     * The maximum values for the version increment and version minor values are 999,
+     * the version major should be no larger than 2000.  Any other suffixes do not
+     * participate in the version code generation.
+     */
+    @Parameter(property = "android.manifest.versionCodeUpdateFromVersion", defaultValue = "false")
+    protected Boolean manifestVersionCodeUpdateFromVersion = false;
+    /**
+     * Optionally use a pattern to match version elements for automatic generation of version codes,
+     * useful in case of complex version naming schemes. The new behavior is disabled by default;
+     * set the pattern to a non-empty string to activate. Otherwise, continue using the old
+     * behavior of separating version elements by dots and ignoring all non-digit characters.
+     * The pattern is standard Java regex. Capturing groups in the pattern are sequentially passed
+     * to the version code generator, while other parts are ignored. Be sure to properly escape
+     * your pattern string, in case you use characters that have special meaning in XML.
+     * Exposed via the project property
+     * <code>android.manifestMerger.versionNamingPattern</code>.
+     */
+    @Parameter(property = "android.manifestMerger.versionNamingPattern")
+    protected String manifestVersionNamingPattern;
+    /**
+     * The number of digits per version element. Must be specified as a comma/semicolon separated list of
+     * digits, one for each version element, Exposed via the project property
+     * <code>android.manifestMerger.versionDigits</code>.
+     */
+    @Parameter(property = "android.manifestMerger.versionDigits", defaultValue = "4,3,3")
+    protected String manifestVersionDigits;
+    /**
+     * Merge Manifest with library projects. Exposed via the project property
+     * <code>android.manifestMerger.mergeLibraries</code>.
+     */
+    @Parameter(property = "android.manifestMerger.mergeLibraries", defaultValue = "false")
+    protected Boolean manifestMergeLibraries;
+    /**
+     * Merge Manifest with library projects. Exposed via the project property
+     * <code>android.manifestMerger.mergeLibraries</code>.
+     */
+    @Parameter(property = "android.manifestMerger.mergeReportFile")
+    protected File manifestMergeReportFile;
+    /**
+     * Update the uses-sdk tag. It can be configured to change: <code>android:minSdkVersion</code>,
+     * <code>android:maxSdkVersion</code> and <code>android:targetSdkVersion</code>
+     */
+    protected UsesSdk manifestUsesSdk;
     /**
      * Configuration for the manifest-update goal.
      * <p>
@@ -51,7 +112,7 @@ public class ManifestMergerMojo extends AbstractAndroidMojo
      * </p>
      * <p>
      * You can configure attributes in the plugin configuration like so
-     * 
+     *
      * <pre>
      *   &lt;plugin&gt;
      *     &lt;groupId&gt;com.jayway.maven.plugins.android.generation2&lt;/groupId&gt;
@@ -80,86 +141,13 @@ public class ManifestMergerMojo extends AbstractAndroidMojo
      *     &lt;/executions&gt;
      *   &lt;/plugin&gt;
      * </pre>
-     * 
+     * <p>
      * or use properties set in the pom or settings file or supplied as command line parameter. Add
      * "android." in front of the property name for command line usage. All parameters follow a
      * manifestMerger.* naming convention.
-     * 
      */
     @Parameter
     private ManifestMerger manifestMerger;
-
-    /**
-     * Update the <code>android:versionName</code> with the specified parameter. If left empty it
-     * will use the version number of the project. Exposed via the project property
-     * <code>android.manifestMerger.versionName</code>.
-     */
-    @Parameter( property = "android.manifestMerger.versionName", defaultValue = "${project.version}" )
-    protected String manifestVersionName;
-
-    /**
-     * Update the <code>android:versionCode</code> attribute with the specified parameter. Exposed via
-     * the project property <code>android.manifestMerger.versionCode</code>.
-     */
-    @Parameter( property = "android.manifestMerger.versionCode", defaultValue = "1" )
-    protected Integer manifestVersionCode;
-
-    /**
-     * Update the <code>android:versionCode</code> attribute automatically from the project version
-     * e.g 3.2.1 will become version code 3002001. As described in this blog post
-     * http://www.simpligility.com/2010/11/release-version-management-for-your-android-application/
-     * but done without using resource filtering. The value is exposed via the project property
-     * property <code>android.manifest.versionCodeUpdateFromVersion</code> and the resulting value
-     * as <code>android.manifest.versionCode</code>.
-     * For the purpose of generating the versionCode, if a version element is missing it is presumed to be 0.
-     * The maximum values for the version increment and version minor values are 999,
-     * the version major should be no larger than 2000.  Any other suffixes do not
-     * participate in the version code generation.
-     */
-    @Parameter( property = "android.manifest.versionCodeUpdateFromVersion", defaultValue = "false" )
-    protected Boolean manifestVersionCodeUpdateFromVersion = false;
-
-    /**
-     * Optionally use a pattern to match version elements for automatic generation of version codes,
-     * useful in case of complex version naming schemes. The new behavior is disabled by default;
-     * set the pattern to a non-empty string to activate. Otherwise, continue using the old
-     * behavior of separating version elements by dots and ignoring all non-digit characters.
-     * The pattern is standard Java regex. Capturing groups in the pattern are sequentially passed
-     * to the version code generator, while other parts are ignored. Be sure to properly escape
-     * your pattern string, in case you use characters that have special meaning in XML.
-     * Exposed via the project property
-     * <code>android.manifestMerger.versionNamingPattern</code>.
-     */
-    @Parameter( property = "android.manifestMerger.versionNamingPattern" )
-    protected String manifestVersionNamingPattern;
-
-    /**
-     * The number of digits per version element. Must be specified as a comma/semicolon separated list of
-     * digits, one for each version element, Exposed via the project property
-     * <code>android.manifestMerger.versionDigits</code>.
-     */
-    @Parameter( property = "android.manifestMerger.versionDigits", defaultValue = "4,3,3" )
-    protected String manifestVersionDigits;
-
-    /**
-     * Merge Manifest with library projects. Exposed via the project property
-     * <code>android.manifestMerger.mergeLibraries</code>.
-     */
-    @Parameter( property = "android.manifestMerger.mergeLibraries", defaultValue = "false" )
-    protected Boolean manifestMergeLibraries;
-
-    /**
-     * Merge Manifest with library projects. Exposed via the project property
-     * <code>android.manifestMerger.mergeLibraries</code>.
-     */
-    @Parameter( property = "android.manifestMerger.mergeReportFile" )
-    protected File manifestMergeReportFile;
-
-    /**
-     *  Update the uses-sdk tag. It can be configured to change: <code>android:minSdkVersion</code>,
-     *  <code>android:maxSdkVersion</code> and <code>android:targetSdkVersion</code>
-     */
-    protected UsesSdk manifestUsesSdk;
     private Boolean parsedVersionCodeUpdateFromVersion;
     private String parsedVersionNamingPattern;
     private String parsedVersionDigits;
@@ -173,112 +161,80 @@ public class ManifestMergerMojo extends AbstractAndroidMojo
      * @throws org.apache.maven.plugin.MojoExecutionException
      * @throws org.apache.maven.plugin.MojoFailureException
      */
-    public void execute() throws MojoExecutionException, MojoFailureException
-    {
-        if ( ! AndroidExtension.isAndroidPackaging( project.getPackaging() ) )
-        {
+    public void execute() throws MojoExecutionException, MojoFailureException {
+        if (!AndroidExtension.isAndroidPackaging(project.getPackaging())) {
             return; // skip, not an android project.
         }
 
-        if ( androidManifestFile == null )
-        {
-            getLog().debug( "skip, no androidmanifest.xml defined (androidManifestFile rare case)" );
+        if (androidManifestFile == null) {
+            getLog().debug("skip, no androidmanifest.xml defined (androidManifestFile rare case)");
             return; // skip, no androidmanifest.xml defined (rare case)
         }
 
         parseConfiguration();
 
-        getLog().info( "Attempting to update manifest " + androidManifestFile );
-        getLog().debug( "    usesSdk=" + parsedUsesSdk );
-        getLog().debug( "    versionName=" + parsedVersionName );
-        getLog().debug( "    versionCode=" + parsedVersionCode );
-        getLog().debug( "    versionCodeUpdateFromVersion=" + parsedVersionCodeUpdateFromVersion );
-        getLog().debug( "    versionNamingPattern=" + parsedVersionNamingPattern );
-        getLog().debug( "    versionDigits=" + parsedVersionDigits );
-        getLog().debug( "    mergeLibraries=" + parsedMergeLibraries );
-        getLog().debug( "    mergeReportFile=" + parsedMergeReportFile );
+        getLog().info("Attempting to update manifest " + androidManifestFile);
+        getLog().debug("    usesSdk=" + parsedUsesSdk);
+        getLog().debug("    versionName=" + parsedVersionName);
+        getLog().debug("    versionCode=" + parsedVersionCode);
+        getLog().debug("    versionCodeUpdateFromVersion=" + parsedVersionCodeUpdateFromVersion);
+        getLog().debug("    versionNamingPattern=" + parsedVersionNamingPattern);
+        getLog().debug("    versionDigits=" + parsedVersionDigits);
+        getLog().debug("    mergeLibraries=" + parsedMergeLibraries);
+        getLog().debug("    mergeReportFile=" + parsedMergeReportFile);
 
-        if ( ! androidManifestFile.exists() )
-        {
+        if (!androidManifestFile.exists()) {
             return; // skip, no AndroidManifest.xml file found.
         }
 
-        getLog().debug( "Using manifest merger V2" );
+        getLog().debug("Using manifest merger V2");
         manifestMergerV2();
     }
 
-    private void parseConfiguration()
-    {
+    private void parseConfiguration() {
         // manifestMerger element found in plugin config in pom
-        if ( manifestMerger != null )
-        {
-            if ( StringUtils.isNotEmpty( manifestMerger.getVersionName() ) )
-            {
+        if (manifestMerger != null) {
+            if (StringUtils.isNotEmpty(manifestMerger.getVersionName())) {
                 parsedVersionName = manifestMerger.getVersionName();
-            }
-            else
-            {
+            } else {
                 parsedVersionName = manifestVersionName;
             }
-            if ( manifestMerger.getVersionCode() != null )
-            {
+            if (manifestMerger.getVersionCode() != null) {
                 parsedVersionCode = manifestMerger.getVersionCode();
-            }
-            else
-            {
+            } else {
                 parsedVersionCode = manifestVersionCode;
             }
-            if ( manifestMerger.getVersionCodeUpdateFromVersion() != null )
-            {
+            if (manifestMerger.getVersionCodeUpdateFromVersion() != null) {
                 parsedVersionCodeUpdateFromVersion = manifestMerger.getVersionCodeUpdateFromVersion();
-            }
-            else
-            {
+            } else {
                 parsedVersionCodeUpdateFromVersion = manifestVersionCodeUpdateFromVersion;
             }
-            if ( manifestMerger.getVersionNamingPattern() != null )
-            {
+            if (manifestMerger.getVersionNamingPattern() != null) {
                 parsedVersionNamingPattern = manifestMerger.getVersionNamingPattern();
-            }
-            else
-            {
+            } else {
                 parsedVersionNamingPattern = manifestVersionNamingPattern;
             }
-            if ( manifestMerger.getVersionDigits() != null )
-            {
+            if (manifestMerger.getVersionDigits() != null) {
                 parsedVersionDigits = manifestMerger.getVersionDigits();
-            }
-            else
-            {
+            } else {
                 parsedVersionDigits = manifestVersionDigits;
             }
-            if ( manifestMerger.getUsesSdk() != null )
-            {
+            if (manifestMerger.getUsesSdk() != null) {
                 parsedUsesSdk = manifestMerger.getUsesSdk();
-            }
-            else
-            {
+            } else {
                 parsedUsesSdk = manifestUsesSdk;
             }
-            if ( manifestMerger.getMergeLibraries() != null )
-            {
+            if (manifestMerger.getMergeLibraries() != null) {
                 parsedMergeLibraries = manifestMerger.getMergeLibraries();
-            }
-            else
-            {
+            } else {
                 parsedMergeLibraries = manifestMergeLibraries;
             }
-            if ( manifestMerger.getMergeReportFile() != null )
-            {
+            if (manifestMerger.getMergeReportFile() != null) {
                 parsedMergeReportFile = manifestMerger.getMergeReportFile();
-            }
-            else
-            {
+            } else {
                 parsedMergeReportFile = manifestMergeReportFile;
             }
-        }
-        else
-        {
+        } else {
             parsedVersionName = manifestVersionName;
             parsedVersionCode = manifestVersionCode;
             parsedUsesSdk = manifestUsesSdk;
@@ -291,47 +247,39 @@ public class ManifestMergerMojo extends AbstractAndroidMojo
     }
 
 
-    public void manifestMergerV2() throws MojoExecutionException, MojoFailureException
-    {
-        ILogger logger = new MavenILogger( getLog(), ( parsedMergeReportFile != null ) );
-        AndroidBuilder builder = new AndroidBuilder( project.toString(), "created by Android Maven Plugin",
-            new DefaultProcessExecutor( logger ),
-            new DefaultJavaProcessExecutor( logger ),
-            new MavenErrorReporter( logger, ErrorReporter.EvaluationMode.STANDARD ),
-            logger,
-          false );
-        
+    public void manifestMergerV2() throws MojoExecutionException, MojoFailureException {
+        ILogger logger = new MavenILogger(getLog(), (parsedMergeReportFile != null));
+        AndroidBuilder builder = new AndroidBuilder(project.toString(), "created by Android Maven Plugin",
+                new DefaultProcessExecutor(logger),
+                new DefaultJavaProcessExecutor(logger),
+                new MavenErrorReporter(logger, MavenErrorReporter.EvaluationMode.STANDARD),
+                logger,
+                false);
+
         String minSdkVersion = null;
         String targetSdkVersion = null;
         int versionCode;
-        if ( parsedUsesSdk != null )
-        {
+        if (parsedUsesSdk != null) {
             minSdkVersion = parsedUsesSdk.getMinSdkVersion();
             targetSdkVersion = parsedUsesSdk.getTargetSdkVersion();
         }
-        if ( parsedVersionCodeUpdateFromVersion )
-        {
-            VersionGenerator gen = new VersionGenerator( parsedVersionDigits, parsedVersionNamingPattern );
+        if (parsedVersionCodeUpdateFromVersion) {
+            VersionGenerator gen = new VersionGenerator(parsedVersionDigits, parsedVersionNamingPattern);
 
-            versionCode = gen.generate( parsedVersionName );
-        }
-        else
-        {
+            versionCode = gen.generate(parsedVersionName);
+        } else {
             versionCode = parsedVersionCode;
         }
         List<AndroidDependency> manifestDependencies = new ArrayList<>();
 
-        if ( parsedMergeLibraries )
-        {
+        if (parsedMergeLibraries) {
             final Set<Artifact> allArtifacts = project.getDependencyArtifacts();
-            Set<Artifact> dependencyArtifacts = getArtifactResolverHelper().getFilteredArtifacts( allArtifacts );
+            Set<Artifact> dependencyArtifacts = getArtifactResolverHelper().getFilteredArtifacts(allArtifacts);
 
-            for ( Artifact dependency : dependencyArtifacts )
-            {
-                final File unpackedLibFolder = getUnpackedLibFolder( dependency );
-                final File manifestFile = new File( unpackedLibFolder, SdkConstants.FN_ANDROID_MANIFEST_XML );
-                if ( manifestFile.exists() )
-                {
+            for (Artifact dependency : dependencyArtifacts) {
+                final File unpackedLibFolder = getUnpackedLibFolder(dependency);
+                final File manifestFile = new File(unpackedLibFolder, SdkConstants.FN_ANDROID_MANIFEST_XML);
+                if (manifestFile.exists()) {
                     /*
                     File artifactFile,
                     MavenCoordinates coordinates,
@@ -340,12 +288,12 @@ public class ManifestMergerMojo extends AbstractAndroidMojo
                      File extractedFolder
                     * */
                     // TODO this might not be working just yet....
-                    manifestDependencies.add( AndroidDependency.createExplodedAarLibrary(
+                    manifestDependencies.add(AndroidDependency.createExplodedAarLibrary(
                             manifestFile,
                             null,
                             dependency.getArtifactId(),
                             unpackedLibFolder.getPath(),
-                            unpackedLibFolder ) );
+                            unpackedLibFolder));
                 }
             }
         }
@@ -369,23 +317,22 @@ public class ManifestMergerMojo extends AbstractAndroidMojo
          */
 
         builder.mergeManifestsForApplication(
-                  androidManifestFile,     // mainManifest
-                  new ArrayList<File>(),   // manifestOverlays
-                  manifestDependencies,    // libraries
-                  null,                      //featurename
-                  "",                      // packageOverride
-                  versionCode,             // versionCode
-                  parsedVersionName,       // versionName
-                  minSdkVersion,           // minSdkVersion
-                  targetSdkVersion,        // targetSdkVersion
-                  null,                    // maxSdkVersion
-                  destinationManifestFile.getPath(),       // outManifestLocation
-                  null,                                    // outAaptSafeManifestLocation
-                  null, // outInstantRunManifestLocation,
-                  ManifestMerger2.MergeType.APPLICATION,   // mergeType
-                  new HashMap<String, Object>(),           // placeHolders
-                  new ArrayList<ManifestMerger2.Invoker.Feature>(),  // optionalFeatures
-                  parsedMergeReportFile                    // reportFile
-                  );
+                androidManifestFile,     // mainManifest
+                new ArrayList<>(),   // manifestOverlays
+                manifestDependencies,    // libraries
+                "",                      // packageOverride
+                versionCode,             // versionCode
+                parsedVersionName,       // versionName
+                minSdkVersion,           // minSdkVersion
+                targetSdkVersion,        // targetSdkVersion
+                null,                    // maxSdkVersion
+                destinationManifestFile.getPath(),       // outManifestLocation
+                null,                                    // outAaptSafeManifestLocation
+                null,                                    // outInstantRunManifestLocation,
+                ManifestMerger2.MergeType.APPLICATION,   // mergeType
+                new HashMap<>(),           // placeHolders
+                new ArrayList<>(),  // optionalFeatures
+                parsedMergeReportFile                    // reportFile
+        );
     }
 }

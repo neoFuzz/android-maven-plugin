@@ -46,36 +46,37 @@ public class List8 extends ListActivity {
 
         // Use a custom layout file
         setContentView(R.layout.list_8);
-        
+
         // Tell the list view which view to display when the list is empty
         getListView().setEmptyView(findViewById(R.id.empty));
-        
+
         // Set up our adapter
         mAdapter = new PhotoAdapter(this);
         setListAdapter(mAdapter);
-        
+
         // Wire up the clear button to remove all photos
         Button clear = (Button) findViewById(R.id.clear);
         clear.setOnClickListener(new View.OnClickListener() {
 
             public void onClick(View v) {
                 mAdapter.clearPhotos();
-            } });
-        
+            }
+        });
+
         // Wire up the add button to add a new photo
         Button add = (Button) findViewById(R.id.add);
         add.setOnClickListener(new View.OnClickListener() {
 
             public void onClick(View v) {
                 mAdapter.addPhotos();
-            } });
+            }
+        });
     }
 
     /**
-     * A simple adapter which maintains an ArrayList of photo resource Ids. 
+     * A simple adapter which maintains an ArrayList of photo resource Ids.
      * Each photo is displayed as an image. This adapter supports clearing the
      * list of photos and adding a new photo.
-     *
      */
     public class PhotoAdapter extends BaseAdapter {
 
@@ -85,7 +86,7 @@ public class List8 extends ListActivity {
                 R.drawable.sample_thumb_6, R.drawable.sample_thumb_7};
 
         private ArrayList<Integer> mPhotos = new ArrayList<Integer>();
-        
+
         public PhotoAdapter(Context c) {
             mContext = c;
         }
@@ -121,9 +122,9 @@ public class List8 extends ListActivity {
             mPhotos.clear();
             notifyDataSetChanged();
         }
-        
+
         public void addPhotos() {
-            int whichPhoto = (int)Math.round(Math.random() * (mPhotoPool.length - 1));
+            int whichPhoto = (int) Math.round(Math.random() * (mPhotoPool.length - 1));
             int newPhoto = mPhotoPool[whichPhoto];
             mPhotos.add(newPhoto);
             notifyDataSetChanged();

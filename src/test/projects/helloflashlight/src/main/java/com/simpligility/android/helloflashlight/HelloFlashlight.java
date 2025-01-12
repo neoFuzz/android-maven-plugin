@@ -15,12 +15,12 @@ import android.widget.TableLayout;
  */
 public class HelloFlashlight extends Activity {
 
-	TableLayout table;
-	Button redButton;
-	Button greenButton;
-	Button blueButton;
-	Button blackButton;
-	Button whiteButton;
+    TableLayout table;
+    Button redButton;
+    Button greenButton;
+    Button blueButton;
+    Button blackButton;
+    Button whiteButton;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -48,11 +48,11 @@ public class HelloFlashlight extends Activity {
 
     /**
      * An OnClickListener that changes the color of the table.
+     *
      * @param color
      * @return
      */
-    View.OnClickListener OnClickChangeColor(final int color)
-    {
+    View.OnClickListener OnClickChangeColor(final int color) {
         return new View.OnClickListener() {
             public void onClick(View view) {
                 table.setBackgroundColor(color);

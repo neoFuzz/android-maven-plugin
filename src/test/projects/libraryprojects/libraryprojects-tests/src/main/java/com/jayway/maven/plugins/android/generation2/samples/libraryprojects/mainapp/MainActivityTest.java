@@ -52,7 +52,7 @@ public class MainActivityTest extends ActivityInstrumentationTestCase2<MainActiv
         assertTrue(robotium.searchText("libraryprojects-aar-from-aar Java class"));
         assertTrue(robotium.searchText("libraryprojects-apklib-from-apklib Java class"));
     }
-    
+
     public void testJavaResourcesAppear() {
         assertTrue(robotium.searchText("libraryprojects-apk-with-deps Java resource"));
         assertTrue(robotium.searchText("libraryprojects-aar1 Java resource"));

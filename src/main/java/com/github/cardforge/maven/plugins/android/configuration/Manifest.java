@@ -15,9 +15,8 @@ import java.util.Properties;
  * combination
  * with {@link ManifestMergerMojo}
  */
-@Deprecated
-public class Manifest
-{
+@Deprecated(since = "4.8", forRemoval = false)
+public class Manifest {
     /**
      * Mirror of {@link ManifestUpdateMojo#manifestVersionName}.
      */
@@ -27,136 +26,112 @@ public class Manifest
      * Mirror of {@link ManifestUpdateMojo#manifestVersionCode}.
      */
     protected Integer versionCode;
-
-    /**
-     * Mirror of {@link ManifestUpdateMojo
-     * #manifestVersionCodeAutoIncrement}.
-     */
-    private Boolean versionCodeAutoIncrement;
-
     /**
      * Mirror of {@link ManifestUpdateMojo
      * #manifestVersionCodeUpdateFromVersion}.
      */
     protected Boolean versionCodeUpdateFromVersion;
-
     /**
      * Mirror of {@link com.github.cardforge.standalonemojos
      * .ManifestUpdateMojo#manifestApplicationIcon}.
      */
     protected String applicationIcon;
-
     /**
      * Mirror of {@link com.github.cardforge.standalonemojos
      * .ManifestUpdateMojo#manifestApplicationLabel}.
      */
-    protected String applicationLabel;    
-    
+    protected String applicationLabel;
     /**
      * Mirror of {@link com.github.cardforge.standalonemojos
      * .ManifestUpdateMojo#manifestApplicationTheme}.
      */
-    protected String applicationTheme;    
-    
+    protected String applicationTheme;
     /**
      * Mirror of {@link ManifestUpdateMojo#manifestSharedUserId}.
      */
     protected String sharedUserId;
-
     /**
      * Mirror of {@link ManifestUpdateMojo#manifestDebuggable}.
      */
     protected Boolean debuggable;
-
     /**
      * Mirror of
      * {@link ManifestUpdateMojo#manifestSupportsScreens}
      * .
      */
     protected SupportsScreens supportsScreens;
-
     /**
      * Mirror of
      * {@link ManifestUpdateMojo#manifestCompatibleScreens}
      * .
      */
     protected List<CompatibleScreen> compatibleScreens;
-
     /**
      * Mirror of
      * {@link ManifestUpdateMojo#manifestProviderAuthorities}
      * .
      */
     protected Properties providerAuthorities;
-
     /**
      * Mirror of
      * {@link ManifestUpdateMojo#manifestUsesSdk}
      */
     protected UsesSdk usesSdk;
+    /**
+     * Mirror of {@link ManifestUpdateMojo
+     * #manifestVersionCodeAutoIncrement}.
+     */
+    private Boolean versionCodeAutoIncrement;
 
-    public String getVersionName()
-    {
+    public String getVersionName() {
         return versionName;
     }
 
-    public Integer getVersionCode()
-    {
+    public Integer getVersionCode() {
         return versionCode;
     }
 
-    public Boolean getVersionCodeAutoIncrement()
-    {
+    public Boolean getVersionCodeAutoIncrement() {
         return versionCodeAutoIncrement;
     }
 
-    public Boolean getVersionCodeUpdateFromVersion()
-    {
+    public Boolean getVersionCodeUpdateFromVersion() {
         return versionCodeUpdateFromVersion;
     }
 
-    public String getApplicationIcon() 
-    {
-    return applicationIcon; 
+    public String getApplicationIcon() {
+        return applicationIcon;
     }
-    
-    public String getApplicationLabel() 
-    {
+
+    public String getApplicationLabel() {
         return applicationLabel;
     }
 
-    public String getApplicationTheme() 
-    {
+    public String getApplicationTheme() {
         return applicationTheme;
     }
 
-    public String getSharedUserId()
-    {
+    public String getSharedUserId() {
         return sharedUserId;
     }
 
-    public Boolean getDebuggable()
-    {
+    public Boolean getDebuggable() {
         return debuggable;
     }
 
-    public SupportsScreens getSupportsScreens()
-    {
+    public SupportsScreens getSupportsScreens() {
         return supportsScreens;
     }
 
-    public List<CompatibleScreen> getCompatibleScreens()
-    {
+    public List<CompatibleScreen> getCompatibleScreens() {
         return compatibleScreens;
     }
 
-    public Properties getProviderAuthorities()
-    {
+    public Properties getProviderAuthorities() {
         return providerAuthorities;
     }
 
-    public UsesSdk getUsesSdk()
-    {
+    public UsesSdk getUsesSdk() {
         return usesSdk;
     }
 }

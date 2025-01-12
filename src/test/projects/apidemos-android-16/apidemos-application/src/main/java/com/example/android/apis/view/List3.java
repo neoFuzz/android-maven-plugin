@@ -24,7 +24,7 @@ import android.view.View;
 import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 
- /**
+/**
  * A list view example where the
  * data comes from a cursor, and a
  * SimpleCursorListAdapter is used to map each item to a two-line
@@ -44,11 +44,11 @@ public class List3 extends ListActivity {
         // Map Cursor columns to views defined in simple_list_item_2.xml
         SimpleCursorAdapter adapter = new SimpleCursorAdapter(this,
                 android.R.layout.simple_list_item_2, c,
-                        new String[] {
-                            Phone.TYPE,
-                            Phone.NUMBER
-                        },
-                        new int[] { android.R.id.text1, android.R.id.text2 });
+                new String[]{
+                        Phone.TYPE,
+                        Phone.NUMBER
+                },
+                new int[]{android.R.id.text1, android.R.id.text2});
         //Used to display a readable string for the phone type
         adapter.setViewBinder(new SimpleCursorAdapter.ViewBinder() {
             public boolean setViewValue(View view, Cursor cursor, int columnIndex) {
@@ -72,13 +72,14 @@ public class List3 extends ListActivity {
         setListAdapter(adapter);
     }
 
-    private static final String[] PHONE_PROJECTION = new String[] {
-        Phone._ID,
-        Phone.TYPE,
-        Phone.LABEL,
-        Phone.NUMBER
+    private static final String[] PHONE_PROJECTION = new String[]{
+            Phone._ID,
+            Phone.TYPE,
+            Phone.LABEL,
+            Phone.NUMBER
     };
 
-    private static final int COLUMN_TYPE = 1;;
+    private static final int COLUMN_TYPE = 1;
+    ;
     private static final int COLUMN_LABEL = 2;
 }

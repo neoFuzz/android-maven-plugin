@@ -1,15 +1,13 @@
 package com.github.cardforge.maven.plugins.android.configuration;
 
 
-
 /**
  * Configuration for the ui automator test runs. This class is only the definition of the parameters that are shadowed
  * in {@link UIAutomatorMojo} and used there.
- * 
+ *
  * @author Stéphane Nicolas - snicolas@octo.com
  */
-public class UIAutomator
-{
+public class UIAutomator {
     /**
      * Mirror of {@link UIAutomatorMojo#testSkip}
      */
@@ -59,63 +57,51 @@ public class UIAutomator
      */
     private String propertiesKeyPrefix;
 
-    public Boolean isSkip()
-    {
+    public Boolean isSkip() {
         return skip;
     }
 
-    public String getJarFile()
-    {
+    public String getJarFile() {
         return jarFile;
     }
 
-    public String[] getTestClassOrMethods()
-    {
+    public String[] getTestClassOrMethods() {
         return testClassOrMethods;
     }
 
-    public Boolean getNoHup()
-    {
+    public Boolean getNoHup() {
         return noHup;
     }
 
-    public Boolean getDebug()
-    {
+    public Boolean getDebug() {
         return debug;
     }
 
-    public Boolean getUseDump()
-    {
+    public Boolean getUseDump() {
         return useDump;
     }
 
-    public String getDumpFilePath()
-    {
+    public String getDumpFilePath() {
         return dumpFilePath;
     }
 
-    public Boolean isCreateReport()
-    {
+    public Boolean isCreateReport() {
         return createReport;
     }
 
-    public String getReportSuffix()
-    {
+    public String getReportSuffix() {
         return reportSuffix;
     }
 
-    public Boolean isTakeScreenshotOnFailure()
-    {
+    public Boolean isTakeScreenshotOnFailure() {
         return takeScreenshotOnFailure;
     }
 
-    public String getScreenshotsPathOnDevice()
-    {
+    public String getScreenshotsPathOnDevice() {
         return screenshotsPathOnDevice;
     }
-    
-    public String getPropertiesKeyPrefix()
-    {
+
+    public String getPropertiesKeyPrefix() {
         return propertiesKeyPrefix;
     }
 }

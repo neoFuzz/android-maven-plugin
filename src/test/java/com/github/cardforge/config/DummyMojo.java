@@ -5,62 +5,61 @@ import com.github.cardforge.maven.plugins.android.config.PullParameter;
 
 public class DummyMojo {
 
-	@ConfigPojo
-	private DummyConfigPojo configPojo;
+    @ConfigPojo
+    private DummyConfigPojo configPojo;
 
-	// Maven injected parameters
-	private String configPojoStringValue;
-	private Boolean configPojoBooleanValue;
+    // Maven injected parameters
+    private String configPojoStringValue;
+    private Boolean configPojoBooleanValue;
     private String[] configPojoMethodValue;
 
-	@PullParameter(defaultValue = "hello")
-	private String parsedStringValue;
+    @PullParameter(defaultValue = "hello")
+    private String parsedStringValue;
 
-	@PullParameter(defaultValue = "true")
-	private Boolean parsedBooleanValue;
+    @PullParameter(defaultValue = "true")
+    private Boolean parsedBooleanValue;
 
-	@PullParameter(defaultValueGetterMethod = "getDefaultMethodValue")
-	private String[] parsedMethodValue;
+    @PullParameter(defaultValueGetterMethod = "getDefaultMethodValue")
+    private String[] parsedMethodValue;
 
-	public String[] getDefaultMethodValue()
-	{
-		return new String[] {"a","b"};
-	}
-	
-	public void setConfigPojo(DummyConfigPojo configPojo) {
-		this.configPojo = configPojo;
-	}
+    public String[] getDefaultMethodValue() {
+        return new String[]{"a", "b"};
+    }
 
-	public void setConfigPojoStringValue(String configPojoStringValue) {
-		this.configPojoStringValue = configPojoStringValue;
-	}
+    public void setConfigPojo(DummyConfigPojo configPojo) {
+        this.configPojo = configPojo;
+    }
 
-	public void setConfigPojoBooleanValue(Boolean configPojoBooleanValue) {
-		this.configPojoBooleanValue = configPojoBooleanValue;
-	}
+    public void setConfigPojoStringValue(String configPojoStringValue) {
+        this.configPojoStringValue = configPojoStringValue;
+    }
 
-	public DummyConfigPojo getConfigPojo() {
-		return configPojo;
-	}
+    public void setConfigPojoBooleanValue(Boolean configPojoBooleanValue) {
+        this.configPojoBooleanValue = configPojoBooleanValue;
+    }
 
-	public String getConfigPojoStringValue() {
-		return configPojoStringValue;
-	}
+    public DummyConfigPojo getConfigPojo() {
+        return configPojo;
+    }
 
-	public Boolean getConfigPojoBooleanValue() {
-		return configPojoBooleanValue;
-	}
+    public String getConfigPojoStringValue() {
+        return configPojoStringValue;
+    }
 
-	public String getParsedStringValue() {
-		return parsedStringValue;
-	}
+    public Boolean getConfigPojoBooleanValue() {
+        return configPojoBooleanValue;
+    }
 
-	public Boolean getParsedBooleanValue() {
-		return parsedBooleanValue;
-	}
+    public String getParsedStringValue() {
+        return parsedStringValue;
+    }
 
-	public String[] getParsedMethodValue() {
-		return parsedMethodValue;
-	}
+    public Boolean getParsedBooleanValue() {
+        return parsedBooleanValue;
+    }
+
+    public String[] getParsedMethodValue() {
+        return parsedMethodValue;
+    }
 
 }

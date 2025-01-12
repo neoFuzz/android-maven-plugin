@@ -3,7 +3,6 @@ package com.github.cardforge.maven.plugins.android.standalonemojos;
 import com.github.cardforge.maven.plugins.android.AbstractAndroidMojo;
 import com.github.cardforge.maven.plugins.android.CommandExecutor;
 import com.github.cardforge.maven.plugins.android.ExecutionException;
-
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Mojo;
@@ -16,20 +15,16 @@ import java.util.List;
  *
  * @author demey.emmanuel@gmail.com
  */
-@Mojo( name = "disconnect", requiresProject = false )
-public class DisconnectMojo extends AbstractAndroidMojo
-{
+@Mojo(name = "disconnect", requiresProject = false)
+public class DisconnectMojo extends AbstractAndroidMojo {
     @Override
-    public void execute() throws MojoExecutionException, MojoFailureException
-    {
-        if ( ips.length > 0 )
-        {
+    public void execute() throws MojoExecutionException, MojoFailureException {
+        if (ips.length > 0) {
             CommandExecutor executor = CommandExecutor.Factory.createDefaultCommmandExecutor();
-            executor.setLogger( this.getLog() );
+            executor.setLogger(this.getLog());
 
-            for ( String ip : ips )
-            {
-                getLog().debug( "Disconnecting " + ip );
+            for (String ip : ips) {
+                getLog().debug("Disconnecting " + ip);
 
 
                 // It would be better to use the AndroidDebugBridge class 
@@ -37,17 +32,14 @@ public class DisconnectMojo extends AbstractAndroidMojo
                 String command = getAndroidSdk().getAdbPath();
 
                 List<String> parameters = new ArrayList<String>();
-                parameters.add( "disconnect" );
-                parameters.add( ip );
+                parameters.add("disconnect");
+                parameters.add(ip);
 
-                try
-                {
-                    executor.setCaptureStdOut( true );
-                    executor.executeCommand( command, parameters, false );
-                }
-                catch ( ExecutionException e )
-                {
-                    throw new MojoExecutionException( String.format( "Can not disconnect %s", ip ), e );
+                try {
+                    executor.setCaptureStdOut(true);
+                    executor.executeCommand(command, parameters, false);
+                } catch (ExecutionException e) {
+                    throw new MojoExecutionException(String.format("Can not disconnect %s", ip), e);
                 }
             }
         }

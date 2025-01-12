@@ -25,7 +25,6 @@ import javax.microedition.khronos.opengles.GL10;
 
 /**
  * A 2D rectangular mesh. Can be drawn textured or untextured.
- *
  */
 class Grid {
 
@@ -46,9 +45,9 @@ class Grid {
         final int FLOAT_SIZE = 4;
         final int CHAR_SIZE = 2;
         mVertexBuffer = ByteBuffer.allocateDirect(FLOAT_SIZE * size * 3)
-            .order(ByteOrder.nativeOrder()).asFloatBuffer();
+                .order(ByteOrder.nativeOrder()).asFloatBuffer();
         mTexCoordBuffer = ByteBuffer.allocateDirect(FLOAT_SIZE * size * 2)
-            .order(ByteOrder.nativeOrder()).asFloatBuffer();
+                .order(ByteOrder.nativeOrder()).asFloatBuffer();
 
         int quadW = mW - 1;
         int quadH = mH - 1;
@@ -56,7 +55,7 @@ class Grid {
         int indexCount = quadCount * 6;
         mIndexCount = indexCount;
         mIndexBuffer = ByteBuffer.allocateDirect(CHAR_SIZE * indexCount)
-            .order(ByteOrder.nativeOrder()).asCharBuffer();
+                .order(ByteOrder.nativeOrder()).asCharBuffer();
 
         /*
          * Initialize triangle list mesh.

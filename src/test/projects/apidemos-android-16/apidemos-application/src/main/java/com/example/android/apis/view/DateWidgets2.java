@@ -53,9 +53,9 @@ public class DateWidgets2 extends Activity {
 
     private void updateDisplay(int hourOfDay, int minute) {
         mTimeDisplay.setText(
-                    new StringBuilder()
-                    .append(pad(hourOfDay)).append(":")
-                    .append(pad(minute)));
+                new StringBuilder()
+                        .append(pad(hourOfDay)).append(":")
+                        .append(pad(minute)));
     }
 
     private static String pad(int c) {

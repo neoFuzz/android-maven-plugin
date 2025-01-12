@@ -17,8 +17,9 @@ package com.github.cardforge.asm.withouttests;
 
 /**
  * A class which is not a test.
- *
+ * <p>
  * For {@link com.github.cardforge.asm.AndroidTestFinderTest}.
+ *
  * @author hugo.josefson@jayway.com
  */
 public class NoTestClassA {

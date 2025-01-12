@@ -41,21 +41,21 @@ public class Gallery2 extends Activity {
         startManagingCursor(c);
 
         SpinnerAdapter adapter = new SimpleCursorAdapter(this,
-        // Use a template that displays a text view
+                // Use a template that displays a text view
                 android.R.layout.simple_gallery_item,
                 // Give the cursor to the list adatper
                 c,
                 // Map the NAME column in the people database to...
-                new String[] {Contacts.DISPLAY_NAME},
+                new String[]{Contacts.DISPLAY_NAME},
                 // The "text1" view defined in the XML template
-                new int[] { android.R.id.text1 });
+                new int[]{android.R.id.text1});
 
         Gallery g = (Gallery) findViewById(R.id.gallery);
         g.setAdapter(adapter);
     }
 
-    private static final String[] CONTACT_PROJECTION = new String[] {
-        Contacts._ID,
-        Contacts.DISPLAY_NAME
+    private static final String[] CONTACT_PROJECTION = new String[]{
+            Contacts._ID,
+            Contacts.DISPLAY_NAME
     };
 }

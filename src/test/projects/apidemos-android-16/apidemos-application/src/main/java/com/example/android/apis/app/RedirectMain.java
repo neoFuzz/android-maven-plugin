@@ -35,15 +35,15 @@ public class RedirectMain extends Activity {
     static final int NEW_TEXT_REQUEST = 1;
 
     @Override
-	protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.redirect_main);
 
         // Watch for button clicks.
-        Button clearButton = (Button)findViewById(R.id.clear);
+        Button clearButton = (Button) findViewById(R.id.clear);
         clearButton.setOnClickListener(mClearListener);
-        Button newButton = (Button)findViewById(R.id.newView);
+        Button newButton = (Button) findViewById(R.id.newView);
         newButton.setOnClickListener(mNewListener);
 
         // Retrieve the current text preference.  If there is no text
@@ -58,17 +58,17 @@ public class RedirectMain extends Activity {
     }
 
     @Override
-	protected void onActivityResult(int requestCode, int resultCode,
-		Intent data) {
+    protected void onActivityResult(int requestCode, int resultCode,
+                                    Intent data) {
         if (requestCode == INIT_TEXT_REQUEST) {
 
             // If the request was cancelled, then we are cancelled as well.
             if (resultCode == RESULT_CANCELED) {
                 finish();
 
-            // Otherwise, there now should be text...  reload the prefs,
-            // and show our UI.  (Optionally we could verify that the text
-            // is now set and exit if it isn't.)
+                // Otherwise, there now should be text...  reload the prefs,
+                // and show our UI.  (Optionally we could verify that the text
+                // is now set and exit if it isn't.)
             } else {
                 loadPrefs();
             }
@@ -93,7 +93,7 @@ public class RedirectMain extends Activity {
 
         mTextPref = preferences.getString("text", null);
         if (mTextPref != null) {
-            TextView text = (TextView)findViewById(R.id.text);
+            TextView text = (TextView) findViewById(R.id.text);
             text.setText(mTextPref);
             return true;
         }

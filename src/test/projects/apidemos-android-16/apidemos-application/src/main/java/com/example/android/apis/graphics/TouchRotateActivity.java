@@ -28,7 +28,7 @@ import android.view.MotionEvent;
 /**
  * Wrapper activity demonstrating the use of {@link GLSurfaceView}, a view
  * that uses OpenGL drawing into a dedicated surface.
- *
+ * <p>
  * Shows:
  * + How to redraw in response to user input.
  */
@@ -66,7 +66,6 @@ public class TouchRotateActivity extends Activity {
 
 /**
  * Implement a simple rotation control.
- *
  */
 class TouchSurfaceView extends GLSurfaceView {
 
@@ -77,23 +76,25 @@ class TouchSurfaceView extends GLSurfaceView {
         setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);
     }
 
-    @Override public boolean onTrackballEvent(MotionEvent e) {
+    @Override
+    public boolean onTrackballEvent(MotionEvent e) {
         mRenderer.mAngleX += e.getX() * TRACKBALL_SCALE_FACTOR;
         mRenderer.mAngleY += e.getY() * TRACKBALL_SCALE_FACTOR;
         requestRender();
         return true;
     }
 
-    @Override public boolean onTouchEvent(MotionEvent e) {
+    @Override
+    public boolean onTouchEvent(MotionEvent e) {
         float x = e.getX();
         float y = e.getY();
         switch (e.getAction()) {
-        case MotionEvent.ACTION_MOVE:
-            float dx = x - mPreviousX;
-            float dy = y - mPreviousY;
-            mRenderer.mAngleX += dx * TOUCH_SCALE_FACTOR;
-            mRenderer.mAngleY += dy * TOUCH_SCALE_FACTOR;
-            requestRender();
+            case MotionEvent.ACTION_MOVE:
+                float dx = x - mPreviousX;
+                float dy = y - mPreviousY;
+                mRenderer.mAngleX += dx * TOUCH_SCALE_FACTOR;
+                mRenderer.mAngleY += dy * TOUCH_SCALE_FACTOR;
+                requestRender();
         }
         mPreviousX = x;
         mPreviousY = y;
@@ -134,18 +135,18 @@ class TouchSurfaceView extends GLSurfaceView {
         }
 
         public void onSurfaceChanged(GL10 gl, int width, int height) {
-             gl.glViewport(0, 0, width, height);
+            gl.glViewport(0, 0, width, height);
 
-             /*
-              * Set our projection matrix. This doesn't have to be done
-              * each time we draw, but usually a new projection needs to
-              * be set when the viewport is resized.
-              */
+            /*
+             * Set our projection matrix. This doesn't have to be done
+             * each time we draw, but usually a new projection needs to
+             * be set when the viewport is resized.
+             */
 
-             float ratio = (float) width / height;
-             gl.glMatrixMode(GL10.GL_PROJECTION);
-             gl.glLoadIdentity();
-             gl.glFrustumf(-ratio, ratio, -1, 1, 1, 10);
+            float ratio = (float) width / height;
+            gl.glMatrixMode(GL10.GL_PROJECTION);
+            gl.glLoadIdentity();
+            gl.glFrustumf(-ratio, ratio, -1, 1, 1, 10);
         }
 
         public void onSurfaceCreated(GL10 gl, EGLConfig config) {
@@ -160,15 +161,16 @@ class TouchSurfaceView extends GLSurfaceView {
              * Some one-time OpenGL initialization can be made here
              * probably based on features of this particular context
              */
-             gl.glHint(GL10.GL_PERSPECTIVE_CORRECTION_HINT,
-                     GL10.GL_FASTEST);
+            gl.glHint(GL10.GL_PERSPECTIVE_CORRECTION_HINT,
+                    GL10.GL_FASTEST);
 
 
-             gl.glClearColor(1,1,1,1);
-             gl.glEnable(GL10.GL_CULL_FACE);
-             gl.glShadeModel(GL10.GL_SMOOTH);
-             gl.glEnable(GL10.GL_DEPTH_TEST);
+            gl.glClearColor(1, 1, 1, 1);
+            gl.glEnable(GL10.GL_CULL_FACE);
+            gl.glShadeModel(GL10.GL_SMOOTH);
+            gl.glEnable(GL10.GL_DEPTH_TEST);
         }
+
         private Cube mCube;
         public float mAngleX;
         public float mAngleY;

@@ -90,12 +90,12 @@ public class BitmapDecode extends GraphicsActivity {
             // create a deep copy of it using getPixels() into different configs
             int w = mBitmap2.getWidth();
             int h = mBitmap2.getHeight();
-            int[] pixels = new int[w*h];
+            int[] pixels = new int[w * h];
             mBitmap2.getPixels(pixels, 0, w, 0, 0, w, h);
             mBitmap3 = Bitmap.createBitmap(pixels, 0, w, w, h,
-                                           Bitmap.Config.ARGB_8888);
+                    Bitmap.Config.ARGB_8888);
             mBitmap4 = Bitmap.createBitmap(pixels, 0, w, w, h,
-                                           Bitmap.Config.ARGB_4444);
+                    Bitmap.Config.ARGB_4444);
 
             mDrawable = context.getResources().getDrawable(R.drawable.button);
             mDrawable.setBounds(150, 20, 300, 100);
@@ -133,10 +133,10 @@ public class BitmapDecode extends GraphicsActivity {
                 if (dur == 0) {
                     dur = 1000;
                 }
-                int relTime = (int)((now - mMovieStart) % dur);
+                int relTime = (int) ((now - mMovieStart) % dur);
                 mMovie.setTime(relTime);
                 mMovie.draw(canvas, getWidth() - mMovie.width(),
-                            getHeight() - mMovie.height());
+                        getHeight() - mMovie.height());
                 invalidate();
             }
         }

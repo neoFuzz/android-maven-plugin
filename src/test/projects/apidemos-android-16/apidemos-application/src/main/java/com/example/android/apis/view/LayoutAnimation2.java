@@ -41,24 +41,24 @@ public class LayoutAnimation2 extends ListActivity {
         set.addAnimation(animation);
 
         animation = new TranslateAnimation(
-            Animation.RELATIVE_TO_SELF, 0.0f,Animation.RELATIVE_TO_SELF, 0.0f,
-            Animation.RELATIVE_TO_SELF, -1.0f,Animation.RELATIVE_TO_SELF, 0.0f
+                Animation.RELATIVE_TO_SELF, 0.0f, Animation.RELATIVE_TO_SELF, 0.0f,
+                Animation.RELATIVE_TO_SELF, -1.0f, Animation.RELATIVE_TO_SELF, 0.0f
         );
         animation.setDuration(100);
         set.addAnimation(animation);
 
         LayoutAnimationController controller = new LayoutAnimationController(set, 0.5f);
-        ListView listView = getListView();        
+        ListView listView = getListView();
         listView.setLayoutAnimation(controller);
     }
 
     private String[] mStrings = {
-        "Bordeaux",
-        "Lyon",
-        "Marseille",
-        "Nancy",
-        "Paris",
-        "Toulouse",
-        "Strasbourg"
+            "Bordeaux",
+            "Lyon",
+            "Marseille",
+            "Nancy",
+            "Paris",
+            "Toulouse",
+            "Strasbourg"
     };
 }

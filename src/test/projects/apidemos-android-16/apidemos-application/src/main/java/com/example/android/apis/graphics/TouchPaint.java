@@ -60,34 +60,52 @@ import java.util.Random;
  * </p>
  */
 public class TouchPaint extends GraphicsActivity {
-    /** Used as a pulse to gradually fade the contents of the window. */
+    /**
+     * Used as a pulse to gradually fade the contents of the window.
+     */
     private static final int MSG_FADE = 1;
 
-    /** Menu ID for the command to clear the window. */
+    /**
+     * Menu ID for the command to clear the window.
+     */
     private static final int CLEAR_ID = Menu.FIRST;
 
-    /** Menu ID for the command to toggle fading. */
-    private static final int FADE_ID = Menu.FIRST+1;
+    /**
+     * Menu ID for the command to toggle fading.
+     */
+    private static final int FADE_ID = Menu.FIRST + 1;
 
-    /** How often to fade the contents of the window (in ms). */
+    /**
+     * How often to fade the contents of the window (in ms).
+     */
     private static final int FADE_DELAY = 100;
 
-    /** Colors to cycle through. */
-    static final int[] COLORS = new int[] {
-        Color.WHITE, Color.RED, Color.YELLOW, Color.GREEN,
-        Color.CYAN, Color.BLUE, Color.MAGENTA,
+    /**
+     * Colors to cycle through.
+     */
+    static final int[] COLORS = new int[]{
+            Color.WHITE, Color.RED, Color.YELLOW, Color.GREEN,
+            Color.CYAN, Color.BLUE, Color.MAGENTA,
     };
 
-    /** Background color. */
+    /**
+     * Background color.
+     */
     static final int BACKGROUND_COLOR = Color.BLACK;
 
-    /** The view responsible for drawing the window. */
+    /**
+     * The view responsible for drawing the window.
+     */
     PaintView mView;
 
-    /** Is fading mode enabled? */
+    /**
+     * Is fading mode enabled?
+     */
     boolean mFading;
 
-    /** The index of the current color to use. */
+    /**
+     * The index of the current color to use.
+     */
     int mColorIndex;
 
     @Override
@@ -222,7 +240,7 @@ public class TouchPaint extends GraphicsActivity {
 
     /**
      * This view implements the drawing canvas.
-     *
+     * <p>
      * It handles all of the input events and drawing functions.
      */
     class PaintView extends View {
@@ -416,8 +434,8 @@ public class TouchPaint extends GraphicsActivity {
         }
 
         private void paint(PaintMode mode, float x, float y, float pressure,
-                float major, float minor, float orientation,
-                float distance, float tilt) {
+                           float major, float minor, float orientation,
+                           float distance, float tilt) {
             if (mBitmap != null) {
                 if (major <= 0 || minor <= 0) {
                     // If size is not available, use a default value.
@@ -427,13 +445,13 @@ public class TouchPaint extends GraphicsActivity {
                 switch (mode) {
                     case Draw:
                         mPaint.setColor(COLORS[mColorIndex]);
-                        mPaint.setAlpha(Math.min((int)(pressure * 128), 255));
+                        mPaint.setAlpha(Math.min((int) (pressure * 128), 255));
                         drawOval(mCanvas, x, y, major, minor, orientation, mPaint);
                         break;
 
                     case Erase:
                         mPaint.setColor(BACKGROUND_COLOR);
-                        mPaint.setAlpha(Math.min((int)(pressure * 128), 255));
+                        mPaint.setAlpha(Math.min((int) (pressure * 128), 255));
                         drawOval(mCanvas, x, y, major, minor, orientation, mPaint);
                         break;
 
@@ -450,13 +468,14 @@ public class TouchPaint extends GraphicsActivity {
 
         /**
          * Draw an oval.
-         *
+         * <p>
          * When the orienation is 0 radians, orients the major axis vertically,
          * angles less than or greater than 0 radians rotate the major axis left or right.
          */
         private final RectF mReusableOvalRect = new RectF();
+
         private void drawOval(Canvas canvas, float x, float y, float major, float minor,
-                float orientation, Paint paint) {
+                              float orientation, Paint paint) {
             canvas.save(Canvas.MATRIX_SAVE_FLAG);
             canvas.rotate((float) (orientation * 180 / Math.PI), x, y);
             mReusableOvalRect.left = x - minor / 2;
@@ -469,21 +488,21 @@ public class TouchPaint extends GraphicsActivity {
 
         /**
          * Splatter paint in an area.
-         *
+         * <p>
          * Chooses random vectors describing the flow of paint from a round nozzle
          * across a range of a few degrees.  Then adds this vector to the direction
          * indicated by the orientation and tilt of the tool and throws paint at
          * the canvas along that vector.
-         *
+         * <p>
          * Repeats the process until a masterpiece is born.
          */
         private void drawSplat(Canvas canvas, float x, float y, float orientation,
-                float distance, float tilt, Paint paint) {
+                               float distance, float tilt, Paint paint) {
             float z = distance * 2 + 10;
 
             // Calculate the center of the spray.
             float nx = (float) (Math.sin(orientation) * Math.sin(tilt));
-            float ny = (float) (- Math.cos(orientation) * Math.sin(tilt));
+            float ny = (float) (-Math.cos(orientation) * Math.sin(tilt));
             float nz = (float) Math.cos(tilt);
             if (nz < 0.05) {
                 return;

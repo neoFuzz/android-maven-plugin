@@ -56,20 +56,25 @@ public class OverscanActivity extends Activity
     public static class IV extends ImageView implements View.OnSystemUiVisibilityChangeListener {
         private OverscanActivity mActivity;
         private ActionMode mActionMode;
+
         public IV(Context context) {
             super(context);
         }
+
         public IV(Context context, AttributeSet attrs) {
             super(context, attrs);
         }
+
         public void setActivity(OverscanActivity act) {
             setOnSystemUiVisibilityChangeListener(this);
             mActivity = act;
         }
+
         @Override
         public void onSizeChanged(int w, int h, int oldw, int oldh) {
             mActivity.refreshSizes();
         }
+
         @Override
         public void onSystemUiVisibilityChange(int visibility) {
             mActivity.updateCheckControls();
@@ -77,7 +82,8 @@ public class OverscanActivity extends Activity
         }
 
         private class MyActionModeCallback implements ActionMode.Callback {
-            @Override public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+            @Override
+            public boolean onCreateActionMode(ActionMode mode, Menu menu) {
                 mode.setTitle("My Action Mode!");
                 mode.setSubtitle(null);
                 mode.setTitleOptionalHint(false);
@@ -86,15 +92,18 @@ public class OverscanActivity extends Activity
                 return true;
             }
 
-            @Override public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+            @Override
+            public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
                 return true;
             }
 
-            @Override public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+            @Override
+            public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
                 return true;
             }
 
-            @Override public void onDestroyActionMode(ActionMode mode) {
+            @Override
+            public void onDestroyActionMode(ActionMode mode) {
                 mActionMode = null;
                 mActivity.clearActionMode();
             }
@@ -119,7 +128,7 @@ public class OverscanActivity extends Activity
         WindowManager.LayoutParams winParams = win.getAttributes();
         final int bits = WindowManager.LayoutParams.FLAG_FULLSCREEN;
         if (on) {
-            winParams.flags |=  bits;
+            winParams.flags |= bits;
         } else {
             winParams.flags &= ~bits;
         }
@@ -130,11 +139,13 @@ public class OverscanActivity extends Activity
         DisplayMetrics dm = getResources().getDisplayMetrics();
         return String.format("DisplayMetrics = (%d x %d)", dm.widthPixels, dm.heightPixels);
     }
+
     private String getViewSize() {
         return String.format("View = (%d,%d - %d,%d)",
                 mImage.getLeft(), mImage.getTop(),
                 mImage.getRight(), mImage.getBottom());
     }
+
     void refreshSizes() {
         mMetricsText.setText(getDisplaySize() + " " + getViewSize());
     }
@@ -142,7 +153,7 @@ public class OverscanActivity extends Activity
     static int TOAST_LENGTH = 500;
     IV mImage;
     CheckBox[] mCheckControls = new CheckBox[6];
-    int[] mCheckFlags = new int[] { View.SYSTEM_UI_FLAG_LOW_PROFILE,
+    int[] mCheckFlags = new int[]{View.SYSTEM_UI_FLAG_LOW_PROFILE,
             View.SYSTEM_UI_FLAG_FULLSCREEN, View.SYSTEM_UI_FLAG_HIDE_NAVIGATION,
             View.SYSTEM_UI_FLAG_LAYOUT_STABLE, View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN,
             View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
@@ -164,7 +175,8 @@ public class OverscanActivity extends Activity
 
         CompoundButton.OnCheckedChangeListener checkChangeListener
                 = new CompoundButton.OnCheckedChangeListener() {
-            @Override public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 updateSystemUi();
             }
         };
@@ -174,7 +186,7 @@ public class OverscanActivity extends Activity
         mCheckControls[3] = (CheckBox) findViewById(R.id.layoutStable);
         mCheckControls[4] = (CheckBox) findViewById(R.id.layoutFullscreen);
         mCheckControls[5] = (CheckBox) findViewById(R.id.layoutHideNavigation);
-        for (int i=0; i<mCheckControls.length; i++) {
+        for (int i = 0; i < mCheckControls.length; i++) {
             mCheckControls[i].setOnCheckedChangeListener(checkChangeListener);
         }
         ((CheckBox) findViewById(R.id.windowFullscreen)).setOnCheckedChangeListener(
@@ -286,14 +298,14 @@ public class OverscanActivity extends Activity
 
     public void updateCheckControls() {
         int visibility = mImage.getSystemUiVisibility();
-        for (int i=0; i<mCheckControls.length; i++) {
-            mCheckControls[i].setChecked((visibility&mCheckFlags[i]) != 0);
+        for (int i = 0; i < mCheckControls.length; i++) {
+            mCheckControls[i].setChecked((visibility & mCheckFlags[i]) != 0);
         }
     }
 
     public void updateSystemUi() {
         int visibility = 0;
-        for (int i=0; i<mCheckControls.length; i++) {
+        for (int i = 0; i < mCheckControls.length; i++) {
             if (mCheckControls[i].isChecked()) {
                 visibility |= mCheckFlags[i];
             }

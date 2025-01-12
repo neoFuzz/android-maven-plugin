@@ -39,20 +39,20 @@ import android.os.SystemClock;
 
 import com.example.android.apis.R;
 
-public class MatrixPaletteRenderer implements GLSurfaceView.Renderer{
+public class MatrixPaletteRenderer implements GLSurfaceView.Renderer {
     private Context mContext;
     private Grid mGrid;
     private int mTextureID;
 
-    /** A grid is a topologically rectangular array of vertices.
-     *
+    /**
+     * A grid is a topologically rectangular array of vertices.
+     * <p>
      * This grid class is customized for the vertex data required for this
      * example.
-     *
+     * <p>
      * The vertex and index data are held in VBO objects because on most
      * GPUs VBO objects are the fastest way of rendering static vertex
      * and index data.
-     *
      */
 
     private static class Grid {
@@ -102,7 +102,7 @@ public class MatrixPaletteRenderer implements GLSurfaceView.Renderer{
             int size = w * h;
 
             mVertexByteBuffer = ByteBuffer.allocateDirect(VERTEX_SIZE * size)
-                .order(ByteOrder.nativeOrder());
+                    .order(ByteOrder.nativeOrder());
             mVertexBuffer = mVertexByteBuffer.asFloatBuffer();
 
             int quadW = mW - 1;
@@ -111,7 +111,7 @@ public class MatrixPaletteRenderer implements GLSurfaceView.Renderer{
             int indexCount = quadCount * 6;
             mIndexCount = indexCount;
             mIndexBuffer = ByteBuffer.allocateDirect(CHAR_SIZE * indexCount)
-                .order(ByteOrder.nativeOrder()).asCharBuffer();
+                    .order(ByteOrder.nativeOrder()).asCharBuffer();
 
             /*
              * Initialize triangle list mesh.
@@ -148,9 +148,9 @@ public class MatrixPaletteRenderer implements GLSurfaceView.Renderer{
         }
 
         public void set(int i, int j, float x, float y, float z,
-                float u, float v,
-                float w0, float w1,
-                int p0, int p1) {
+                        float u, float v,
+                        float w0, float w1,
+                        int p0, int p1) {
             if (i < 0 || i >= mW) {
                 throw new IllegalArgumentException("i");
             }
@@ -214,8 +214,8 @@ public class MatrixPaletteRenderer implements GLSurfaceView.Renderer{
             gl.glEnableClientState(GL11Ext.GL_MATRIX_INDEX_ARRAY_OES);
             gl.glEnableClientState(GL11Ext.GL_WEIGHT_ARRAY_OES);
 
-            gl11Ext.glWeightPointerOES(2, GL10.GL_FLOAT, VERTEX_SIZE, VERTEX_WEIGHT_BUFFER_INDEX_OFFSET  * FLOAT_SIZE);
-            gl11Ext.glMatrixIndexPointerOES(2, GL10.GL_UNSIGNED_BYTE, VERTEX_SIZE, VERTEX_PALETTE_INDEX_OFFSET );
+            gl11Ext.glWeightPointerOES(2, GL10.GL_FLOAT, VERTEX_SIZE, VERTEX_WEIGHT_BUFFER_INDEX_OFFSET * FLOAT_SIZE);
+            gl11Ext.glMatrixIndexPointerOES(2, GL10.GL_UNSIGNED_BYTE, VERTEX_SIZE, VERTEX_PALETTE_INDEX_OFFSET);
 
             gl11.glBindBuffer(GL11.GL_ELEMENT_ARRAY_BUFFER, mElementBufferObjectId);
             gl11.glDrawElements(GL10.GL_TRIANGLES, mIndexCount, GL10.GL_UNSIGNED_SHORT, 0);
@@ -284,7 +284,7 @@ public class MatrixPaletteRenderer implements GLSurfaceView.Renderer{
         } finally {
             try {
                 is.close();
-            } catch(IOException e) {
+            } catch (IOException e) {
                 // Ignore.
             }
         }
@@ -369,10 +369,10 @@ public class MatrixPaletteRenderer implements GLSurfaceView.Renderer{
         gl.glViewport(0, 0, w, h);
 
         /*
-        * Set our projection matrix. This doesn't have to be done
-        * each time we draw, but usually a new projection needs to
-        * be set when the viewport is resized.
-        */
+         * Set our projection matrix. This doesn't have to be done
+         * each time we draw, but usually a new projection needs to
+         * be set when the viewport is resized.
+         */
 
         float ratio = (float) w / h;
         gl.glMatrixMode(GL10.GL_PROJECTION);

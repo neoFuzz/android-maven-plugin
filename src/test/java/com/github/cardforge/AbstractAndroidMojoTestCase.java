@@ -1,10 +1,8 @@
 package com.github.cardforge;
 
-import static org.easymock.EasyMock.*;
-
-import java.io.File;
-
 import com.github.cardforge.maven.plugins.android.AbstractAndroidMojo;
+import com.github.cardforge.maven.plugins.android.standalonemojos.ManifestUpdateMojo;
+import com.github.cardforge.standalonemojos.MojoProjectStub;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.maven.execution.MavenSession;
@@ -25,8 +23,9 @@ import org.codehaus.plexus.logging.console.ConsoleLogger;
 import org.junit.Assert;
 import org.powermock.reflect.Whitebox;
 
-import com.github.cardforge.maven.plugins.android.standalonemojos.ManifestUpdateMojo;
-import com.github.cardforge.standalonemojos.MojoProjectStub;
+import java.io.File;
+
+import static org.easymock.EasyMock.*;
 
 public abstract class AbstractAndroidMojoTestCase<T extends AbstractAndroidMojo> extends AbstractMojoTestCase {
 
@@ -37,9 +36,9 @@ public abstract class AbstractAndroidMojoTestCase<T extends AbstractAndroidMojo>
     /**
      * The Goal Name of the Plugin being tested.
      * <p>
-     * Used to look for <code>&lt;configuration&gt;</code> section in the <code>plugin-config.xml</code> 
+     * Used to look for <code>&lt;configuration&gt;</code> section in the <code>plugin-config.xml</code>
      * that will be used to configure the mojo from.
-     * 
+     *
      * @return the string name of the goal. (eg "version-update", "dex", etc...)
      */
     public abstract String getPluginGoalName();
@@ -51,15 +50,12 @@ public abstract class AbstractAndroidMojoTestCase<T extends AbstractAndroidMojo>
      * Note: only configuration entries supplied in the plugin-config.xml are presently configured in the mojo returned.
      * That means and 'default-value' settings are not automatically injected by this testing framework (or plexus
      * underneath that is suppling this functionality)
-     * 
-     * @param resourceProject
-     *            the name of the goal to look for in the <code>plugin-config.xml</code> that the configuration will be
-     *            pulled from.
-     * @param resourceProject
-     *            the resourceProject path (in src/test/resources) to find the example/test project.
+     *
+     * @param resourceProject the name of the goal to look for in the <code>plugin-config.xml</code> that the configuration will be
+     *                        pulled from.
+     * @param resourceProject the resourceProject path (in src/test/resources) to find the example/test project.
      * @return the created mojo (unexecuted)
-     * @throws Exception
-     *             if there was a problem creating the mojo.
+     * @throws Exception if there was a problem creating the mojo.
      */
     protected T createMojo(String resourceProject) throws Exception {
         // Establish test details project example
@@ -89,8 +85,7 @@ public abstract class AbstractAndroidMojoTestCase<T extends AbstractAndroidMojo>
 
         // Setup Mojo
         PlexusConfiguration config = extractPluginConfiguration("android-maven-plugin", project.getFile());
-        @SuppressWarnings("unchecked")
-        final T mojo = (T) lookupMojo(getPluginGoalName(), project.getFile());
+        @SuppressWarnings("unchecked") final T mojo = (T) lookupMojo(getPluginGoalName(), project.getFile());
 
         // Inject project itself
         setVariableValueToObject(mojo, "project", project);
@@ -108,35 +103,34 @@ public abstract class AbstractAndroidMojoTestCase<T extends AbstractAndroidMojo>
         // - Declared to prevent NPE from logging events in maven core
         Logger logger = new ConsoleLogger(Logger.LEVEL_DEBUG, mojo.getClass().getName());
 
-        MavenSession context = createNiceMock( MavenSession.class );
+        MavenSession context = createNiceMock(MavenSession.class);
 
-        expect( context.getExecutionProperties() ).andReturn( project.getProperties() );
-        expect( context.getCurrentProject() ).andReturn( project );
-        replay( context );
+        expect(context.getExecutionProperties()).andReturn(project.getProperties());
+        expect(context.getCurrentProject()).andReturn(project);
+        replay(context);
 
         // Declare evalator that maven itself uses.
         ExpressionEvaluator evaluator = new PluginParameterExpressionEvaluator(
-            context, mojoExec, pathTranslator, logger, project, project.getProperties() );
+                context, mojoExec, pathTranslator, logger, project, project.getProperties());
         // Lookup plexus configuration component
-        ComponentConfigurator configurator = (ComponentConfigurator) lookup(ComponentConfigurator.ROLE,"basic");
+        ComponentConfigurator configurator = (ComponentConfigurator) lookup(ComponentConfigurator.ROLE, "basic");
         // Configure mojo using above
-        ConfigurationListener listener = new DebugConfigurationListener( logger );
-        configurator.configureComponent( mojo, config, evaluator, getContainer().getContainerRealm(), listener );
+        ConfigurationListener listener = new DebugConfigurationListener(logger);
+        configurator.configureComponent(mojo, config, evaluator, getContainer().getContainerRealm(), listener);
 
         this.session = context;
         this.execution = mojoExec;
 
-        Whitebox.setInternalState( mojo, "session", this.session );
-        Whitebox.setInternalState( mojo, "execution", this.execution );
+        Whitebox.setInternalState(mojo, "session", this.session);
+        Whitebox.setInternalState(mojo, "execution", this.execution);
 
         return mojo;
     }
 
 
-
     /**
      * Get the project directory used for this mojo.
-     * 
+     *
      * @param mojo the mojo to query.
      * @return the project directory.
      * @throws IllegalAccessException if unable to get the project directory.

@@ -3,13 +3,12 @@ package com.github.cardforge.maven.plugins.android.configuration;
 /**
  * Configuration for the lint command. This class is only the definition of the parameters that are shadowed in
  * {@link LintMojo} and used there.
- * 
+ *
  * @author Stéphane Nicolas snicolas@octo.com
  * @author Manfred Moser - manfred@simpligility.com
  * @see LintMojo
  */
-public class Lint
-{
+public class Lint {
     private Boolean failOnError;
     private Boolean skip;
     private Boolean legacy;
@@ -52,123 +51,99 @@ public class Lint
     // Getters
     // ---------------
 
-    public final Boolean isFailOnError()
-    {
+    public final Boolean isFailOnError() {
         return failOnError;
     }
 
-    public final Boolean isSkip()
-    {
+    public final Boolean isSkip() {
         return skip;
     }
 
-    public final Boolean isQuiet()
-    {
+    public final Boolean isQuiet() {
         return quiet;
     }
 
-    public final Boolean isLegacy()
-    {
+    public final Boolean isLegacy() {
         return legacy;
     }
 
-    public final Boolean isIgnoreWarnings()
-    {
+    public final Boolean isIgnoreWarnings() {
         return ignoreWarnings;
     }
 
-    public final Boolean isWarnAll()
-    {
+    public final Boolean isWarnAll() {
         return warnAll;
     }
 
-    public final Boolean isWarningsAsErrors()
-    {
+    public final Boolean isWarningsAsErrors() {
         return warningsAsErrors;
     }
 
-    public final String getConfig()
-    {
+    public final String getConfig() {
         return config;
     }
 
-    public final Boolean isFullPath()
-    {
+    public final Boolean isFullPath() {
         return fullPath;
     }
 
-    public final Boolean getShowAll()
-    {
+    public final Boolean getShowAll() {
         return showAll;
     }
 
-    public final Boolean isDisableSourceLines()
-    {
+    public final Boolean isDisableSourceLines() {
         return disableSourceLines;
     }
 
-    public final String getUrl()
-    {
+    public final String getUrl() {
         return url;
     }
 
-    public final Boolean isEnableHtml()
-    {
+    public final Boolean isEnableHtml() {
         return enableHtml;
     }
 
-    public final String getHtmlOutputPath()
-    {
+    public final String getHtmlOutputPath() {
         return htmlOutputPath;
     }
 
-    public final Boolean isEnableSimpleHtml()
-    {
+    public final Boolean isEnableSimpleHtml() {
         return enableSimpleHtml;
     }
 
-    public final String getSimpleHtmlOutputPath()
-    {
+    public final String getSimpleHtmlOutputPath() {
         return simpleHtmlOutputPath;
     }
 
-    public final Boolean isEnableXml()
-    {
+    public final Boolean isEnableXml() {
         return enableXml;
     }
 
-    public final String getXmlOutputPath()
-    {
+    public final String getXmlOutputPath() {
         return xmlOutputPath;
     }
 
-    public Boolean getEnableSources()
-    {
+    public Boolean getEnableSources() {
         return enableSources;
     }
 
-    public final String getSources()
-    {
+    public final String getSources() {
         return sources;
     }
 
-    public Boolean getEnableClasspath()
-    {
+    public Boolean getEnableClasspath() {
         return enableClasspath;
     }
 
-    public final String getClasspath()
-    {
+    public final String getClasspath() {
         return classpath;
     }
 
-    public Boolean getEnableLibraries()
-    {
+    public Boolean getEnableLibraries() {
         return enableLibraries;
     }
 
-    public final String getLibraries()
-    {
+    public final String getLibraries() {
         return libraries;
     }
 }

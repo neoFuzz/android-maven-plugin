@@ -50,7 +50,7 @@ class GLES20TriangleRenderer implements GLSurfaceView.Renderer {
         // Ignore the passed-in GL10 interface, and use the GLES20
         // class's static methods instead.
         GLES20.glClearColor(0.0f, 0.0f, 1.0f, 1.0f);
-        GLES20.glClear( GLES20.GL_DEPTH_BUFFER_BIT | GLES20.GL_COLOR_BUFFER_BIT);
+        GLES20.glClear(GLES20.GL_DEPTH_BUFFER_BIT | GLES20.GL_COLOR_BUFFER_BIT);
         GLES20.glUseProgram(mProgram);
         checkGlError("glUseProgram");
 
@@ -136,14 +136,14 @@ class GLES20TriangleRenderer implements GLSurfaceView.Renderer {
                 GLES20.GL_REPEAT);
 
         InputStream is = mContext.getResources()
-            .openRawResource(R.raw.robot);
+                .openRawResource(R.raw.robot);
         Bitmap bitmap;
         try {
             bitmap = BitmapFactory.decodeStream(is);
         } finally {
             try {
                 is.close();
-            } catch(IOException e) {
+            } catch (IOException e) {
                 // Ignore.
             }
         }
@@ -217,27 +217,27 @@ class GLES20TriangleRenderer implements GLSurfaceView.Renderer {
             // X, Y, Z, U, V
             -1.0f, -0.5f, 0, -0.5f, 0.0f,
             1.0f, -0.5f, 0, 1.5f, -0.0f,
-            0.0f,  1.11803399f, 0, 0.5f,  1.61803399f };
+            0.0f, 1.11803399f, 0, 0.5f, 1.61803399f};
 
     private FloatBuffer mTriangleVertices;
 
     private final String mVertexShader =
-        "uniform mat4 uMVPMatrix;\n" +
-        "attribute vec4 aPosition;\n" +
-        "attribute vec2 aTextureCoord;\n" +
-        "varying vec2 vTextureCoord;\n" +
-        "void main() {\n" +
-        "  gl_Position = uMVPMatrix * aPosition;\n" +
-        "  vTextureCoord = aTextureCoord;\n" +
-        "}\n";
+            "uniform mat4 uMVPMatrix;\n" +
+                    "attribute vec4 aPosition;\n" +
+                    "attribute vec2 aTextureCoord;\n" +
+                    "varying vec2 vTextureCoord;\n" +
+                    "void main() {\n" +
+                    "  gl_Position = uMVPMatrix * aPosition;\n" +
+                    "  vTextureCoord = aTextureCoord;\n" +
+                    "}\n";
 
     private final String mFragmentShader =
-        "precision mediump float;\n" +
-        "varying vec2 vTextureCoord;\n" +
-        "uniform sampler2D sTexture;\n" +
-        "void main() {\n" +
-        "  gl_FragColor = texture2D(sTexture, vTextureCoord);\n" +
-        "}\n";
+            "precision mediump float;\n" +
+                    "varying vec2 vTextureCoord;\n" +
+                    "uniform sampler2D sTexture;\n" +
+                    "void main() {\n" +
+                    "  gl_FragColor = texture2D(sTexture, vTextureCoord);\n" +
+                    "}\n";
 
     private float[] mMVPMatrix = new float[16];
     private float[] mProjMatrix = new float[16];

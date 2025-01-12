@@ -8,8 +8,7 @@ package com.github.cardforge.maven.plugins.android.configuration;
  *
  * @author Manfred Moser - manfred@simpligility.com
  */
-public class Dex
-{
+public class Dex {
     /**
      * Mirror of {@link DexMojo#dexJvmArguments}
      */
@@ -61,68 +60,55 @@ public class Dex
 
     private String dexArguments;
 
-    public String[] getJvmArguments()
-    {
+    public String[] getJvmArguments() {
         return jvmArguments;
     }
 
-    public Boolean isCoreLibrary()
-    {
+    public Boolean isCoreLibrary() {
         return coreLibrary;
     }
 
-    public Boolean isNoLocals()
-    {
+    public Boolean isNoLocals() {
         return noLocals;
     }
 
-    public Boolean isOptimize()
-    {
+    public Boolean isOptimize() {
         return optimize;
     }
 
-    public Boolean isPreDex()
-    {
+    public Boolean isPreDex() {
         return preDex;
     }
 
-    public String getPreDexLibLocation()
-    {
-      return preDexLibLocation;
+    public String getPreDexLibLocation() {
+        return preDexLibLocation;
     }
 
-    public Boolean isIncremental()
-    {
+    public Boolean isIncremental() {
         return incremental;
     }
 
-    public Boolean isForceJumbo()
-    {
+    public Boolean isForceJumbo() {
         return forceJumbo;
     }
 
-    public Boolean isMultiDex()
-    {
+    public Boolean isMultiDex() {
         return multiDex;
     }
 
-    public String getMainDexList()
-    {
+    public String getMainDexList() {
         return mainDexList;
     }
 
-    public Boolean isMinimalMainDex()
-    {
+    public Boolean isMinimalMainDex() {
         return minimalMainDex;
     }
 
-    public Boolean isGenerateMainDexList()
-    {
+    public Boolean isGenerateMainDexList() {
         return generateMainDexList;
     }
-    
-    public String getDexArguments()
-    {
+
+    public String getDexArguments() {
         return dexArguments;
     }
 

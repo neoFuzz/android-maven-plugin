@@ -39,10 +39,10 @@ public class IncomingMessageInterstitial extends Activity {
 
         Button button = (Button) findViewById(R.id.notify_app);
         button.setOnClickListener(new Button.OnClickListener() {
-                public void onClick(View v) {
-                    switchToApp();
-                }
-            });
+            public void onClick(View v) {
+                switchToApp();
+            }
+        });
     }
 
 

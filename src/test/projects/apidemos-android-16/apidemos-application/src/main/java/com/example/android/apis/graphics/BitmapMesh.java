@@ -38,15 +38,15 @@ public class BitmapMesh extends GraphicsActivity {
         private static final int COUNT = (WIDTH + 1) * (HEIGHT + 1);
 
         private final Bitmap mBitmap;
-        private final float[] mVerts = new float[COUNT*2];
-        private final float[] mOrig = new float[COUNT*2];
+        private final float[] mVerts = new float[COUNT * 2];
+        private final float[] mOrig = new float[COUNT * 2];
 
         private final Matrix mMatrix = new Matrix();
         private final Matrix mInverse = new Matrix();
 
         private static void setXY(float[] array, int index, float x, float y) {
-            array[index*2 + 0] = x;
-            array[index*2 + 1] = y;
+            array[index * 2 + 0] = x;
+            array[index * 2 + 1] = y;
         }
 
         public SampleView(Context context) {
@@ -54,7 +54,7 @@ public class BitmapMesh extends GraphicsActivity {
             setFocusable(true);
 
             mBitmap = BitmapFactory.decodeResource(getResources(),
-                                                     R.drawable.beach);
+                    R.drawable.beach);
 
             float w = mBitmap.getWidth();
             float h = mBitmap.getHeight();
@@ -74,36 +74,37 @@ public class BitmapMesh extends GraphicsActivity {
             mMatrix.invert(mInverse);
         }
 
-        @Override protected void onDraw(Canvas canvas) {
+        @Override
+        protected void onDraw(Canvas canvas) {
             canvas.drawColor(0xFFCCCCCC);
 
             canvas.concat(mMatrix);
             canvas.drawBitmapMesh(mBitmap, WIDTH, HEIGHT, mVerts, 0,
-                                  null, 0, null);
+                    null, 0, null);
         }
 
         private void warp(float cx, float cy) {
             final float K = 10000;
             float[] src = mOrig;
             float[] dst = mVerts;
-            for (int i = 0; i < COUNT*2; i += 2) {
-                float x = src[i+0];
-                float y = src[i+1];
+            for (int i = 0; i < COUNT * 2; i += 2) {
+                float x = src[i + 0];
+                float y = src[i + 1];
                 float dx = cx - x;
                 float dy = cy - y;
-                float dd = dx*dx + dy*dy;
+                float dd = dx * dx + dy * dy;
                 float d = FloatMath.sqrt(dd);
                 float pull = K / (dd + 0.000001f);
 
                 pull /= (d + 0.000001f);
-             //   android.util.Log.d("skia", "index " + i + " dist=" + d + " pull=" + pull);
+                //   android.util.Log.d("skia", "index " + i + " dist=" + d + " pull=" + pull);
 
                 if (pull >= 1) {
-                    dst[i+0] = cx;
-                    dst[i+1] = cy;
+                    dst[i + 0] = cx;
+                    dst[i + 1] = cy;
                 } else {
-                    dst[i+0] = x + dx * pull;
-                    dst[i+1] = y + dy * pull;
+                    dst[i + 0] = x + dx * pull;
+                    dst[i + 1] = y + dy * pull;
                 }
             }
         }
@@ -111,12 +112,13 @@ public class BitmapMesh extends GraphicsActivity {
         private int mLastWarpX = -9999; // don't match a touch coordinate
         private int mLastWarpY;
 
-        @Override public boolean onTouchEvent(MotionEvent event) {
-            float[] pt = { event.getX(), event.getY() };
+        @Override
+        public boolean onTouchEvent(MotionEvent event) {
+            float[] pt = {event.getX(), event.getY()};
             mInverse.mapPoints(pt);
 
-            int x = (int)pt[0];
-            int y = (int)pt[1];
+            int x = (int) pt[0];
+            int y = (int) pt[1];
             if (mLastWarpX != x || mLastWarpY != y) {
                 mLastWarpX = x;
                 mLastWarpY = y;

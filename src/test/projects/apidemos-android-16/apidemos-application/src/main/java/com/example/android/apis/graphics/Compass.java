@@ -52,15 +52,14 @@ public class Compass extends GraphicsActivity {
     @Override
     protected void onCreate(Bundle icicle) {
         super.onCreate(icicle);
-        mSensorManager = (SensorManager)getSystemService(Context.SENSOR_SERVICE);
+        mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         mSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_ORIENTATION);
         mView = new SampleView(this);
         setContentView(mView);
     }
 
     @Override
-    protected void onResume()
-    {
+    protected void onResume() {
         if (false) Log.d(TAG, "onResume");
         super.onResume();
 
@@ -69,16 +68,15 @@ public class Compass extends GraphicsActivity {
     }
 
     @Override
-    protected void onStop()
-    {
+    protected void onStop() {
         if (false) Log.d(TAG, "onStop");
         mSensorManager.unregisterListener(mListener);
         super.onStop();
     }
 
     private class SampleView extends View {
-        private Paint   mPaint = new Paint();
-        private Path    mPath = new Path();
+        private Paint mPaint = new Paint();
+        private Path mPath = new Path();
         private boolean mAnimate;
 
         public SampleView(Context context) {
@@ -92,7 +90,8 @@ public class Compass extends GraphicsActivity {
             mPath.close();
         }
 
-        @Override protected void onDraw(Canvas canvas) {
+        @Override
+        protected void onDraw(Canvas canvas) {
             Paint paint = mPaint;
 
             canvas.drawColor(Color.WHITE);

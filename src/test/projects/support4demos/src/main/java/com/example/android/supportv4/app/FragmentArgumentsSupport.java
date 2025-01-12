@@ -37,7 +37,8 @@ import android.widget.TextView;
  */
 public class FragmentArgumentsSupport extends FragmentActivity {
 
-    @Override protected void onCreate(Bundle savedInstanceState) {
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.fragment_arguments_support);
 
@@ -49,7 +50,6 @@ public class FragmentArgumentsSupport extends FragmentActivity {
             ft.commit();
         }
     }
-
 
 
     public static class MyFragment extends Fragment {
@@ -71,8 +71,9 @@ public class FragmentArgumentsSupport extends FragmentActivity {
          * Parse attributes during inflation from a view hierarchy into the
          * arguments we handle.
          */
-        @Override public void onInflate(Activity activity, AttributeSet attrs,
-                Bundle savedInstanceState) {
+        @Override
+        public void onInflate(Activity activity, AttributeSet attrs,
+                              Bundle savedInstanceState) {
             super.onInflate(activity, attrs, savedInstanceState);
 
             TypedArray a = activity.obtainStyledAttributes(attrs,
@@ -85,7 +86,8 @@ public class FragmentArgumentsSupport extends FragmentActivity {
          * During creation, if arguments have been supplied to the fragment
          * then parse those out.
          */
-        @Override public void onCreate(Bundle savedInstanceState) {
+        @Override
+        public void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
 
             Bundle args = getArguments();
@@ -100,11 +102,12 @@ public class FragmentArgumentsSupport extends FragmentActivity {
         /**
          * Create the view for this fragment, using the arguments given to it.
          */
-        @Override public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                Bundle savedInstanceState) {
+        @Override
+        public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                                 Bundle savedInstanceState) {
             View v = inflater.inflate(R.layout.hello_world, container, false);
             View tv = v.findViewById(R.id.text);
-            ((TextView)tv).setText(mLabel != null ? mLabel : "(no label)");
+            ((TextView) tv).setText(mLabel != null ? mLabel : "(no label)");
             tv.setBackgroundDrawable(getResources().getDrawable(android.R.drawable.gallery_thumb));
             return v;
         }

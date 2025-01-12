@@ -18,6 +18,7 @@ package com.example.android.apis.animation;
 
 // Need the following import to get access to the app resources, since this
 // class is in a sub-package.
+
 import android.animation.Animator;
 import android.animation.ObjectAnimator;
 import com.example.android.apis.R;
@@ -50,7 +51,9 @@ public class LayoutAnimations extends Activity {
     Animator currentAppearingAnim, currentDisappearingAnim;
     Animator currentChangingAppearingAnim, currentChangingDisappearingAnim;
 
-    /** Called when the activity is first created. */
+    /**
+     * Called when the activity is first created.
+     */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -58,8 +61,8 @@ public class LayoutAnimations extends Activity {
 
         container = new FixedGridLayout(this);
         container.setClipChildren(false);
-        ((FixedGridLayout)container).setCellHeight(90);
-        ((FixedGridLayout)container).setCellWidth(100);
+        ((FixedGridLayout) container).setCellHeight(90);
+        ((FixedGridLayout) container).setCellWidth(100);
         final LayoutTransition transitioner = new LayoutTransition();
         container.setLayoutTransition(transitioner);
         defaultAppearingAnim = transitioner.getAnimator(LayoutTransition.APPEARING);
@@ -141,8 +144,8 @@ public class LayoutAnimations extends Activity {
                         defaultChangingAppearingAnim) : null);
         transition.setAnimator(LayoutTransition.CHANGE_DISAPPEARING,
                 changingDisappearingCB.isChecked() ?
-                (customAnimCB.isChecked() ? customChangingDisappearingAnim :
-                        defaultChangingDisappearingAnim) : null);
+                        (customAnimCB.isChecked() ? customChangingDisappearingAnim :
+                                defaultChangingDisappearingAnim) : null);
     }
 
     private void createCustomAnimations(LayoutTransition transition) {

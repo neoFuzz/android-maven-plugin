@@ -59,10 +59,10 @@ public class LocalService extends Service {
             return LocalService.this;
         }
     }
-    
+
     @Override
     public void onCreate() {
-        mNM = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
+        mNM = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
 
         // Display a notification about us starting.  We put an icon in the status bar.
         showNotification();
@@ -111,7 +111,7 @@ public class LocalService extends Service {
 
         // Set the info for the views that show in the notification panel.
         notification.setLatestEventInfo(this, getText(R.string.local_service_label),
-                       text, contentIntent);
+                text, contentIntent);
 
         // Send the notification.
         mNM.notify(NOTIFICATION, notification);

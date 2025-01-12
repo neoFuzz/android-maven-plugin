@@ -33,6 +33,7 @@ public class AndroidTestFinderTest {
         final boolean result = AndroidTestFinder.containsAndroidTests(new File("target/test-classes/com/github/cardforge/asm/withouttests"));
         Assert.assertFalse("'withouttests' should not contain any tests.", result);
     }
+
     @Test
     public void givenDirectoryWithTestsThenItContainsTests() throws MojoExecutionException {
         final boolean result = AndroidTestFinder.containsAndroidTests(new File("target/test-classes/com/github/cardforge/asm/withtests"));

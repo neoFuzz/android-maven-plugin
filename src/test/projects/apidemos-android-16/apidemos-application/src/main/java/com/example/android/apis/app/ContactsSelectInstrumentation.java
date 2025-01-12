@@ -58,18 +58,18 @@ public class ContactsSelectInstrumentation extends Instrumentation {
 
         // Monitor for the expected start activity call.
         ActivityMonitor am = addMonitor(IntentFilter.create(
-            Intent.ACTION_VIEW, ContactsContract.Contacts.CONTENT_ITEM_TYPE), null, true);
+                Intent.ACTION_VIEW, ContactsContract.Contacts.CONTENT_ITEM_TYPE), null, true);
 
         // We are going to enqueue a couple key events to simulate the user
         // selecting an item in the list.
         sendKeySync(new KeyEvent(
-            KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_DPAD_DOWN));
+                KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_DPAD_DOWN));
         sendKeySync(new KeyEvent(
-            KeyEvent.ACTION_UP, KeyEvent.KEYCODE_DPAD_DOWN));
+                KeyEvent.ACTION_UP, KeyEvent.KEYCODE_DPAD_DOWN));
         sendKeySync(new KeyEvent(
-            KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_DPAD_CENTER));
+                KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_DPAD_CENTER));
         sendKeySync(new KeyEvent(
-            KeyEvent.ACTION_UP, KeyEvent.KEYCODE_DPAD_CENTER));
+                KeyEvent.ACTION_UP, KeyEvent.KEYCODE_DPAD_CENTER));
 
         // Was the expected activity started?
         if (checkMonitorHit(am, 1)) {

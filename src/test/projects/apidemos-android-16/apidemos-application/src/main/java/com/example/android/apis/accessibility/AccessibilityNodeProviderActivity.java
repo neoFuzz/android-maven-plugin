@@ -55,39 +55,53 @@ import java.util.List;
  * </p>
  */
 public class AccessibilityNodeProviderActivity extends Activity {
-    /** Called when the activity is first created. */
+    /**
+     * Called when the activity is first created.
+     */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.accessibility_node_provider);
     }
 
-   /**
-    * This class presents a View that is composed of three virtual children
-    * each of which is drawn with a different color and represents a region
-    * of the View that has different semantics compared to other such regions.
-    * While the virtual view tree exposed by this class is one level deep
-    * for simplicity, there is no bound on the complexity of that virtual
-    * sub-tree.
-    */
+    /**
+     * This class presents a View that is composed of three virtual children
+     * each of which is drawn with a different color and represents a region
+     * of the View that has different semantics compared to other such regions.
+     * While the virtual view tree exposed by this class is one level deep
+     * for simplicity, there is no bound on the complexity of that virtual
+     * sub-tree.
+     */
     public static class VirtualSubtreeRootView extends View {
 
-        /** Paint object for drawing the virtual sub-tree */
+        /**
+         * Paint object for drawing the virtual sub-tree
+         */
         private final Paint mPaint = new Paint();
 
-        /** Temporary rectangle to minimize object creation. */
+        /**
+         * Temporary rectangle to minimize object creation.
+         */
         private final Rect mTempRect = new Rect();
 
-        /** Handle to the system accessibility service. */
+        /**
+         * Handle to the system accessibility service.
+         */
         private final AccessibilityManager mAccessibilityManager;
 
-        /** The virtual children of this View. */
+        /**
+         * The virtual children of this View.
+         */
         private final List<VirtualView> mChildren = new ArrayList<VirtualView>();
 
-        /** The instance of the node provider for the virtual tree - lazily instantiated. */
+        /**
+         * The instance of the node provider for the virtual tree - lazily instantiated.
+         */
         private AccessibilityNodeProvider mAccessibilityNodeProvider;
 
-        /** The last hovered child used for event dispatching. */
+        /**
+         * The last hovered child used for event dispatching.
+         */
         private VirtualView mLastHoveredChild;
 
         public VirtualSubtreeRootView(Context context, AttributeSet attrs) {
@@ -137,14 +151,15 @@ public class AccessibilityNodeProviderActivity extends Activity {
                         mLastHoveredChild = child;
                         handled |= onHoverVirtualView(child, event);
                         event.setAction(action);
-                    } break;
+                    }
+                    break;
                     case MotionEvent.ACTION_HOVER_MOVE: {
                         if (child == mLastHoveredChild) {
                             handled |= onHoverVirtualView(child, event);
                             event.setAction(action);
                         } else {
                             MotionEvent eventNoHistory = event.getHistorySize() > 0
-                                ? MotionEvent.obtainNoHistory(event) : event;
+                                    ? MotionEvent.obtainNoHistory(event) : event;
                             eventNoHistory.setAction(MotionEvent.ACTION_HOVER_EXIT);
                             onHoverVirtualView(mLastHoveredChild, eventNoHistory);
                             eventNoHistory.setAction(MotionEvent.ACTION_HOVER_ENTER);
@@ -158,12 +173,14 @@ public class AccessibilityNodeProviderActivity extends Activity {
                                 event.setAction(action);
                             }
                         }
-                    } break;
+                    }
+                    break;
                     case MotionEvent.ACTION_HOVER_EXIT: {
                         mLastHoveredChild = null;
                         handled |= onHoverVirtualView(child, event);
                         event.setAction(action);
-                    } break;
+                    }
+                    break;
                 }
             }
             if (!handled) {
@@ -250,7 +267,7 @@ public class AccessibilityNodeProviderActivity extends Activity {
          * Set the selected state of a virtual view.
          *
          * @param virtualView The virtual view whose selected state to set.
-         * @param selected Whether the virtual view is selected.
+         * @param selected    Whether the virtual view is selected.
          */
         private void setVirtualViewSelected(VirtualView virtualView, boolean selected) {
             virtualView.mAlpha = selected ? VirtualView.ALPHA_SELECTED : VirtualView.ALPHA_NOT_SELECTED;
@@ -260,7 +277,7 @@ public class AccessibilityNodeProviderActivity extends Activity {
          * Handle a hover over a virtual view.
          *
          * @param virtualView The virtual view over which is hovered.
-         * @param event The event to dispatch.
+         * @param event       The event to dispatch.
          * @return Whether the event was handled.
          */
         private boolean onHoverVirtualView(VirtualView virtualView, MotionEvent event) {
@@ -274,11 +291,13 @@ public class AccessibilityNodeProviderActivity extends Activity {
                 case MotionEvent.ACTION_HOVER_ENTER: {
                     sendAccessibilityEventForVirtualView(virtualView,
                             AccessibilityEvent.TYPE_VIEW_HOVER_ENTER);
-                } break;
+                }
+                break;
                 case MotionEvent.ACTION_HOVER_EXIT: {
                     sendAccessibilityEventForVirtualView(virtualView,
                             AccessibilityEvent.TYPE_VIEW_HOVER_EXIT);
-                } break;
+                }
+                break;
             }
             return true;
         }
@@ -287,7 +306,7 @@ public class AccessibilityNodeProviderActivity extends Activity {
          * Sends a properly initialized accessibility event for a virtual view..
          *
          * @param virtualView The virtual view.
-         * @param eventType The type of the event to send.
+         * @param eventType   The type of the event to send.
          */
         private void sendAccessibilityEventForVirtualView(VirtualView virtualView, int eventType) {
             // If touch exploration, i.e. the user gets feedback while touching
@@ -397,7 +416,7 @@ public class AccessibilityNodeProviderActivity extends Activity {
              */
             @Override
             public List<AccessibilityNodeInfo> findAccessibilityNodeInfosByText(String searched,
-                    int virtualViewId) {
+                                                                                int virtualViewId) {
                 if (TextUtils.isEmpty(searched)) {
                     return Collections.emptyList();
                 }

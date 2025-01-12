@@ -17,7 +17,6 @@
 package com.github.cardforge.maven.plugins.android.standalonemojos;
 
 import com.github.cardforge.maven.plugins.android.AbstractAndroidMojo;
-
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
@@ -28,7 +27,7 @@ import org.apache.maven.plugins.annotations.ResolutionScope;
  * Deploys the apk(s) of the current project(s) to all attached devices and emulators.
  * Automatically skips other projects in a multi-module build that do not use packaging
  * apk without terminating.<br>
- *
+ * <p>
  * Deploymnet is automatically performed when running <code>mvn integration-test</code>
  * (or <code>mvn install</code>) on a project with instrumentation tests.
  *
@@ -40,16 +39,14 @@ import org.apache.maven.plugins.annotations.ResolutionScope;
         defaultPhase = LifecyclePhase.PRE_INTEGRATION_TEST,
         requiresDependencyResolution = ResolutionScope.RUNTIME
 )
-public class DeployMojo extends AbstractAndroidMojo
-{
+public class DeployMojo extends AbstractAndroidMojo {
     /**
-     * Deploy the apk built with the current projects to all attached devices and emulators. 
+     * Deploy the apk built with the current projects to all attached devices and emulators.
      *
      * @throws MojoExecutionException
      * @throws MojoFailureException
      */
-    public void execute() throws MojoExecutionException, MojoFailureException
-    {
+    public void execute() throws MojoExecutionException, MojoFailureException {
         deployBuiltApk();
     }
 }

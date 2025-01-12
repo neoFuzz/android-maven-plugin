@@ -1,11 +1,5 @@
 package com.github.cardforge.standalonemojos;
 
-import java.io.File;
-import java.io.FileReader;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Properties;
-
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -15,6 +9,12 @@ import org.apache.maven.model.Resource;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.apache.maven.plugin.testing.stubs.MavenProjectStub;
 import org.junit.Assert;
+
+import java.io.File;
+import java.io.FileReader;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Properties;
 
 /**
  * Basic MavenProject implementation that can be used for testing.
@@ -52,7 +52,7 @@ public class MojoProjectStub extends MavenProjectStub {
         setFile(pom);
 
         build = model.getBuild();
-        if(build == null) {
+        if (build == null) {
             build = new Build();
         }
 
@@ -85,12 +85,12 @@ public class MojoProjectStub extends MavenProjectStub {
 
         getBuild().setResources(resources);
     }
-    
+
     @Override
     public Properties getProperties() {
         return props;
     }
-    
+
     @Override
     public Build getBuild() {
         return this.build;
@@ -108,20 +108,20 @@ public class MojoProjectStub extends MavenProjectStub {
         makeDirs(dir);
         return dir;
     }
-    
+
     /**
      * Normalize a path.
      * <p>
      * Ensure path is absolute, and has proper system file separators.
-     * 
+     *
      * @param path the raw path.
      * @return
      */
     private File normalize(final String path) {
         String ospath = FilenameUtils.separatorsToSystem(path);
         File file = new File(ospath);
-        if(file.isAbsolute()) {
-           return file; 
+        if (file.isAbsolute()) {
+            return file;
         } else {
             return new File(getBasedir(), ospath);
         }

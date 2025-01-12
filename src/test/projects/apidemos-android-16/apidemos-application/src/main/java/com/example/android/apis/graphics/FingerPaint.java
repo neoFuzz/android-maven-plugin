@@ -41,15 +41,15 @@ public class FingerPaint extends GraphicsActivity
         mPaint.setStrokeCap(Paint.Cap.ROUND);
         mPaint.setStrokeWidth(12);
 
-        mEmboss = new EmbossMaskFilter(new float[] { 1, 1, 1 },
-                                       0.4f, 6, 3.5f);
+        mEmboss = new EmbossMaskFilter(new float[]{1, 1, 1},
+                0.4f, 6, 3.5f);
 
         mBlur = new BlurMaskFilter(8, BlurMaskFilter.Blur.NORMAL);
     }
 
-    private Paint       mPaint;
-    private MaskFilter  mEmboss;
-    private MaskFilter  mBlur;
+    private Paint mPaint;
+    private MaskFilter mEmboss;
+    private MaskFilter mBlur;
 
     public void colorChanged(int color) {
         mPaint.setColor(color);
@@ -60,10 +60,10 @@ public class FingerPaint extends GraphicsActivity
         private static final float MINP = 0.25f;
         private static final float MAXP = 0.75f;
 
-        private Bitmap  mBitmap;
-        private Canvas  mCanvas;
-        private Path    mPath;
-        private Paint   mBitmapPaint;
+        private Bitmap mBitmap;
+        private Canvas mCanvas;
+        private Path mPath;
+        private Paint mBitmapPaint;
 
         public MyView(Context c) {
             super(c);
@@ -97,15 +97,17 @@ public class FingerPaint extends GraphicsActivity
             mX = x;
             mY = y;
         }
+
         private void touch_move(float x, float y) {
             float dx = Math.abs(x - mX);
             float dy = Math.abs(y - mY);
             if (dx >= TOUCH_TOLERANCE || dy >= TOUCH_TOLERANCE) {
-                mPath.quadTo(mX, mY, (x + mX)/2, (y + mY)/2);
+                mPath.quadTo(mX, mY, (x + mX) / 2, (y + mY) / 2);
                 mX = x;
                 mY = y;
             }
         }
+
         private void touch_up() {
             mPath.lineTo(mX, mY);
             // commit the path to our offscreen
@@ -154,13 +156,13 @@ public class FingerPaint extends GraphicsActivity
         menu.add(0, SRCATOP_MENU_ID, 0, "SrcATop").setShortcut('5', 'z');
 
         /****   Is this the mechanism to extend with filter effects?
-        Intent intent = new Intent(null, getIntent().getData());
-        intent.addCategory(Intent.CATEGORY_ALTERNATIVE);
-        menu.addIntentOptions(
-                              Menu.ALTERNATIVE, 0,
-                              new ComponentName(this, NotesList.class),
-                              null, intent, 0, null);
-        *****/
+         Intent intent = new Intent(null, getIntent().getData());
+         intent.addCategory(Intent.CATEGORY_ALTERNATIVE);
+         menu.addIntentOptions(
+         Menu.ALTERNATIVE, 0,
+         new ComponentName(this, NotesList.class),
+         null, intent, 0, null);
+         *****/
         return true;
     }
 
@@ -195,11 +197,11 @@ public class FingerPaint extends GraphicsActivity
                 return true;
             case ERASE_MENU_ID:
                 mPaint.setXfermode(new PorterDuffXfermode(
-                                                        PorterDuff.Mode.CLEAR));
+                        PorterDuff.Mode.CLEAR));
                 return true;
             case SRCATOP_MENU_ID:
                 mPaint.setXfermode(new PorterDuffXfermode(
-                                                    PorterDuff.Mode.SRC_ATOP));
+                        PorterDuff.Mode.SRC_ATOP));
                 mPaint.setAlpha(0x80);
                 return true;
         }

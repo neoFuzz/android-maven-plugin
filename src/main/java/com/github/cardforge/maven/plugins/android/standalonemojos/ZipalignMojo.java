@@ -7,7 +7,6 @@ import com.github.cardforge.maven.plugins.android.config.ConfigHandler;
 import com.github.cardforge.maven.plugins.android.config.ConfigPojo;
 import com.github.cardforge.maven.plugins.android.config.PullParameter;
 import com.github.cardforge.maven.plugins.android.configuration.Zipalign;
-
 import org.apache.commons.io.FilenameUtils;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
@@ -28,9 +27,8 @@ import static com.github.cardforge.maven.plugins.android.common.AndroidExtension
  *
  * @author Manfred Moser - manfred@simpligility.com
  */
-@Mojo( name = "zipalign" )
-public class ZipalignMojo extends AbstractAndroidMojo 
-{
+@Mojo(name = "zipalign")
+public class ZipalignMojo extends AbstractAndroidMojo {
 
     /**
      * The configuration for the zipalign goal. As soon as a zipalign goal is invoked the command will be executed
@@ -45,7 +43,7 @@ public class ZipalignMojo extends AbstractAndroidMojo
      *     &lt;outputApk&gt;${project.build.directory}/${project.finalName}-aligned.apk&lt;/outputApk&gt;
      * &lt;/zipalign&gt;
      * </pre>
-     *
+     * <p>
      * Values can also be configured as properties on the command line as android.zipalign.*
      * or in pom or settings file as properties like zipalign.*.
      */
@@ -55,22 +53,24 @@ public class ZipalignMojo extends AbstractAndroidMojo
 
     /**
      * Skip the zipalign goal execution. Defaults to "true".
+     *
      * @see Zipalign#skip
      */
-    @Parameter( property = "android.zipalign.skip" )
+    @Parameter(property = "android.zipalign.skip")
     private Boolean zipalignSkip;
 
-    @PullParameter( defaultValue = "true" )
+    @PullParameter(defaultValue = "true")
     private Boolean parsedSkip;
 
     /**
      * Activate verbose output for the zipalign goal execution. Defaults to "false".
+     *
      * @see Zipalign#verbose
      */
-    @Parameter( property = "android.zipalign.verbose" )
+    @Parameter(property = "android.zipalign.verbose")
     private Boolean zipalignVerbose;
 
-    @PullParameter( defaultValue = "false" )
+    @PullParameter(defaultValue = "false")
     private Boolean parsedVerbose;
 
     /**
@@ -79,10 +79,10 @@ public class ZipalignMojo extends AbstractAndroidMojo
      *
      * @see Zipalign#inputApk
      */
-    @Parameter( property = "android.zipalign.inputApk" )
+    @Parameter(property = "android.zipalign.inputApk")
     private String zipalignInputApk;
 
-    @PullParameter ( defaultValueGetterMethod = "getInputApkPath" )
+    @PullParameter(defaultValueGetterMethod = "getInputApkPath")
     private String parsedInputApk;
 
     /**
@@ -91,10 +91,10 @@ public class ZipalignMojo extends AbstractAndroidMojo
      *
      * @see Zipalign#outputApk
      */
-    @Parameter( property = "android.zipalign.outputApk" )
+    @Parameter(property = "android.zipalign.outputApk")
     private String zipalignOutputApk;
 
-    @PullParameter( defaultValueGetterMethod = "getOutputApkPath" )
+    @PullParameter(defaultValueGetterMethod = "getOutputApkPath")
     private String parsedOutputApk;
 
     /**
@@ -109,10 +109,10 @@ public class ZipalignMojo extends AbstractAndroidMojo
     /**
      * <p>Classifier to add to the artifact generated. </p>
      */
-    @Parameter ( property = "android.zipalign.classifier" )
+    @Parameter(property = "android.zipalign.classifier")
     private String zipalignClassifier;
-    
-    @PullParameter( defaultValue = "aligned" )
+
+    @PullParameter(defaultValue = "aligned")
     private String parsedClassifier;
 
     /**
@@ -120,111 +120,90 @@ public class ZipalignMojo extends AbstractAndroidMojo
      *
      * @throws MojoExecutionException
      */
-    public void execute() throws MojoExecutionException, MojoFailureException
-    {
+    public void execute() throws MojoExecutionException, MojoFailureException {
 
         // If we're not on a supported packaging with just skip (Issue 87)
         // http://code.google.com/p/maven-android-plugin/issues/detail?id=87
-        if ( ! SUPPORTED_PACKAGING_TYPES.contains( project.getPackaging() ) )
-        {
-            getLog().info( "Skipping zipalign on " + project.getPackaging() );
+        if (!SUPPORTED_PACKAGING_TYPES.contains(project.getPackaging())) {
+            getLog().info("Skipping zipalign on " + project.getPackaging());
             return;
         }
 
-        ConfigHandler configHandler = new ConfigHandler( this, this.session, this.execution );
+        ConfigHandler configHandler = new ConfigHandler(this, this.session, this.execution);
         configHandler.parseConfiguration();
 
-        parsedInputApk = FilenameUtils.separatorsToSystem( parsedInputApk );
-        parsedOutputApk = FilenameUtils.separatorsToSystem( parsedOutputApk );
+        parsedInputApk = FilenameUtils.separatorsToSystem(parsedInputApk);
+        parsedOutputApk = FilenameUtils.separatorsToSystem(parsedOutputApk);
 
-        getLog().debug( "skip:" + parsedSkip );
-        getLog().debug( "verbose:" + parsedVerbose );
-        getLog().debug( "inputApk:" + parsedInputApk );
-        getLog().debug( "outputApk:" + parsedOutputApk );
-        getLog().debug( "classifier:" + parsedClassifier );
+        getLog().debug("skip:" + parsedSkip);
+        getLog().debug("verbose:" + parsedVerbose);
+        getLog().debug("inputApk:" + parsedInputApk);
+        getLog().debug("outputApk:" + parsedOutputApk);
+        getLog().debug("classifier:" + parsedClassifier);
 
-        if ( parsedSkip )
-        {
-            getLog().info( "Skipping zipalign" );
-        }
-        else
-        {
+        if (parsedSkip) {
+            getLog().info("Skipping zipalign");
+        } else {
             boolean outputToSameFile = sameOutputAsInput();
 
             CommandExecutor executor = CommandExecutor.Factory.createDefaultCommmandExecutor();
-            executor.setLogger( this.getLog() );
+            executor.setLogger(this.getLog());
 
             String command = getAndroidSdk().getZipalignPath();
 
             List<String> parameters = new ArrayList<String>();
-            if ( parsedVerbose )
-            {
-                parameters.add( "-v" );
+            if (parsedVerbose) {
+                parameters.add("-v");
             }
-            parameters.add( "-f" ); // force overwriting existing output file
-            parameters.add( "4" ); // byte alignment has to be 4!
-            parameters.add( parsedInputApk );
+            parameters.add("-f"); // force overwriting existing output file
+            parameters.add("4"); // byte alignment has to be 4!
+            parameters.add(parsedInputApk);
             String outputApk = outputToSameFile ? getTemporaryOutputApkFilename() : parsedOutputApk;
-            parameters.add( outputApk );
+            parameters.add(outputApk);
 
-            try
-            {
-                getLog().info( "Running command: " + command );
-                getLog().info( "with parameters: " + parameters );
-                executor.setCaptureStdOut( true );
-                executor.executeCommand( command, parameters );
+            try {
+                getLog().info("Running command: " + command);
+                getLog().info("with parameters: " + parameters);
+                executor.setCaptureStdOut(true);
+                executor.executeCommand(command, parameters);
 
-                if ( FileUtils.fileExists( outputApk ) )
-                {
-                    if ( outputToSameFile )
-                    {
+                if (FileUtils.fileExists(outputApk)) {
+                    if (outputToSameFile) {
                         // No needs to attach zipaligned apk to artifacts
-                        try
-                        {
-                            FileUtils.rename( new File( outputApk ),  new File( parsedInputApk ) );
+                        try {
+                            FileUtils.rename(new File(outputApk), new File(parsedInputApk));
+                        } catch (IOException e) {
+                            getLog().error("Failed to replace original apk with aligned "
+                                    + getFullPathWithName(outputApk), e);
                         }
-                        catch ( IOException e )
-                        {
-                            getLog().error( "Failed to replace original apk with aligned "
-                                    + getFullPathWithName( outputApk ), e );
-                        }
-                    }
-                    else
-                    {
+                    } else {
                         // Attach the resulting artifact (Issue 88)
                         // http://code.google.com/p/maven-android-plugin/issues/detail?id=88
-                        projectHelper.attachArtifact( project, APK, parsedClassifier, new File( outputApk ) );
-                        getLog().info( "Attach " + getFullPathWithName( outputApk )  + " as '"
-                                + parsedClassifier + "' to the project" );
+                        projectHelper.attachArtifact(project, APK, parsedClassifier, new File(outputApk));
+                        getLog().info("Attach " + getFullPathWithName(outputApk) + " as '"
+                                + parsedClassifier + "' to the project");
                     }
+                } else {
+                    getLog().error("Cannot attach " + getFullPathWithName(outputApk) + " to the project"
+                            + " - The file does not exist");
                 }
-                else
-                {
-                    getLog().error( "Cannot attach " + getFullPathWithName( outputApk ) + " to the project"
-                            + " - The file does not exist" );
-                }
-            }
-            catch ( ExecutionException e )
-            {
-                throw new MojoExecutionException( "", e );
+            } catch (ExecutionException e) {
+                throw new MojoExecutionException("", e);
             }
         }
     }
 
-    private String getFullPathWithName( String filename )
-    {
-        return FilenameUtils.getFullPath( filename ) + FilenameUtils.getName( filename );
+    private String getFullPathWithName(String filename) {
+        return FilenameUtils.getFullPath(filename) + FilenameUtils.getName(filename);
     }
 
-    private boolean sameOutputAsInput()
-    {
-        return getFullPathWithName( parsedInputApk ).equals( getFullPathWithName( parsedOutputApk ) );
+    private boolean sameOutputAsInput() {
+        return getFullPathWithName(parsedInputApk).equals(getFullPathWithName(parsedOutputApk));
     }
 
     // zipalign doesn't allow output file to be same as input
-    private String getTemporaryOutputApkFilename()
-    {
-        return parsedOutputApk.substring( 0, parsedOutputApk.lastIndexOf( '.' ) ) + "-aligned-temp.apk";
+    private String getTemporaryOutputApkFilename() {
+        return parsedOutputApk.substring(0, parsedOutputApk.lastIndexOf('.')) + "-aligned-temp.apk";
     }
 
     /**
@@ -233,11 +212,9 @@ public class ZipalignMojo extends AbstractAndroidMojo
      * @return absolute path.
      */
     // used via PullParameter annotation - do not remove
-    private String getInputApkPath()
-    {
-        if ( apkFile == null )
-        {
-            apkFile = new File( targetDirectory, finalName + "." + APK );
+    private String getInputApkPath() {
+        if (apkFile == null) {
+            apkFile = new File(targetDirectory, finalName + "." + APK);
         }
         return apkFile.getAbsolutePath();
     }
@@ -249,12 +226,10 @@ public class ZipalignMojo extends AbstractAndroidMojo
      * @return absolute path.
      */
     // used via PullParameter annotation - do not remove
-    private String getOutputApkPath()
-    {
-        if ( alignedApkFile == null )
-        {
-            alignedApkFile = new File( targetDirectory,
-                    finalName + "-aligned." + APK );
+    private String getOutputApkPath() {
+        if (alignedApkFile == null) {
+            alignedApkFile = new File(targetDirectory,
+                    finalName + "-aligned." + APK);
         }
         return alignedApkFile.getAbsolutePath();
     }

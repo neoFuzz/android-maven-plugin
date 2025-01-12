@@ -30,12 +30,12 @@ public class TextAlign extends GraphicsActivity {
     }
 
     private static class SampleView extends View {
-        private Paint   mPaint;
-        private float   mX;
+        private Paint mPaint;
+        private float mX;
         private float[] mPos;
 
-        private Path    mPath;
-        private Paint   mPathPaint;
+        private Path mPath;
+        private Paint mPathPaint;
 
         private static final int DY = 30;
         private static final String TEXT_L = "Left";
@@ -57,8 +57,8 @@ public class TextAlign extends GraphicsActivity {
             float[] pos = new float[n * 2];
             float accumulatedX = 0;
             for (int i = 0; i < n; i++) {
-                pos[i*2 + 0] = accumulatedX;
-                pos[i*2 + 1] = y;
+                pos[i * 2 + 0] = accumulatedX;
+                pos[i * 2 + 1] = y;
                 accumulatedX += widths[i];
             }
             return pos;
@@ -84,7 +84,8 @@ public class TextAlign extends GraphicsActivity {
             mPathPaint.setStyle(Paint.Style.STROKE);
         }
 
-        @Override protected void onDraw(Canvas canvas) {
+        @Override
+        protected void onDraw(Canvas canvas) {
             canvas.drawColor(Color.WHITE);
 
             Paint p = mPaint;
@@ -95,7 +96,7 @@ public class TextAlign extends GraphicsActivity {
             // draw the normal strings
 
             p.setColor(0x80FF0000);
-            canvas.drawLine(x, y, x, y+DY*3, p);
+            canvas.drawLine(x, y, x, y + DY * 3, p);
             p.setColor(Color.BLACK);
 
             canvas.translate(0, DY);
@@ -110,14 +111,14 @@ public class TextAlign extends GraphicsActivity {
             p.setTextAlign(Paint.Align.RIGHT);
             canvas.drawText(TEXT_R, x, y, p);
 
-            canvas.translate(100, DY*2);
+            canvas.translate(100, DY * 2);
 
             // now draw the positioned strings
 
             p.setColor(0xBB00FF00);
-            for (int i = 0; i < pos.length/2; i++) {
-                canvas.drawLine(pos[i*2+0], pos[i*2+1]-DY,
-                                pos[i*2+0], pos[i*2+1]+DY*2, p);
+            for (int i = 0; i < pos.length / 2; i++) {
+                canvas.drawLine(pos[i * 2 + 0], pos[i * 2 + 1] - DY,
+                        pos[i * 2 + 0], pos[i * 2 + 1] + DY * 2, p);
             }
             p.setColor(Color.BLACK);
 
@@ -134,18 +135,18 @@ public class TextAlign extends GraphicsActivity {
 
             // now draw the text on path
 
-            canvas.translate(-100, DY*2);
+            canvas.translate(-100, DY * 2);
 
             canvas.drawPath(mPath, mPathPaint);
             p.setTextAlign(Paint.Align.LEFT);
             canvas.drawTextOnPath(TEXTONPATH, mPath, 0, 0, p);
 
-            canvas.translate(0, DY*1.5f);
+            canvas.translate(0, DY * 1.5f);
             canvas.drawPath(mPath, mPathPaint);
             p.setTextAlign(Paint.Align.CENTER);
             canvas.drawTextOnPath(TEXTONPATH, mPath, 0, 0, p);
 
-            canvas.translate(0, DY*1.5f);
+            canvas.translate(0, DY * 1.5f);
             canvas.drawPath(mPath, mPathPaint);
             p.setTextAlign(Paint.Align.RIGHT);
             canvas.drawTextOnPath(TEXTONPATH, mPath, 0, 0, p);

@@ -2,19 +2,16 @@ package com.github.cardforge.maven.plugins.android;
 
 import java.util.Set;
 
-public class IncludeExcludeSet
-{
+public class IncludeExcludeSet {
 
-    private Set< String > includes;
-    private Set< String > excludes;
+    private Set<String> includes;
+    private Set<String> excludes;
 
-    public Set< String > getIncludes() 
-    {
+    public Set<String> getIncludes() {
         return includes;
     }
-    
-    public Set< String > getExcludes() 
-    {
+
+    public Set<String> getExcludes() {
         return excludes;
     }
 

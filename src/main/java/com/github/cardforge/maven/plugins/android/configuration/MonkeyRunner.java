@@ -5,11 +5,10 @@ import java.util.List;
 /**
  * Configuration for the monkey runner tests runs. This class is only the definition of the parameters that are shadowed
  * in {@link com.jayway.maven.plugins.android.standalonemojos.MonkeyRunner} and used there.
- * 
+ *
  * @author Stéphane Nicolas - snicolas@octo.com
  */
-public class MonkeyRunner
-{
+public class MonkeyRunner {
     /**
      * Mirror of {@link com.jayway.maven.plugins.android.standalonemojos.MonkeyRunner#testSkip}
      */
@@ -17,7 +16,7 @@ public class MonkeyRunner
     /**
      * Mirror of {@link com.jayway.maven.plugins.android.standalonemojos.MonkeyRunner#programs}
      */
-    private List< Program > programs;
+    private List<Program> programs;
     /**
      * Mirror of {@link com.jayway.maven.plugins.android.standalonemojos.MonkeyRunner#plugins}
      */
@@ -32,28 +31,23 @@ public class MonkeyRunner
      */
     private Boolean injectDeviceSerialNumberIntoScript;
 
-    public boolean isSkip()
-    {
+    public boolean isSkip() {
         return skip;
     }
 
-    public List< Program > getPrograms()
-    {
+    public List<Program> getPrograms() {
         return programs;
     }
 
-    public String[] getPlugins()
-    {
+    public String[] getPlugins() {
         return plugins;
     }
 
-    public Boolean isCreateReport()
-    {
+    public Boolean isCreateReport() {
         return createReport;
     }
 
-    public Boolean isInjectDeviceSerialNumberIntoScript()
-    {
+    public Boolean isInjectDeviceSerialNumberIntoScript() {
         return injectDeviceSerialNumberIntoScript;
     }
 }

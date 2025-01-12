@@ -31,9 +31,9 @@ public class RoundRects extends GraphicsActivity {
     }
 
     private static class SampleView extends View {
-        private Path    mPath;
-        private Paint   mPaint;
-        private Rect    mRect;
+        private Path mPath;
+        private Paint mPaint;
+        private Rect mRect;
         private GradientDrawable mDrawable;
 
         public SampleView(Context context) {
@@ -45,19 +45,20 @@ public class RoundRects extends GraphicsActivity {
             mRect = new Rect(0, 0, 120, 120);
 
             mDrawable = new GradientDrawable(GradientDrawable.Orientation.TL_BR,
-                                             new int[] { 0xFFFF0000, 0xFF00FF00,
-                                                 0xFF0000FF });
+                    new int[]{0xFFFF0000, 0xFF00FF00,
+                            0xFF0000FF});
             mDrawable.setShape(GradientDrawable.RECTANGLE);
-            mDrawable.setGradientRadius((float)(Math.sqrt(2) * 60));
+            mDrawable.setGradientRadius((float) (Math.sqrt(2) * 60));
         }
 
         static void setCornerRadii(GradientDrawable drawable, float r0,
                                    float r1, float r2, float r3) {
-            drawable.setCornerRadii(new float[] { r0, r0, r1, r1,
-                                                  r2, r2, r3, r3 });
+            drawable.setCornerRadii(new float[]{r0, r0, r1, r1,
+                    r2, r2, r3, r3});
         }
 
-        @Override protected void onDraw(Canvas canvas) {
+        @Override
+        protected void onDraw(Canvas canvas) {
 
             mDrawable.setBounds(mRect);
 

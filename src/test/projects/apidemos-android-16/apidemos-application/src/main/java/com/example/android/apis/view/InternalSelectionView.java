@@ -26,20 +26,19 @@ import android.view.KeyEvent;
 import android.view.View;
 
 
-
 /**
  * A view that has a known number of selectable rows, and maintains a notion of which
  * row is selected. The rows take up the
  * entire width of the view.  The height of the view is divided evenly among
  * the rows.
- *
+ * <p>
  * Notice what this view does to be a good citizen w.r.t its internal selection:
  * 1) calls {@link View#requestRectangleOnScreen} each time the selection changes due to
- *    internal navigation.
+ * internal navigation.
  * 2) overrides {@link View#getFocusedRect} by filling in the rectangle of the currently
- *    selected row
+ * selected row
  * 3) overrides {@link View#onFocusChanged} and sets selection appropriately according to
- *    the previously focused rectangle.
+ * the previously focused rectangle.
  */
 public class InternalSelectionView extends View {
 
@@ -58,7 +57,7 @@ public class InternalSelectionView extends View {
     public InternalSelectionView(Context context, int numRows) {
         this(context, numRows, "");
     }
-    
+
     public InternalSelectionView(Context context, int numRows, String label) {
         super(context);
         mNumRows = numRows;
@@ -97,8 +96,8 @@ public class InternalSelectionView extends View {
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         setMeasuredDimension(
-            measureWidth(widthMeasureSpec),
-            measureHeight(heightMeasureSpec));
+                measureWidth(widthMeasureSpec),
+                measureHeight(heightMeasureSpec));
     }
 
     private int measureWidth(int measureSpec) {
@@ -197,11 +196,11 @@ public class InternalSelectionView extends View {
 
 
     /* (non-Javadoc)
-    * @see android.view.KeyEvent.Callback#onKeyDown(int, android.view.KeyEvent)
-    */
+     * @see android.view.KeyEvent.Callback#onKeyDown(int, android.view.KeyEvent)
+     */
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
-        switch(event.getKeyCode()) {
+        switch (event.getKeyCode()) {
             case KeyEvent.KEYCODE_DPAD_UP:
                 if (mSelectedRow > 0) {
                     mSelectedRow--;
@@ -230,7 +229,7 @@ public class InternalSelectionView extends View {
 
     @Override
     protected void onFocusChanged(boolean focused, int direction,
-            Rect previouslyFocusedRect) {
+                                  Rect previouslyFocusedRect) {
         super.onFocusChanged(focused, direction, previouslyFocusedRect);
 
         if (focused) {

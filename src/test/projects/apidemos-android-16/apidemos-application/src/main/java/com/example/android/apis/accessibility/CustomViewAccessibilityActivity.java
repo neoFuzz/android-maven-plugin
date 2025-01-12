@@ -66,7 +66,7 @@ public class CustomViewAccessibilityActivity extends Activity {
      * For example, {@link AccessibilityNodeInfo} was introduced in
      * {@link Build.VERSION_CODES#ICE_CREAM_SANDWICH API 14}, thus overriding
      * {@link View#onInitializeAccessibilityNodeInfo(AccessibilityNodeInfo)
-     *  View.onInitializeAccessibilityNodeInfo(AccessibilityNodeInfo)}
+     * View.onInitializeAccessibilityNodeInfo(AccessibilityNodeInfo)}
      * will prevent you application from running on a platform older than
      * {@link Build.VERSION_CODES#ICE_CREAM_SANDWICH API 14}.
      * </p>
@@ -155,7 +155,7 @@ public class CustomViewAccessibilityActivity extends Activity {
 
                 @Override
                 public void onInitializeAccessibilityNodeInfo(View host,
-                        AccessibilityNodeInfo info) {
+                                                              AccessibilityNodeInfo info) {
                     super.onInitializeAccessibilityNodeInfo(host, info);
                     // We called the super implementation to let super classes set
                     // appropriate info properties. Then we add our properties

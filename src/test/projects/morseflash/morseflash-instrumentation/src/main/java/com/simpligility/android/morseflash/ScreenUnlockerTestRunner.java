@@ -19,7 +19,7 @@ import static android.os.PowerManager.ON_AFTER_RELEASE;
  *     <uses-permission android:name="android.permission.DISABLE_KEYGUARD"/>
  *     <uses-permission android:name="android.permission.WAKE_LOCK"/>
  * </pre>
- *
+ * <p>
  * Adapted from https://github.com/JakeWharton/u2020/blob/master/src/androidTestInternal/java/com/jakewharton/u2020/U2020TestRunner.java.
  */
 public final class ScreenUnlockerTestRunner extends AndroidJUnitRunner {

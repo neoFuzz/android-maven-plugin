@@ -1,7 +1,6 @@
 package com.github.cardforge.maven.plugins.android.standalonemojos;
 
 import com.github.cardforge.maven.plugins.android.AbstractEmulatorMojo;
-
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Mojo;
@@ -11,9 +10,8 @@ import org.apache.maven.plugins.annotations.Mojo;
  *
  * @author Bryan O'Neil - bryan.oneil@hotmail.com
  */
-@Mojo( name = "emulator-stop-all", requiresProject = false )
-public class EmulatorStopAllMojo extends AbstractEmulatorMojo
-{
+@Mojo(name = "emulator-stop-all", requiresProject = false)
+public class EmulatorStopAllMojo extends AbstractEmulatorMojo {
 
     /**
      * Stop all attached emulators.
@@ -21,8 +19,7 @@ public class EmulatorStopAllMojo extends AbstractEmulatorMojo
      * @throws MojoExecutionException
      * @throws MojoFailureException
      */
-    public void execute() throws MojoExecutionException, MojoFailureException
-    {
+    public void execute() throws MojoExecutionException, MojoFailureException {
         stopAndroidEmulators();
     }
 }

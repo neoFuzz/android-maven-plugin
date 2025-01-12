@@ -83,22 +83,24 @@ public class UnicodeChart extends GraphicsActivity {
             char[] chars = mChars;
             for (int i = 0; i < 256; i++) {
                 int unichar = base + i;
-                chars[i] = (char)unichar;
+                chars[i] = (char) unichar;
 
                 canvas.drawText(Integer.toHexString(unichar),
-                                computeX(i), computeY(i), mLabelPaint);
+                        computeX(i), computeY(i), mLabelPaint);
             }
             canvas.drawPosText(chars, 0, 256, mPos, mBigCharPaint);
         }
 
-        @Override protected void onDraw(Canvas canvas) {
+        @Override
+        protected void onDraw(Canvas canvas) {
             canvas.drawColor(Color.WHITE);
 
             canvas.translate(0, 1);
             drawChart(canvas, mBase * 256);
         }
 
-        @Override public boolean onKeyDown(int keyCode, KeyEvent event) {
+        @Override
+        public boolean onKeyDown(int keyCode, KeyEvent event) {
             switch (keyCode) {
                 case KeyEvent.KEYCODE_DPAD_LEFT:
                     if (mBase > 0) {

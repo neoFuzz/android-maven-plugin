@@ -17,13 +17,11 @@
 package com.github.cardforge.maven.plugins.android.standalonemojos;
 
 
+import com.github.cardforge.maven.plugins.android.AbstractAndroidMojo;
+import com.github.cardforge.maven.plugins.android.common.AndroidExtension;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
-
-import com.github.cardforge.maven.plugins.android.AbstractAndroidMojo;
-import com.github.cardforge.maven.plugins.android.common.AndroidExtension;
-
 import org.apache.maven.plugins.annotations.Mojo;
 
 /**
@@ -36,29 +34,23 @@ import org.apache.maven.plugins.annotations.Mojo;
  * @author hugo.josefson@jayway.com
  * @author Manfred Moser - manfred@simpligility.com
  */
-@Mojo( name = "undeploy" )
-public class UndeployMojo extends AbstractAndroidMojo
-{
+@Mojo(name = "undeploy")
+public class UndeployMojo extends AbstractAndroidMojo {
     /**
      * @throws MojoExecutionException
      * @throws MojoFailureException
      */
-    public void execute() throws MojoExecutionException, MojoFailureException
-    {
+    public void execute() throws MojoExecutionException, MojoFailureException {
         String packageToUndeploy;
-        if ( project.getPackaging().equals( AndroidExtension.APK ) ) 
-        {
+        if (project.getPackaging().equals(AndroidExtension.APK)) {
             packageToUndeploy = renameManifestPackage != null
-                ? renameManifestPackage
-                : extractPackageNameFromAndroidManifest( androidManifestFile );
-            if ( StringUtils.isNotBlank( packageToUndeploy ) ) 
-            {
-                undeployApk( packageToUndeploy );
+                    ? renameManifestPackage
+                    : extractPackageNameFromAndroidManifest(androidManifestFile);
+            if (StringUtils.isNotBlank(packageToUndeploy)) {
+                undeployApk(packageToUndeploy);
             }
-        }
-        else 
-        {
-            getLog().info( "Project packaging is not apk, skipping undeployment." );
+        } else {
+            getLog().info("Project packaging is not apk, skipping undeployment.");
         }
     }
 }

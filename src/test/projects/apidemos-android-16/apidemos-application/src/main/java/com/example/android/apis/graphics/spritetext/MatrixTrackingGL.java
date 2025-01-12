@@ -34,7 +34,7 @@ import javax.microedition.khronos.opengles.GL11Ext;
 /**
  * Allows retrieving the current matrix even if the current OpenGL ES
  * driver does not support retrieving the current matrix.
- *
+ * <p>
  * Note: the actual matrix may differ from the retrieved matrix, due
  * to differences in the way the math is implemented by GLMatrixWrapper
  * as compared to the way the math is implemented by the OpenGL ES
@@ -135,7 +135,7 @@ class MatrixTrackingGL implements GL, GL10, GL10Ext, GL11, GL11Ext {
     }
 
     public void glColorMask(boolean red, boolean green, boolean blue,
-            boolean alpha) {
+                            boolean alpha) {
         mgl.glColorMask(red, green, blue, alpha);
     }
 
@@ -144,27 +144,27 @@ class MatrixTrackingGL implements GL, GL10, GL10Ext, GL11, GL11Ext {
     }
 
     public void glCompressedTexImage2D(int target, int level,
-            int internalformat, int width, int height, int border,
-            int imageSize, Buffer data) {
+                                       int internalformat, int width, int height, int border,
+                                       int imageSize, Buffer data) {
         mgl.glCompressedTexImage2D(target, level, internalformat, width,
                 height, border, imageSize, data);
     }
 
     public void glCompressedTexSubImage2D(int target, int level, int xoffset,
-            int yoffset, int width, int height, int format, int imageSize,
-            Buffer data) {
+                                          int yoffset, int width, int height, int format, int imageSize,
+                                          Buffer data) {
         mgl.glCompressedTexSubImage2D(target, level, xoffset, yoffset, width,
                 height, format, imageSize, data);
     }
 
     public void glCopyTexImage2D(int target, int level, int internalformat,
-            int x, int y, int width, int height, int border) {
+                                 int x, int y, int width, int height, int border) {
         mgl.glCopyTexImage2D(target, level, internalformat, x, y, width,
                 height, border);
     }
 
     public void glCopyTexSubImage2D(int target, int level, int xoffset,
-            int yoffset, int x, int y, int width, int height) {
+                                    int yoffset, int x, int y, int width, int height) {
         mgl.glCopyTexSubImage2D(target, level, xoffset, yoffset, x, y, width,
                 height);
     }
@@ -258,17 +258,17 @@ class MatrixTrackingGL implements GL, GL10, GL10Ext, GL11, GL11Ext {
     }
 
     public void glFrustumf(float left, float right, float bottom, float top,
-            float near, float far) {
+                           float near, float far) {
         mCurrent.glFrustumf(left, right, bottom, top, near, far);
         mgl.glFrustumf(left, right, bottom, top, near, far);
-        if ( _check) check();
+        if (_check) check();
     }
 
     public void glFrustumx(int left, int right, int bottom, int top, int near,
-            int far) {
+                           int far) {
         mCurrent.glFrustumx(left, right, bottom, top, near, far);
         mgl.glFrustumx(left, right, bottom, top, near, far);
-        if ( _check) check();
+        if (_check) check();
     }
 
     public void glGenTextures(int n, int[] textures, int offset) {
@@ -360,13 +360,13 @@ class MatrixTrackingGL implements GL, GL10, GL10Ext, GL11, GL11Ext {
     public void glLoadIdentity() {
         mCurrent.glLoadIdentity();
         mgl.glLoadIdentity();
-        if ( _check) check();
+        if (_check) check();
     }
 
     public void glLoadMatrixf(float[] m, int offset) {
         mCurrent.glLoadMatrixf(m, offset);
         mgl.glLoadMatrixf(m, offset);
-        if ( _check) check();
+        if (_check) check();
     }
 
     public void glLoadMatrixf(FloatBuffer m) {
@@ -374,13 +374,13 @@ class MatrixTrackingGL implements GL, GL10, GL10Ext, GL11, GL11Ext {
         mCurrent.glLoadMatrixf(m);
         m.position(position);
         mgl.glLoadMatrixf(m);
-        if ( _check) check();
+        if (_check) check();
     }
 
     public void glLoadMatrixx(int[] m, int offset) {
         mCurrent.glLoadMatrixx(m, offset);
         mgl.glLoadMatrixx(m, offset);
-        if ( _check) check();
+        if (_check) check();
     }
 
     public void glLoadMatrixx(IntBuffer m) {
@@ -388,7 +388,7 @@ class MatrixTrackingGL implements GL, GL10, GL10Ext, GL11, GL11Ext {
         mCurrent.glLoadMatrixx(m);
         m.position(position);
         mgl.glLoadMatrixx(m);
-        if ( _check) check();
+        if (_check) check();
     }
 
     public void glLogicOp(int opcode) {
@@ -421,27 +421,27 @@ class MatrixTrackingGL implements GL, GL10, GL10Ext, GL11, GL11Ext {
 
     public void glMatrixMode(int mode) {
         switch (mode) {
-        case GL10.GL_MODELVIEW:
-            mCurrent = mModelView;
-            break;
-        case GL10.GL_TEXTURE:
-            mCurrent = mTexture;
-            break;
-        case GL10.GL_PROJECTION:
-            mCurrent = mProjection;
-            break;
-        default:
-            throw new IllegalArgumentException("Unknown matrix mode: " + mode);
+            case GL10.GL_MODELVIEW:
+                mCurrent = mModelView;
+                break;
+            case GL10.GL_TEXTURE:
+                mCurrent = mTexture;
+                break;
+            case GL10.GL_PROJECTION:
+                mCurrent = mProjection;
+                break;
+            default:
+                throw new IllegalArgumentException("Unknown matrix mode: " + mode);
         }
         mgl.glMatrixMode(mode);
         mMatrixMode = mode;
-        if ( _check) check();
+        if (_check) check();
     }
 
     public void glMultMatrixf(float[] m, int offset) {
         mCurrent.glMultMatrixf(m, offset);
         mgl.glMultMatrixf(m, offset);
-        if ( _check) check();
+        if (_check) check();
     }
 
     public void glMultMatrixf(FloatBuffer m) {
@@ -449,13 +449,13 @@ class MatrixTrackingGL implements GL, GL10, GL10Ext, GL11, GL11Ext {
         mCurrent.glMultMatrixf(m);
         m.position(position);
         mgl.glMultMatrixf(m);
-        if ( _check) check();
+        if (_check) check();
     }
 
     public void glMultMatrixx(int[] m, int offset) {
         mCurrent.glMultMatrixx(m, offset);
         mgl.glMultMatrixx(m, offset);
-        if ( _check) check();
+        if (_check) check();
     }
 
     public void glMultMatrixx(IntBuffer m) {
@@ -463,11 +463,11 @@ class MatrixTrackingGL implements GL, GL10, GL10Ext, GL11, GL11Ext {
         mCurrent.glMultMatrixx(m);
         m.position(position);
         mgl.glMultMatrixx(m);
-        if ( _check) check();
+        if (_check) check();
     }
 
     public void glMultiTexCoord4f(int target,
-            float s, float t, float r, float q) {
+                                  float s, float t, float r, float q) {
         mgl.glMultiTexCoord4f(target, s, t, r, q);
     }
 
@@ -488,17 +488,17 @@ class MatrixTrackingGL implements GL, GL10, GL10Ext, GL11, GL11Ext {
     }
 
     public void glOrthof(float left, float right, float bottom, float top,
-            float near, float far) {
+                         float near, float far) {
         mCurrent.glOrthof(left, right, bottom, top, near, far);
         mgl.glOrthof(left, right, bottom, top, near, far);
-        if ( _check) check();
+        if (_check) check();
     }
 
     public void glOrthox(int left, int right, int bottom, int top, int near,
-            int far) {
+                         int far) {
         mCurrent.glOrthox(left, right, bottom, top, near, far);
         mgl.glOrthox(left, right, bottom, top, near, far);
-        if ( _check) check();
+        if (_check) check();
     }
 
     public void glPixelStorei(int pname, int param) {
@@ -524,30 +524,30 @@ class MatrixTrackingGL implements GL, GL10, GL10Ext, GL11, GL11Ext {
     public void glPopMatrix() {
         mCurrent.glPopMatrix();
         mgl.glPopMatrix();
-        if ( _check) check();
+        if (_check) check();
     }
 
     public void glPushMatrix() {
         mCurrent.glPushMatrix();
         mgl.glPushMatrix();
-        if ( _check) check();
+        if (_check) check();
     }
 
     public void glReadPixels(int x, int y, int width, int height, int format,
-            int type, Buffer pixels) {
+                             int type, Buffer pixels) {
         mgl.glReadPixels(x, y, width, height, format, type, pixels);
     }
 
     public void glRotatef(float angle, float x, float y, float z) {
         mCurrent.glRotatef(angle, x, y, z);
         mgl.glRotatef(angle, x, y, z);
-        if ( _check) check();
+        if (_check) check();
     }
 
     public void glRotatex(int angle, int x, int y, int z) {
         mCurrent.glRotatex(angle, x, y, z);
         mgl.glRotatex(angle, x, y, z);
-        if ( _check) check();
+        if (_check) check();
     }
 
     public void glSampleCoverage(float value, boolean invert) {
@@ -561,13 +561,13 @@ class MatrixTrackingGL implements GL, GL10, GL10Ext, GL11, GL11Ext {
     public void glScalef(float x, float y, float z) {
         mCurrent.glScalef(x, y, z);
         mgl.glScalef(x, y, z);
-        if ( _check) check();
+        if (_check) check();
     }
 
     public void glScalex(int x, int y, int z) {
         mCurrent.glScalex(x, y, z);
         mgl.glScalex(x, y, z);
-        if ( _check) check();
+        if (_check) check();
     }
 
     public void glScissor(int x, int y, int width, int height) {
@@ -591,7 +591,7 @@ class MatrixTrackingGL implements GL, GL10, GL10Ext, GL11, GL11Ext {
     }
 
     public void glTexCoordPointer(int size, int type,
-            int stride, Buffer pointer) {
+                                  int stride, Buffer pointer) {
         mgl.glTexCoordPointer(size, type, stride, pointer);
     }
 
@@ -620,8 +620,8 @@ class MatrixTrackingGL implements GL, GL10, GL10Ext, GL11, GL11Ext {
     }
 
     public void glTexImage2D(int target, int level, int internalformat,
-            int width, int height, int border, int format, int type,
-            Buffer pixels) {
+                             int width, int height, int border, int format, int type,
+                             Buffer pixels) {
         mgl.glTexImage2D(target, level, internalformat, width, height, border,
                 format, type, pixels);
     }
@@ -643,8 +643,8 @@ class MatrixTrackingGL implements GL, GL10, GL10Ext, GL11, GL11Ext {
     }
 
     public void glTexSubImage2D(int target, int level, int xoffset,
-            int yoffset, int width, int height, int format, int type,
-            Buffer pixels) {
+                                int yoffset, int width, int height, int format, int type,
+                                Buffer pixels) {
         mgl.glTexSubImage2D(target, level, xoffset, yoffset, width, height,
                 format, type, pixels);
     }
@@ -652,17 +652,17 @@ class MatrixTrackingGL implements GL, GL10, GL10Ext, GL11, GL11Ext {
     public void glTranslatef(float x, float y, float z) {
         mCurrent.glTranslatef(x, y, z);
         mgl.glTranslatef(x, y, z);
-        if ( _check) check();
+        if (_check) check();
     }
 
     public void glTranslatex(int x, int y, int z) {
         mCurrent.glTranslatex(x, y, z);
         mgl.glTranslatex(x, y, z);
-        if ( _check) check();
+        if (_check) check();
     }
 
     public void glVertexPointer(int size, int type,
-            int stride, Buffer pointer) {
+                                int stride, Buffer pointer) {
         mgl.glVertexPointer(size, type, stride, pointer);
     }
 
@@ -689,7 +689,7 @@ class MatrixTrackingGL implements GL, GL10, GL10Ext, GL11, GL11Ext {
     // Draw Texture Extension
 
     public void glDrawTexfOES(float x, float y, float z,
-        float width, float height) {
+                              float width, float height) {
         mgl11Ext.glDrawTexfOES(x, y, z, width, height);
     }
 
@@ -714,7 +714,7 @@ class MatrixTrackingGL implements GL, GL10, GL10Ext, GL11, GL11Ext {
     }
 
     public void glDrawTexsOES(short x, short y, short z,
-        short width, short height) {
+                              short width, short height) {
         mgl11Ext.glDrawTexsOES(x, y, z, width, height);
     }
 
@@ -739,9 +739,9 @@ class MatrixTrackingGL implements GL, GL10, GL10Ext, GL11, GL11Ext {
     }
 
     public int glQueryMatrixxOES(int[] mantissa, int mantissaOffset,
-        int[] exponent, int exponentOffset) {
+                                 int[] exponent, int exponentOffset) {
         return mgl10Ext.glQueryMatrixxOES(mantissa, mantissaOffset,
-            exponent, exponentOffset);
+                exponent, exponentOffset);
     }
 
     public int glQueryMatrixxOES(IntBuffer mantissa, IntBuffer exponent) {
@@ -1007,17 +1007,17 @@ class MatrixTrackingGL implements GL, GL10, GL10Ext, GL11, GL11Ext {
     }
 
     public void glMatrixIndexPointerOES(int size, int type, int stride,
-            Buffer pointer) {
+                                        Buffer pointer) {
         throw new UnsupportedOperationException();
     }
 
     public void glMatrixIndexPointerOES(int size, int type, int stride,
-            int offset) {
+                                        int offset) {
         throw new UnsupportedOperationException();
     }
 
     public void glWeightPointerOES(int size, int type, int stride,
-            Buffer pointer) {
+                                   Buffer pointer) {
         throw new UnsupportedOperationException();
     }
 
@@ -1044,20 +1044,20 @@ class MatrixTrackingGL implements GL, GL10, GL10Ext, GL11, GL11Ext {
     private void check() {
         int oesMode;
         switch (mMatrixMode) {
-        case GL_MODELVIEW:
-            oesMode = GL11.GL_MODELVIEW_MATRIX_FLOAT_AS_INT_BITS_OES;
-            break;
-        case GL_PROJECTION:
-            oesMode = GL11.GL_PROJECTION_MATRIX_FLOAT_AS_INT_BITS_OES;
-            break;
-        case GL_TEXTURE:
-            oesMode = GL11.GL_TEXTURE_MATRIX_FLOAT_AS_INT_BITS_OES;
-            break;
-        default:
-            throw new IllegalArgumentException("Unknown matrix mode");
+            case GL_MODELVIEW:
+                oesMode = GL11.GL_MODELVIEW_MATRIX_FLOAT_AS_INT_BITS_OES;
+                break;
+            case GL_PROJECTION:
+                oesMode = GL11.GL_PROJECTION_MATRIX_FLOAT_AS_INT_BITS_OES;
+                break;
+            case GL_TEXTURE:
+                oesMode = GL11.GL_TEXTURE_MATRIX_FLOAT_AS_INT_BITS_OES;
+                break;
+            default:
+                throw new IllegalArgumentException("Unknown matrix mode");
         }
 
-        if ( mByteBuffer == null) {
+        if (mByteBuffer == null) {
             mCheckA = new float[16];
             mCheckB = new float[16];
             mByteBuffer = ByteBuffer.allocateDirect(64);
@@ -1065,16 +1065,16 @@ class MatrixTrackingGL implements GL, GL10, GL10Ext, GL11, GL11Ext {
             mFloatBuffer = mByteBuffer.asFloatBuffer();
         }
         mgl.glGetIntegerv(oesMode, mByteBuffer.asIntBuffer());
-        for(int i = 0; i < 16; i++) {
+        for (int i = 0; i < 16; i++) {
             mCheckB[i] = mFloatBuffer.get(i);
         }
         mCurrent.getMatrix(mCheckA, 0);
 
         boolean fail = false;
-        for(int i = 0; i < 16; i++) {
+        for (int i = 0; i < 16; i++) {
             if (mCheckA[i] != mCheckB[i]) {
                 Log.d("GLMatWrap", "i:" + i + " a:" + mCheckA[i]
-                + " a:" + mCheckB[i]);
+                        + " a:" + mCheckB[i]);
                 fail = true;
             }
         }

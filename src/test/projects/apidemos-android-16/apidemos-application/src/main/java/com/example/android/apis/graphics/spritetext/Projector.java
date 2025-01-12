@@ -22,7 +22,6 @@ import javax.microedition.khronos.opengles.GL10;
 
 /**
  * A utility that projects
- *
  */
 class Projector {
     public Projector() {
@@ -56,6 +55,7 @@ class Projector {
     /**
      * Get the current projection matrix. Has the side-effect of
      * setting current matrix mode to GL_PROJECTION
+     *
      * @param gl
      */
     public void getCurrentProjection(GL10 gl) {
@@ -66,6 +66,7 @@ class Projector {
     /**
      * Get the current model view matrix. Has the side-effect of
      * setting current matrix mode to GL_MODELVIEW
+     *
      * @param gl
      */
     public void getCurrentModelView(GL10 gl) {

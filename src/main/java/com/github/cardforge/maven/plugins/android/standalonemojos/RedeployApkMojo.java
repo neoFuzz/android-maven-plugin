@@ -23,7 +23,6 @@ import com.github.cardforge.maven.plugins.android.config.ConfigPojo;
 import com.github.cardforge.maven.plugins.android.config.PullParameter;
 import com.github.cardforge.maven.plugins.android.configuration.DeployApk;
 import com.github.cardforge.maven.plugins.android.configuration.ValidationResponse;
-
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Mojo;
@@ -32,20 +31,19 @@ import org.apache.maven.plugins.annotations.Parameter;
 import java.io.File;
 
 /**
- * Reploys a specified Android application apk to attached devices and emulators. 
- * By default it will deploy to all, but a asubset or single one can be configured 
- * with the device and devices parameters. This simply tries to undeploy the APK 
- * first and then deploy it again. This goal can be used in non-android projects and 
+ * Reploys a specified Android application apk to attached devices and emulators.
+ * By default it will deploy to all, but a asubset or single one can be configured
+ * with the device and devices parameters. This simply tries to undeploy the APK
+ * first and then deploy it again. This goal can be used in non-android projects and
  * as standalone execution on the command line.<br>
  *
  * @author Manfred Moser - manfred@simpligility.com
  */
-@Mojo( name = "redeploy-apk", requiresProject = false )
-public class RedeployApkMojo extends AbstractAndroidMojo
-{
+@Mojo(name = "redeploy-apk", requiresProject = false)
+public class RedeployApkMojo extends AbstractAndroidMojo {
     /**
-     * Configuration for apk file redeployment within a pom file. See {@link #deployapkFilename}. 
-     * 
+     * Configuration for apk file redeployment within a pom file. See {@link #deployapkFilename}.
+     *
      * <pre>
      * &lt;deployapk&gt;
      *    &lt;filename&gt;yourapk.apke&lt;/filename&gt;
@@ -56,28 +54,24 @@ public class RedeployApkMojo extends AbstractAndroidMojo
     @ConfigPojo
     protected DeployApk deployapk;
 
-    @Parameter( property = "android.deployapk.filename" )
+    @Parameter(property = "android.deployapk.filename")
     private File deployapkFilename;
 
     @PullParameter
     private File parsedFilename;
 
-    public void execute() throws MojoExecutionException, MojoFailureException
-    {
-        ConfigHandler configHandler = new ConfigHandler( this, this.session, this.execution );
+    public void execute() throws MojoExecutionException, MojoFailureException {
+        ConfigHandler configHandler = new ConfigHandler(this, this.session, this.execution);
         configHandler.parseConfiguration();
-        
-        ValidationResponse response = DeployApk.validFileParameter( parsedFilename );
-        if ( response.isValid() ) 
-        {   
-            getLog().debug( "Undeploying with file " + parsedFilename );
-            undeployApk( parsedFilename );
-            getLog().debug( "Deploying with apkFile " + parsedFilename );
-            deployApk( parsedFilename );
-        } 
-        else 
-        {
-            throw new MojoFailureException( response.getMessage() );
+
+        ValidationResponse response = DeployApk.validFileParameter(parsedFilename);
+        if (response.isValid()) {
+            getLog().debug("Undeploying with file " + parsedFilename);
+            undeployApk(parsedFilename);
+            getLog().debug("Deploying with apkFile " + parsedFilename);
+            deployApk(parsedFilename);
+        } else {
+            throw new MojoFailureException(response.getMessage());
         }
     }
 }

@@ -20,7 +20,6 @@ import roboguice.activity.RoboActivity;
 import roboguice.inject.ContentView;
 
 /**
- *
  * @author Piotr Soróbka - psorobka@gmail.com
  */
 @ContentView(R.layout.main)

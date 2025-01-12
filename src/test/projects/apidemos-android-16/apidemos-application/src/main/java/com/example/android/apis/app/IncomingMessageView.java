@@ -44,9 +44,9 @@ public class IncomingMessageView extends Activity {
         setContentView(R.layout.incoming_message_view);
 
         // Fill in the message content.
-        ((TextView)findViewById(R.id.from)).setText(
+        ((TextView) findViewById(R.id.from)).setText(
                 getIntent().getCharSequenceExtra(KEY_FROM));
-        ((TextView)findViewById(R.id.message)).setText(
+        ((TextView) findViewById(R.id.message)).setText(
                 getIntent().getCharSequenceExtra(KEY_MESSAGE));
 
         // look up the notification manager service

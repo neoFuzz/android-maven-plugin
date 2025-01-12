@@ -42,7 +42,7 @@ import android.view.View;
 
 public class GameView extends View {
 
-    public static final long FPS_MS = 1000/2;
+    public static final long FPS_MS = 1000 / 2;
 
     public enum State {
         UNKNOWN(-3),
@@ -91,7 +91,9 @@ public class GameView extends View {
 
     private ICellListener mCellListener;
 
-    /** Contains one of {@link State#EMPTY}, {@link State#PLAYER1} or {@link State#PLAYER2}. */
+    /**
+     * Contains one of {@link State#EMPTY}, {@link State#PLAYER1} or {@link State#PLAYER2}.
+     */
     private final State[] mData = new State[9];
 
     private int mSelectedCell = -1;
@@ -105,7 +107,6 @@ public class GameView extends View {
 
     private boolean mBlinkDisplayOff;
     private final Rect mBlinkRect = new Rect();
-
 
 
     public interface ICellListener {
@@ -123,7 +124,7 @@ public class GameView extends View {
         mBmpPlayer2 = getResBitmap(R.drawable.lib_circle);
 
         if (mBmpPlayer1 != null) {
-            mSrcRect.set(0, 0, mBmpPlayer1.getWidth() -1, mBmpPlayer1.getHeight() - 1);
+            mSrcRect.set(0, 0, mBmpPlayer1.getWidth() - 1, mBmpPlayer1.getHeight() - 1);
         }
 
         mBmpPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
@@ -190,7 +191,9 @@ public class GameView extends View {
         mWinner = winner;
     }
 
-    /** Sets winning mark on specified column or row (0..2) or diagonal (0..1). */
+    /**
+     * Sets winning mark on specified column or row (0..2) or diagonal (0..1).
+     */
     public void setFinished(int col, int row, int diagonal) {
         mWinCol = col;
         mWinRow = row;
@@ -205,18 +208,18 @@ public class GameView extends View {
         super.onDraw(canvas);
 
         int sxy = mSxy;
-        int s3  = sxy * 3;
+        int s3 = sxy * 3;
         int x7 = mOffetX;
         int y7 = mOffetY;
 
         for (int i = 0, k = sxy; i < 2; i++, k += sxy) {
-            canvas.drawLine(x7    , y7 + k, x7 + s3 - 1, y7 + k     , mLinePaint);
-            canvas.drawLine(x7 + k, y7    , x7 + k     , y7 + s3 - 1, mLinePaint);
+            canvas.drawLine(x7, y7 + k, x7 + s3 - 1, y7 + k, mLinePaint);
+            canvas.drawLine(x7 + k, y7, x7 + k, y7 + s3 - 1, mLinePaint);
         }
 
         for (int j = 0, k = 0, y = y7; j < 3; j++, y += sxy) {
             for (int i = 0, x = x7; i < 3; i++, k++, x += sxy) {
-                mDstRect.offsetTo(MARGIN+x, MARGIN+y);
+                mDstRect.offsetTo(MARGIN + x, MARGIN + y);
 
                 State v;
                 if (mSelectedCell == k) {
@@ -228,17 +231,17 @@ public class GameView extends View {
                     v = mData[k];
                 }
 
-                switch(v) {
-                case PLAYER1:
-                    if (mBmpPlayer1 != null) {
-                        canvas.drawBitmap(mBmpPlayer1, mSrcRect, mDstRect, mBmpPaint);
-                    }
-                    break;
-                case PLAYER2:
-                    if (mBmpPlayer2 != null) {
-                        canvas.drawBitmap(mBmpPlayer2, mSrcRect, mDstRect, mBmpPaint);
-                    }
-                    break;
+                switch (v) {
+                    case PLAYER1:
+                        if (mBmpPlayer1 != null) {
+                            canvas.drawBitmap(mBmpPlayer1, mSrcRect, mDstRect, mBmpPaint);
+                        }
+                        break;
+                    case PLAYER2:
+                        if (mBmpPlayer2 != null) {
+                            canvas.drawBitmap(mBmpPlayer2, mSrcRect, mDstRect, mBmpPaint);
+                        }
+                        break;
                 }
             }
         }
@@ -317,7 +320,7 @@ public class GameView extends View {
                 mSelectedValue = state;
                 mBlinkDisplayOff = false;
                 mBlinkRect.set(MARGIN + x * sxy, MARGIN + y * sxy,
-                               MARGIN + (x + 1) * sxy, MARGIN + (y + 1) * sxy);
+                        MARGIN + (x + 1) * sxy, MARGIN + (y + 1) * sxy);
 
                 if (state != State.EMPTY) {
                     // Start the blinker
@@ -366,7 +369,7 @@ public class GameView extends View {
         b.putIntArray("gv_data", data);
 
         b.putInt("gv_sel_cell", mSelectedCell);
-        b.putInt("gv_sel_val",  mSelectedValue.getValue());
+        b.putInt("gv_sel_val", mSelectedValue.getValue());
         b.putInt("gv_curr_play", mCurrentPlayer.getValue());
         b.putInt("gv_winner", mWinner.getValue());
 

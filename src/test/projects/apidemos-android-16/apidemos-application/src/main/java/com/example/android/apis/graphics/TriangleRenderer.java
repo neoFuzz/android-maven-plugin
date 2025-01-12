@@ -36,7 +36,7 @@ import android.os.SystemClock;
 
 import com.example.android.apis.R;
 
-public class TriangleRenderer implements GLSurfaceView.Renderer{
+public class TriangleRenderer implements GLSurfaceView.Renderer {
 
     public TriangleRenderer(Context context) {
         mContext = context;
@@ -96,7 +96,7 @@ public class TriangleRenderer implements GLSurfaceView.Renderer{
         } finally {
             try {
                 is.close();
-            } catch(IOException e) {
+            } catch (IOException e) {
                 // Ignore.
             }
         }
@@ -155,10 +155,10 @@ public class TriangleRenderer implements GLSurfaceView.Renderer{
         gl.glViewport(0, 0, w, h);
 
         /*
-        * Set our projection matrix. This doesn't have to be done
-        * each time we draw, but usually a new projection needs to
-        * be set when the viewport is resized.
-        */
+         * Set our projection matrix. This doesn't have to be done
+         * each time we draw, but usually a new projection needs to
+         * be set when the viewport is resized.
+         */
 
         float ratio = (float) w / h;
         gl.glMatrixMode(GL10.GL_PROJECTION);
@@ -199,23 +199,23 @@ class Triangle {
         float[] coords = {
                 // X, Y, Z
                 -0.5f, -0.25f, 0,
-                 0.5f, -0.25f, 0,
-                 0.0f,  0.559016994f, 0
+                0.5f, -0.25f, 0,
+                0.0f, 0.559016994f, 0
         };
 
         for (int i = 0; i < VERTS; i++) {
-            for(int j = 0; j < 3; j++) {
-                mFVertexBuffer.put(coords[i*3+j] * 2.0f);
+            for (int j = 0; j < 3; j++) {
+                mFVertexBuffer.put(coords[i * 3 + j] * 2.0f);
             }
         }
 
         for (int i = 0; i < VERTS; i++) {
-            for(int j = 0; j < 2; j++) {
-                mTexBuffer.put(coords[i*3+j] * 2.0f + 0.5f);
+            for (int j = 0; j < 2; j++) {
+                mTexBuffer.put(coords[i * 3 + j] * 2.0f + 0.5f);
             }
         }
 
-        for(int i = 0; i < VERTS; i++) {
+        for (int i = 0; i < VERTS; i++) {
             mIndexBuffer.put((short) i);
         }
 

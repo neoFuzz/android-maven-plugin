@@ -29,13 +29,13 @@ import com.example.android.apis.R;
 
 /**
  * <h3>App that vibrates the vibrator with the Morse Code for a string.</h3>
-
-<p>This demonstrates the {@link android.os.Vibrator android.os.Vibrator} class.
-
-<h4>Demo</h4>
-OS / Morse Code Vibrator
- 
-<h4>Source files</h4>
+ *
+ * <p>This demonstrates the {@link android.os.Vibrator android.os.Vibrator} class.
+ *
+ * <h4>Demo</h4>
+ * OS / Morse Code Vibrator
+ *
+ * <h4>Source files</h4>
  * <table class="LinkTable">
  *         <tr>
  *             <td >src/com.example.android.apis/os/MorseCode.java</td>
@@ -45,11 +45,12 @@ OS / Morse Code Vibrator
  *             <td >res/any/layout/morse_code.xml</td>
  *             <td >Defines contents of the screen</td>
  *         </tr>
- * </table> 
+ * </table>
  */
-public class MorseCode extends Activity
-{
-    /** Our text view */
+public class MorseCode extends Activity {
+    /**
+     * Our text view
+     */
     private TextView mTextView;
 
     /**
@@ -58,8 +59,7 @@ public class MorseCode extends Activity
      * describe what is to be displayed in the screen.
      */
     @Override
-	protected void onCreate(Bundle savedInstanceState)
-    {
+    protected void onCreate(Bundle savedInstanceState) {
         // Be sure to call the super class.
         super.onCreate(savedInstanceState);
 
@@ -72,10 +72,12 @@ public class MorseCode extends Activity
         findViewById(R.id.button).setOnClickListener(mClickListener);
 
         // Save the text view so we don't have to look it up each time
-        mTextView = (TextView)findViewById(R.id.text);
+        mTextView = (TextView) findViewById(R.id.text);
     }
 
-    /** Called when the button is pushed */
+    /**
+     * Called when the button is pushed
+     */
     View.OnClickListener mClickListener = new View.OnClickListener() {
         public void onClick(View v) {
             // Get the text out of the view
@@ -86,7 +88,7 @@ public class MorseCode extends Activity
             long[] pattern = MorseCodeConverter.pattern(text);
 
             // Start the vibration
-            Vibrator vibrator = (Vibrator)getSystemService(Context.VIBRATOR_SERVICE);
+            Vibrator vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
             vibrator.vibrate(pattern, -1);
         }
     };

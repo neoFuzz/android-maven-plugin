@@ -1,12 +1,12 @@
 /**
  * Copyright (c) 2010, The Android Open Source Project
- *
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -57,7 +57,7 @@ public class ClipboardSample extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        mClipboard = (ClipboardManager)getSystemService(CLIPBOARD_SERVICE);
+        mClipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
 
         // See res/any/layout/resources.xml for this view layout definition.
         setContentView(R.layout.clipboard);
@@ -65,16 +65,16 @@ public class ClipboardSample extends Activity {
         TextView tv;
 
         mStyledText = getText(R.string.styled_text);
-        tv = (TextView)findViewById(R.id.styled_text);
+        tv = (TextView) findViewById(R.id.styled_text);
         tv.setText(mStyledText);
 
         mPlainText = mStyledText.toString();
-        tv = (TextView)findViewById(R.id.plain_text);
+        tv = (TextView) findViewById(R.id.plain_text);
         tv.setText(mPlainText);
 
         mHtmlText = "<b>Link:</b> <a href=\"http://www.android.com\">Android</a>";
         mHtmlPlainText = "Link: http://www.android.com";
-        tv = (TextView)findViewById(R.id.html_text);
+        tv = (TextView) findViewById(R.id.html_text);
         tv.setText(mHtmlText);
 
         mSpinner = (Spinner) findViewById(R.id.clip_type);
@@ -88,12 +88,13 @@ public class ClipboardSample extends Activity {
                             AdapterView<?> parent, View view, int position, long id) {
                         updateClipData(false);
                     }
+
                     public void onNothingSelected(AdapterView<?> parent) {
                     }
                 });
 
-        mMimeTypes = (TextView)findViewById(R.id.clip_mime_types);
-        mDataText = (TextView)findViewById(R.id.clip_text);
+        mMimeTypes = (TextView) findViewById(R.id.clip_mime_types);
+        mDataText = (TextView) findViewById(R.id.clip_text);
 
         mClipboard.addPrimaryClipChangedListener(mPrimaryChangeListener);
         updateClipData(true);
@@ -131,7 +132,7 @@ public class ClipboardSample extends Activity {
         String[] mimeTypes = clip != null ? clip.getDescription().filterMimeTypes("*/*") : null;
         if (mimeTypes != null) {
             mMimeTypes.setText("");
-            for (int i=0; i<mimeTypes.length; i++) {
+            for (int i = 0; i < mimeTypes.length; i++) {
                 if (i > 0) {
                     mMimeTypes.append("\n");
                 }

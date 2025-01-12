@@ -1,16 +1,13 @@
 package com.github.cardforge.maven.plugins.android.configuration;
 
 
-
-
 /**
  * Configuration for the Android Emulator. This class is only the definition of the parameters that are shadowed in
  * {@link AbstractAndroidMojo} and used there.
  *
  * @author Manfred Moser - manfred@simpligility.com
  */
-public class Emulator
-{
+public class Emulator {
     /**
      * Mirror of {@link AbstractEmulatorMojo#emulatorAvd}
      */
@@ -30,31 +27,25 @@ public class Emulator
      * Override default emulator executable
      */
     private String executable;
+    private String location;
 
-    public String getLocation()
-    {
+    public String getLocation() {
         return location;
     }
 
-    private String location;
-
-    public String getAvd()
-    {
+    public String getAvd() {
         return avd;
     }
 
-    public String getWait()
-    {
+    public String getWait() {
         return wait;
     }
 
-    public String getOptions()
-    {
+    public String getOptions() {
         return options;
     }
 
-    public String getExecutable()
-    {
+    public String getExecutable() {
         return executable;
     }
 }

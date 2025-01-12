@@ -16,24 +16,14 @@
  */
 package com.github.cardforge.maven.plugins.android;
 
-import com.android.ddmlib.AdbCommandRejectedException;
-import com.android.ddmlib.AndroidDebugBridge;
-import com.android.ddmlib.IDevice;
-import com.android.ddmlib.ShellCommandUnresponsiveException;
-import com.android.ddmlib.TimeoutException;
+import com.android.ddmlib.*;
 import com.github.cardforge.maven.plugins.android.common.DeviceHelper;
 import com.github.cardforge.maven.plugins.android.configuration.Emulator;
-
 import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.Parameter;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
+import java.io.*;
 import java.net.Socket;
 import java.util.Arrays;
 import java.util.List;
@@ -55,12 +45,11 @@ import java.util.concurrent.Future;
  * @see EmulatorStopMojo
  * @see EmulatorStopAllMojo
  */
-public abstract class AbstractEmulatorMojo extends AbstractAndroidMojo
-{
+public abstract class AbstractEmulatorMojo extends AbstractAndroidMojo {
     /**
      * operating system name.
      */
-    public static final String OS_NAME = System.getProperty( "os.name" ).toLowerCase( Locale.US );
+    public static final String OS_NAME = System.getProperty("os.name").toLowerCase(Locale.US);
     private static final int MILLIS_TO_SLEEP_BETWEEN_DEVICE_ONLINE_CHECKS = 200;
 
     /**
@@ -73,12 +62,12 @@ public abstract class AbstractEmulatorMojo extends AbstractAndroidMojo
      * Names of device properties related to the boot state
      */
     private static final String[] BOOT_INDICATOR_PROP_NAMES
-            = { "dev.bootcomplete", "sys.boot_completed", "init.svc.bootanim" };
+            = {"dev.bootcomplete", "sys.boot_completed", "init.svc.bootanim"};
 
     /**
      * Target values for properties listed in {@link #BOOT_INDICATOR_PROP_NAMES}, which indicate 'boot completed'
      */
-    private static final String[] BOOT_INDICATOR_PROP_TARGET_VALUES = { "1", "1", "stopped" };
+    private static final String[] BOOT_INDICATOR_PROP_TARGET_VALUES = {"1", "1", "stopped"};
 
     /**
      * Determines, which of the properties listed in {@link #BOOT_INDICATOR_PROP_NAMES} are required
@@ -86,14 +75,19 @@ public abstract class AbstractEmulatorMojo extends AbstractAndroidMojo
      * Since one cannot be picky about what is used as a 'booted' indicator, any 'signalled' property will
      * be used as an indicator in case of a timeout.
      */
-    private static final boolean[] BOOT_INDICATOR_PROP_WAIT_FOR = { false, false, true };
+    private static final boolean[] BOOT_INDICATOR_PROP_WAIT_FOR = {false, false, true};
 
     /**
      * Warning threshold for narrow timeout values
      * TODO Improve; e.g. with an additional percentage threshold
      */
     private static final long START_TIMEOUT_REMAINING_TIME_WARNING_THRESHOLD = 5000; //[ms]
-
+    private static final String START_EMULATOR_MSG = "Starting android emulator with script: ";
+    private static final String START_EMULATOR_WAIT_MSG = "Waiting for emulator start:";
+    /**
+     * Folder that contains the startup script and the pid file.
+     */
+    private static final String SCRIPT_FOLDER = System.getProperty("java.io.tmpdir");
     /**
      * Configuration for the emulator goals. Either use the plugin configuration like this
      * <pre>
@@ -111,29 +105,25 @@ public abstract class AbstractEmulatorMojo extends AbstractAndroidMojo
      */
     @Parameter
     private Emulator emulator;
-
     /**
      * Name of the Android Virtual Device (emulatorAvd) that will be started by the emulator. Default value is "Default"
      *
      * @see Emulator#avd
      */
-    @Parameter( property = "android.emulator.avd" )
+    @Parameter(property = "android.emulator.avd")
     private String emulatorAvd;
-
     /**
      * Unlock the emulator after it is started.
      */
-    @Parameter( property = "android.emulatorUnlock", defaultValue = "false" )
+    @Parameter(property = "android.emulatorUnlock", defaultValue = "false")
     private boolean emulatorUnlock;
-
     /**
      * Wait time for the emulator start up.
      *
      * @see Emulator#wait
      */
-    @Parameter( property = "android.emulator.wait" )
+    @Parameter(property = "android.emulator.wait")
     private String emulatorWait;
-
     /**
      * Additional command line options for the emulator start up. This option can be used to pass any additional
      * options desired to the invocation of the emulator. Use emulator -help for more details. An example would be
@@ -141,70 +131,51 @@ public abstract class AbstractEmulatorMojo extends AbstractAndroidMojo
      *
      * @see Emulator#options
      */
-    @Parameter( property = "android.emulator.options" )
+    @Parameter(property = "android.emulator.options")
     private String emulatorOptions;
-
     /**
      * Override default emulator executable. Default uses just "emulator".
      *
      * @see Emulator#executable
      */
-    @Parameter( property = "android.emulator.executable" )
+    @Parameter(property = "android.emulator.executable")
     private String emulatorExecutable;
-
     /**
      * Override default path to emulator folder.
      */
-    @Parameter( property = "android.emulator.location" )
+    @Parameter(property = "android.emulator.location")
     private String emulatorLocation;
-
     /**
      * parsed value for avd that will be used for the invocation.
      */
     private String parsedAvd;
-
     /**
      * parsed value for options that will be used for the invocation.
      */
     private String parsedOptions;
-
     /**
      * parsed value for wait that will be used for the invocation.
      */
     private String parsedWait;
-
     private String parsedExecutable;
-
     /**
      * parsed value for location that will be used for the invocation.
      */
     private String parsedEmulatorLocation;
-
-    private static final String START_EMULATOR_MSG = "Starting android emulator with script: ";
-    private static final String START_EMULATOR_WAIT_MSG = "Waiting for emulator start:";
-
-    /**
-     * Folder that contains the startup script and the pid file.
-     */
-    private static final String SCRIPT_FOLDER = System.getProperty( "java.io.tmpdir" );
 
     /**
      * Are we running on a flavour of Windows.
      *
      * @return
      */
-    private boolean isWindows()
-    {
+    private boolean isWindows() {
         boolean result;
-        if ( OS_NAME.toLowerCase().contains( "windows" ) )
-        {
+        if (OS_NAME.toLowerCase().contains("windows")) {
             result = true;
-        }
-        else
-        {
+        } else {
             result = false;
         }
-        getLog().debug( "isWindows: " + result );
+        getLog().debug("isWindows: " + result);
         return result;
     }
 
@@ -212,110 +183,90 @@ public abstract class AbstractEmulatorMojo extends AbstractAndroidMojo
      * Start the Android Emulator with the specified options.
      *
      * @throws org.apache.maven.plugin.MojoExecutionException
-     *
      * @see #emulatorAvd
      * @see #emulatorWait
      * @see #emulatorOptions
      */
-    public void startAndroidEmulator() throws MojoExecutionException
-    {
+    public void startAndroidEmulator() throws MojoExecutionException {
         parseParameters();
 
         CommandExecutor executor = CommandExecutor.Factory.createDefaultCommmandExecutor();
-        executor.setLogger( this.getLog() );
+        executor.setLogger(this.getLog());
 
-        try
-        {
+        try {
             String filename;
-            if ( isWindows() )
-            {
+            if (isWindows()) {
                 filename = writeEmulatorStartScriptWindows();
-            }
-            else
-            {
+            } else {
                 filename = writeEmulatorStartScriptUnix();
             }
 
             final AndroidDebugBridge androidDebugBridge = initAndroidDebugBridge();
-            if ( androidDebugBridge.isConnected() )
-            {
-                waitForInitialDeviceList( androidDebugBridge );
-                List<IDevice> devices = Arrays.asList( androidDebugBridge.getDevices() );
+            if (androidDebugBridge.isConnected()) {
+                waitForInitialDeviceList(androidDebugBridge);
+                List<IDevice> devices = Arrays.asList(androidDebugBridge.getDevices());
                 int numberOfDevices = devices.size();
-                getLog().info( "Found " + numberOfDevices + " devices connected with the Android Debug Bridge" );
+                getLog().info("Found " + numberOfDevices + " devices connected with the Android Debug Bridge");
 
-                IDevice existingEmulator = findExistingEmulator( devices );
-                if ( existingEmulator == null )
-                {
-                    getLog().info( START_EMULATOR_MSG + filename );
-                    executor.executeCommand( filename, null );
+                IDevice existingEmulator = findExistingEmulator(devices);
+                if (existingEmulator == null) {
+                    getLog().info(START_EMULATOR_MSG + filename);
+                    executor.executeCommand(filename, null);
 
-                    getLog().info( START_EMULATOR_WAIT_MSG + parsedWait );
+                    getLog().info(START_EMULATOR_WAIT_MSG + parsedWait);
                     // wait for the emulator to start up
-                    boolean booted = waitUntilDeviceIsBootedOrTimeout( androidDebugBridge );
-                    if ( booted )
-                    {
-                        getLog().info( "Emulator is up and running." );
-                        unlockEmulator( androidDebugBridge );
-                    }
-                    else
-                    {
-                        throw new MojoExecutionException( "Timeout while waiting for emulator to startup." );
+                    boolean booted = waitUntilDeviceIsBootedOrTimeout(androidDebugBridge);
+                    if (booted) {
+                        getLog().info("Emulator is up and running.");
+                        unlockEmulator(androidDebugBridge);
+                    } else {
+                        throw new MojoExecutionException("Timeout while waiting for emulator to startup.");
                     }
 
-                }
-                else
-                {
-                    getLog().info( String.format(
+                } else {
+                    getLog().info(String.format(
                             "Emulator already running [Serial No: '%s', AVD Name '%s']. " + "Skipping start and wait.",
-                            existingEmulator.getSerialNumber(), existingEmulator.getAvdName() ) );
+                            existingEmulator.getSerialNumber(), existingEmulator.getAvdName()));
                 }
             }
-        }
-        catch ( Exception e )
-        {
-            throw new MojoExecutionException( "", e );
+        } catch (Exception e) {
+            throw new MojoExecutionException("", e);
         }
     }
 
     /**
      * Unlocks the emulator.
+     *
      * @param androidDebugBridge
      */
-    void unlockEmulator( AndroidDebugBridge androidDebugBridge )
-    {
-        if ( emulatorUnlock )
-        {
-            IDevice myEmulator = findExistingEmulator( Arrays.asList( androidDebugBridge.getDevices() ) );
-            int devicePort = extractPortFromDevice( myEmulator );
-            if ( devicePort == -1 )
-            {
-                getLog().info( "Unable to retrieve port to unlock emulator "
-                        + DeviceHelper.getDescriptiveName( myEmulator ) );
-            }
-            else
-            {
-                getLog().info( "Unlocking emulator "
-                        + DeviceHelper.getDescriptiveName( myEmulator ) );
+    void unlockEmulator(AndroidDebugBridge androidDebugBridge) {
+        if (emulatorUnlock) {
+            IDevice myEmulator = findExistingEmulator(Arrays.asList(androidDebugBridge.getDevices()));
+            int devicePort = extractPortFromDevice(myEmulator);
+            if (devicePort == -1) {
+                getLog().info("Unable to retrieve port to unlock emulator "
+                        + DeviceHelper.getDescriptiveName(myEmulator));
+            } else {
+                getLog().info("Unlocking emulator "
+                        + DeviceHelper.getDescriptiveName(myEmulator));
 
-                sendEmulatorCommand( devicePort,
-                        "event send EV_KEY:KEY_SOFT1:1" );
-                sendEmulatorCommand( devicePort,
-                        "event send EV_KEY:KEY_SOFT1:0" );
-                sendEmulatorCommand( devicePort,
-                        "event send EV_KEY:KEY_SOFT1:1" );
-                sendEmulatorCommand( devicePort,
-                        "event send EV_KEY:KEY_SOFT1:0" );
+                sendEmulatorCommand(devicePort,
+                        "event send EV_KEY:KEY_SOFT1:1");
+                sendEmulatorCommand(devicePort,
+                        "event send EV_KEY:KEY_SOFT1:0");
+                sendEmulatorCommand(devicePort,
+                        "event send EV_KEY:KEY_SOFT1:1");
+                sendEmulatorCommand(devicePort,
+                        "event send EV_KEY:KEY_SOFT1:0");
             }
         }
     }
 
     // TODO Separate timeout params?: New param 'android.emulator.bootTimeout', rename param 'android.emulator.wait' to 'android.emulator.connectTimeout'
     // TODO Higher default timeout(s)?: Perhaps at least for emulators, since they are probably booted or even created on demand
-    boolean waitUntilDeviceIsBootedOrTimeout( AndroidDebugBridge androidDebugBridge )
-            throws MojoExecutionException
-    {
-        final long timeout = System.currentTimeMillis() + Long.parseLong( parsedWait );
+    boolean waitUntilDeviceIsBootedOrTimeout(AndroidDebugBridge androidDebugBridge)
+            throws MojoExecutionException {
+        final long timeout = System.currentTimeMillis() + Long.parseLong(parsedWait);
         IDevice myEmulator;
         boolean devOnline;
         boolean sysBootCompleted = false;
@@ -323,156 +274,122 @@ public abstract class AbstractEmulatorMojo extends AbstractAndroidMojo
 
         //If necessary, wait until the device is online or the specified timeout is reached
         boolean waitingForConnection = false;
-        do
-        {
-            myEmulator = findExistingEmulator( Arrays.asList( androidDebugBridge.getDevices() ) );
-            devOnline = ( myEmulator != null ) && ( myEmulator.isOnline() );
-            if ( devOnline )
-            {
+        do {
+            myEmulator = findExistingEmulator(Arrays.asList(androidDebugBridge.getDevices()));
+            devOnline = (myEmulator != null) && (myEmulator.isOnline());
+            if (devOnline) {
                 break;
-            }
-            else
-            {
+            } else {
                 myEmulator = null;
             }
 
-            if ( !waitingForConnection )
-            {
+            if (!waitingForConnection) {
                 waitingForConnection = true;
-                getLog().info( "Waiting for the device to go online..." );
+                getLog().info("Waiting for the device to go online...");
             }
-            try
-            {
-                Thread.sleep( MILLIS_TO_SLEEP_BETWEEN_DEVICE_ONLINE_CHECKS );
-            }
-            catch ( InterruptedException e )
-            {
-                throw new MojoExecutionException( "Interrupted waiting for device to become ready" );
+            try {
+                Thread.sleep(MILLIS_TO_SLEEP_BETWEEN_DEVICE_ONLINE_CHECKS);
+            } catch (InterruptedException e) {
+                throw new MojoExecutionException("Interrupted waiting for device to become ready");
             }
 
             remainingTime = timeout - System.currentTimeMillis();
-        } while ( remainingTime > 0 );
+        } while (remainingTime > 0);
 
-        if ( devOnline )
-        {
+        if (devOnline) {
             boolean waitingForBootCompleted = false;
-            final String[] bootIndicatorPropValues = new String[ BOOT_INDICATOR_PROP_NAMES.length ];
+            final String[] bootIndicatorPropValues = new String[BOOT_INDICATOR_PROP_NAMES.length];
             boolean anyTargetStateReached = false;
             boolean requiredTargetStatesReached = false;
 
             // If necessary, wait until the device's system is booted or the specified timeout is reached
-            do
-            {
-                try
-                {
+            do {
+                try {
                     // update state flags...
                     anyTargetStateReached = false;
                     requiredTargetStatesReached = true;
 
-                    for ( int indicatorProp = 0; indicatorProp < BOOT_INDICATOR_PROP_NAMES.length; ++indicatorProp )
-                    {
+                    for (int indicatorProp = 0; indicatorProp < BOOT_INDICATOR_PROP_NAMES.length; ++indicatorProp) {
                         // issue an un-cached property request
                         boolean targetStateReached =
                                 (
                                         bootIndicatorPropValues[indicatorProp] != null
-                                                &&  bootIndicatorPropValues[indicatorProp]
-                                                .equals( BOOT_INDICATOR_PROP_TARGET_VALUES[indicatorProp] )
+                                                && bootIndicatorPropValues[indicatorProp]
+                                                .equals(BOOT_INDICATOR_PROP_TARGET_VALUES[indicatorProp])
                                 );
-                        if ( !targetStateReached )
-                        {
+                        if (!targetStateReached) {
                             // (re)query
                             bootIndicatorPropValues[indicatorProp] =
-                                    myEmulator.getPropertySync( BOOT_INDICATOR_PROP_NAMES[indicatorProp] );
+                                    myEmulator.getPropertySync(BOOT_INDICATOR_PROP_NAMES[indicatorProp]);
                             targetStateReached =
                                     (
                                             bootIndicatorPropValues[indicatorProp] != null
-                                                    &&  bootIndicatorPropValues[indicatorProp]
-                                                    .equals( BOOT_INDICATOR_PROP_TARGET_VALUES[indicatorProp] )
+                                                    && bootIndicatorPropValues[indicatorProp]
+                                                    .equals(BOOT_INDICATOR_PROP_TARGET_VALUES[indicatorProp])
                                     );
                         }
                         anyTargetStateReached |= targetStateReached;
                         requiredTargetStatesReached &=
                                 BOOT_INDICATOR_PROP_WAIT_FOR[indicatorProp] ? targetStateReached : true;
 
-                        getLog().debug( BOOT_INDICATOR_PROP_NAMES[indicatorProp]
-                                        + " : " +  bootIndicatorPropValues[indicatorProp]
-                                        + ( targetStateReached ? " == " : " != " )
-                                        + BOOT_INDICATOR_PROP_TARGET_VALUES[indicatorProp]
-                                        + " [" + ( targetStateReached ? "OK" : "PENDING" ) + ']'
+                        getLog().debug(BOOT_INDICATOR_PROP_NAMES[indicatorProp]
+                                + " : " + bootIndicatorPropValues[indicatorProp]
+                                + (targetStateReached ? " == " : " != ")
+                                + BOOT_INDICATOR_PROP_TARGET_VALUES[indicatorProp]
+                                + " [" + (targetStateReached ? "OK" : "PENDING") + ']'
                         );
                     }
-                }
-                catch ( TimeoutException e )
-                {
+                } catch (TimeoutException e) {
                     // TODO Abort here? Not too problematic since timeouts are used
                     // optimistically ignore this exception and continue...
-                }
-                catch ( AdbCommandRejectedException e )
-                {
+                } catch (AdbCommandRejectedException e) {
                     // TODO Abort here? Not too problematic since timeouts are used
                     // optimistically ignore this exception and continue...
-                }
-                catch ( ShellCommandUnresponsiveException e )
-                {
+                } catch (ShellCommandUnresponsiveException e) {
                     // TODO Abort here? Not too problematic since timeouts are used
                     // optimistically ignore this exception and continue...
-                }
-                catch ( IOException e )
-                {
-                    throw new MojoExecutionException( "IO error during status request" , e );
+                } catch (IOException e) {
+                    throw new MojoExecutionException("IO error during status request", e);
                 }
 
                 remainingTime = timeout - System.currentTimeMillis();
 
-                if ( remainingTime > 0 )
-                {
+                if (remainingTime > 0) {
                     // consider the boot process to be finished, if all required states have been reached
                     sysBootCompleted = requiredTargetStatesReached;
-                }
-                else
-                {
+                } else {
                     // on timeout, use any indicator
                     sysBootCompleted = anyTargetStateReached;
                 }
 
-                if ( remainingTime > 0 && !sysBootCompleted )
-                {
-                    if ( !waitingForBootCompleted )
-                    {
+                if (remainingTime > 0 && !sysBootCompleted) {
+                    if (!waitingForBootCompleted) {
                         waitingForBootCompleted = true;
-                        getLog().info( "Waiting for the device to finish booting..." );
+                        getLog().info("Waiting for the device to finish booting...");
                     }
 
-                    try
-                    {
-                        Thread.sleep( MILLIS_TO_SLEEP_BETWEEN_SYS_BOOTED_CHECKS );
-                    }
-                    catch ( InterruptedException e )
-                    {
+                    try {
+                        Thread.sleep(MILLIS_TO_SLEEP_BETWEEN_SYS_BOOTED_CHECKS);
+                    } catch (InterruptedException e) {
                         throw new MojoExecutionException(
-                                "Interrupted while waiting for the device to finish booting" );
+                                "Interrupted while waiting for the device to finish booting");
                     }
                 }
-            } while ( !sysBootCompleted && remainingTime > 0 );
-            if ( sysBootCompleted && remainingTime < START_TIMEOUT_REMAINING_TIME_WARNING_THRESHOLD )
-            {
+            } while (!sysBootCompleted && remainingTime > 0);
+            if (sysBootCompleted && remainingTime < START_TIMEOUT_REMAINING_TIME_WARNING_THRESHOLD) {
                 getLog().warn(
-                        "Boot indicators have been signalled, but remaining time was " + remainingTime + " ms" );
+                        "Boot indicators have been signalled, but remaining time was " + remainingTime + " ms");
             }
         }
         return sysBootCompleted;
     }
 
-    private IDevice findExistingEmulator( List<IDevice> devices )
-    {
+    private IDevice findExistingEmulator(List<IDevice> devices) {
         IDevice existingEmulator = null;
 
-        for ( IDevice device : devices )
-        {
-            if ( device.isEmulator() )
-            {
-                if ( isExistingEmulator( device ) )
-                {
+        for (IDevice device : devices) {
+            if (device.isEmulator()) {
+                if (isExistingEmulator(device)) {
                     existingEmulator = device;
                     break;
                 }
@@ -489,9 +406,8 @@ public abstract class AbstractEmulatorMojo extends AbstractAndroidMojo
      * @param device The device to check
      * @return Boolean results of the check
      */
-    private boolean isExistingEmulator( IDevice device )
-    {
-        return ( ( device.getAvdName() != null ) && ( device.getAvdName().equalsIgnoreCase( parsedAvd ) ) );
+    private boolean isExistingEmulator(IDevice device) {
+        return ((device.getAvdName() != null) && (device.getAvdName().equalsIgnoreCase(parsedAvd)));
     }
 
     /**
@@ -501,45 +417,37 @@ public abstract class AbstractEmulatorMojo extends AbstractAndroidMojo
      * @throws IOException
      * @throws MojoExecutionException
      */
-    private String writeEmulatorStartScriptWindows() throws MojoExecutionException
-    {
+    private String writeEmulatorStartScriptWindows() throws MojoExecutionException {
 
         String filename = SCRIPT_FOLDER + "\\android-maven-plugin-emulator-start.vbs";
 
-        File file = new File( filename );
+        File file = new File(filename);
         PrintWriter writer = null;
-        try
-        {
-            writer = new PrintWriter( new FileWriter( file ) );
+        try {
+            writer = new PrintWriter(new FileWriter(file));
 
 
             // command needs to be assembled before unique window title since it parses settings and sets up parsedAvd
             // and others.
             String command = assembleStartCommandLine();
             String uniqueWindowTitle = "AndroidMavenPlugin-AVD" + parsedAvd;
-            writer.println( "Dim oShell" );
-            writer.println( "Set oShell = WScript.CreateObject(\"WScript.shell\")" );
-            String cmdPath = System.getenv( "COMSPEC" );
-            if ( cmdPath == null )
-            {
+            writer.println("Dim oShell");
+            writer.println("Set oShell = WScript.CreateObject(\"WScript.shell\")");
+            String cmdPath = System.getenv("COMSPEC");
+            if (cmdPath == null) {
                 cmdPath = "cmd.exe";
             }
             String cmd = cmdPath + " /X /C START /SEPARATE \"\"" + uniqueWindowTitle + "\"\"  " + command.trim();
-            writer.println( "oShell.run \"" + cmd + "\"" );
-        }
-        catch ( IOException e )
-        {
-            getLog().error( "Failure writing file " + filename );
-        }
-        finally
-        {
-            if ( writer != null )
-            {
+            writer.println("oShell.run \"" + cmd + "\"");
+        } catch (IOException e) {
+            getLog().error("Failure writing file " + filename);
+        } finally {
+            if (writer != null) {
                 writer.flush();
                 writer.close();
             }
         }
-        file.setExecutable( true );
+        file.setExecutable(true);
         return filename;
     }
 
@@ -550,43 +458,34 @@ public abstract class AbstractEmulatorMojo extends AbstractAndroidMojo
      * @throws IOException
      * @throws MojoExecutionException
      */
-    private String writeEmulatorStartScriptUnix() throws MojoExecutionException
-    {
+    private String writeEmulatorStartScriptUnix() throws MojoExecutionException {
         String filename = SCRIPT_FOLDER + "/android-maven-plugin-emulator-start.sh";
 
         File sh;
-        sh = new File( "/bin/bash" );
-        if ( !sh.exists() )
-        {
-            sh = new File( "/usr/bin/bash" );
+        sh = new File("/bin/bash");
+        if (!sh.exists()) {
+            sh = new File("/usr/bin/bash");
         }
-        if ( !sh.exists() )
-        {
-            sh = new File( "/bin/sh" );
+        if (!sh.exists()) {
+            sh = new File("/bin/sh");
         }
 
-        File file = new File( filename );
+        File file = new File(filename);
         PrintWriter writer = null;
-        try
-        {
-            writer = new PrintWriter( new FileWriter( file ) );
-            writer.println( "#!" + sh.getAbsolutePath() );
-            writer.print( assembleStartCommandLine() );
-            writer.print( " 1>/dev/null 2>&1 &" ); // redirect outputs and run as background task
-        }
-        catch ( IOException e )
-        {
-            getLog().error( "Failure writing file " + filename );
-        }
-        finally
-        {
-            if ( writer != null )
-            {
+        try {
+            writer = new PrintWriter(new FileWriter(file));
+            writer.println("#!" + sh.getAbsolutePath());
+            writer.print(assembleStartCommandLine());
+            writer.print(" 1>/dev/null 2>&1 &"); // redirect outputs and run as background task
+        } catch (IOException e) {
+            getLog().error("Failure writing file " + filename);
+        } finally {
+            if (writer != null) {
                 writer.flush();
                 writer.close();
             }
         }
-        file.setExecutable( true );
+        file.setExecutable(true);
         return filename;
     }
 
@@ -594,31 +493,23 @@ public abstract class AbstractEmulatorMojo extends AbstractAndroidMojo
      * Stop the running Android Emulator.
      *
      * @throws org.apache.maven.plugin.MojoExecutionException
-     *
      */
-    protected void stopAndroidEmulator() throws MojoExecutionException
-    {
+    protected void stopAndroidEmulator() throws MojoExecutionException {
         parseParameters();
 
         final AndroidDebugBridge androidDebugBridge = initAndroidDebugBridge();
-        if ( androidDebugBridge.isConnected() )
-        {
-            List<IDevice> devices = Arrays.asList( androidDebugBridge.getDevices() );
+        if (androidDebugBridge.isConnected()) {
+            List<IDevice> devices = Arrays.asList(androidDebugBridge.getDevices());
             int numberOfDevices = devices.size();
-            getLog().info( "Found " + numberOfDevices + " devices connected with the Android Debug Bridge" );
+            getLog().info("Found " + numberOfDevices + " devices connected with the Android Debug Bridge");
 
-            for ( IDevice device : devices )
-            {
-                if ( device.isEmulator() )
-                {
-                    if ( isExistingEmulator( device ) )
-                    {
-                        stopEmulator( device );
+            for (IDevice device : devices) {
+                if (device.isEmulator()) {
+                    if (isExistingEmulator(device)) {
+                        stopEmulator(device);
                     }
-                }
-                else
-                {
-                    getLog().info( "Skipping stop. Not an emulator. " + DeviceHelper.getDescriptiveName( device ) );
+                } else {
+                    getLog().info("Skipping stop. Not an emulator. " + DeviceHelper.getDescriptiveName(device));
                 }
             }
         }
@@ -628,26 +519,19 @@ public abstract class AbstractEmulatorMojo extends AbstractAndroidMojo
      * Stop the running Android Emulators.
      *
      * @throws org.apache.maven.plugin.MojoExecutionException
-     *
      */
-    protected void stopAndroidEmulators() throws MojoExecutionException
-    {
+    protected void stopAndroidEmulators() throws MojoExecutionException {
         final AndroidDebugBridge androidDebugBridge = initAndroidDebugBridge();
-        if ( androidDebugBridge.isConnected() )
-        {
-            List<IDevice> devices = Arrays.asList( androidDebugBridge.getDevices() );
+        if (androidDebugBridge.isConnected()) {
+            List<IDevice> devices = Arrays.asList(androidDebugBridge.getDevices());
             int numberOfDevices = devices.size();
-            getLog().info( "Found " + numberOfDevices + " devices connected with the Android Debug Bridge" );
+            getLog().info("Found " + numberOfDevices + " devices connected with the Android Debug Bridge");
 
-            for ( IDevice device : devices )
-            {
-                if ( device.isEmulator() )
-                {
-                    stopEmulator( device );
-                }
-                else
-                {
-                    getLog().info( "Skipping stop. Not an emulator. " + DeviceHelper.getDescriptiveName( device ) );
+            for (IDevice device : devices) {
+                if (device.isEmulator()) {
+                    stopEmulator(device);
+                } else {
+                    getLog().info("Skipping stop. Not an emulator. " + DeviceHelper.getDescriptiveName(device));
                 }
             }
         }
@@ -658,26 +542,19 @@ public abstract class AbstractEmulatorMojo extends AbstractAndroidMojo
      *
      * @param device The device to stop
      */
-    private void stopEmulator( IDevice device )
-    {
-        int devicePort = extractPortFromDevice( device );
-        if ( devicePort == -1 )
-        {
-            getLog().info( "Unable to retrieve port to stop emulator " + DeviceHelper.getDescriptiveName( device ) );
-        }
-        else
-        {
-            getLog().info( "Stopping emulator " + DeviceHelper.getDescriptiveName( device ) );
+    private void stopEmulator(IDevice device) {
+        int devicePort = extractPortFromDevice(device);
+        if (devicePort == -1) {
+            getLog().info("Unable to retrieve port to stop emulator " + DeviceHelper.getDescriptiveName(device));
+        } else {
+            getLog().info("Stopping emulator " + DeviceHelper.getDescriptiveName(device));
 
-            sendEmulatorCommand( devicePort, "avd stop" );
-            boolean killed = sendEmulatorCommand( devicePort, "kill" );
-            if ( !killed )
-            {
-                getLog().info( "Emulator failed to stop " + DeviceHelper.getDescriptiveName( device ) );
-            }
-            else
-            {
-                getLog().info( "Emulator stopped successfully " + DeviceHelper.getDescriptiveName( device ) );
+            sendEmulatorCommand(devicePort, "avd stop");
+            boolean killed = sendEmulatorCommand(devicePort, "kill");
+            if (!killed) {
+                getLog().info("Emulator failed to stop " + DeviceHelper.getDescriptiveName(device));
+            } else {
+                getLog().info("Emulator stopped successfully " + DeviceHelper.getDescriptiveName(device));
             }
         }
     }
@@ -690,12 +567,10 @@ public abstract class AbstractEmulatorMojo extends AbstractAndroidMojo
      * @param device The device to extract the port number from.
      * @return Returns the port number of the device
      */
-    private int extractPortFromDevice( IDevice device )
-    {
-        String portStr = StringUtils.substringAfterLast( device.getSerialNumber(), "-" );
-        if ( StringUtils.isNotBlank( portStr ) && StringUtils.isNumeric( portStr ) )
-        {
-            return Integer.parseInt( portStr );
+    private int extractPortFromDevice(IDevice device) {
+        String portStr = StringUtils.substringAfterLast(device.getSerialNumber(), "-");
+        if (StringUtils.isNotBlank(portStr) && StringUtils.isNumeric(portStr)) {
+            return Integer.parseInt(portStr);
         }
 
         //If the port is not available then return -1
@@ -712,58 +587,45 @@ public abstract class AbstractEmulatorMojo extends AbstractAndroidMojo
     private boolean sendEmulatorCommand(
             //final Launcher launcher,
             //final PrintStream logger,
-            final int port, final String command )
-    {
-        Callable<Boolean> task = new Callable<Boolean>()
-        {
-            public Boolean call() throws IOException
-            {
+            final int port, final String command) {
+        Callable<Boolean> task = new Callable<Boolean>() {
+            private static final long serialVersionUID = 1L;
+
+            public Boolean call() throws IOException {
                 Socket socket = null;
                 BufferedReader in = null;
                 PrintWriter out = null;
-                try
-                {
-                    socket = new Socket( "127.0.0.1", port );
-                    out = new PrintWriter( socket.getOutputStream(), true );
-                    in = new BufferedReader( new InputStreamReader( socket.getInputStream() ) );
-                    if ( in.readLine() == null )
-                    {
+                try {
+                    socket = new Socket("127.0.0.1", port);
+                    out = new PrintWriter(socket.getOutputStream(), true);
+                    in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+                    if (in.readLine() == null) {
                         return false;
                     }
 
-                    out.write( command );
-                    out.write( "\r\n" );
-                }
-                finally
-                {
-                    try
-                    {
+                    out.write(command);
+                    out.write("\r\n");
+                } finally {
+                    try {
                         out.close();
                         in.close();
                         socket.close();
-                    }
-                    catch ( Exception e )
-                    {
+                    } catch (Exception e) {
                         // Do nothing
                     }
                 }
 
                 return true;
             }
-
-            private static final long serialVersionUID = 1L;
         };
 
         boolean result = false;
-        try
-        {
+        try {
             ExecutorService executor = Executors.newSingleThreadExecutor();
-            Future<Boolean> future = executor.submit( task );
+            Future<Boolean> future = executor.submit(task);
             result = future.get();
-        }
-        catch ( Exception e )
-        {
-            getLog().error( String.format( "Failed to execute emulator command '%s': %s", command, e ) );
+        } catch (Exception e) {
+            getLog().error(String.format("Failed to execute emulator command '%s': %s", command, e));
         }
 
         return result;
@@ -778,81 +640,58 @@ public abstract class AbstractEmulatorMojo extends AbstractAndroidMojo
      * @throws MojoExecutionException
      * @see Emulator
      */
-    private String assembleStartCommandLine() throws MojoExecutionException
-    {
+    private String assembleStartCommandLine() throws MojoExecutionException {
         String emulatorPath;
-        if ( !"SdkTools".equals( parsedEmulatorLocation ) )
-        {
-            emulatorPath = new File( parsedEmulatorLocation, parsedExecutable ).getAbsolutePath();
+        if (!"SdkTools".equals(parsedEmulatorLocation)) {
+            emulatorPath = new File(parsedEmulatorLocation, parsedExecutable).getAbsolutePath();
+        } else {
+            emulatorPath = new File(getAndroidSdk().getToolsPath(), parsedExecutable).getAbsolutePath();
         }
-        else
-        {
-            emulatorPath = new File( getAndroidSdk().getToolsPath(), parsedExecutable ).getAbsolutePath();
+        StringBuilder startCommandline = new StringBuilder("\"\"").append(emulatorPath).append("\"\"")
+                .append(" -avd ").append(parsedAvd).append(" ");
+        if (!StringUtils.isEmpty(parsedOptions)) {
+            startCommandline.append(parsedOptions);
         }
-        StringBuilder startCommandline = new StringBuilder( "\"\"" ).append( emulatorPath ).append( "\"\"" )
-                .append( " -avd " ).append( parsedAvd ).append( " " );
-        if ( !StringUtils.isEmpty( parsedOptions ) )
-        {
-            startCommandline.append( parsedOptions );
-        }
-        getLog().info( "Android emulator command: " + startCommandline );
+        getLog().info("Android emulator command: " + startCommandline);
         return startCommandline.toString();
     }
 
-    private void parseParameters()
-    {
+    private void parseParameters() {
         // <emulator> exist in pom file
-        if ( emulator != null )
-        {
+        if (emulator != null) {
             // <emulator><avd> exists in pom file
-            if ( emulator.getAvd() != null )
-            {
+            if (emulator.getAvd() != null) {
                 parsedAvd = emulator.getAvd();
-            }
-            else
-                {
+            } else {
                 parsedAvd = determineAvd();
             }
             // <emulator><options> exists in pom file
-            if ( emulator.getOptions() != null )
-            {
+            if (emulator.getOptions() != null) {
                 parsedOptions = emulator.getOptions();
-            }
-            else
-                {
+            } else {
                 parsedOptions = determineOptions();
             }
             // <emulator><wait> exists in pom file
-            if ( emulator.getWait() != null )
-            {
+            if (emulator.getWait() != null) {
                 parsedWait = emulator.getWait();
-            }
-            else
-                {
+            } else {
                 parsedWait = determineWait();
             }
             // <emulator><emulatorExecutable> exists in pom file
-            if ( emulator.getExecutable() != null )
-            {
+            if (emulator.getExecutable() != null) {
                 parsedExecutable = emulator.getExecutable();
-            }
-            else
-                {
+            } else {
                 parsedExecutable = determineExecutable();
             }
             // <emulator><location> exists in pom file
-            if ( emulator.getLocation() != null )
-            {
+            if (emulator.getLocation() != null) {
                 parsedEmulatorLocation = emulator.getLocation();
-            }
-            else
-            {
-            parsedEmulatorLocation = determineEmulatorLocation();
+            } else {
+                parsedEmulatorLocation = determineEmulatorLocation();
             }
         }
         // commandline options
-        else
-        {
+        else {
             parsedAvd = determineAvd();
             parsedOptions = determineOptions();
             parsedWait = determineWait();
@@ -866,15 +705,11 @@ public abstract class AbstractEmulatorMojo extends AbstractAndroidMojo
      *
      * @return
      */
-    private String determineExecutable()
-    {
+    private String determineExecutable() {
         String emulator;
-        if ( emulatorExecutable != null )
-        {
+        if (emulatorExecutable != null) {
             emulator = emulatorExecutable;
-        }
-        else
-        {
+        } else {
             emulator = "emulator";
         }
         return emulator;
@@ -885,15 +720,11 @@ public abstract class AbstractEmulatorMojo extends AbstractAndroidMojo
      *
      * @return if available return command line value otherwise return default value (5000).
      */
-    String determineWait()
-    {
+    String determineWait() {
         String wait;
-        if ( emulatorWait != null )
-        {
+        if (emulatorWait != null) {
             wait = emulatorWait;
-        }
-        else
-        {
+        } else {
             wait = "5000";
         }
         return wait;
@@ -904,15 +735,11 @@ public abstract class AbstractEmulatorMojo extends AbstractAndroidMojo
      *
      * @return if available return command line value otherwise return default value ("").
      */
-    private String determineOptions()
-    {
+    private String determineOptions() {
         String options;
-        if ( emulatorOptions != null )
-        {
+        if (emulatorOptions != null) {
             options = emulatorOptions;
-        }
-        else
-        {
+        } else {
             options = "";
         }
         return options;
@@ -923,15 +750,11 @@ public abstract class AbstractEmulatorMojo extends AbstractAndroidMojo
      *
      * @return if available return command line value otherwise return default value ("Default").
      */
-    String determineAvd()
-    {
+    String determineAvd() {
         String avd;
-        if ( emulatorAvd != null )
-        {
+        if (emulatorAvd != null) {
             avd = emulatorAvd;
-        }
-        else
-        {
+        } else {
             avd = "Default";
         }
         return avd;
@@ -942,15 +765,11 @@ public abstract class AbstractEmulatorMojo extends AbstractAndroidMojo
      *
      * @return if available return command line value otherwise return default value ("SdkTools").
      */
-    String determineEmulatorLocation()
-    {
+    String determineEmulatorLocation() {
         String location;
-        if ( emulatorLocation != null )
-        {
+        if (emulatorLocation != null) {
             location = emulatorLocation;
-        }
-        else
-        {
+        } else {
             location = "SdkTools";
         }
         return location;

@@ -60,7 +60,7 @@ public class ExampleAppWidgetConfigure extends Activity {
         setContentView(R.layout.appwidget_configure);
 
         // Find the EditText
-        mAppWidgetPrefix = (EditText)findViewById(R.id.appwidget_prefix);
+        mAppWidgetPrefix = (EditText) findViewById(R.id.appwidget_prefix);
 
         // Bind the action for the save button.
         findViewById(R.id.save_button).setOnClickListener(mOnClickListener);
@@ -126,7 +126,7 @@ public class ExampleAppWidgetConfigure extends Activity {
     }
 
     static void loadAllTitlePrefs(Context context, ArrayList<Integer> appWidgetIds,
-            ArrayList<String> texts) {
+                                  ArrayList<String> texts) {
     }
 }
 

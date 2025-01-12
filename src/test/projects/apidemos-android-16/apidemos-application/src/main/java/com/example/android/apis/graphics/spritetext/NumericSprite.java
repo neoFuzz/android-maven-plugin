@@ -34,7 +34,7 @@ public class NumericSprite {
         mLabelMaker.initialize(gl);
         mLabelMaker.beginAdding(gl);
         for (int i = 0; i < 10; i++) {
-            String digit = sStrike.substring(i, i+1);
+            String digit = sStrike.substring(i, i + 1);
             mLabelId[i] = mLabelMaker.add(gl, digit, paint);
             mWidth[i] = (int) Math.ceil(mLabelMaker.getWidth(i));
         }
@@ -56,7 +56,7 @@ public class NumericSprite {
         x = x | (x >> 2);
         x = x | (x >> 4);
         x = x | (x >> 8);
-        x = x | (x >>16);
+        x = x | (x >> 16);
         return x + 1;
     }
 
@@ -65,10 +65,10 @@ public class NumericSprite {
     }
 
     public void draw(GL10 gl, float x, float y,
-            float viewWidth, float viewHeight) {
+                     float viewWidth, float viewHeight) {
         int length = mText.length();
         mLabelMaker.beginDrawing(gl, viewWidth, viewHeight);
-        for(int i = 0; i < length; i++) {
+        for (int i = 0; i < length; i++) {
             char c = mText.charAt(i);
             int digit = c - '0';
             mLabelMaker.draw(gl, x, y, mLabelId[digit]);
@@ -80,7 +80,7 @@ public class NumericSprite {
     public float width() {
         float width = 0.0f;
         int length = mText.length();
-        for(int i = 0; i < length; i++) {
+        for (int i = 0; i < length; i++) {
             char c = mText.charAt(i);
             width += mWidth[c - '0'];
         }

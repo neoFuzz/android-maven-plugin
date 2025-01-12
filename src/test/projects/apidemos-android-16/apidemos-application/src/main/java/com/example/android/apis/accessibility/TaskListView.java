@@ -30,9 +30,10 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 
-/** Acts as a go-between for all AccessibilityEvents sent from items in the ListView, providing the
- *  option of sending more context to an AccessibilityService by adding more AccessiblityRecords to
- *  an event.
+/**
+ * Acts as a go-between for all AccessibilityEvents sent from items in the ListView, providing the
+ * option of sending more context to an AccessibilityService by adding more AccessiblityRecords to
+ * an event.
  */
 public class TaskListView extends ListView {
 
@@ -61,8 +62,10 @@ public class TaskListView extends ListView {
     }
 }
 
-/** Adds Accessibility information to individual child views of rows in the list. */
-final class TaskAdapter extends BaseAdapter{
+/**
+ * Adds Accessibility information to individual child views of rows in the list.
+ */
+final class TaskAdapter extends BaseAdapter {
 
     private String[] mLabels = null;
     private boolean[] mCheckboxes = null;
@@ -80,12 +83,13 @@ final class TaskAdapter extends BaseAdapter{
         return mLabels.length;
     }
 
-    /** Expands the views for individual list entries, and sets content descriptions for use by the
-     *  TaskBackAccessibilityService.
+    /**
+     * Expands the views for individual list entries, and sets content descriptions for use by the
+     * TaskBackAccessibilityService.
      */
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        if(convertView == null) {
+        if (convertView == null) {
             LayoutInflater inflater = LayoutInflater.from(mContext);
             convertView = inflater.inflate(R.layout.tasklist_row, parent, false);
         }
@@ -93,7 +97,7 @@ final class TaskAdapter extends BaseAdapter{
         CheckBox checkbox = (CheckBox) convertView.findViewById(R.id.tasklist_finished);
         checkbox.setChecked(mCheckboxes[position]);
 
-        TextView label = (TextView)(convertView.findViewById(R.id.tasklist_label));
+        TextView label = (TextView) (convertView.findViewById(R.id.tasklist_label));
         label.setText(mLabels[position]);
 
         String contentDescription = new StringBuilder()

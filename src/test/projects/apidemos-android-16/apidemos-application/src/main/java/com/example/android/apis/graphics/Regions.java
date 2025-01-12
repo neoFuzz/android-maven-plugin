@@ -31,8 +31,8 @@ public class Regions extends GraphicsActivity {
 
     private static class SampleView extends View {
         private final Paint mPaint = new Paint();
-        private final Rect  mRect1 = new Rect();
-        private final Rect  mRect2 = new Rect();
+        private final Rect mRect1 = new Rect();
+        private final Rect mRect2 = new Rect();
 
         public SampleView(Context context) {
             super(context);
@@ -87,7 +87,7 @@ public class Regions extends GraphicsActivity {
                 inset = 0.5f;
             }
             c.drawRect(r.left + inset, r.top + inset,
-                       r.right - inset, r.bottom - inset, p);
+                    r.right - inset, r.bottom - inset, p);
         }
 
         @Override

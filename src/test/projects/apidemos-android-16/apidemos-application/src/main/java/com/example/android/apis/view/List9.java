@@ -35,7 +35,7 @@ import android.widget.TextView;
 
 /**
  * Another variation of the list of cheeses. In this case, we use
- * {@link AbsListView#setOnScrollListener(AbsListView.OnScrollListener) 
+ * {@link AbsListView#setOnScrollListener(AbsListView.OnScrollListener)
  * AbsListView#setOnItemScrollListener(AbsListView.OnItemScrollListener)} to display the
  * first letter of the visible range of cheeses.
  */
@@ -54,25 +54,25 @@ public class List9 extends ListActivity implements ListView.OnScrollListener {
     private boolean mShowing;
     private boolean mReady;
     private char mPrevLetter = Character.MIN_VALUE;
-    
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        mWindowManager = (WindowManager)getSystemService(Context.WINDOW_SERVICE);
-        
+        mWindowManager = (WindowManager) getSystemService(Context.WINDOW_SERVICE);
+
         // Use an existing ListAdapter that will map an array
         // of strings to TextViews
         setListAdapter(new ArrayAdapter<String>(this,
                 android.R.layout.simple_list_item_1, mStrings));
-        
+
         getListView().setOnScrollListener(this);
-        
-        LayoutInflater inflate = (LayoutInflater)getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        
+
+        LayoutInflater inflate = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+
         mDialogText = (TextView) inflate.inflate(R.layout.list_position, null);
         mDialogText.setVisibility(View.INVISIBLE);
-        
+
         mHandler.post(new Runnable() {
 
             public void run() {
@@ -84,16 +84,17 @@ public class List9 extends ListActivity implements ListView.OnScrollListener {
                                 | WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
                         PixelFormat.TRANSLUCENT);
                 mWindowManager.addView(mDialogText, lp);
-            }});
+            }
+        });
     }
-    
+
     @Override
     protected void onResume() {
         super.onResume();
         mReady = true;
     }
 
-    
+
     @Override
     protected void onPause() {
         super.onPause();
@@ -108,31 +109,29 @@ public class List9 extends ListActivity implements ListView.OnScrollListener {
         mReady = false;
     }
 
-    
-   
-    
+
     public void onScroll(AbsListView view, int firstVisibleItem,
-            int visibleItemCount, int totalItemCount) {
+                         int visibleItemCount, int totalItemCount) {
         if (mReady) {
             char firstLetter = mStrings[firstVisibleItem].charAt(0);
-            
+
             if (!mShowing && firstLetter != mPrevLetter) {
 
                 mShowing = true;
                 mDialogText.setVisibility(View.VISIBLE);
             }
-            mDialogText.setText(((Character)firstLetter).toString());
+            mDialogText.setText(((Character) firstLetter).toString());
             mHandler.removeCallbacks(mRemoveWindow);
             mHandler.postDelayed(mRemoveWindow, 3000);
             mPrevLetter = firstLetter;
         }
     }
-    
+
 
     public void onScrollStateChanged(AbsListView view, int scrollState) {
     }
-    
-    
+
+
     private void removeWindow() {
         if (mShowing) {
             mShowing = false;

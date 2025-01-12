@@ -18,6 +18,7 @@ package com.example.android.apis.animation;
 
 // Need the following import to get access to the app resources, since this
 // class is in a sub-package.
+
 import android.animation.AnimatorListenerAdapter;
 import android.animation.Animator;
 import android.animation.ObjectAnimator;
@@ -44,7 +45,7 @@ public class ListFlipper extends Activity {
     private static final int DURATION = 1500;
     private SeekBar mSeekBar;
 
-    private static final String[] LIST_STRINGS_EN = new String[] {
+    private static final String[] LIST_STRINGS_EN = new String[]{
             "One",
             "Two",
             "Three",
@@ -52,7 +53,7 @@ public class ListFlipper extends Activity {
             "Five",
             "Six"
     };
-    private static final String[] LIST_STRINGS_FR = new String[] {
+    private static final String[] LIST_STRINGS_FR = new String[]{
             "Un",
             "Deux",
             "Trois",
@@ -64,7 +65,9 @@ public class ListFlipper extends Activity {
     ListView mEnglishList;
     ListView mFrenchList;
 
-    /** Called when the activity is first created. */
+    /**
+     * Called when the activity is first created.
+     */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -94,6 +97,7 @@ public class ListFlipper extends Activity {
 
     private Interpolator accelerator = new AccelerateInterpolator();
     private Interpolator decelerator = new DecelerateInterpolator();
+
     private void flipit() {
         final ListView visibleList;
         final ListView invisibleList;

@@ -26,7 +26,9 @@ import android.provider.ContactsContract;
 import android.telephony.SmsMessage;
 
 public class SmsMessageReceiver extends BroadcastReceiver {
-    /** Tag string for our debug logs */
+    /**
+     * Tag string for our debug logs
+     */
     private static final String TAG = "SmsMessageReceiver";
 
     @Override
@@ -51,7 +53,7 @@ public class SmsMessageReceiver extends BroadcastReceiver {
             uri = Uri.withAppendedPath(
                     ContactsContract.PhoneLookup.CONTENT_FILTER_URI,
                     Uri.encode(fromAddress));
-            projection = new String[] { ContactsContract.PhoneLookup.DISPLAY_NAME };
+            projection = new String[]{ContactsContract.PhoneLookup.DISPLAY_NAME};
 
             // Query the filter URI
             Cursor cursor = context.getContentResolver().query(uri, projection, null, null, null);

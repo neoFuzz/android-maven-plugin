@@ -12,10 +12,9 @@ import java.lang.annotation.Target;
  * @author Manfred Moser - manfred@simpligility.com
  * @see ConfigHandler
  */
-@Target( { ElementType.FIELD } )
-@Retention( RetentionPolicy.RUNTIME )
-public @interface ConfigPojo
-{
+@Target({ElementType.FIELD})
+@Retention(RetentionPolicy.RUNTIME)
+public @interface ConfigPojo {
 
     String prefix() default "parsed";
 }

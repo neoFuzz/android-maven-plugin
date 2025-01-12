@@ -18,6 +18,7 @@ package com.example.android.apis.view;
 
 // Need the following import to get access to the app resources, since this
 // class is in a sub-package.
+
 import com.example.android.apis.R;
 
 import android.app.Activity;
@@ -26,7 +27,6 @@ import android.os.Bundle;
 
 /**
  * Builds building a simple form using a RelativeLayout
- * 
  */
 public class RelativeLayout2 extends Activity {
 

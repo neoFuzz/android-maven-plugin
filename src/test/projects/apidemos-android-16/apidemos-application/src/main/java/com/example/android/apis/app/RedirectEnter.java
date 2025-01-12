@@ -18,6 +18,7 @@ package com.example.android.apis.app;
 
 // Need the following import to get access to the app resources, since this
 // class is in a sub-package.
+
 import com.example.android.apis.R;
 
 import android.app.Activity;
@@ -31,24 +32,20 @@ import android.widget.Button;
 /**
  * Entry into our redirection example, describing what will happen.
  */
-public class RedirectEnter extends Activity
-{
+public class RedirectEnter extends Activity {
     @Override
-	protected void onCreate(Bundle savedInstanceState)
-    {
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.redirect_enter);
 
         // Watch for button clicks.
-        Button goButton = (Button)findViewById(R.id.go);
+        Button goButton = (Button) findViewById(R.id.go);
         goButton.setOnClickListener(mGoListener);
     }
 
-    private OnClickListener mGoListener = new OnClickListener()
-    {
-        public void onClick(View v)
-        {
+    private OnClickListener mGoListener = new OnClickListener() {
+        public void onClick(View v) {
             // Here we start up the main entry point of our redirection
             // example.
             Intent intent = new Intent(RedirectEnter.this, RedirectMain.class);

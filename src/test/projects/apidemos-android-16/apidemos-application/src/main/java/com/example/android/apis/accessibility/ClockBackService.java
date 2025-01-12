@@ -60,70 +60,101 @@ import java.util.List;
  */
 public class ClockBackService extends AccessibilityService {
 
-    /** Tag for logging from this service. */
+    /**
+     * Tag for logging from this service.
+     */
     private static final String LOG_TAG = "ClockBackService";
 
     // Fields for configuring how the system handles this accessibility service.
 
-    /** Minimal timeout between accessibility events we want to receive. */
+    /**
+     * Minimal timeout between accessibility events we want to receive.
+     */
     private static final int EVENT_NOTIFICATION_TIMEOUT_MILLIS = 80;
 
-    /** Packages we are interested in.
+    /**
+     * Packages we are interested in.
      * <p>
-     *   <strong>
-     *   Note: This code sample will work only on devices shipped with the
-     *   default Clock application.
-     *   </strong>
+     * <strong>
+     * Note: This code sample will work only on devices shipped with the
+     * default Clock application.
+     * </strong>
      * </p>
      */
     // This works with AlarmClock and Clock whose package name changes in different releases
-    private static final String[] PACKAGE_NAMES = new String[] {
+    private static final String[] PACKAGE_NAMES = new String[]{
             "com.android.alarmclock", "com.google.android.deskclock", "com.android.deskclock"
     };
 
     // Message types we are passing around.
 
-    /** Speak. */
+    /**
+     * Speak.
+     */
     private static final int MESSAGE_SPEAK = 1;
 
-    /** Stop speaking. */
+    /**
+     * Stop speaking.
+     */
     private static final int MESSAGE_STOP_SPEAK = 2;
 
-    /** Start the TTS service. */
+    /**
+     * Start the TTS service.
+     */
     private static final int MESSAGE_START_TTS = 3;
 
-    /** Stop the TTS service. */
+    /**
+     * Stop the TTS service.
+     */
     private static final int MESSAGE_SHUTDOWN_TTS = 4;
 
-    /** Play an earcon. */
+    /**
+     * Play an earcon.
+     */
     private static final int MESSAGE_PLAY_EARCON = 5;
 
-    /** Stop playing an earcon. */
+    /**
+     * Stop playing an earcon.
+     */
     private static final int MESSAGE_STOP_PLAY_EARCON = 6;
 
-    /** Vibrate a pattern. */
+    /**
+     * Vibrate a pattern.
+     */
     private static final int MESSAGE_VIBRATE = 7;
 
-    /** Stop vibrating. */
+    /**
+     * Stop vibrating.
+     */
     private static final int MESSAGE_STOP_VIBRATE = 8;
 
     // Screen state broadcast related constants.
 
-    /** Feedback mapping index used as a key for the screen-on broadcast. */
+    /**
+     * Feedback mapping index used as a key for the screen-on broadcast.
+     */
     private static final int INDEX_SCREEN_ON = 0x00000100;
 
-    /** Feedback mapping index used as a key for the screen-off broadcast. */
+    /**
+     * Feedback mapping index used as a key for the screen-off broadcast.
+     */
     private static final int INDEX_SCREEN_OFF = 0x00000200;
 
     // Ringer mode change related constants.
 
-    /** Feedback mapping index used as a key for normal ringer mode. */
+    /**
+     * Feedback mapping index used as a key for normal ringer mode.
+     */
     private static final int INDEX_RINGER_NORMAL = 0x00000400;
 
-    /** Feedback mapping index used as a key for vibration ringer mode. */
+    /**
+     * Feedback mapping index used as a key for vibration ringer mode.
+     */
     private static final int INDEX_RINGER_VIBRATE = 0x00000800;
 
-    /** Feedback mapping index used as a key for silent ringer mode. */
+    /**
+     * Feedback mapping index used as a key for silent ringer mode.
+     */
     private static final int INDEX_RINGER_SILENT = 0x00001000;
 
     // Speech related constants.
@@ -134,40 +165,48 @@ public class ClockBackService extends AccessibilityService {
      */
     private static final int QUEUING_MODE_INTERRUPT = 2;
 
-    /** The space string constant. */
+    /**
+     * The space string constant.
+     */
     private static final String SPACE = " ";
 
-    /** Mapping from integers to vibration patterns for haptic feedback. */
+    /**
+     * Mapping from integers to vibration patterns for haptic feedback.
+     */
     private static final SparseArray<long[]> sVibrationPatterns = new SparseArray<long[]>();
+
     static {
-        sVibrationPatterns.put(AccessibilityEvent.TYPE_VIEW_CLICKED, new long[] {
+        sVibrationPatterns.put(AccessibilityEvent.TYPE_VIEW_CLICKED, new long[]{
                 0L, 100L
         });
-        sVibrationPatterns.put(AccessibilityEvent.TYPE_VIEW_LONG_CLICKED, new long[] {
+        sVibrationPatterns.put(AccessibilityEvent.TYPE_VIEW_LONG_CLICKED, new long[]{
                 0L, 100L
         });
-        sVibrationPatterns.put(AccessibilityEvent.TYPE_VIEW_SELECTED, new long[] {
+        sVibrationPatterns.put(AccessibilityEvent.TYPE_VIEW_SELECTED, new long[]{
                 0L, 15L, 10L, 15L
         });
-        sVibrationPatterns.put(AccessibilityEvent.TYPE_VIEW_FOCUSED, new long[] {
+        sVibrationPatterns.put(AccessibilityEvent.TYPE_VIEW_FOCUSED, new long[]{
                 0L, 15L, 10L, 15L
         });
-        sVibrationPatterns.put(AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED, new long[] {
+        sVibrationPatterns.put(AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED, new long[]{
                 0L, 25L, 50L, 25L, 50L, 25L
         });
-        sVibrationPatterns.put(AccessibilityEvent.TYPE_VIEW_HOVER_ENTER, new long[] {
+        sVibrationPatterns.put(AccessibilityEvent.TYPE_VIEW_HOVER_ENTER, new long[]{
                 0L, 15L, 10L, 15L, 15L, 10L
         });
-        sVibrationPatterns.put(INDEX_SCREEN_ON, new long[] {
+        sVibrationPatterns.put(INDEX_SCREEN_ON, new long[]{
                 0L, 10L, 10L, 20L, 20L, 30L
         });
-        sVibrationPatterns.put(INDEX_SCREEN_OFF, new long[] {
+        sVibrationPatterns.put(INDEX_SCREEN_OFF, new long[]{
                 0L, 30L, 20L, 20L, 10L, 10L
         });
     }
 
-    /** Mapping from integers to raw sound resource ids. */
+    /**
+     * Mapping from integers to raw sound resource ids.
+     */
     private static SparseArray<Integer> sSoundsResourceIds = new SparseArray<Integer>();
+
     static {
         sSoundsResourceIds.put(AccessibilityEvent.TYPE_VIEW_CLICKED,
                 R.raw.sound_view_clicked);
@@ -190,7 +229,9 @@ public class ClockBackService extends AccessibilityService {
 
     // Sound pool related member fields.
 
-    /** Mapping from integers to earcon names - dynamically populated. */
+    /**
+     * Mapping from integers to earcon names - dynamically populated.
+     */
     private final SparseArray<String> mEarconNames = new SparseArray<String>();
 
     // Auxiliary fields.
@@ -200,27 +241,41 @@ public class ClockBackService extends AccessibilityService {
      */
     Context mContext;
 
-    /** The feedback this service is currently providing. */
+    /**
+     * The feedback this service is currently providing.
+     */
     int mProvidedFeedbackType;
 
-    /** Reusable instance for building utterances. */
+    /**
+     * Reusable instance for building utterances.
+     */
     private final StringBuilder mUtterance = new StringBuilder();
 
     // Feedback providing services.
 
-    /** The {@link TextToSpeech} used for speaking. */
+    /**
+     * The {@link TextToSpeech} used for speaking.
+     */
     private TextToSpeech mTts;
 
-    /** The {@link AudioManager} for detecting ringer state. */
+    /**
+     * The {@link AudioManager} for detecting ringer state.
+     */
     private AudioManager mAudioManager;
 
-    /** Vibrator for providing haptic feedback. */
+    /**
+     * Vibrator for providing haptic feedback.
+     */
     private Vibrator mVibrator;
 
-    /** Flag if the infrastructure is initialized. */
+    /**
+     * Flag if the infrastructure is initialized.
+     */
     private boolean isInfrastructureInitialized;
 
-    /** {@link Handler} for executing messages on the service main thread. */
+    /**
+     * {@link Handler} for executing messages on the service main thread.
+     */
     Handler mHandler = new Handler() {
         @Override
         public void handleMessage(Message message) {
@@ -401,29 +456,29 @@ public class ClockBackService extends AccessibilityService {
      * Configures the service according to a ringer mode. Possible
      * configurations:
      * <p>
-     *   1. {@link AudioManager#RINGER_MODE_SILENT}<br>
-     *   Goal:     Provide only custom haptic feedback.<br>
-     *   Approach: Take over the haptic feedback by configuring this service to provide
-     *             such and do so. This way the system will not call the default haptic
-     *             feedback service KickBack.<br>
-     *             Take over the audible and spoken feedback by configuring this
-     *             service to provide such feedback but not doing so. This way the system
-     *             will not call the default spoken feedback service TalkBack and the
-     *             default audible feedback service SoundBack.
+     * 1. {@link AudioManager#RINGER_MODE_SILENT}<br>
+     * Goal:     Provide only custom haptic feedback.<br>
+     * Approach: Take over the haptic feedback by configuring this service to provide
+     * such and do so. This way the system will not call the default haptic
+     * feedback service KickBack.<br>
+     * Take over the audible and spoken feedback by configuring this
+     * service to provide such feedback but not doing so. This way the system
+     * will not call the default spoken feedback service TalkBack and the
+     * default audible feedback service SoundBack.
      * </p>
      * <p>
-     *   2. {@link AudioManager#RINGER_MODE_VIBRATE}<br>
-     *   Goal:     Provide custom audible and default haptic feedback.<br>
-     *   Approach: Take over the audible feedback and provide custom one.<br>
-     *             Take over the spoken feedback but do not provide such.<br>
-     *             Let some other service provide haptic feedback (KickBack).
+     * 2. {@link AudioManager#RINGER_MODE_VIBRATE}<br>
+     * Goal:     Provide custom audible and default haptic feedback.<br>
+     * Approach: Take over the audible feedback and provide custom one.<br>
+     * Take over the spoken feedback but do not provide such.<br>
+     * Let some other service provide haptic feedback (KickBack).
      * </p>
      * <p>
-     *   3. {@link AudioManager#RINGER_MODE_NORMAL}
-     *   Goal:     Provide custom spoken, default audible and default haptic feedback.<br>
-     *   Approach: Take over the spoken feedback and provide custom one.<br>
-     *             Let some other services provide audible feedback (SounBack) and haptic
-     *             feedback (KickBack).
+     * 3. {@link AudioManager#RINGER_MODE_NORMAL}
+     * Goal:     Provide custom spoken, default audible and default haptic feedback.<br>
+     * Approach: Take over the spoken feedback and provide custom one.<br>
+     * Let some other services provide audible feedback (SounBack) and haptic
+     * feedback (KickBack).
      * </p>
      *
      * @param ringerMode The device ringer mode.
@@ -466,10 +521,10 @@ public class ClockBackService extends AccessibilityService {
      * handle this {@link AccessibilityService}.
      *
      * @param feedbackType The type of feedback this service will provide.
-     * <p>
-     *   Note: The feedbackType parameter is an bitwise or of all
-     *   feedback types this service would like to provide.
-     * </p>
+     *                     <p>
+     *                     Note: The feedbackType parameter is an bitwise or of all
+     *                     feedback types this service would like to provide.
+     *                     </p>
      */
     private void setServiceInfo(int feedbackType) {
         AccessibilityServiceInfo info = new AccessibilityServiceInfo();
@@ -532,7 +587,7 @@ public class ClockBackService extends AccessibilityService {
         if (!eventText.isEmpty()) {
             for (CharSequence subText : eventText) {
                 // Make 01 pronounced as 1
-                if (subText.charAt(0) =='0') {
+                if (subText.charAt(0) == '0') {
                     subText = subText.subSequence(1, subText.length());
                 }
                 utterance.append(subText);

@@ -3,11 +3,10 @@ package com.github.cardforge.maven.plugins.android.configuration;
 /**
  * Configuration for the monkey test runs. This class is only the definition of the parameters that are shadowed in
  * {@link MonkeyMojo} and used there.
- * 
+ *
  * @author Stéphane Nicolas - snicolas@octo.com
  */
-public class Monkey
-{
+public class Monkey {
     /**
      * Mirror of {@link UIAutomatorMojo#testSkip}
      */
@@ -98,108 +97,87 @@ public class Monkey
      */
     private Boolean createReport;
 
-    public Boolean isSkip()
-    {
+    public Boolean isSkip() {
         return skip;
     }
 
-    public Integer getEventCount()
-    {
+    public Integer getEventCount() {
         return eventCount;
     }
 
-    public Long getSeed()
-    {
+    public Long getSeed() {
         return seed;
     }
 
-    public Long isThrottle()
-    {
+    public Long isThrottle() {
         return throttle;
     }
 
-    public Integer getPercentTouch()
-    {
+    public Integer getPercentTouch() {
         return percentTouch;
     }
 
-    public Integer getPercentMotion()
-    {
+    public Integer getPercentMotion() {
         return percentMotion;
     }
 
-    public Integer getPercentTrackball()
-    {
+    public Integer getPercentTrackball() {
         return percentTrackball;
     }
 
-    public Integer getPercentNav()
-    {
+    public Integer getPercentNav() {
         return percentNav;
     }
 
-    public Integer getPercentMajorNav()
-    {
+    public Integer getPercentMajorNav() {
         return percentMajorNav;
     }
 
-    public Integer getPercentSyskeys()
-    {
+    public Integer getPercentSyskeys() {
         return percentSyskeys;
     }
 
-    public Integer getPercentAppswitch()
-    {
+    public Integer getPercentAppswitch() {
         return percentAppswitch;
     }
 
-    public Integer getPercentAnyevent()
-    {
+    public Integer getPercentAnyevent() {
         return percentAnyevent;
     }
 
-    public String[] getPackages()
-    {
+    public String[] getPackages() {
         return packages;
     }
 
-    public String[] getCategories()
-    {
+    public String[] getCategories() {
         return categories;
     }
 
-    public Boolean isDebugNoEvents()
-    {
+    public Boolean isDebugNoEvents() {
         return skip;
     }
 
-    public Boolean hProf()
-    {
+    public Boolean hProf() {
         return skip;
     }
 
-    public Boolean isIgnoreTimeouts()
-    {
+    public Boolean isIgnoreTimeouts() {
         return ignoreTimeouts;
     }
 
-    public Boolean isIgnoreSecurityExceptions()
-    {
+    public Boolean isIgnoreSecurityExceptions() {
         return ignoreSecurityExceptions;
     }
 
-    public Boolean isKillProcessAfterError()
-    {
+    public Boolean isKillProcessAfterError() {
         return killProcessAfterError;
     }
 
-    public Boolean isMonitorNativeErrors()
-    {
+    public Boolean isMonitorNativeErrors() {
         return monitorNativeCrashes;
     }
 
-    public Boolean isCreateReport()
-    {
+    public Boolean isCreateReport() {
         return createReport;
     }
 }

@@ -33,42 +33,41 @@ import android.graphics.RectF;
 
 /**
  * <h3>Application that displays the values of the acceleration sensor graphically.</h3>
-
-<p>This demonstrates the {@link android.hardware.SensorManager android.hardware.SensorManager} class.
-
-<h4>Demo</h4>
-OS / Sensors
- 
-<h4>Source files</h4>
+ *
+ * <p>This demonstrates the {@link android.hardware.SensorManager android.hardware.SensorManager} class.
+ *
+ * <h4>Demo</h4>
+ * OS / Sensors
+ *
+ * <h4>Source files</h4>
  * <table class="LinkTable">
  *         <tr>
  *             <td >src/com.example.android.apis/os/Sensors.java</td>
  *             <td >Sensors</td>
  *         </tr>
- * </table> 
+ * </table>
  */
 public class Sensors extends Activity {
     private SensorManager mSensorManager;
     private GraphView mGraphView;
 
-    private class GraphView extends View implements SensorEventListener
-    {
-        private Bitmap  mBitmap;
-        private Paint   mPaint = new Paint();
-        private Canvas  mCanvas = new Canvas();
-        private Path    mPath = new Path();
-        private RectF   mRect = new RectF();
-        private float   mLastValues[] = new float[3*2];
-        private float   mOrientationValues[] = new float[3];
-        private int     mColors[] = new int[3*2];
-        private float   mLastX;
-        private float   mScale[] = new float[2];
-        private float   mYOffset;
-        private float   mMaxX;
-        private float   mSpeed = 1.0f;
-        private float   mWidth;
-        private float   mHeight;
-        
+    private class GraphView extends View implements SensorEventListener {
+        private Bitmap mBitmap;
+        private Paint mPaint = new Paint();
+        private Canvas mCanvas = new Canvas();
+        private Path mPath = new Path();
+        private RectF mRect = new RectF();
+        private float mLastValues[] = new float[3 * 2];
+        private float mOrientationValues[] = new float[3];
+        private int mColors[] = new int[3 * 2];
+        private float mLastX;
+        private float mScale[] = new float[2];
+        private float mYOffset;
+        private float mMaxX;
+        private float mSpeed = 1.0f;
+        private float mWidth;
+        private float mHeight;
+
         public GraphView(Context context) {
             super(context);
             mColors[0] = Color.argb(192, 255, 64, 64);
@@ -82,21 +81,21 @@ public class Sensors extends Activity {
             mRect.set(-0.5f, -0.5f, 0.5f, 0.5f);
             mPath.arcTo(mRect, 0, 180);
         }
-        
+
         @Override
         protected void onSizeChanged(int w, int h, int oldw, int oldh) {
             mBitmap = Bitmap.createBitmap(w, h, Bitmap.Config.RGB_565);
             mCanvas.setBitmap(mBitmap);
             mCanvas.drawColor(0xFFFFFFFF);
             mYOffset = h * 0.5f;
-            mScale[0] = - (h * 0.5f * (1.0f / (SensorManager.STANDARD_GRAVITY * 2)));
-            mScale[1] = - (h * 0.5f * (1.0f / (SensorManager.MAGNETIC_FIELD_EARTH_MAX)));
+            mScale[0] = -(h * 0.5f * (1.0f / (SensorManager.STANDARD_GRAVITY * 2)));
+            mScale[1] = -(h * 0.5f * (1.0f / (SensorManager.MAGNETIC_FIELD_EARTH_MAX)));
             mWidth = w;
             mHeight = h;
             if (mWidth < mHeight) {
                 mMaxX = w;
             } else {
-                mMaxX = w-50;
+                mMaxX = w - 50;
             }
             mLastX = mMaxX;
             super.onSizeChanged(w, h, oldw, oldh);
@@ -119,26 +118,26 @@ public class Sensors extends Activity {
                         final float oneG = SensorManager.STANDARD_GRAVITY * mScale[0];
                         paint.setColor(0xFFAAAAAA);
                         cavas.drawColor(0xFFFFFFFF);
-                        cavas.drawLine(0, yoffset,      maxx, yoffset,      paint);
-                        cavas.drawLine(0, yoffset+oneG, maxx, yoffset+oneG, paint);
-                        cavas.drawLine(0, yoffset-oneG, maxx, yoffset-oneG, paint);
+                        cavas.drawLine(0, yoffset, maxx, yoffset, paint);
+                        cavas.drawLine(0, yoffset + oneG, maxx, yoffset + oneG, paint);
+                        cavas.drawLine(0, yoffset - oneG, maxx, yoffset - oneG, paint);
                     }
                     canvas.drawBitmap(mBitmap, 0, 0, null);
 
                     float[] values = mOrientationValues;
                     if (mWidth < mHeight) {
                         float w0 = mWidth * 0.333333f;
-                        float w  = w0 - 32;
-                        float x = w0*0.5f;
-                        for (int i=0 ; i<3 ; i++) {
+                        float w = w0 - 32;
+                        float x = w0 * 0.5f;
+                        for (int i = 0; i < 3; i++) {
                             canvas.save(Canvas.MATRIX_SAVE_FLAG);
-                            canvas.translate(x, w*0.5f + 4.0f);
+                            canvas.translate(x, w * 0.5f + 4.0f);
                             canvas.save(Canvas.MATRIX_SAVE_FLAG);
                             paint.setColor(outer);
                             canvas.scale(w, w);
                             canvas.drawOval(mRect, paint);
                             canvas.restore();
-                            canvas.scale(w-5, w-5);
+                            canvas.scale(w - 5, w - 5);
                             paint.setColor(inner);
                             canvas.rotate(-values[i]);
                             canvas.drawPath(path, paint);
@@ -147,17 +146,17 @@ public class Sensors extends Activity {
                         }
                     } else {
                         float h0 = mHeight * 0.333333f;
-                        float h  = h0 - 32;
-                        float y = h0*0.5f;
-                        for (int i=0 ; i<3 ; i++) {
+                        float h = h0 - 32;
+                        float y = h0 * 0.5f;
+                        for (int i = 0; i < 3; i++) {
                             canvas.save(Canvas.MATRIX_SAVE_FLAG);
-                            canvas.translate(mWidth - (h*0.5f + 4.0f), y);
+                            canvas.translate(mWidth - (h * 0.5f + 4.0f), y);
                             canvas.save(Canvas.MATRIX_SAVE_FLAG);
                             paint.setColor(outer);
                             canvas.scale(h, h);
                             canvas.drawOval(mRect, paint);
                             canvas.restore();
-                            canvas.scale(h-5, h-5);
+                            canvas.scale(h - 5, h - 5);
                             paint.setColor(inner);
                             canvas.rotate(-values[i]);
                             canvas.drawPath(path, paint);
@@ -177,7 +176,7 @@ public class Sensors extends Activity {
                     final Canvas canvas = mCanvas;
                     final Paint paint = mPaint;
                     if (event.sensor.getType() == Sensor.TYPE_ORIENTATION) {
-                        for (int i=0 ; i<3 ; i++) {
+                        for (int i = 0; i < 3; i++) {
                             mOrientationValues[i] = event.values[i];
                         }
                     } else {
@@ -185,8 +184,8 @@ public class Sensors extends Activity {
                         float newX = mLastX + deltaX;
 
                         int j = (event.sensor.getType() == Sensor.TYPE_MAGNETIC_FIELD) ? 1 : 0;
-                        for (int i=0 ; i<3 ; i++) {
-                            int k = i+j*3;
+                        for (int i = 0; i < 3; i++) {
+                            int k = i + j * 3;
                             final float v = mYOffset + event.values[i] * mScale[j];
                             paint.setColor(mColors[k]);
                             canvas.drawLine(mLastX, mLastValues[k], newX, v, paint);
@@ -203,7 +202,7 @@ public class Sensors extends Activity {
         public void onAccuracyChanged(Sensor sensor, int accuracy) {
         }
     }
-    
+
     /**
      * Initialization of the Activity after it is first created.  Must at least
      * call {@link android.app.Activity#setContentView setContentView()} to
@@ -228,11 +227,11 @@ public class Sensors extends Activity {
         mSensorManager.registerListener(mGraphView,
                 mSensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD),
                 SensorManager.SENSOR_DELAY_FASTEST);
-        mSensorManager.registerListener(mGraphView, 
+        mSensorManager.registerListener(mGraphView,
                 mSensorManager.getDefaultSensor(Sensor.TYPE_ORIENTATION),
                 SensorManager.SENSOR_DELAY_FASTEST);
     }
-    
+
     @Override
     protected void onStop() {
         mSensorManager.unregisterListener(mGraphView);

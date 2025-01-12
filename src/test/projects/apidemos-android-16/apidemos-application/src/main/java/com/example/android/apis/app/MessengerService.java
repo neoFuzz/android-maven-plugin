@@ -50,34 +50,40 @@ import com.example.android.apis.app.RemoteService.Controller;
  */
 
 public class MessengerService extends Service {
-    /** For showing and hiding our notification. */
+    /**
+     * For showing and hiding our notification.
+     */
     NotificationManager mNM;
-    /** Keeps track of all current registered clients. */
+    /**
+     * Keeps track of all current registered clients.
+     */
     ArrayList<Messenger> mClients = new ArrayList<Messenger>();
-    /** Holds last value set by a client. */
+    /**
+     * Holds last value set by a client.
+     */
     int mValue = 0;
-    
+
     /**
      * Command to the service to register a client, receiving callbacks
      * from the service.  The Message's replyTo field must be a Messenger of
      * the client where callbacks should be sent.
      */
     static final int MSG_REGISTER_CLIENT = 1;
-    
+
     /**
      * Command to the service to unregister a client, ot stop receiving callbacks
      * from the service.  The Message's replyTo field must be a Messenger of
      * the client as previously given with MSG_REGISTER_CLIENT.
      */
     static final int MSG_UNREGISTER_CLIENT = 2;
-    
+
     /**
      * Command to service to set a new value.  This can be sent to the
      * service to supply a new value, and will be sent by the service to
      * any registered clients with the new value.
      */
     static final int MSG_SET_VALUE = 3;
-    
+
     /**
      * Handler of incoming messages from clients.
      */
@@ -93,7 +99,7 @@ public class MessengerService extends Service {
                     break;
                 case MSG_SET_VALUE:
                     mValue = msg.arg1;
-                    for (int i=mClients.size()-1; i>=0; i--) {
+                    for (int i = mClients.size() - 1; i >= 0; i--) {
                         try {
                             mClients.get(i).send(Message.obtain(null,
                                     MSG_SET_VALUE, mValue, 0));
@@ -110,15 +116,15 @@ public class MessengerService extends Service {
             }
         }
     }
-    
+
     /**
      * Target we publish for clients to send messages to IncomingHandler.
      */
     final Messenger mMessenger = new Messenger(new IncomingHandler());
-    
+
     @Override
     public void onCreate() {
-        mNM = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
+        mNM = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
 
         // Display a notification about us starting.
         showNotification();
@@ -132,7 +138,7 @@ public class MessengerService extends Service {
         // Tell the user we stopped.
         Toast.makeText(this, R.string.remote_service_stopped, Toast.LENGTH_SHORT).show();
     }
-    
+
     /**
      * When binding to the service, we return an interface to our messenger
      * for sending messages to the service.
@@ -159,7 +165,7 @@ public class MessengerService extends Service {
 
         // Set the info for the views that show in the notification panel.
         notification.setLatestEventInfo(this, getText(R.string.remote_service_label),
-                       text, contentIntent);
+                text, contentIntent);
 
         // Send the notification.
         // We use a string id because it is a unique number.  We use it later to cancel.

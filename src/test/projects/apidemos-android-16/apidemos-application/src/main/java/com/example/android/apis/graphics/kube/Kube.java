@@ -26,8 +26,7 @@ import java.util.Random;
 
 public class Kube extends Activity implements KubeRenderer.AnimationCallback {
 
-    private GLWorld makeGLWorld()
-    {
+    private GLWorld makeGLWorld() {
         GLWorld world = new GLWorld();
 
         int one = 0x10000;
@@ -49,19 +48,19 @@ public class Kube extends Activity implements KubeRenderer.AnimationCallback {
         float c5 = 1.0f;
 
         // top back, left to right
-        mCubes[0]  = new Cube(world, c0, c4, c0, c1, c5, c1);
-        mCubes[1]  = new Cube(world, c2, c4, c0, c3, c5, c1);
-        mCubes[2]  = new Cube(world, c4, c4, c0, c5, c5, c1);
+        mCubes[0] = new Cube(world, c0, c4, c0, c1, c5, c1);
+        mCubes[1] = new Cube(world, c2, c4, c0, c3, c5, c1);
+        mCubes[2] = new Cube(world, c4, c4, c0, c5, c5, c1);
         // top middle, left to right
-        mCubes[3]  = new Cube(world, c0, c4, c2, c1, c5, c3);
-        mCubes[4]  = new Cube(world, c2, c4, c2, c3, c5, c3);
-        mCubes[5]  = new Cube(world, c4, c4, c2, c5, c5, c3);
+        mCubes[3] = new Cube(world, c0, c4, c2, c1, c5, c3);
+        mCubes[4] = new Cube(world, c2, c4, c2, c3, c5, c3);
+        mCubes[5] = new Cube(world, c4, c4, c2, c5, c5, c3);
         // top front, left to right
-        mCubes[6]  = new Cube(world, c0, c4, c4, c1, c5, c5);
-        mCubes[7]  = new Cube(world, c2, c4, c4, c3, c5, c5);
-        mCubes[8]  = new Cube(world, c4, c4, c4, c5, c5, c5);
+        mCubes[6] = new Cube(world, c0, c4, c4, c1, c5, c5);
+        mCubes[7] = new Cube(world, c2, c4, c4, c3, c5, c5);
+        mCubes[8] = new Cube(world, c4, c4, c4, c5, c5, c5);
         // middle back, left to right
-        mCubes[9]  = new Cube(world, c0, c2, c0, c1, c3, c1);
+        mCubes[9] = new Cube(world, c0, c2, c0, c1, c3, c1);
         mCubes[10] = new Cube(world, c2, c2, c0, c3, c3, c1);
         mCubes[11] = new Cube(world, c4, c2, c0, c5, c3, c1);
         // middle middle, left to right
@@ -213,8 +212,7 @@ public class Kube extends Activity implements KubeRenderer.AnimationCallback {
     }
 
     @Override
-    protected void onCreate(Bundle savedInstanceState)
-    {
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         // We don't need a title either.
@@ -227,15 +225,13 @@ public class Kube extends Activity implements KubeRenderer.AnimationCallback {
     }
 
     @Override
-    protected void onResume()
-    {
+    protected void onResume() {
         super.onResume();
         mView.onResume();
     }
 
     @Override
-    protected void onPause()
-    {
+    protected void onPause() {
         super.onPause();
         mView.onPause();
     }
@@ -255,35 +251,35 @@ public class Kube extends Activity implements KubeRenderer.AnimationCallback {
             count = 1;
             direction = false;
             mCurrentAngle = 0;
-             if (direction) {
-                mAngleIncrement = (float)Math.PI / 50;
-                   mEndAngle = mCurrentAngle + ((float)Math.PI * count) / 2f;
-               } else {
-                mAngleIncrement = -(float)Math.PI / 50;
-                   mEndAngle = mCurrentAngle - ((float)Math.PI * count) / 2f;
+            if (direction) {
+                mAngleIncrement = (float) Math.PI / 50;
+                mEndAngle = mCurrentAngle + ((float) Math.PI * count) / 2f;
+            } else {
+                mAngleIncrement = -(float) Math.PI / 50;
+                mEndAngle = mCurrentAngle - ((float) Math.PI * count) / 2f;
             }
         }
 
-         mCurrentAngle += mAngleIncrement;
+        mCurrentAngle += mAngleIncrement;
 
-         if ((mAngleIncrement > 0f && mCurrentAngle >= mEndAngle) ||
-                 (mAngleIncrement < 0f && mCurrentAngle <= mEndAngle)) {
-             mCurrentLayer.setAngle(mEndAngle);
-             mCurrentLayer.endAnimation();
-             mCurrentLayer = null;
+        if ((mAngleIncrement > 0f && mCurrentAngle >= mEndAngle) ||
+                (mAngleIncrement < 0f && mCurrentAngle <= mEndAngle)) {
+            mCurrentLayer.setAngle(mEndAngle);
+            mCurrentLayer.endAnimation();
+            mCurrentLayer = null;
 
-             // adjust mPermutation based on the completed layer rotation
-             int[] newPermutation = new int[27];
-             for (int i = 0; i < 27; i++) {
+            // adjust mPermutation based on the completed layer rotation
+            int[] newPermutation = new int[27];
+            for (int i = 0; i < 27; i++) {
                 newPermutation[i] = mPermutation[mCurrentLayerPermutation[i]];
- //    			newPermutation[i] = mCurrentLayerPermutation[mPermutation[i]];
-             }
-             mPermutation = newPermutation;
-             updateLayers();
+                //    			newPermutation[i] = mCurrentLayerPermutation[mPermutation[i]];
+            }
+            mPermutation = newPermutation;
+            updateLayers();
 
-         } else {
-             mCurrentLayer.setAngle(mCurrentAngle);
-         }
+        } else {
+            mCurrentLayer.setAngle(mCurrentAngle);
+        }
     }
 
     GLSurfaceView mView;
@@ -294,25 +290,24 @@ public class Kube extends Activity implements KubeRenderer.AnimationCallback {
     // permutations corresponding to a pi/2 rotation of each layer about its axis
     static int[][] mLayerPermutations = {
             // permutation for UP layer
-            { 2, 5, 8, 1, 4, 7, 0, 3, 6, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26 },
+            {2, 5, 8, 1, 4, 7, 0, 3, 6, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26},
             // permutation for DOWN layer
-            { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 20, 23, 26, 19, 22, 25, 18, 21, 24 },
+            {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 20, 23, 26, 19, 22, 25, 18, 21, 24},
             // permutation for LEFT layer
-            { 6, 1, 2, 15, 4, 5, 24, 7, 8, 3, 10, 11, 12, 13, 14, 21, 16, 17, 0, 19, 20, 9, 22, 23, 18, 25, 26 },
+            {6, 1, 2, 15, 4, 5, 24, 7, 8, 3, 10, 11, 12, 13, 14, 21, 16, 17, 0, 19, 20, 9, 22, 23, 18, 25, 26},
             // permutation for RIGHT layer
-            { 0, 1, 8, 3, 4, 17, 6, 7, 26, 9, 10, 5, 12, 13, 14, 15, 16, 23, 18, 19, 2, 21, 22, 11, 24, 25, 20 },
+            {0, 1, 8, 3, 4, 17, 6, 7, 26, 9, 10, 5, 12, 13, 14, 15, 16, 23, 18, 19, 2, 21, 22, 11, 24, 25, 20},
             // permutation for FRONT layer
-            { 0, 1, 2, 3, 4, 5, 24, 15, 6, 9, 10, 11, 12, 13, 14, 25, 16, 7, 18, 19, 20, 21, 22, 23, 26, 17, 8 },
+            {0, 1, 2, 3, 4, 5, 24, 15, 6, 9, 10, 11, 12, 13, 14, 25, 16, 7, 18, 19, 20, 21, 22, 23, 26, 17, 8},
             // permutation for BACK layer
-            { 18, 9, 0, 3, 4, 5, 6, 7, 8, 19, 10, 1, 12, 13, 14, 15, 16, 17, 20, 11, 2, 21, 22, 23, 24, 25, 26 },
+            {18, 9, 0, 3, 4, 5, 6, 7, 8, 19, 10, 1, 12, 13, 14, 15, 16, 17, 20, 11, 2, 21, 22, 23, 24, 25, 26},
             // permutation for MIDDLE layer
-            { 0, 7, 2, 3, 16, 5, 6, 25, 8, 9, 4, 11, 12, 13, 14, 15, 22, 17, 18, 1, 20, 21, 10, 23, 24, 19, 26 },
+            {0, 7, 2, 3, 16, 5, 6, 25, 8, 9, 4, 11, 12, 13, 14, 15, 22, 17, 18, 1, 20, 21, 10, 23, 24, 19, 26},
             // permutation for EQUATOR layer
-            { 0, 1, 2, 3, 4, 5, 6, 7, 8, 11, 14, 17, 10, 13, 16, 9, 12, 15, 18, 19, 20, 21, 22, 23, 24, 25, 26 },
+            {0, 1, 2, 3, 4, 5, 6, 7, 8, 11, 14, 17, 10, 13, 16, 9, 12, 15, 18, 19, 20, 21, 22, 23, 24, 25, 26},
             // permutation for SIDE layer
-            { 0, 1, 2, 21, 12, 3, 6, 7, 8, 9, 10, 11, 22, 13, 4, 15, 16, 17, 18, 19, 20, 23, 14, 5, 24, 25, 26 }
+            {0, 1, 2, 21, 12, 3, 6, 7, 8, 9, 10, 11, 22, 13, 4, 15, 16, 17, 18, 19, 20, 23, 14, 5, 24, 25, 26}
     };
-
 
 
     // current permutation of starting position

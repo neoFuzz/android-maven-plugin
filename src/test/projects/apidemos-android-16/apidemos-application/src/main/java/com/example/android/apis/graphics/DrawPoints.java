@@ -30,7 +30,7 @@ public class DrawPoints extends GraphicsActivity {
     }
 
     private static class SampleView extends View {
-        private Paint   mPaint = new Paint();
+        private Paint mPaint = new Paint();
         private float[] mPts;
 
         private static final float SIZE = 300;
@@ -45,10 +45,10 @@ public class DrawPoints extends GraphicsActivity {
             float value = 0;
             final float delta = SIZE / SEGS;
             for (int i = 0; i <= SEGS; i++) {
-                mPts[i*4 + X] = SIZE - value;
-                mPts[i*4 + Y] = 0;
-                mPts[i*4 + X + 2] = 0;
-                mPts[i*4 + Y + 2] = value;
+                mPts[i * 4 + X] = SIZE - value;
+                mPts[i * 4 + Y] = 0;
+                mPts[i * 4 + X + 2] = 0;
+                mPts[i * 4 + Y + 2] = value;
                 value += delta;
             }
         }
@@ -59,7 +59,8 @@ public class DrawPoints extends GraphicsActivity {
             buildPoints();
         }
 
-        @Override protected void onDraw(Canvas canvas) {
+        @Override
+        protected void onDraw(Canvas canvas) {
             Paint paint = mPaint;
 
             canvas.translate(10, 10);

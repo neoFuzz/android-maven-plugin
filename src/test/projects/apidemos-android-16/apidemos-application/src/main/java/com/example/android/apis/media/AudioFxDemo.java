@@ -144,12 +144,15 @@ public class AudioFxDemo extends Activity {
 
             bar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
                 public void onProgressChanged(SeekBar seekBar, int progress,
-                        boolean fromUser) {
+                                              boolean fromUser) {
                     mEqualizer.setBandLevel(band, (short) (progress + minEQLevel));
                 }
 
-                public void onStartTrackingTouch(SeekBar seekBar) {}
-                public void onStopTrackingTouch(SeekBar seekBar) {}
+                public void onStartTrackingTouch(SeekBar seekBar) {
+                }
+
+                public void onStopTrackingTouch(SeekBar seekBar) {
+                }
             });
 
             row.addView(minDbTextView);
@@ -166,7 +169,7 @@ public class AudioFxDemo extends Activity {
         mVisualizerView = new VisualizerView(this);
         mVisualizerView.setLayoutParams(new ViewGroup.LayoutParams(
                 ViewGroup.LayoutParams.FILL_PARENT,
-                (int)(VISUALIZER_HEIGHT_DIP * getResources().getDisplayMetrics().density)));
+                (int) (VISUALIZER_HEIGHT_DIP * getResources().getDisplayMetrics().density)));
         mLinearLayout.addView(mVisualizerView);
 
         // Create the Visualizer object and attach it to our media player.
@@ -174,11 +177,12 @@ public class AudioFxDemo extends Activity {
         mVisualizer.setCaptureSize(Visualizer.getCaptureSizeRange()[1]);
         mVisualizer.setDataCaptureListener(new Visualizer.OnDataCaptureListener() {
             public void onWaveFormDataCapture(Visualizer visualizer, byte[] bytes,
-                    int samplingRate) {
+                                              int samplingRate) {
                 mVisualizerView.updateVisualizer(bytes);
             }
 
-            public void onFftDataCapture(Visualizer visualizer, byte[] bytes, int samplingRate) {}
+            public void onFftDataCapture(Visualizer visualizer, byte[] bytes, int samplingRate) {
+            }
         }, Visualizer.getMaxCaptureRate() / 2, true, false);
     }
 

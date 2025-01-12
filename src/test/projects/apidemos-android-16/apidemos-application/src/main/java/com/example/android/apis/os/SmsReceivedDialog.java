@@ -81,34 +81,34 @@ public class SmsReceivedDialog extends Activity implements OnInitListener {
     @Override
     protected Dialog onCreateDialog(int id) {
         switch (id) {
-        case DIALOG_SHOW_MESSAGE:
-            return new AlertDialog.Builder(this)
-                    .setIcon(android.R.drawable.ic_dialog_email)
-                    .setTitle("Message Received")
-                    .setMessage(mFullBodyString)
-                    .setPositiveButton(R.string.reply, new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int whichButton) {
-                            // Begin creating the reply with the SmsMessagingDemo activity
-                            Intent i = new Intent();
-                            i.setClass(SmsReceivedDialog.this, SmsMessagingDemo.class);
-                            i.putExtra(SmsMessagingDemo.SMS_RECIPIENT_EXTRA, mFromAddress);
-                            startActivity(i);
+            case DIALOG_SHOW_MESSAGE:
+                return new AlertDialog.Builder(this)
+                        .setIcon(android.R.drawable.ic_dialog_email)
+                        .setTitle("Message Received")
+                        .setMessage(mFullBodyString)
+                        .setPositiveButton(R.string.reply, new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int whichButton) {
+                                // Begin creating the reply with the SmsMessagingDemo activity
+                                Intent i = new Intent();
+                                i.setClass(SmsReceivedDialog.this, SmsMessagingDemo.class);
+                                i.putExtra(SmsMessagingDemo.SMS_RECIPIENT_EXTRA, mFromAddress);
+                                startActivity(i);
 
-                            dialog.dismiss();
-                            finish();
-                        }
-                    })
-                    .setNegativeButton(R.string.dismiss, new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int whichButton) {
-                            dialog.dismiss();
-                            finish();
-                        }
-                    })
-                    .setOnCancelListener(new DialogInterface.OnCancelListener() {
-                        public void onCancel(DialogInterface dialog) {
-                            finish();
-                        }
-                    }).create();
+                                dialog.dismiss();
+                                finish();
+                            }
+                        })
+                        .setNegativeButton(R.string.dismiss, new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int whichButton) {
+                                dialog.dismiss();
+                                finish();
+                            }
+                        })
+                        .setOnCancelListener(new DialogInterface.OnCancelListener() {
+                            public void onCancel(DialogInterface dialog) {
+                                finish();
+                            }
+                        }).create();
         }
         return null;
     }

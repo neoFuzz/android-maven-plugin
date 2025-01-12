@@ -42,7 +42,7 @@ public class SurfaceViewOverlay extends Activity {
         setContentView(R.layout.surface_view_overlay);
 
         GLSurfaceView glSurfaceView =
-            (GLSurfaceView) findViewById(R.id.glsurfaceview);
+                (GLSurfaceView) findViewById(R.id.glsurfaceview);
         glSurfaceView.setRenderer(new CubeRenderer(false));
 
         // Find the views whose visibility will change

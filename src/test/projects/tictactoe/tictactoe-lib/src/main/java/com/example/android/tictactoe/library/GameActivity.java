@@ -34,9 +34,11 @@ import com.example.android.tictactoe.library.GameView.State;
 
 public class GameActivity extends Activity {
 
-    /** Start player. Must be 1 or 2. Default is 1. */
+    /**
+     * Start player. Must be 1 or 2. Default is 1.
+     */
     public static final String EXTRA_START_PLAYER =
-        "com.example.android.tictactoe.library.GameActivity.EXTRA_START_PLAYER";
+            "com.example.android.tictactoe.library.GameActivity.EXTRA_START_PLAYER";
 
     private static final int MSG_COMPUTER_TURN = 1;
     private static final long COMPUTER_DELAY_MS = 500;
@@ -47,7 +49,9 @@ public class GameActivity extends Activity {
     private TextView mInfoView;
     private Button mButtonNext;
 
-    /** Called when the activity is first created. */
+    /**
+     * Called when the activity is first created.
+     */
     @Override
     public void onCreate(Bundle bundle) {
         super.onCreate(bundle);
@@ -194,27 +198,27 @@ public class GameActivity extends Activity {
 
         // check rows
         for (int j = 0, k = 0; j < 3; j++, k += 3) {
-            if (data[k] != State.EMPTY && data[k] == data[k+1] && data[k] == data[k+2]) {
+            if (data[k] != State.EMPTY && data[k] == data[k + 1] && data[k] == data[k + 2]) {
                 row = j;
             }
             if (full && (data[k] == State.EMPTY ||
-                         data[k+1] == State.EMPTY ||
-                         data[k+2] == State.EMPTY)) {
+                    data[k + 1] == State.EMPTY ||
+                    data[k + 2] == State.EMPTY)) {
                 full = false;
             }
         }
 
         // check columns
         for (int i = 0; i < 3; i++) {
-            if (data[i] != State.EMPTY && data[i] == data[i+3] && data[i] == data[i+6]) {
+            if (data[i] != State.EMPTY && data[i] == data[i + 3] && data[i] == data[i + 6]) {
                 col = i;
             }
         }
 
         // check diagonals
-        if (data[0] != State.EMPTY && data[0] == data[1+3] && data[0] == data[2+6]) {
+        if (data[0] != State.EMPTY && data[0] == data[1 + 3] && data[0] == data[2 + 6]) {
             diag = 0;
-        } else  if (data[2] != State.EMPTY && data[2] == data[1+3] && data[2] == data[0+6]) {
+        } else if (data[2] != State.EMPTY && data[2] == data[1 + 3] && data[2] == data[0 + 6]) {
             diag = 1;
         }
 

@@ -63,10 +63,14 @@ public class ActionBarSettingsActionProviderActivity extends Activity {
 
     public static class SettingsActionProvider extends ActionProvider {
 
-        /** An intent for launching the system settings. */
+        /**
+         * An intent for launching the system settings.
+         */
         private static final Intent sSettingsIntent = new Intent(Settings.ACTION_SETTINGS);
 
-        /** Context for accessing resources. */
+        /**
+         * Context for accessing resources.
+         */
         private final Context mContext;
 
         /**

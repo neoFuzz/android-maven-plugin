@@ -15,9 +15,9 @@
  */
 package com.github.cardforge.maven.plugins.android.configuration;
 
-import java.io.File;
-
 import org.apache.maven.plugins.annotations.Parameter;
+
+import java.io.File;
 
 /**
  * Configuration for an Android SDK. Only receives config parameter values, and there is no logic in here. Logic is in
@@ -25,13 +25,12 @@ import org.apache.maven.plugins.annotations.Parameter;
  *
  * @author hugo.josefson@jayway.com
  */
-public class Sdk
-{
+public class Sdk {
 
     /**
      * Directory of the installed Android SDK, for example <code>/opt/android-sdk-linux_x86-1.5_r1</code>
      */
-    @Parameter ( property = "android.sdk.path", required = true )
+    @Parameter(property = "android.sdk.path", required = true)
     private File path;
 
     /**
@@ -40,28 +39,25 @@ public class Sdk
      * <p>Note: this parameter is just the version number, without <code>"android-"</code> in the
      * beginning.</p>
      */
-    @Parameter ( property = "android.sdk.platform" )
+    @Parameter(property = "android.sdk.platform")
     private String platform;
 
     /**
      * <p>Chosen Build-Tools version. Valid values are whichever build-tools are available in the SDK,
      * under the directory <code>buildTools</code>. Defaults to the latest available one if not set.</p>
      */
-    @Parameter ( property = "android.sdk.buildTools" )
+    @Parameter(property = "android.sdk.buildTools")
     private String buildTools;
 
-    public File getPath()
-    {
+    public File getPath() {
         return path;
     }
 
-    public String getPlatform()
-    {
+    public String getPlatform() {
         return platform;
     }
 
-    public String getBuildTools()
-    {
+    public String getBuildTools() {
         return buildTools;
     }
 }

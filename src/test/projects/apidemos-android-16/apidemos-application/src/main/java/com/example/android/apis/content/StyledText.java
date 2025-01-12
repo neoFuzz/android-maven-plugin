@@ -18,6 +18,7 @@ package com.example.android.apis.content;
 
 // Need the following import to get access to the app resources, since this
 // class is in a sub-package.
+
 import com.example.android.apis.R;
 
 import android.app.Activity;
@@ -28,11 +29,9 @@ import android.widget.TextView;
 /**
  * Demonstration of styled text resources.
  */
-public class StyledText extends Activity
-{
+public class StyledText extends Activity {
     @Override
-	protected void onCreate(Bundle savedInstanceState)
-    {
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         // See assets/res/any/layout/styled_text.xml for this
@@ -44,7 +43,7 @@ public class StyledText extends Activity
         // use of CharSequence instead of String so we don't lose
         // the style info.
         CharSequence str = getText(R.string.styled_text);
-        TextView tv = (TextView)findViewById(R.id.text);
+        TextView tv = (TextView) findViewById(R.id.text);
         tv.setText(str);
     }
 }

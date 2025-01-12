@@ -47,7 +47,7 @@ public class ExampleBroadcastReceiver extends BroadcastReceiver {
             ExampleAppWidgetConfigure.loadAllTitlePrefs(context, appWidgetIds, texts);
 
             final int N = appWidgetIds.size();
-            for (int i=0; i<N; i++) {
+            for (int i = 0; i < N; i++) {
                 ExampleAppWidgetProvider.updateAppWidget(context, gm, appWidgetIds.get(i), texts.get(i));
             }
         }

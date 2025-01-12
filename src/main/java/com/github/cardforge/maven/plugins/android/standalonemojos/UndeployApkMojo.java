@@ -22,7 +22,6 @@ import com.github.cardforge.maven.plugins.android.config.ConfigPojo;
 import com.github.cardforge.maven.plugins.android.config.PullParameter;
 import com.github.cardforge.maven.plugins.android.configuration.DeployApk;
 import com.github.cardforge.maven.plugins.android.configuration.ValidationResponse;
-
 import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
@@ -32,20 +31,19 @@ import org.apache.maven.plugins.annotations.Parameter;
 import java.io.File;
 
 /**
- * Undeploys a specified Android application apk from attached devices and emulators. 
- * By default it will undeploy from all, but a subset or single one can be configured 
- * with the device and devices parameters. You can supply the package of the 
- * application and/or an apk file. This goal can be used in non-android projects and as 
+ * Undeploys a specified Android application apk from attached devices and emulators.
+ * By default it will undeploy from all, but a subset or single one can be configured
+ * with the device and devices parameters. You can supply the package of the
+ * application and/or an apk file. This goal can be used in non-android projects and as
  * standalone execution on the command line.<br>
  *
  * @author Manfred Moser - manfred@simpligility.com
  */
-@Mojo( name = "undeploy-apk", requiresProject = false )
-public class UndeployApkMojo extends AbstractAndroidMojo
-{
+@Mojo(name = "undeploy-apk", requiresProject = false)
+public class UndeployApkMojo extends AbstractAndroidMojo {
     /**
-     * Configuration for apk file undeployment within a pom file. See {@link #deployapkFilename}. 
-     * 
+     * Configuration for apk file undeployment within a pom file. See {@link #deployapkFilename}.
+     *
      * <pre>
      * &lt;deployapk&gt;
      *    &lt;filename&gt;yourapk.apk&lt;/filename&gt;
@@ -57,13 +55,13 @@ public class UndeployApkMojo extends AbstractAndroidMojo
     @Parameter
     protected DeployApk deployapk;
 
-    @Parameter( property = "android.deployapk.filename" )
+    @Parameter(property = "android.deployapk.filename")
     private File deployapkFilename;
 
     @PullParameter
     private File parsedFilename;
 
-    @Parameter( property = "android.deployapk.packagename" )
+    @Parameter(property = "android.deployapk.packagename")
     private String deployapkPackagename;
 
     @PullParameter
@@ -73,34 +71,28 @@ public class UndeployApkMojo extends AbstractAndroidMojo
      * @throws MojoExecutionException
      * @throws MojoFailureException
      */
-    public void execute() throws MojoExecutionException, MojoFailureException
-    {
-        ConfigHandler configHandler = new ConfigHandler( this, this.session, this.execution );
+    public void execute() throws MojoExecutionException, MojoFailureException {
+        ConfigHandler configHandler = new ConfigHandler(this, this.session, this.execution);
         configHandler.parseConfiguration();
 
-        if ( parsedFilename == null && parsedPackagename == null )
-        {
-            throw new MojoFailureException( "\n\n One of the parameters android.deployapk.packagename "
-                    + "or android.deployapk.filename is required. \n" );
-        }
-        
-        if ( StringUtils.isNotBlank( parsedPackagename ) )
-        {
-            getLog().debug( "Undeploying with packagename " + parsedPackagename );
-            undeployApk( parsedPackagename );
+        if (parsedFilename == null && parsedPackagename == null) {
+            throw new MojoFailureException("\n\n One of the parameters android.deployapk.packagename "
+                    + "or android.deployapk.filename is required. \n");
         }
 
-        ValidationResponse response = DeployApk.validFileParameter( parsedFilename );
-        if ( response.isValid() ) 
-        {
-            getLog().debug( "Undeploying with file " + parsedFilename );
-            undeployApk( parsedFilename );
-        } 
-        else 
-        {
-            getLog().info( "Ignoring invalid file parameter." );
-            getLog().debug( response.getMessage() );
-            
+        if (StringUtils.isNotBlank(parsedPackagename)) {
+            getLog().debug("Undeploying with packagename " + parsedPackagename);
+            undeployApk(parsedPackagename);
+        }
+
+        ValidationResponse response = DeployApk.validFileParameter(parsedFilename);
+        if (response.isValid()) {
+            getLog().debug("Undeploying with file " + parsedFilename);
+            undeployApk(parsedFilename);
+        } else {
+            getLog().info("Ignoring invalid file parameter.");
+            getLog().debug(response.getMessage());
+
         }
     }
 }

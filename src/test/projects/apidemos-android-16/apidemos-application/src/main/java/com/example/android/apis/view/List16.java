@@ -42,13 +42,13 @@ public class List16 extends ListActivity {
         setListAdapter(new ArrayAdapter<String>(this,
                 android.R.layout.simple_list_item_activated_1, Cheeses.sCheeseStrings));
     }
-    
+
     @Override
     protected void onPostCreate(Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
         getActionBar().setSubtitle("Long press to start selection");
     }
-    
+
     private class ModeCallback implements ListView.MultiChoiceModeListener {
 
         public boolean onCreateActionMode(ActionMode mode, Menu menu) {
@@ -64,15 +64,15 @@ public class List16 extends ListActivity {
 
         public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
             switch (item.getItemId()) {
-            case R.id.share:
-                Toast.makeText(List16.this, "Shared " + getListView().getCheckedItemCount() +
-                        " items", Toast.LENGTH_SHORT).show();
-                mode.finish();
-                break;
-            default:
-                Toast.makeText(List16.this, "Clicked " + item.getTitle(),
-                        Toast.LENGTH_SHORT).show();
-                break;
+                case R.id.share:
+                    Toast.makeText(List16.this, "Shared " + getListView().getCheckedItemCount() +
+                            " items", Toast.LENGTH_SHORT).show();
+                    mode.finish();
+                    break;
+                default:
+                    Toast.makeText(List16.this, "Clicked " + item.getTitle(),
+                            Toast.LENGTH_SHORT).show();
+                    break;
             }
             return true;
         }
@@ -81,7 +81,7 @@ public class List16 extends ListActivity {
         }
 
         public void onItemCheckedStateChanged(ActionMode mode,
-                int position, long id, boolean checked) {
+                                              int position, long id, boolean checked) {
             final int checkedCount = getListView().getCheckedItemCount();
             switch (checkedCount) {
                 case 0:
@@ -95,6 +95,6 @@ public class List16 extends ListActivity {
                     break;
             }
         }
-        
+
     }
 }

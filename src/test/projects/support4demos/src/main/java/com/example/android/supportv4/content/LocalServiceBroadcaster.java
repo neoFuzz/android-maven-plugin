@@ -53,7 +53,7 @@ public class LocalServiceBroadcaster extends Activity {
         setContentView(R.layout.local_service_broadcaster);
 
         // This is where we print the data we get back.
-        final TextView callbackData = (TextView)findViewById(R.id.callback);
+        final TextView callbackData = (TextView) findViewById(R.id.callback);
 
         // Put in some initial text.
         callbackData.setText("No broadcast received yet");
@@ -81,9 +81,9 @@ public class LocalServiceBroadcaster extends Activity {
         mLocalBroadcastManager.registerReceiver(mReceiver, filter);
 
         // Watch for button clicks.
-        Button button = (Button)findViewById(R.id.start);
+        Button button = (Button) findViewById(R.id.start);
         button.setOnClickListener(mStartListener);
-        button = (Button)findViewById(R.id.stop);
+        button = (Button) findViewById(R.id.stop);
         button.setOnClickListener(mStopListener);
     }
 
@@ -122,7 +122,8 @@ public class LocalServiceBroadcaster extends Activity {
                         mLocalBroadcastManager.sendBroadcast(intent);
                         Message nmsg = mHandler.obtainMessage(MSG_UPDATE);
                         mHandler.sendMessageDelayed(nmsg, 1000);
-                    } break;
+                    }
+                    break;
                     default:
                         super.handleMessage(msg);
                 }

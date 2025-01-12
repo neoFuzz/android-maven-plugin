@@ -52,7 +52,7 @@ public class ActivityRecreate extends Activity {
         setContentView(R.layout.activity_recreate);
 
         // Watch for button clicks.
-        Button button = (Button)findViewById(R.id.recreate);
+        Button button = (Button) findViewById(R.id.recreate);
         button.setOnClickListener(mRecreateListener);
     }
 

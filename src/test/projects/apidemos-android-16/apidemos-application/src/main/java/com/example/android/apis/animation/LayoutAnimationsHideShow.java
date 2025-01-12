@@ -18,6 +18,7 @@ package com.example.android.apis.animation;
 
 // Need the following import to get access to the app resources, since this
 // class is in a sub-package.
+
 import android.animation.Animator;
 import android.animation.ObjectAnimator;
 import android.widget.LinearLayout;
@@ -46,7 +47,9 @@ public class LayoutAnimationsHideShow extends Activity {
     ViewGroup container = null;
     private LayoutTransition mTransitioner;
 
-    /** Called when the activity is first created. */
+    /**
+     * Called when the activity is first created.
+     */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

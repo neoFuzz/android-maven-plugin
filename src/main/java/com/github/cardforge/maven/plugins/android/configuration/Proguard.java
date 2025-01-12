@@ -10,8 +10,7 @@ import java.io.File;
  * @author Michal Harakal
  * @see ProguardMojo
  */
-public class Proguard
-{
+public class Proguard {
 
     /**
      * Whether ProGuard is enabled or not.
@@ -32,58 +31,47 @@ public class Proguard
     private String[] options;
     private Boolean attachMap;
 
-    public Boolean isSkip()
-    {
+    public Boolean isSkip() {
         return skip;
     }
 
-    public File getConfig()
-    {
+    public File getConfig() {
         return config;
     }
 
-    public String[] getConfigs()
-    {
+    public String[] getConfigs() {
         return configs;
     }
 
-    public String getProguardJarPath()
-    {
+    public String getProguardJarPath() {
         return proguardJarPath;
     }
-    
-    public File getOutputDirectory()
-    {
+
+    public File getOutputDirectory() {
         return outputDirectory;
     }
-   
-    public String[] getJvmArguments()
-    {
+
+    public String[] getJvmArguments() {
         return jvmArguments;
     }
 
-    public Boolean isFilterMavenDescriptor()
-    {
+    public Boolean isFilterMavenDescriptor() {
         return filterMavenDescriptor;
     }
-    
-    public String getCustomFilter()
-    {
+
+    public String getCustomFilter() {
         return customFilter;
     }
 
-    public Boolean isFilterManifest()
-    {
+    public Boolean isFilterManifest() {
         return filterManifest;
     }
-    
-    public Boolean isIncludeJdkLibs()
-    {
+
+    public Boolean isIncludeJdkLibs() {
         return includeJdkLibs;
     }
 
-    public String[] getOptions()
-    {
+    public String[] getOptions() {
         return options;
     }
 }

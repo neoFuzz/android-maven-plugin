@@ -27,16 +27,14 @@ import com.google.api.client.repackaged.com.google.common.base.Preconditions;
 import com.google.api.client.repackaged.com.google.common.base.Strings;
 import com.google.api.services.androidpublisher.AndroidPublisher;
 import com.google.api.services.androidpublisher.AndroidPublisherScopes;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
+import javax.annotation.Nullable;
 import java.io.File;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.util.Collections;
-
-import javax.annotation.Nullable;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
  * Helper class to initialize the publisher APIs client library.
@@ -47,16 +45,14 @@ import org.apache.commons.logging.LogFactory;
  * resources/client_secrets.json and authorize this client against the API.
  * </p>
  */
-public class AndroidPublisherHelper
-{
-
-    private static final Log LOG = LogFactory.getLog( AndroidPublisherHelper.class );
+public class AndroidPublisherHelper {
 
     public static final String MIME_TYPE_APK = "application/vnd.android.package-archive";
-
     public static final String MIME_TYPE_IMAGE = "image/*";
-
-    /** Path to the private key file (only used for Service Account auth). */
+    private static final Log LOG = LogFactory.getLog(AndroidPublisherHelper.class);
+    /**
+     * Path to the private key file (only used for Service Account auth).
+     */
     private static final String SRC_RESOURCES_KEY_P12 = "resources/key.p12";
 
     /**
@@ -72,38 +68,40 @@ public class AndroidPublisherHelper
     private static final String DATA_STORE_SYSTEM_PROPERTY = "user.home";
     private static final String DATA_STORE_FILE = ".store/android_publisher_api";
     private static final File DATA_STORE_DIR =
-            new File( System.getProperty( DATA_STORE_SYSTEM_PROPERTY ), DATA_STORE_FILE );
+            new File(System.getProperty(DATA_STORE_SYSTEM_PROPERTY), DATA_STORE_FILE);
 
-    /** Global instance of the JSON factory. */
+    /**
+     * Global instance of the JSON factory.
+     */
     private static final JsonFactory JSON_FACTORY = JacksonFactory.getDefaultInstance();
-
-    /** Global instance of the HTTP transport. */
+    /**
+     * Installed application user ID.
+     */
+    private static final String INST_APP_USER_ID = "user";
+    /**
+     * Global instance of the HTTP transport.
+     */
     private static HttpTransport httpTransport;
 
-    /** Installed application user ID. */
-    private static final String INST_APP_USER_ID = "user";
+    private static Credential authorizeWithServiceAccount(String serviceAccountEmail)
+            throws GeneralSecurityException, IOException {
+        LOG.info(String.format("Authorizing using Service Account: %s", serviceAccountEmail));
 
-    private static Credential authorizeWithServiceAccount( String serviceAccountEmail )
-            throws GeneralSecurityException, IOException
-    {
-        LOG.info( String.format( "Authorizing using Service Account: %s", serviceAccountEmail ) );
-
-        return authorizeWithServiceAccount( serviceAccountEmail, null );
+        return authorizeWithServiceAccount(serviceAccountEmail, null);
     }
 
-    private static Credential authorizeWithServiceAccount( String serviceAccountEmail, File pk12File )
-            throws GeneralSecurityException, IOException
-    {
-        LOG.info( String.format( "Authorizing using Service Account: %s", serviceAccountEmail ) );
+    private static Credential authorizeWithServiceAccount(String serviceAccountEmail, File pk12File)
+            throws GeneralSecurityException, IOException {
+        LOG.info(String.format("Authorizing using Service Account: %s", serviceAccountEmail));
 
         // Build service account credential.
         GoogleCredential credential = new GoogleCredential.Builder()
-                .setTransport( httpTransport )
-                .setJsonFactory( JSON_FACTORY )
-                .setServiceAccountId( serviceAccountEmail )
-                .setServiceAccountScopes( Collections.singleton( AndroidPublisherScopes.ANDROIDPUBLISHER ) )
-                .setServiceAccountPrivateKeyFromP12File( pk12File == null ? new File( SRC_RESOURCES_KEY_P12 )
-                        : pk12File )
+                .setTransport(httpTransport)
+                .setJsonFactory(JSON_FACTORY)
+                .setServiceAccountId(serviceAccountEmail)
+                .setServiceAccountScopes(Collections.singleton(AndroidPublisherScopes.ANDROIDPUBLISHER))
+                .setServiceAccountPrivateKeyFromP12File(pk12File == null ? new File(SRC_RESOURCES_KEY_P12)
+                        : pk12File)
                 .build();
         return credential;
     }
@@ -112,16 +110,14 @@ public class AndroidPublisherHelper
      * Ensure the client secrets file has been filled out.
      *
      * @param clientSecrets the GoogleClientSecrets containing data from the
-     *            file
+     *                      file
      */
-    private static void checkClientSecretsFile( GoogleClientSecrets clientSecrets )
-    {
-        if ( clientSecrets.getDetails().getClientId().startsWith( "[[INSERT" )
-                || clientSecrets.getDetails().getClientSecret().startsWith( "[[INSERT" ) )
-        {
-            LOG.error( "Enter Client ID and Secret from "
-                    + "APIs console into resources/client_secrets.json." );
-            System.exit( 1 );
+    private static void checkClientSecretsFile(GoogleClientSecrets clientSecrets) {
+        if (clientSecrets.getDetails().getClientId().startsWith("[[INSERT")
+                || clientSecrets.getDetails().getClientSecret().startsWith("[[INSERT")) {
+            LOG.error("Enter Client ID and Secret from "
+                    + "APIs console into resources/client_secrets.json.");
+            System.exit(1);
         }
     }
 
@@ -132,35 +128,33 @@ public class AndroidPublisherHelper
      * @param applicationName the name of the application: com.example.app
      * @return the {@Link AndroidPublisher} service
      */
-    public static AndroidPublisher init( String applicationName ) throws Exception
-    {
-        return init( applicationName, null );
+    public static AndroidPublisher init(String applicationName) throws Exception {
+        return init(applicationName, null);
     }
 
     /**
      * Performs all necessary setup steps for running requests against the API.
      *
-     * @param applicationName the name of the application: com.example.app
+     * @param applicationName     the name of the application: com.example.app
      * @param serviceAccountEmail the Service Account Email (empty if using
-     *            installed application)
+     *                            installed application)
      * @return the {@Link AndroidPublisher} service
      * @throws GeneralSecurityException
      * @throws IOException
      */
-    public static AndroidPublisher init( String applicationName,
-            @Nullable String serviceAccountEmail ) throws IOException, GeneralSecurityException
-    {
-        Preconditions.checkArgument( !Strings.isNullOrEmpty( applicationName ),
-                "applicationName cannot be null or empty!" );
+    public static AndroidPublisher init(String applicationName,
+                                        @Nullable String serviceAccountEmail) throws IOException, GeneralSecurityException {
+        Preconditions.checkArgument(!Strings.isNullOrEmpty(applicationName),
+                "applicationName cannot be null or empty!");
 
         // Authorization.
         newTrustedTransport();
         Credential credential;
-        credential = authorizeWithServiceAccount( serviceAccountEmail );
+        credential = authorizeWithServiceAccount(serviceAccountEmail);
 
         // Set up and return API client.
         return new AndroidPublisher.Builder(
-                httpTransport, JSON_FACTORY, credential ).setApplicationName( applicationName )
+                httpTransport, JSON_FACTORY, credential).setApplicationName(applicationName)
                 .build();
     }
 
@@ -168,30 +162,27 @@ public class AndroidPublisherHelper
      * Performs all necessary setup steps for running requests against the API.
      *
      * @param serviceAccountEmail the Service Account Email (empty if using
-     *            installed application)
+     *                            installed application)
      * @return the {@Link AndroidPublisher} service
      * @throws GeneralSecurityException
      * @throws IOException
      */
-    public static AndroidPublisher init( String applicationName, String serviceAccountEmail, File pk12File )
-            throws IOException, GeneralSecurityException
-    {
+    public static AndroidPublisher init(String applicationName, String serviceAccountEmail, File pk12File)
+            throws IOException, GeneralSecurityException {
 
         // Authorization.
         newTrustedTransport();
-        Credential credential = authorizeWithServiceAccount( serviceAccountEmail, pk12File );
+        Credential credential = authorizeWithServiceAccount(serviceAccountEmail, pk12File);
 
         // Set up and return API client.
-        return new AndroidPublisher.Builder( httpTransport, JSON_FACTORY, credential )
-                .setApplicationName( applicationName )
+        return new AndroidPublisher.Builder(httpTransport, JSON_FACTORY, credential)
+                .setApplicationName(applicationName)
                 .build();
     }
 
     private static void newTrustedTransport() throws GeneralSecurityException,
-            IOException
-    {
-        if ( null == httpTransport )
-        {
+            IOException {
+        if (null == httpTransport) {
             httpTransport = GoogleNetHttpTransport.newTrustedTransport();
         }
     }

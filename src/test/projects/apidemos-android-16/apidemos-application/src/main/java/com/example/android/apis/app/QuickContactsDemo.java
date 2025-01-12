@@ -31,7 +31,7 @@ import android.widget.ResourceCursorAdapter;
 import android.widget.TextView;
 
 public class QuickContactsDemo extends ListActivity {
-    static final String[] CONTACTS_SUMMARY_PROJECTION = new String[] {
+    static final String[] CONTACTS_SUMMARY_PROJECTION = new String[]{
             Contacts._ID, // 0
             Contacts.DISPLAY_NAME, // 1
             Contacts.STARRED, // 2
@@ -60,7 +60,7 @@ public class QuickContactsDemo extends ListActivity {
                 + Contacts.DISPLAY_NAME + " != '' ))";
         Cursor c =
                 getContentResolver().query(Contacts.CONTENT_URI, CONTACTS_SUMMARY_PROJECTION, select,
-                null, Contacts.DISPLAY_NAME + " COLLATE LOCALIZED ASC");
+                        null, Contacts.DISPLAY_NAME + " COLLATE LOCALIZED ASC");
         startManagingCursor(c);
         ContactListItemAdapter adapter = new ContactListItemAdapter(this, R.layout.quick_contacts, c);
         setListAdapter(adapter);

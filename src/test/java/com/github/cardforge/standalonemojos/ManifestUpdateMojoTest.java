@@ -1,8 +1,6 @@
 package com.github.cardforge.standalonemojos;
 
-import java.io.File;
-import java.io.IOException;
-
+import com.github.cardforge.AbstractAndroidMojoTestCase;
 import com.github.cardforge.maven.plugins.android.standalonemojos.ManifestUpdateMojo;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -10,9 +8,10 @@ import org.apache.maven.plugin.MojoFailureException;
 import org.junit.Assert;
 import org.junit.Ignore;
 
-import com.github.cardforge.AbstractAndroidMojoTestCase;
+import java.io.File;
+import java.io.IOException;
 
-@Ignore("This test has to be migrated to be an IntegrationTest using AbstractAndroidMojoIntegrationTest") 
+@Ignore("This test has to be migrated to be an IntegrationTest using AbstractAndroidMojoIntegrationTest")
 public class ManifestUpdateMojoTest extends AbstractAndroidMojoTestCase<ManifestUpdateMojo> {
     @Override
     public String getPluginGoalName() {
@@ -25,8 +24,8 @@ public class ManifestUpdateMojoTest extends AbstractAndroidMojoTestCase<Manifest
         File dir = getProjectDir(mojo);
         File manifestFile = new File(dir, "AndroidManifest.xml");
         assertExpectedAndroidManifest(manifestFile, dir);
-    }    
-    
+    }
+
     public void testBasicAndroidProjectVersion() throws Exception {
         ManifestUpdateMojo mojo = createMojo("manifest-tests/basic-android-project");
         mojo.execute();
@@ -84,47 +83,47 @@ public class ManifestUpdateMojoTest extends AbstractAndroidMojoTestCase<Manifest
         File manifestFile = new File(dir, "AndroidManifest.xml");
         assertExpectedAndroidManifest(manifestFile, dir);
     }
-    
+
     public void testWhenNewVersionHasfiveDigits() throws Exception {
-      ManifestUpdateMojo mojo = createMojo("manifest-tests/fiveDigitLengthVersion-android-project");
-      mojo.execute();
-      File dir = getProjectDir(mojo);
-      File manifestFile = new File(dir, "AndroidManifest.xml");
-      assertExpectedAndroidManifest(manifestFile, dir);
+        ManifestUpdateMojo mojo = createMojo("manifest-tests/fiveDigitLengthVersion-android-project");
+        mojo.execute();
+        File dir = getProjectDir(mojo);
+        File manifestFile = new File(dir, "AndroidManifest.xml");
+        assertExpectedAndroidManifest(manifestFile, dir);
     }
 
     public void testVersionCodeUpdateAndIncrementFail() throws Exception {
         ManifestUpdateMojo mojo = createMojo("manifest-tests/bad-android-project1");
         try {
-			mojo.execute();
+            mojo.execute();
         } catch (MojoFailureException e) {
-	        Assert.assertTrue(e.getMessage().startsWith("versionCodeAutoIncrement, versionCodeUpdateFromVersion and versionCode"));
-	        return;
+            Assert.assertTrue(e.getMessage().startsWith("versionCodeAutoIncrement, versionCodeUpdateFromVersion and versionCode"));
+            return;
         }
-		Assert.assertTrue("bad-android-project1 did not throw MojoFailureException", false);
+        Assert.assertTrue("bad-android-project1 did not throw MojoFailureException", false);
     }
 
-	public void testVersionCodeAndVersionCodeUpdateFail() throws Exception {
-	    ManifestUpdateMojo mojo = createMojo("manifest-tests/bad-android-project2");
-	    try {
-			mojo.execute();
-	    } catch (MojoFailureException e) {
-		    Assert.assertTrue(e.getMessage().startsWith("versionCodeAutoIncrement, versionCodeUpdateFromVersion and versionCode"));
-		    return;
-	    }
-		Assert.assertTrue("bad-android-project2 did not throw MojoFailureException", false);
-	}
+    public void testVersionCodeAndVersionCodeUpdateFail() throws Exception {
+        ManifestUpdateMojo mojo = createMojo("manifest-tests/bad-android-project2");
+        try {
+            mojo.execute();
+        } catch (MojoFailureException e) {
+            Assert.assertTrue(e.getMessage().startsWith("versionCodeAutoIncrement, versionCodeUpdateFromVersion and versionCode"));
+            return;
+        }
+        Assert.assertTrue("bad-android-project2 did not throw MojoFailureException", false);
+    }
 
-	public void testVersionCodeAndVersionIncrementFail() throws Exception {
-	    ManifestUpdateMojo mojo = createMojo("manifest-tests/bad-android-project3");
-	    try {
-			mojo.execute();
-	    } catch (MojoFailureException e) {
-		    Assert.assertTrue(e.getMessage().startsWith("versionCodeAutoIncrement, versionCodeUpdateFromVersion and versionCode"));
-		    return;
-	    }
-		Assert.assertTrue("bad-android-project3 did not throw MojoFailureException", false);
-	}
+    public void testVersionCodeAndVersionIncrementFail() throws Exception {
+        ManifestUpdateMojo mojo = createMojo("manifest-tests/bad-android-project3");
+        try {
+            mojo.execute();
+        } catch (MojoFailureException e) {
+            Assert.assertTrue(e.getMessage().startsWith("versionCodeAutoIncrement, versionCodeUpdateFromVersion and versionCode"));
+            return;
+        }
+        Assert.assertTrue("bad-android-project3 did not throw MojoFailureException", false);
+    }
 
     public void testSupportsScreensUpdate() throws Exception {
         ManifestUpdateMojo mojo = createMojo("manifest-tests/supports-screens-android-project");

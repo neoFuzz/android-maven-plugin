@@ -36,29 +36,27 @@ import com.example.android.apis.R;
  * case, we pretend that binding a view to its data is slow (even though it really isn't). When
  * a scroll/fling is happening, the adapter binds the view to temporary data. After the scroll/fling
  * has finished, the temporary data is replace with the actual data.
- *
  */
 public class List13 extends ListActivity implements ListView.OnScrollListener {
 
     private TextView mStatus;
-    
+
     private boolean mBusy = false;
-    
+
     /**
      * Will not bind views while the list is scrolling
-     * 
      */
     private class SlowAdapter extends BaseAdapter {
         private LayoutInflater mInflater;
-        
+
         public SlowAdapter(Context context) {
-            mInflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         }
 
         /**
          * The number of items in the list is determined by the number of speeches
          * in our array.
-         * 
+         *
          * @see android.widget.ListAdapter#getCount()
          */
         public int getCount() {
@@ -70,7 +68,7 @@ public class List13 extends ListActivity implements ListView.OnScrollListener {
          * sufficent to get at the data. If we were using a more complex data
          * structure, we would return whatever object represents one row in the
          * list.
-         * 
+         *
          * @see android.widget.ListAdapter#getItem(int)
          */
         public Object getItem(int position) {
@@ -79,7 +77,7 @@ public class List13 extends ListActivity implements ListView.OnScrollListener {
 
         /**
          * Use the array index as a unique id.
-         * 
+         *
          * @see android.widget.ListAdapter#getItemId(int)
          */
         public long getItemId(int position) {
@@ -88,17 +86,17 @@ public class List13 extends ListActivity implements ListView.OnScrollListener {
 
         /**
          * Make a view to hold each row.
-         * 
+         *
          * @see android.widget.ListAdapter#getView(int, android.view.View,
-         *      android.view.ViewGroup)
+         * android.view.ViewGroup)
          */
         public View getView(int position, View convertView, ViewGroup parent) {
             TextView text;
-            
+
             if (convertView == null) {
-                text = (TextView)mInflater.inflate(android.R.layout.simple_list_item_1, parent, false);
+                text = (TextView) mInflater.inflate(android.R.layout.simple_list_item_1, parent, false);
             } else {
-                text = (TextView)convertView;
+                text = (TextView) convertView;
             }
 
             if (!mBusy) {
@@ -114,52 +112,52 @@ public class List13 extends ListActivity implements ListView.OnScrollListener {
             return text;
         }
     }
-    
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.list_13);
         mStatus = (TextView) findViewById(R.id.status);
         mStatus.setText("Idle");
-        
+
         // Use an existing ListAdapter that will map an array
         // of strings to TextViews
         setListAdapter(new SlowAdapter(this));
-        
+
         getListView().setOnScrollListener(this);
     }
-    
-    
+
+
     public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount,
-            int totalItemCount) {
+                         int totalItemCount) {
     }
-    
+
 
     public void onScrollStateChanged(AbsListView view, int scrollState) {
         switch (scrollState) {
-        case OnScrollListener.SCROLL_STATE_IDLE:
-            mBusy = false;
-            
-            int first = view.getFirstVisiblePosition();
-            int count = view.getChildCount();
-            for (int i=0; i<count; i++) {
-                TextView t = (TextView)view.getChildAt(i);
-                if (t.getTag() != null) {
-                    t.setText(mStrings[first + i]);
-                    t.setTag(null);
+            case OnScrollListener.SCROLL_STATE_IDLE:
+                mBusy = false;
+
+                int first = view.getFirstVisiblePosition();
+                int count = view.getChildCount();
+                for (int i = 0; i < count; i++) {
+                    TextView t = (TextView) view.getChildAt(i);
+                    if (t.getTag() != null) {
+                        t.setText(mStrings[first + i]);
+                        t.setTag(null);
+                    }
                 }
-            }
-            
-            mStatus.setText("Idle");
-            break;
-        case OnScrollListener.SCROLL_STATE_TOUCH_SCROLL:
-            mBusy = true;
-            mStatus.setText("Touch scroll");
-            break;
-        case OnScrollListener.SCROLL_STATE_FLING:
-            mBusy = true;
-            mStatus.setText("Fling");
-            break;
+
+                mStatus.setText("Idle");
+                break;
+            case OnScrollListener.SCROLL_STATE_TOUCH_SCROLL:
+                mBusy = true;
+                mStatus.setText("Touch scroll");
+                break;
+            case OnScrollListener.SCROLL_STATE_FLING:
+                mBusy = true;
+                mStatus.setText("Fling");
+                break;
         }
     }
 

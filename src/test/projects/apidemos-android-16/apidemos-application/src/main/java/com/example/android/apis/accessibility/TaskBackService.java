@@ -35,20 +35,30 @@ import java.util.Locale;
  */
 public class TaskBackService extends AccessibilityService implements OnInitListener {
 
-    /** Tag for logging. */
+    /**
+     * Tag for logging.
+     */
     private static final String LOG_TAG = "TaskBackService/onAccessibilityEvent";
 
-    /** Comma separator. */
+    /**
+     * Comma separator.
+     */
     private static final String SEPARATOR = ", ";
 
-    /** The class name of TaskListView - for simplicity we speak only its items. */
+    /**
+     * The class name of TaskListView - for simplicity we speak only its items.
+     */
     private static final String TASK_LIST_VIEW_CLASS_NAME =
-        "com.example.android.apis.accessibility.TaskListView";
+            "com.example.android.apis.accessibility.TaskListView";
 
-    /** Flag whether Text-To-Speech is initialized. */
+    /**
+     * Flag whether Text-To-Speech is initialized.
+     */
     private boolean mTextToSpeechInitialized;
 
-    /** Handle to the Text-To-Speech engine. */
+    /**
+     * Handle to the Text-To-Speech engine.
+     */
     private TextToSpeech mTts;
 
     /**
@@ -129,7 +139,7 @@ public class TaskBackService extends AccessibilityService implements OnInitListe
         for (int i = 0; i < records; i++) {
             AccessibilityRecord record = event.getRecord(i);
             CharSequence contentDescription = record.getContentDescription();
-            if (!TextUtils.isEmpty(contentDescription )) {
+            if (!TextUtils.isEmpty(contentDescription)) {
                 utterance.append(SEPARATOR);
                 utterance.append(contentDescription);
             }

@@ -94,9 +94,9 @@ public class AutoComplete4 extends Activity {
         private ContentResolver mContent;
     }
 
-    public static final String[] CONTACT_PROJECTION = new String[] {
-        Contacts._ID,
-        Contacts.DISPLAY_NAME
+    public static final String[] CONTACT_PROJECTION = new String[]{
+            Contacts._ID,
+            Contacts.DISPLAY_NAME
     };
 
     private static final int COLUMN_DISPLAY_NAME = 1;

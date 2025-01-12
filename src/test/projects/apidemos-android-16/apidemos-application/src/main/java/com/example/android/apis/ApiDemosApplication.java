@@ -23,9 +23,9 @@ import android.app.Application;
  * be used as a central repository for per-process information about your app;
  * however it is recommended to use singletons for that instead rather than merge
  * all of these globals from across your application into one place here.
- * 
+ * <p>
  * In this case, we have not defined any specific work for this Application.
- * 
+ * <p>
  * See samples/ApiDemos/tests/src/com.example.android.apis/ApiDemosApplicationTests for an example
  * of how to perform unit tests on an Application object.
  */

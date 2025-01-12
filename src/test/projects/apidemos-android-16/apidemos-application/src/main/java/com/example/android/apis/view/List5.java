@@ -18,6 +18,7 @@ package com.example.android.apis.view;
 
 // Need the following import to get access to the app resources, since this
 // class is in a sub-package.
+
 import android.app.ListActivity;
 import android.content.Context;
 import android.os.Bundle;
@@ -81,7 +82,7 @@ public class List5 extends ListActivity {
 
         private Context mContext;
     }
-    
+
     private String[] mStrings = {
             "----------",
             "----------",

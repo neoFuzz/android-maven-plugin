@@ -18,6 +18,7 @@ package com.example.android.apis.view;
 
 //Need the following import to get access to the app resources, since this
 //class is in a sub-package.
+
 import com.example.android.apis.R;
 
 import android.app.Activity;
@@ -51,7 +52,7 @@ public class LinearLayout8 extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.linear_layout_8);
-        mLinearLayout = (LinearLayout)findViewById(R.id.layout);
+        mLinearLayout = (LinearLayout) findViewById(R.id.layout);
     }
 
     @Override
@@ -73,32 +74,32 @@ public class LinearLayout8 extends Activity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
 
-        case VERTICAL_ID:
-            mLinearLayout.setOrientation(LinearLayout.VERTICAL);
-            return true;
-        case HORIZONTAL_ID:
-            mLinearLayout.setOrientation(LinearLayout.HORIZONTAL);
-            return true;
+            case VERTICAL_ID:
+                mLinearLayout.setOrientation(LinearLayout.VERTICAL);
+                return true;
+            case HORIZONTAL_ID:
+                mLinearLayout.setOrientation(LinearLayout.HORIZONTAL);
+                return true;
 
-        case TOP_ID:
-            mLinearLayout.setVerticalGravity(Gravity.TOP);
-            return true;
-        case MIDDLE_ID:
-            mLinearLayout.setVerticalGravity(Gravity.CENTER_VERTICAL);
-            return true;
-        case BOTTOM_ID:
-            mLinearLayout.setVerticalGravity(Gravity.BOTTOM);
-            return true;
+            case TOP_ID:
+                mLinearLayout.setVerticalGravity(Gravity.TOP);
+                return true;
+            case MIDDLE_ID:
+                mLinearLayout.setVerticalGravity(Gravity.CENTER_VERTICAL);
+                return true;
+            case BOTTOM_ID:
+                mLinearLayout.setVerticalGravity(Gravity.BOTTOM);
+                return true;
 
-        case LEFT_ID:
-            mLinearLayout.setHorizontalGravity(Gravity.LEFT);
-            return true;
-        case CENTER_ID:
-            mLinearLayout.setHorizontalGravity(Gravity.CENTER_HORIZONTAL);
-            return true;
-        case RIGHT_ID:
-            mLinearLayout.setHorizontalGravity(Gravity.RIGHT);
-            return true;
+            case LEFT_ID:
+                mLinearLayout.setHorizontalGravity(Gravity.LEFT);
+                return true;
+            case CENTER_ID:
+                mLinearLayout.setHorizontalGravity(Gravity.CENTER_HORIZONTAL);
+                return true;
+            case RIGHT_ID:
+                mLinearLayout.setHorizontalGravity(Gravity.RIGHT);
+                return true;
 
         }
         return super.onOptionsItemSelected(item);

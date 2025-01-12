@@ -18,6 +18,7 @@ package com.example.android.apis.app;
 
 // Need the following import to get access to the app resources, since this
 // class is in a sub-package.
+
 import android.app.Activity;
 import android.content.ComponentName;
 import android.os.Bundle;
@@ -33,20 +34,20 @@ import com.example.android.apis.R;
  */
 public class ContactsFilter extends Activity {
     @Override
-	protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.contacts_filter);
 
         // Watch for button clicks.
-        Button button = (Button)findViewById(R.id.go);
+        Button button = (Button) findViewById(R.id.go);
         button.setOnClickListener(mGoListener);
     }
 
     private OnClickListener mGoListener = new OnClickListener() {
         public void onClick(View v) {
             startInstrumentation(new ComponentName(ContactsFilter.this,
-                            ContactsFilterInstrumentation.class), null, null);
+                    ContactsFilterInstrumentation.class), null, null);
         }
     };
 }

@@ -61,10 +61,8 @@ import android.widget.TextView;
  *             <td class="DescrColumn">Defines contents of the screen</td>
  *         </tr>
  * </table>
- *
  */
-public class PersistentState extends Activity
-{
+public class PersistentState extends Activity {
     /**
      * Initialization of the Activity after it is first created.  Here we use
      * {@link android.app.Activity#setContentView setContentView()} to set up
@@ -82,10 +80,10 @@ public class PersistentState extends Activity
         setContentView(R.layout.save_restore_state);
 
         // Set message to be appropriate for this screen.
-        ((TextView)findViewById(R.id.msg)).setText(R.string.persistent_msg);
+        ((TextView) findViewById(R.id.msg)).setText(R.string.persistent_msg);
 
         // Retrieve the EditText widget whose state we will save.
-        mSaved = (EditText)findViewById(R.id.saved);
+        mSaved = (EditText) findViewById(R.id.saved);
     }
 
     /**
@@ -96,7 +94,7 @@ public class PersistentState extends Activity
     protected void onResume() {
         super.onResume();
 
-        SharedPreferences prefs = getPreferences(0); 
+        SharedPreferences prefs = getPreferences(0);
         String restoredText = prefs.getString("text", null);
         if (restoredText != null) {
             mSaved.setText(restoredText, TextView.BufferType.EDITABLE);

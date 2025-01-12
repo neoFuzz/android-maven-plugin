@@ -64,12 +64,12 @@ public class ForegroundDispatch extends Activity {
         } catch (MalformedMimeTypeException e) {
             throw new RuntimeException("fail", e);
         }
-        mFilters = new IntentFilter[] {
+        mFilters = new IntentFilter[]{
                 ndef,
         };
 
         // Setup a tech list for all NfcF tags
-        mTechLists = new String[][] { new String[] { NfcF.class.getName() } };
+        mTechLists = new String[][]{new String[]{NfcF.class.getName()}};
     }
 
     @Override

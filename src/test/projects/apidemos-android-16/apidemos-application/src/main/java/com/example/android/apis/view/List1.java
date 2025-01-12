@@ -22,7 +22,7 @@ import android.widget.ArrayAdapter;
 
 
 /**
- * A list view example where the 
+ * A list view example where the
  * data for the list comes from an array of strings.
  */
 public class List1 extends ListActivity {

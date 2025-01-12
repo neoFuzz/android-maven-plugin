@@ -5,8 +5,7 @@ import org.apache.maven.plugins.annotations.Parameter;
 /**
  * @author Johan Lindquist
  */
-public class HeaderFilesDirective
-{
+public class HeaderFilesDirective {
 
     /**
      * Base directory from where to include/exclude files from.
@@ -27,38 +26,31 @@ public class HeaderFilesDirective
     /**
      * A list of &lt;include> elements specifying the files (usually C/C++ header files) that should be excluded from
      * the header archive.
-     *
      */
     @Parameter
     private String[] excludes;
 
-    public String getDirectory()
-    {
+    public String getDirectory() {
         return directory;
     }
 
-    public void setDirectory( String directory )
-    {
+    public void setDirectory(String directory) {
         this.directory = directory;
     }
 
-    public String[] getExcludes()
-    {
+    public String[] getExcludes() {
         return excludes;
     }
 
-    public void setExcludes( String[] excludes )
-    {
+    public void setExcludes(String[] excludes) {
         this.excludes = excludes;
     }
 
-    public String[] getIncludes()
-    {
+    public String[] getIncludes() {
         return includes;
     }
 
-    public void setIncludes( String[] includes )
-    {
+    public void setIncludes(String[] includes) {
         this.includes = includes;
     }
 }

@@ -1,90 +1,77 @@
 package com.github.cardforge.phase09package;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import com.github.cardforge.AbstractAndroidMojoTestCase;
+import com.github.cardforge.maven.plugins.android.config.ConfigHandler;
 import com.github.cardforge.maven.plugins.android.phase09package.ApkMojo;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.*;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
-import com.github.cardforge.AbstractAndroidMojoTestCase;
-import com.github.cardforge.maven.plugins.android.config.ConfigHandler;
+import java.util.ArrayList;
+import java.util.List;
 
-@Ignore("This test has to be migrated to be an IntegrationTest using AbstractAndroidMojoIntegrationTest") 
-@RunWith( Parameterized.class )
+@Ignore("This test has to be migrated to be an IntegrationTest using AbstractAndroidMojoIntegrationTest")
+@RunWith(Parameterized.class)
 public class ApkMojoTest
-extends AbstractAndroidMojoTestCase<ApkMojo>
-{
+        extends AbstractAndroidMojoTestCase<ApkMojo> {
 
-	@Parameters
-	static public List<Object[]> suite()
-	{
-		final List<Object[]> suite = new ArrayList<Object[]>();
+    @Parameters
+    static public List<Object[]> suite() {
+        final List<Object[]> suite = new ArrayList<Object[]>();
 
-		suite.add( new Object[] { "apk-config-project1", null } );
-		suite.add( new Object[] { "apk-config-project2", new String[] { "persistence.xml" } } );
-		suite.add( new Object[] { "apk-config-project3", new String[] { "services/**", "persistence.xml" } } );
+        suite.add(new Object[]{"apk-config-project1", null});
+        suite.add(new Object[]{"apk-config-project2", new String[]{"persistence.xml"}});
+        suite.add(new Object[]{"apk-config-project3", new String[]{"services/**", "persistence.xml"}});
 
-		return suite;
-	}
+        return suite;
+    }
 
-	private final String	projectName;
+    private final String projectName;
 
-	private final String[]	expected;
+    private final String[] expected;
 
-	public ApkMojoTest( String projectName, String[] expected )
-	{
-		this.projectName = projectName;
-		this.expected = expected;
-	}
+    public ApkMojoTest(String projectName, String[] expected) {
+        this.projectName = projectName;
+        this.expected = expected;
+    }
 
-	@Override
-	public String getPluginGoalName()
-	{
-		return "apk";
-	}
+    @Override
+    public String getPluginGoalName() {
+        return "apk";
+    }
 
-	@Override
-	@Before
-	public void setUp()
-	throws Exception
-	{
-		super.setUp();
-	}
+    @Override
+    @Before
+    public void setUp()
+            throws Exception {
+        super.setUp();
+    }
 
-	@Override
-	@After
-	public void tearDown()
-	throws Exception
-	{
-		super.tearDown();
-	}
+    @Override
+    @After
+    public void tearDown()
+            throws Exception {
+        super.tearDown();
+    }
 
-	@Test
-	public void testConfigHelper()
-	throws Exception
-	{
-		final ApkMojo mojo = createMojo( this.projectName );
+    @Test
+    public void testConfigHelper()
+            throws Exception {
+        final ApkMojo mojo = createMojo(this.projectName);
 
-        final ConfigHandler cfh = new ConfigHandler( mojo, this.session, this.execution );
+        final ConfigHandler cfh = new ConfigHandler(mojo, this.session, this.execution);
 
-		cfh.parseConfiguration();
+        cfh.parseConfiguration();
 
-		final String[] includes = getFieldValue( mojo, "apkMetaIncludes" );
+        final String[] includes = getFieldValue(mojo, "apkMetaIncludes");
 
-		Assert.assertArrayEquals( this.expected, includes );
-	}
+        Assert.assertArrayEquals(this.expected, includes);
+    }
 
-	protected <T> T getFieldValue( Object object, String fieldName )
-	throws IllegalAccessException
-	{
-		return (T) super.getVariableValueFromObject( object, fieldName );
-	}
+    protected <T> T getFieldValue(Object object, String fieldName)
+            throws IllegalAccessException {
+        return (T) super.getVariableValueFromObject(object, fieldName);
+    }
 
 }

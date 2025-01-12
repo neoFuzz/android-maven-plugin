@@ -28,34 +28,27 @@ import java.util.List;
  *
  * @author William Ferguson - william.ferguson@xandar.com.au
  */
-final class ClassLoaderFactory
-{
+final class ClassLoaderFactory {
     private final List<String> classpathElements;
 
-    ClassLoaderFactory( List<String> classpathElements )
-    {
+    ClassLoaderFactory(List<String> classpathElements) {
         this.classpathElements = classpathElements;
     }
 
     /**
      * @return ClassLoader containing the classpaths.
      */
-    ClassLoader create()
-    {
+    ClassLoader create() {
         final List<URL> urls = new ArrayList<>();
-        for ( final String element : classpathElements )
-        {
-            try
-            {
-                urls.add( new File( element ).toURI().toURL() );
-            }
-            catch ( MalformedURLException e )
-            {
-                throw new IllegalArgumentException( "Could not resolve dependency : " + element, e );
+        for (final String element : classpathElements) {
+            try {
+                urls.add(new File(element).toURI().toURL());
+            } catch (MalformedURLException e) {
+                throw new IllegalArgumentException("Could not resolve dependency : " + element, e);
             }
         }
         return new URLClassLoader(
-                urls.toArray( new URL[urls.size()] ),
+                urls.toArray(new URL[urls.size()]),
                 Thread.currentThread().getContextClassLoader()
         );
     }

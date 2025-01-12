@@ -18,6 +18,7 @@ package com.example.android.apis.view;
 
 // Need the following import to get access to the app resources, since this
 // class is in a sub-package.
+
 import com.example.android.apis.R;
 
 import android.app.Activity;
@@ -52,30 +53,30 @@ public class Animation2 extends Activity implements
     public void onItemSelected(AdapterView<?> parent, View v, int position, long id) {
         switch (position) {
 
-        case 0:
-            mFlipper.setInAnimation(AnimationUtils.loadAnimation(this,
-                    R.anim.push_up_in));
-            mFlipper.setOutAnimation(AnimationUtils.loadAnimation(this,
-                    R.anim.push_up_out));
-            break;
-        case 1:
-            mFlipper.setInAnimation(AnimationUtils.loadAnimation(this,
-                    R.anim.push_left_in));
-            mFlipper.setOutAnimation(AnimationUtils.loadAnimation(this,
-                    R.anim.push_left_out));
-            break;
-        case 2:
-            mFlipper.setInAnimation(AnimationUtils.loadAnimation(this,
-                    android.R.anim.fade_in));
-            mFlipper.setOutAnimation(AnimationUtils.loadAnimation(this,
-                    android.R.anim.fade_out));
-            break;
-        default:
-            mFlipper.setInAnimation(AnimationUtils.loadAnimation(this,
-                    R.anim.hyperspace_in));
-            mFlipper.setOutAnimation(AnimationUtils.loadAnimation(this,
-                    R.anim.hyperspace_out));
-            break;
+            case 0:
+                mFlipper.setInAnimation(AnimationUtils.loadAnimation(this,
+                        R.anim.push_up_in));
+                mFlipper.setOutAnimation(AnimationUtils.loadAnimation(this,
+                        R.anim.push_up_out));
+                break;
+            case 1:
+                mFlipper.setInAnimation(AnimationUtils.loadAnimation(this,
+                        R.anim.push_left_in));
+                mFlipper.setOutAnimation(AnimationUtils.loadAnimation(this,
+                        R.anim.push_left_out));
+                break;
+            case 2:
+                mFlipper.setInAnimation(AnimationUtils.loadAnimation(this,
+                        android.R.anim.fade_in));
+                mFlipper.setOutAnimation(AnimationUtils.loadAnimation(this,
+                        android.R.anim.fade_out));
+                break;
+            default:
+                mFlipper.setInAnimation(AnimationUtils.loadAnimation(this,
+                        R.anim.hyperspace_in));
+                mFlipper.setOutAnimation(AnimationUtils.loadAnimation(this,
+                        R.anim.hyperspace_out));
+                break;
         }
     }
 

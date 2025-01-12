@@ -33,12 +33,12 @@ public class LayoutAnimation3 extends ListActivity {
     }
 
     private String[] mStrings = {
-        "Bordeaux",
-        "Lyon",
-        "Marseille",
-        "Nancy",
-        "Paris",
-        "Toulouse",
-        "Strasbourg"
+            "Bordeaux",
+            "Lyon",
+            "Marseille",
+            "Nancy",
+            "Paris",
+            "Toulouse",
+            "Strasbourg"
     };
 }

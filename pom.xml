@@ -22,7 +22,7 @@
 
   <groupId>com.github.cardforge.maven.plugins</groupId>
   <artifactId>android-maven-plugin</artifactId>
-  <version>4.6.3</version>
+  <version>4.7.0</version>
   <packaging>maven-plugin</packaging>
 
   <name>Android Maven Plugin - android-maven-plugin</name>
@@ -44,7 +44,7 @@
     <asm.version>5.0.4</asm.version>
     <!-- Attention - make sure that the tools version is the versions of
       the transitive dependencies of the builder version -->
-    <android.builder.version>3.0.1</android.builder.version>
+    <android.builder.version>4.0.0</android.builder.version>
     <android.tools.version>26.0.1</android.tools.version>
   </properties>
   <repositories>
@@ -56,35 +56,28 @@
   </repositories>
 
   <scm>
-    <url>http://github.com/simpligility/android-maven-plugin/tree/${scm.branch}</url>
-    <connection>scm:git:git://github.com/simpligility/android-maven-plugin.git</connection>
-    <developerConnection>scm:git:ssh://git@github.com/simpligility/android-maven-plugin.git</developerConnection>
+    <url>http://github.com/Card-Forge/android-maven-plugin/tree/${scm.branch}</url>
+    <connection>scm:git:git://github.com/Card-Forge/android-maven-plugin.git</connection>
+    <developerConnection>scm:git:ssh://git@github.com/Card-Forge/android-maven-plugin.git</developerConnection>
     <tag>HEAD</tag>
   </scm>
 
-  <issueManagement>
-    <system>Google Code Issue Tracking</system>
-    <url>https://github.com/simpligility/android-maven-plugin/issues</url>
-  </issueManagement>
-
   <ciManagement>
-    <system>Travis</system>
-    <url>https://travis-ci.org/simpligility/android-maven-plugin</url>
+    <system>GitHub Actions</system>
+    <url>https://github.com/Card-Forge/android-maven-plugin/actions</url>
   </ciManagement>
 
   <distributionManagement>
     <repository>
-      <id>ossrh</id>
-      <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+      <id>github</id>
+      <name>GitHub Packages</name>
+      <url>https://maven.pkg.github.com/Card-Forge/android-maven-plugin</url>
     </repository>
     <snapshotRepository>
-      <id>ossrh</id>
-      <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+      <id>github-snapshots</id>
+      <name>GitHub Snapshots</name>
+      <url>https://maven.pkg.github.com/Card-Forge/android-maven-plugin</url>
     </snapshotRepository>
-    <site>
-      <id>github</id>
-      <url>scm:git:ssh://git@github.com/simpligility/android-maven-plugin.git</url>
-    </site>
   </distributionManagement>
 
   <licenses>
@@ -98,7 +91,7 @@
     <developer>
       <name>Committers</name>
       <id>Committers</id>
-      <url>https://github.com/orgs/simpligility/teams/android-maven-plugins-core-committers</url>
+      <url>https://github.com/Card-Forge/android-maven-plugin/graphs/contributors</url>
       <roles>
         <role>Committers</role>
       </roles>
@@ -106,7 +99,7 @@
     <developer>
       <name>Contributors</name>
       <id>contributors</id>
-      <url>https://github.com/simpligility/android-maven-plugin/graphs/contributors</url>
+      <url>https://github.com/Card-Forge/android-maven-plugin/graphs/contributors</url>
       <roles>
         <role>Developer</role>
         <role>Contributor</role>
@@ -114,16 +107,9 @@
     </developer>
   </developers>
 
-  <mailingLists>
-    <mailingList>
-      <name>Maven Android Developers</name>
-      <archive>http://groups.google.com/group/maven-android-developers/topics</archive>
-    </mailingList>
-  </mailingLists>
-
   <prerequisites>
     <!-- define the version need to run this plugin -->
-    <maven>[3.6.4)</maven>
+    <maven>[3.7.0)</maven>
   </prerequisites>
 
   <dependencyManagement>
@@ -131,7 +117,7 @@
       <dependency>
         <groupId>org.codehaus.plexus</groupId>
         <artifactId>plexus-archiver</artifactId>
-        <version>3.7.0</version>
+        <version>4.10.0</version>
       </dependency>
 
       <dependency>
@@ -143,6 +129,12 @@
       <dependency>
         <groupId>com.android.tools</groupId>
         <artifactId>dvlib</artifactId>
+        <version>${android.tools.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>com.android</groupId>
+        <artifactId>ide</artifactId>
         <version>${android.tools.version}</version>
       </dependency>
 
@@ -161,6 +153,18 @@
       <dependency>
         <groupId>com.android.tools.build</groupId>
         <artifactId>builder</artifactId>
+        <version>${android.builder.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>com.android.tools.build</groupId>
+        <artifactId>builder-model</artifactId>
+        <version>${android.builder.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>com.android.tools.build</groupId>
+        <artifactId>builder-test-api</artifactId>
         <version>${android.builder.version}</version>
       </dependency>
 
@@ -394,8 +398,11 @@
     <dependency>
       <groupId>com.android.tools.build</groupId>
       <artifactId>builder-model</artifactId>
-      <version>${android.builder.version}</version>
-      <scope>compile</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>com.android.tools.build</groupId>
+      <artifactId>builder-test-api</artifactId>
     </dependency>
 
     <dependency>

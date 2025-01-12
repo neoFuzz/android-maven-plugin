@@ -44,7 +44,7 @@ public class FileProvider extends ContentProvider
 
     @Override
     public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs,
-            String sortOrder) {
+                        String sortOrder) {
         // Don't support queries.
         return null;
     }
@@ -90,13 +90,13 @@ public class FileProvider extends ContentProvider
 
     @Override
     public void writeDataToPipe(ParcelFileDescriptor output, Uri uri, String mimeType,
-            Bundle opts, InputStream args) {
+                                Bundle opts, InputStream args) {
         // Transfer data from the asset to the pipe the client is reading.
         byte[] buffer = new byte[8192];
         int n;
         FileOutputStream fout = new FileOutputStream(output.getFileDescriptor());
         try {
-            while ((n=args.read(buffer)) >= 0) {
+            while ((n = args.read(buffer)) >= 0) {
                 fout.write(buffer, 0, n);
             }
         } catch (IOException e) {

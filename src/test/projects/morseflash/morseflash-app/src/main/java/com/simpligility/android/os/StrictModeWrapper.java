@@ -8,52 +8,52 @@ import android.os.StrictMode;
  * check so that the code can stay in situ for lower platform versions. See the application class for usage.
  *
  * @author Manfred Moser - manfred@simpligility.com
- *
  * @see "http://android-developers.blogspot.com/2009/04/backward-compatibility-for-android.html"
  * @see "http://android-developers.blogspot.com/2010/12/new-gingerbread-api-strictmode.html"
  */
 public class StrictModeWrapper {
 
     /* class initialization fails when this throws an exception */
-   static {
-       try {
-           Class.forName("android.os.StrictMode", true, Thread.currentThread().getContextClassLoader());
-       } catch (Exception ex) {
-           throw new RuntimeException(ex);
-       }
-   }
+    static {
+        try {
+            Class.forName("android.os.StrictMode", true, Thread.currentThread().getContextClassLoader());
+        } catch (Exception ex) {
+            throw new RuntimeException(ex);
+        }
+    }
 
     /**
      * Check if the class android.os.StrictMode is available at runtime.
      */
-   public static void checkAvailable() {}
+    public static void checkAvailable() {
+    }
 
 
     /**
      * Call StrictMode.enableDefaults().
      */
     public static void enableDefaults() {
-       StrictMode.enableDefaults();
+        StrictMode.enableDefaults();
     }
 
     // all the implementation below is not tested but it should work ... feel free to check and send me fixes..
-    public static  void setThreadPolicy(android.os.StrictMode.ThreadPolicy policy) {
+    public static void setThreadPolicy(android.os.StrictMode.ThreadPolicy policy) {
         StrictMode.setThreadPolicy(policy);
     }
 
-    public static  android.os.StrictMode.ThreadPolicy getThreadPolicy() {
+    public static android.os.StrictMode.ThreadPolicy getThreadPolicy() {
         return StrictMode.getThreadPolicy();
     }
 
-    public static  android.os.StrictMode.ThreadPolicy allowThreadDiskWrites() {
+    public static android.os.StrictMode.ThreadPolicy allowThreadDiskWrites() {
         return StrictMode.allowThreadDiskWrites();
     }
 
-    public static  android.os.StrictMode.ThreadPolicy allowThreadDiskReads() {
+    public static android.os.StrictMode.ThreadPolicy allowThreadDiskReads() {
         return StrictMode.allowThreadDiskReads();
     }
 
-    public static  void setVmPolicy(android.os.StrictMode.VmPolicy policy) {
+    public static void setVmPolicy(android.os.StrictMode.VmPolicy policy) {
         StrictMode.setVmPolicy(policy);
     }
 
@@ -61,18 +61,16 @@ public class StrictModeWrapper {
         return StrictMode.getVmPolicy();
     }
 
-    public static final class ThreadPolicyWrapper
-    {
-        public static final class BuilderWrapper
-        {
+    public static final class ThreadPolicyWrapper {
+        public static final class BuilderWrapper {
             StrictMode.ThreadPolicy.Builder builderInstance;
 
-            public  BuilderWrapper() {
-                    builderInstance = new StrictMode.ThreadPolicy.Builder();
+            public BuilderWrapper() {
+                builderInstance = new StrictMode.ThreadPolicy.Builder();
             }
 
-            public  BuilderWrapper(android.os.StrictMode.ThreadPolicy policy) {
-                    builderInstance = new StrictMode.ThreadPolicy.Builder(policy);
+            public BuilderWrapper(android.os.StrictMode.ThreadPolicy policy) {
+                builderInstance = new StrictMode.ThreadPolicy.Builder(policy);
             }
 
             public android.os.StrictMode.ThreadPolicy.Builder detectAll() {

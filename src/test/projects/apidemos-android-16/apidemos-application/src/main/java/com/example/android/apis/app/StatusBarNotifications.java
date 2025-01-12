@@ -115,28 +115,28 @@ public class StatusBarNotifications extends Activity {
                 setMoodView(R.drawable.stat_sad, R.string.status_bar_notifications_sad_message);
             }
         });
-        
+
         button = (Button) findViewById(R.id.defaultSound);
         button.setOnClickListener(new Button.OnClickListener() {
             public void onClick(View v) {
                 setDefault(Notification.DEFAULT_SOUND);
             }
         });
-        
+
         button = (Button) findViewById(R.id.defaultVibrate);
         button.setOnClickListener(new Button.OnClickListener() {
             public void onClick(View v) {
                 setDefault(Notification.DEFAULT_VIBRATE);
             }
         });
-        
+
         button = (Button) findViewById(R.id.defaultAll);
         button.setOnClickListener(new Button.OnClickListener() {
             public void onClick(View v) {
                 setDefault(Notification.DEFAULT_ALL);
             }
         });
-        
+
         button = (Button) findViewById(R.id.clear);
         button.setOnClickListener(new Button.OnClickListener() {
             public void onClick(View v) {
@@ -155,7 +155,7 @@ public class StatusBarNotifications extends Activity {
                 PendingIntent.FLAG_UPDATE_CURRENT);
         return contentIntent;
     }
-    
+
 
     private PendingIntent makeDefaultIntent() {
         // A typical convention for notifications is to launch the user deeply
@@ -203,7 +203,7 @@ public class StatusBarNotifications extends Activity {
 
         // Set the info for the views that show in the notification panel.
         notification.setLatestEventInfo(this, getText(R.string.status_bar_notifications_mood_title),
-                       text, makeMoodIntent(moodId));
+                text, makeMoodIntent(moodId));
 
         // Send the notification.
         // We use a layout id because it is a unique number.  We use it later to cancel.
@@ -237,11 +237,11 @@ public class StatusBarNotifications extends Activity {
         // notification
         mNotificationManager.notify(MOOD_NOTIFICATIONS, notif);
     }
-    
+
     private void setDefault(int defaults) {
-        
+
         // This method sets the defaults on the notification before posting it.
-        
+
         // This is who should be launched if the user selects our notification.
         PendingIntent contentIntent = makeDefaultIntent();
 
@@ -256,15 +256,15 @@ public class StatusBarNotifications extends Activity {
         notification.setLatestEventInfo(
                 this,                        // the context to use
                 getText(R.string.status_bar_notifications_mood_title),
-                                             // the title for the notification
+                // the title for the notification
                 text,                        // the details to display in the notification
                 contentIntent);              // the contentIntent (see above)
 
         notification.defaults = defaults;
-        
+
         mNotificationManager.notify(
                 MOOD_NOTIFICATIONS, // we use a string id because it is a unique
-                                    // number.  we use it later to cancel the notification
+                // number.  we use it later to cancel the notification
                 notification);
-    }    
+    }
 }

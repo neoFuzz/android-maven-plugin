@@ -30,31 +30,28 @@ import android.widget.TextView;
  * Sub-activity that is executed by the redirection example when input is needed
  * from the user.
  */
-public class RedirectGetter extends Activity
-{
+public class RedirectGetter extends Activity {
     private String mTextPref;
     private TextView mText;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState)
-    {
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.redirect_getter);
 
         // Watch for button clicks.
-        Button applyButton = (Button)findViewById(R.id.apply);
+        Button applyButton = (Button) findViewById(R.id.apply);
         applyButton.setOnClickListener(mApplyListener);
 
         // The text being set.
-        mText = (TextView)findViewById(R.id.text);
+        mText = (TextView) findViewById(R.id.text);
 
         // Display the stored values, or if not stored initialize with an empty String
         loadPrefs();
     }
 
-    private final void loadPrefs()
-    {
+    private final void loadPrefs() {
         // Retrieve the current redirect values.
         // NOTE: because this preference is shared between multiple
         // activities, you must be careful about when you read or write
@@ -69,10 +66,8 @@ public class RedirectGetter extends Activity
         }
     }
 
-    private OnClickListener mApplyListener = new OnClickListener()
-    {
-        public void onClick(View v)
-        {
+    private OnClickListener mApplyListener = new OnClickListener() {
+        public void onClick(View v) {
             SharedPreferences preferences = getSharedPreferences("RedirectData", 0);
             SharedPreferences.Editor editor = preferences.edit();
             editor.putString("text", mText.getText().toString());

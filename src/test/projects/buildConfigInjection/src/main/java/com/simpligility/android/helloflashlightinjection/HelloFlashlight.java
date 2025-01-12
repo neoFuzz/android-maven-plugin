@@ -19,12 +19,12 @@ import com.simpligility.android.helloflashlightinjection.R;
  */
 public class HelloFlashlight extends Activity {
 
-	TableLayout table;
-	Button redButton;
-	Button greenButton;
-	Button blueButton;
-	Button blackButton;
-	Button whiteButton;
+    TableLayout table;
+    Button redButton;
+    Button greenButton;
+    Button blueButton;
+    Button blackButton;
+    Button whiteButton;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -49,25 +49,25 @@ public class HelloFlashlight extends Activity {
         blackButton.setOnClickListener(OnClickChangeColor(Color.BLACK));
         whiteButton.setOnClickListener(OnClickChangeColor(Color.WHITE));
 
-        TextView tv = (TextView)findViewById(R.id.buildInfo);
+        TextView tv = (TextView) findViewById(R.id.buildInfo);
         StringBuilder sb = new StringBuilder();
         sb.append("ArtifactId:\n" + BuildConfig.ArtifactId + "\n");
         sb.append("Build on:\n" + BuildConfig.BuiltOn + "\n");
-        sb.append("Built by:\n" + BuildConfig.BuiltBy  + "\n");
-        sb.append("Title:\n" + BuildConfig.Title  + "\n");
-        sb.append("Vendor:\n" + BuildConfig.Vendor  + "\n");
-        sb.append("Version:\n" + BuildConfig.Version  + "\n");
+        sb.append("Built by:\n" + BuildConfig.BuiltBy + "\n");
+        sb.append("Title:\n" + BuildConfig.Title + "\n");
+        sb.append("Vendor:\n" + BuildConfig.Vendor + "\n");
+        sb.append("Version:\n" + BuildConfig.Version + "\n");
 
         tv.setText(sb.toString());
     }
 
     /**
      * An OnClickListener that changes the color of the table.
+     *
      * @param color
      * @return
      */
-    View.OnClickListener OnClickChangeColor(final int color)
-    {
+    View.OnClickListener OnClickChangeColor(final int color) {
         return new View.OnClickListener() {
             public void onClick(View view) {
                 table.setBackgroundColor(color);

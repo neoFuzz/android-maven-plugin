@@ -43,7 +43,7 @@ public class FragmentReceiveResult extends Activity {
         FrameLayout frame = new FrameLayout(this);
         frame.setId(R.id.simple_fragment);
         setContentView(frame, lp);
-        
+
         if (savedInstanceState == null) {
             // Do first time initialization -- add fragment. 
             Fragment newFragment = new ReceiveResultFragment();
@@ -79,19 +79,19 @@ public class FragmentReceiveResult extends Activity {
 
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                Bundle savedInstanceState) {
+                                 Bundle savedInstanceState) {
             View v = inflater.inflate(R.layout.receive_result, container, false);
-            
+
             // Retrieve the TextView widget that will display results.
-            mResults = (TextView)v.findViewById(R.id.results);
+            mResults = (TextView) v.findViewById(R.id.results);
 
             // This allows us to later extend the text buffer.
             mResults.setText(mResults.getText(), TextView.BufferType.EDITABLE);
 
             // Watch for button clicks.
-            Button getButton = (Button)v.findViewById(R.id.get);
+            Button getButton = (Button) v.findViewById(R.id.get);
             getButton.setOnClickListener(mGetListener);
-            
+
             return v;
         }
 
@@ -107,7 +107,7 @@ public class FragmentReceiveResult extends Activity {
             if (requestCode == GET_CODE) {
 
                 // We will be adding to our text.
-                Editable text = (Editable)mResults.getText();
+                Editable text = (Editable) mResults.getText();
 
                 // This is a standard resultCode that is sent back if the
                 // activity doesn't supply an explicit result.  It will also
@@ -115,8 +115,8 @@ public class FragmentReceiveResult extends Activity {
                 if (resultCode == RESULT_CANCELED) {
                     text.append("(cancelled)");
 
-                // Our protocol with the sending activity is that it will send
-                // text in 'data' as its result.
+                    // Our protocol with the sending activity is that it will send
+                    // text in 'data' as its result.
                 } else {
                     text.append("(okay ");
                     text.append(Integer.toString(resultCode));

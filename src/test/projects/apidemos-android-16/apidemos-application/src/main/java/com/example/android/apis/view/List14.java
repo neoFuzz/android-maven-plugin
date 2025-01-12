@@ -32,11 +32,11 @@ import com.example.android.apis.R;
 /**
  * Demonstrates how to write an efficient list adapter. The adapter used in this example binds
  * to an ImageView and to a TextView for each row in the list.
- *
+ * <p>
  * To work efficiently the adapter implemented here uses two techniques:
  * - It reuses the convertView passed to getView() to avoid inflating View when it is not necessary
  * - It uses the ViewHolder pattern to avoid calling findViewById() when it is not necessary
- *
+ * <p>
  * The ViewHolder pattern consists in storing a data structure in the tag of the view returned by
  * getView(). This data structures contains references to the views we want to bind data to, thus
  * avoiding calls to findViewById() every time getView() is invoked.
@@ -92,7 +92,7 @@ public class List14 extends ListActivity {
          * Make a view to hold each row.
          *
          * @see android.widget.ListAdapter#getView(int, android.view.View,
-         *      android.view.ViewGroup)
+         * android.view.ViewGroup)
          */
         public View getView(int position, View convertView, ViewGroup parent) {
             // A ViewHolder keeps references to children views to avoid unneccessary calls

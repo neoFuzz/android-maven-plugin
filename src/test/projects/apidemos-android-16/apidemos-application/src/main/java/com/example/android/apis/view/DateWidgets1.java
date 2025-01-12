@@ -34,7 +34,7 @@ import java.util.Calendar;
 /**
  * Basic example of using date and time widgets, including
  * {@link android.app.TimePickerDialog} and {@link android.widget.DatePicker}.
- *
+ * <p>
  * Also provides a good example of using {@link Activity#onCreateDialog},
  * {@link Activity#onPrepareDialog} and {@link Activity#showDialog} to have the
  * activity automatically save and restore the state of the dialogs.
@@ -96,8 +96,8 @@ public class DateWidgets1 extends Activity {
                         mTimeSetListener, mHour, mMinute, false);
             case DATE_DIALOG_ID:
                 return new DatePickerDialog(this,
-                            mDateSetListener,
-                            mYear, mMonth, mDay);
+                        mDateSetListener,
+                        mYear, mMonth, mDay);
         }
         return null;
     }
@@ -112,24 +112,24 @@ public class DateWidgets1 extends Activity {
                 ((DatePickerDialog) dialog).updateDate(mYear, mMonth, mDay);
                 break;
         }
-    }    
+    }
 
     private void updateDisplay() {
         mDateDisplay.setText(
-            new StringBuilder()
-                    // Month is 0 based so add 1
-                    .append(mMonth + 1).append("-")
-                    .append(mDay).append("-")
-                    .append(mYear).append(" ")
-                    .append(pad(mHour)).append(":")
-                    .append(pad(mMinute)));
+                new StringBuilder()
+                        // Month is 0 based so add 1
+                        .append(mMonth + 1).append("-")
+                        .append(mDay).append("-")
+                        .append(mYear).append(" ")
+                        .append(pad(mHour)).append(":")
+                        .append(pad(mMinute)));
     }
 
     private DatePickerDialog.OnDateSetListener mDateSetListener =
             new DatePickerDialog.OnDateSetListener() {
 
                 public void onDateSet(DatePicker view, int year, int monthOfYear,
-                        int dayOfMonth) {
+                                      int dayOfMonth) {
                     mYear = year;
                     mMonth = monthOfYear;
                     mDay = dayOfMonth;

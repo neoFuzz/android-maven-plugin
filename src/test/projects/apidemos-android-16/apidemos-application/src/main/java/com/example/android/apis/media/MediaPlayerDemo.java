@@ -98,5 +98,4 @@ public class MediaPlayerDemo extends Activity {
     };
 
 
-
 }

@@ -18,6 +18,7 @@ package com.example.android.apis.view;
 
 // Need the following import to get access to the app resources, since this
 // class is in a sub-package.
+
 import com.example.android.apis.R;
 
 import android.app.Activity;
@@ -32,7 +33,9 @@ import android.widget.SeekBar;
  */
 public class RotatingButton extends Activity {
 
-    /** Called when the activity is first created. */
+    /**
+     * Called when the activity is first created.
+     */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -49,8 +52,8 @@ public class RotatingButton extends Activity {
             }
 
             public void onProgressChanged(SeekBar seekBar, int progress,
-                    boolean fromUser) {
-                rotatingButton.setTranslationX((float)progress);
+                                          boolean fromUser) {
+                rotatingButton.setTranslationX((float) progress);
             }
         });
         seekBar = (SeekBar) findViewById(R.id.translationY);
@@ -64,8 +67,8 @@ public class RotatingButton extends Activity {
             }
 
             public void onProgressChanged(SeekBar seekBar, int progress,
-                    boolean fromUser) {
-                rotatingButton.setTranslationY((float)progress);
+                                          boolean fromUser) {
+                rotatingButton.setTranslationY((float) progress);
             }
         });
         seekBar = (SeekBar) findViewById(R.id.scaleX);
@@ -80,8 +83,8 @@ public class RotatingButton extends Activity {
             }
 
             public void onProgressChanged(SeekBar seekBar, int progress,
-                    boolean fromUser) {
-                rotatingButton.setScaleX((float)progress/10f);
+                                          boolean fromUser) {
+                rotatingButton.setScaleX((float) progress / 10f);
             }
         });
         seekBar = (SeekBar) findViewById(R.id.scaleY);
@@ -96,8 +99,8 @@ public class RotatingButton extends Activity {
             }
 
             public void onProgressChanged(SeekBar seekBar, int progress,
-                    boolean fromUser) {
-                rotatingButton.setScaleY((float)progress/10f);
+                                          boolean fromUser) {
+                rotatingButton.setScaleY((float) progress / 10f);
             }
         });
         seekBar = (SeekBar) findViewById(R.id.rotationX);
@@ -111,9 +114,9 @@ public class RotatingButton extends Activity {
             }
 
             public void onProgressChanged(SeekBar seekBar, int progress,
-                    boolean fromUser) {
+                                          boolean fromUser) {
                 // prevent seeking on app creation
-                rotatingButton.setRotationX((float)progress);
+                rotatingButton.setRotationX((float) progress);
             }
         });
         seekBar = (SeekBar) findViewById(R.id.rotationY);
@@ -127,9 +130,9 @@ public class RotatingButton extends Activity {
             }
 
             public void onProgressChanged(SeekBar seekBar, int progress,
-                    boolean fromUser) {
+                                          boolean fromUser) {
                 // prevent seeking on app creation
-                rotatingButton.setRotationY((float)progress);
+                rotatingButton.setRotationY((float) progress);
             }
         });
         seekBar = (SeekBar) findViewById(R.id.rotationZ);
@@ -143,9 +146,9 @@ public class RotatingButton extends Activity {
             }
 
             public void onProgressChanged(SeekBar seekBar, int progress,
-                    boolean fromUser) {
+                                          boolean fromUser) {
                 // prevent seeking on app creation
-                rotatingButton.setRotation((float)progress);
+                rotatingButton.setRotation((float) progress);
             }
         });
     }

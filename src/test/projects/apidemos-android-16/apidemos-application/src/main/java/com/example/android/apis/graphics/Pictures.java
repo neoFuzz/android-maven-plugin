@@ -60,7 +60,8 @@ public class Pictures extends GraphicsActivity {
             mDrawable = new PictureDrawable(mPicture);
         }
 
-        @Override protected void onDraw(Canvas canvas) {
+        @Override
+        protected void onDraw(Canvas canvas) {
             canvas.drawColor(Color.WHITE);
 
             canvas.drawPicture(mPicture);

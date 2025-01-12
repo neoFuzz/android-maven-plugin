@@ -57,11 +57,11 @@ public class FragmentRetainInstanceSupport extends FragmentActivity {
 
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                Bundle savedInstanceState) {
+                                 Bundle savedInstanceState) {
             View v = inflater.inflate(R.layout.fragment_retain_instance, container, false);
 
             // Watch for button clicks.
-            Button button = (Button)v.findViewById(R.id.restart);
+            Button button = (Button) v.findViewById(R.id.restart);
             button.setOnClickListener(new OnClickListener() {
                 public void onClick(View v) {
                     mWorkFragment.restart();
@@ -78,7 +78,7 @@ public class FragmentRetainInstanceSupport extends FragmentActivity {
             FragmentManager fm = getFragmentManager();
 
             // Check to see if we have retained the worker fragment.
-            mWorkFragment = (RetainedFragment)fm.findFragmentByTag("work");
+            mWorkFragment = (RetainedFragment) fm.findFragmentByTag("work");
 
             // If not retained (or first time running), we need to create it.
             if (mWorkFragment == null) {
@@ -176,7 +176,7 @@ public class FragmentRetainInstanceSupport extends FragmentActivity {
             super.onActivityCreated(savedInstanceState);
 
             // Retrieve the progress bar from the target's view hierarchy.
-            mProgressBar = (ProgressBar)getTargetFragment().getView().findViewById(
+            mProgressBar = (ProgressBar) getTargetFragment().getView().findViewById(
                     R.id.progress_horizontal);
 
             // We are ready for our thread to go.

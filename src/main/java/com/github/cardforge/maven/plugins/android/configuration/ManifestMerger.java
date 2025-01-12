@@ -8,8 +8,7 @@ import java.io.File;
  *
  * @author Benoit Billington
  */
-public class ManifestMerger
-{
+public class ManifestMerger {
 
     /**
      * Mirror of {@link ManifestMergerMojo#manifestVersionName}.
@@ -57,43 +56,35 @@ public class ManifestMerger
      */
     protected File mergeReportFile;
 
-    public String getVersionName()
-    {
+    public String getVersionName() {
         return versionName;
     }
 
-    public Integer getVersionCode()
-    {
+    public Integer getVersionCode() {
         return versionCode;
     }
 
-    public UsesSdk getUsesSdk()
-    {
+    public UsesSdk getUsesSdk() {
         return usesSdk;
     }
 
-    public Boolean getVersionCodeUpdateFromVersion()
-    {
+    public Boolean getVersionCodeUpdateFromVersion() {
         return versionCodeUpdateFromVersion;
     }
 
-    public String getVersionNamingPattern()
-    {
+    public String getVersionNamingPattern() {
         return versionNamingPattern;
     }
 
-    public String getVersionDigits()
-    {
+    public String getVersionDigits() {
         return versionDigits;
     }
 
-    public Boolean getMergeLibraries()
-    {
+    public Boolean getMergeLibraries() {
         return mergeLibraries;
     }
 
-    public File getMergeReportFile()
-    {
+    public File getMergeReportFile() {
         return mergeReportFile;
     }
 }

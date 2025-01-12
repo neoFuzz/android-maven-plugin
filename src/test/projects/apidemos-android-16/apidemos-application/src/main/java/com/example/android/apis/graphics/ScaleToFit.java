@@ -30,29 +30,29 @@ public class ScaleToFit extends GraphicsActivity {
     }
 
     private static class SampleView extends View {
-        private final Paint   mPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        private final Paint   mHairPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        private final Paint   mLabelPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        private final Matrix  mMatrix = new Matrix();
-        private final RectF   mSrcR = new RectF();
+        private final Paint mPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        private final Paint mHairPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        private final Paint mLabelPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        private final Matrix mMatrix = new Matrix();
+        private final RectF mSrcR = new RectF();
 
         private static final Matrix.ScaleToFit[] sFits =
-                new Matrix.ScaleToFit[] {
-            Matrix.ScaleToFit.FILL,
-            Matrix.ScaleToFit.START,
-            Matrix.ScaleToFit.CENTER,
-            Matrix.ScaleToFit.END
+                new Matrix.ScaleToFit[]{
+                        Matrix.ScaleToFit.FILL,
+                        Matrix.ScaleToFit.START,
+                        Matrix.ScaleToFit.CENTER,
+                        Matrix.ScaleToFit.END
+                };
+
+        private static final String[] sFitLabels = new String[]{
+                "FILL", "START", "CENTER", "END"
         };
 
-        private static final String[] sFitLabels = new String[] {
-            "FILL", "START", "CENTER", "END"
-        };
-
-        private static final int[] sSrcData = new int[] {
-            80, 40, Color.RED,
-            40, 80, Color.GREEN,
-            30, 30, Color.BLUE,
-            80, 80, Color.BLACK
+        private static final int[] sSrcData = new int[]{
+                80, 40, Color.RED,
+                40, 80, Color.GREEN,
+                30, 30, Color.BLUE,
+                80, 80, Color.BLACK
         };
         private static final int N = 4;
 
@@ -68,13 +68,13 @@ public class ScaleToFit extends GraphicsActivity {
         }
 
         private void setSrcR(int index) {
-            int w = sSrcData[index*3 + 0];
-            int h = sSrcData[index*3 + 1];
+            int w = sSrcData[index * 3 + 0];
+            int h = sSrcData[index * 3 + 1];
             mSrcR.set(0, 0, w, h);
         }
 
         private void drawSrcR(Canvas canvas, int index) {
-            mPaint.setColor(sSrcData[index*3 + 2]);
+            mPaint.setColor(sSrcData[index * 3 + 2]);
             canvas.drawOval(mSrcR, mPaint);
         }
 
@@ -112,7 +112,7 @@ public class ScaleToFit extends GraphicsActivity {
                     drawFit(canvas, i, sFits[j]);
                     canvas.translate(mDstR.width() + 8, 0);
                 }
-                canvas.drawText(sFitLabels[j], 0, HEIGHT*2/3, mLabelPaint);
+                canvas.drawText(sFitLabels[j], 0, HEIGHT * 2 / 3, mLabelPaint);
                 canvas.restore();
                 canvas.translate(0, 80);
             }

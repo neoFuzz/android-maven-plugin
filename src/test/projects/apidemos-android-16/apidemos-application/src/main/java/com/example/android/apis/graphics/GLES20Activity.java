@@ -47,7 +47,7 @@ public class GLES20Activity extends Activity {
 
     private boolean detectOpenGLES20() {
         ActivityManager am =
-            (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+                (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
         ConfigurationInfo info = am.getDeviceConfigurationInfo();
         return (info.reqGlEsVersion >= 0x20000);
     }

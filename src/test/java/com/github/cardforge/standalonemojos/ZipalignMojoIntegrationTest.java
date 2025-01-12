@@ -15,47 +15,45 @@
  */
 package com.github.cardforge.standalonemojos;
 
+import com.github.cardforge.maven.plugins.android.PluginInfo;
 import io.takari.maven.testing.TestResources;
 import io.takari.maven.testing.executor.MavenExecutionResult;
 import io.takari.maven.testing.executor.MavenRuntime;
-import io.takari.maven.testing.executor.MavenVersions;
 import io.takari.maven.testing.executor.MavenRuntime.MavenRuntimeBuilder;
+import io.takari.maven.testing.executor.MavenVersions;
 import io.takari.maven.testing.executor.junit.MavenJUnitTestRunner;
-
-import java.io.File;
-
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import com.github.cardforge.maven.plugins.android.PluginInfo;
+import java.io.File;
 
 @RunWith(MavenJUnitTestRunner.class)
 @MavenVersions({"3.0.5", "3.2.3"})
 public class ZipalignMojoIntegrationTest {
-  
-  @Rule
-  public final TestResources resources = new TestResources();
-  
-  public final MavenRuntime mavenRuntime;
-  
-  public ZipalignMojoIntegrationTest(MavenRuntimeBuilder builder) throws Exception {
-    this.mavenRuntime = builder.build();
-  }
-  
-  @Test
-  public void skipOnNonAndroidProject() throws Exception {
-    File basedir = resources.getBasedir( "non-android-project" );
 
-    MavenExecutionResult result = mavenRuntime
-          .forProject(basedir)
-          // switch on debug logging
-          // .withCliOptions("-X") 
-          .execute(PluginInfo.getQualifiedGoal( "zipalign" ) );
-    
-    result.assertErrorFreeLog();
+    @Rule
+    public final TestResources resources = new TestResources();
 
-    result.assertLogText( "Skipping zipalign on jar" ); 
-  }
+    public final MavenRuntime mavenRuntime;
+
+    public ZipalignMojoIntegrationTest(MavenRuntimeBuilder builder) throws Exception {
+        this.mavenRuntime = builder.build();
+    }
+
+    @Test
+    public void skipOnNonAndroidProject() throws Exception {
+        File basedir = resources.getBasedir("non-android-project");
+
+        MavenExecutionResult result = mavenRuntime
+                .forProject(basedir)
+                // switch on debug logging
+                // .withCliOptions("-X")
+                .execute(PluginInfo.getQualifiedGoal("zipalign"));
+
+        result.assertErrorFreeLog();
+
+        result.assertLogText("Skipping zipalign on jar");
+    }
 
 }

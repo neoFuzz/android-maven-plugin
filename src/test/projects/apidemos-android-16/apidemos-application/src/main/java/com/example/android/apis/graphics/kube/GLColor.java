@@ -40,7 +40,7 @@ public class GLColor {
     @Override
     public boolean equals(Object other) {
         if (other instanceof GLColor) {
-            GLColor color = (GLColor)other;
+            GLColor color = (GLColor) other;
             return (red == color.red &&
                     green == color.green &&
                     blue == color.blue &&

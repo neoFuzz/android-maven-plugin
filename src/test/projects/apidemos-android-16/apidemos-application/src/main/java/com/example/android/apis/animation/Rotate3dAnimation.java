@@ -44,13 +44,13 @@ public class Rotate3dAnimation extends Animation {
      * should be reversed in time.
      *
      * @param fromDegrees the start angle of the 3D rotation
-     * @param toDegrees the end angle of the 3D rotation
-     * @param centerX the X center of the 3D rotation
-     * @param centerY the Y center of the 3D rotation
-     * @param reverse true if the translation should be reversed, false otherwise
+     * @param toDegrees   the end angle of the 3D rotation
+     * @param centerX     the X center of the 3D rotation
+     * @param centerY     the Y center of the 3D rotation
+     * @param reverse     true if the translation should be reversed, false otherwise
      */
     public Rotate3dAnimation(float fromDegrees, float toDegrees,
-            float centerX, float centerY, float depthZ, boolean reverse) {
+                             float centerX, float centerY, float depthZ, boolean reverse) {
         mFromDegrees = fromDegrees;
         mToDegrees = toDegrees;
         mCenterX = centerX;

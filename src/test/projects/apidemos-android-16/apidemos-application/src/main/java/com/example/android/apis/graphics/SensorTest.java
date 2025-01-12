@@ -73,11 +73,13 @@ public class SensorTest extends GraphicsActivity {
             }
             return sum * mWeightScale;
         }
-    };
+    }
+
+    ;
 
     private final SensorEventListener mListener = new SensorEventListener() {
 
-        private final float[] mScale = new float[] { 2, 2.5f, 0.5f };   // accel
+        private final float[] mScale = new float[]{2, 2.5f, 0.5f};   // accel
         private float[] mPrev = new float[3];
         private long mLastGestureTime;
 
@@ -137,7 +139,7 @@ public class SensorTest extends GraphicsActivity {
     @Override
     protected void onCreate(Bundle icicle) {
         super.onCreate(icicle);
-        mSensorManager = (SensorManager)getSystemService(Context.SENSOR_SERVICE);
+        mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         mSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
         mView = new SampleView(this);
         setContentView(mView);
@@ -159,8 +161,8 @@ public class SensorTest extends GraphicsActivity {
     }
 
     private class SampleView extends View {
-        private Paint   mPaint = new Paint();
-        private Path    mPath = new Path();
+        private Paint mPaint = new Paint();
+        private Path mPath = new Path();
         private boolean mAnimate;
 
         public SampleView(Context context) {
@@ -199,14 +201,14 @@ public class SensorTest extends GraphicsActivity {
         @Override
         protected void onAttachedToWindow() {
             mAnimate = true;
-            if (false) Log.d(TAG, "onAttachedToWindow. mAnimate="+mAnimate);
+            if (false) Log.d(TAG, "onAttachedToWindow. mAnimate=" + mAnimate);
             super.onAttachedToWindow();
         }
 
         @Override
         protected void onDetachedFromWindow() {
             mAnimate = false;
-            if (false) Log.d(TAG, "onAttachedToWindow. mAnimate="+mAnimate);
+            if (false) Log.d(TAG, "onAttachedToWindow. mAnimate=" + mAnimate);
             super.onDetachedFromWindow();
         }
     }

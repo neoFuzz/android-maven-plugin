@@ -17,7 +17,6 @@
 package com.github.cardforge.maven.plugins.android.standalonemojos;
 
 import com.github.cardforge.maven.plugins.android.AbstractAndroidMojo;
-
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Mojo;
@@ -32,17 +31,14 @@ import org.apache.maven.plugins.annotations.ResolutionScope;
  *
  * @author hugo.josefson@jayway.com
  */
-@Mojo( name = "deploy-dependencies", requiresDependencyResolution = ResolutionScope.RUNTIME )
-public class DeployDependenciesMojo extends AbstractAndroidMojo
-{
+@Mojo(name = "deploy-dependencies", requiresDependencyResolution = ResolutionScope.RUNTIME)
+public class DeployDependenciesMojo extends AbstractAndroidMojo {
 
     /**
-     *
      * @throws MojoExecutionException
      * @throws MojoFailureException
      */
-    public void execute() throws MojoExecutionException, MojoFailureException
-    {
+    public void execute() throws MojoExecutionException, MojoFailureException {
         deployDependencies();
     }
 

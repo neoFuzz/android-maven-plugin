@@ -29,9 +29,9 @@ public class ReorderFour extends Activity {
     @Override
     protected void onCreate(Bundle savedState) {
         super.onCreate(savedState);
-        
+
         setContentView(R.layout.reorder_four);
-        
+
         Button twoButton = (Button) findViewById(R.id.reorder_second_to_front);
         twoButton.setOnClickListener(mClickListener);
     }

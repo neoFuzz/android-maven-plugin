@@ -30,28 +30,28 @@ public class RatingBar1 extends Activity implements RatingBar.OnRatingBarChangeL
     RatingBar mSmallRatingBar;
     RatingBar mIndicatorRatingBar;
     TextView mRatingText;
-    
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.ratingbar_1);
-        
+
         mRatingText = (TextView) findViewById(R.id.rating);
 
         // We copy the most recently changed rating on to these indicator-only
         // rating bars
         mIndicatorRatingBar = (RatingBar) findViewById(R.id.indicator_ratingbar);
         mSmallRatingBar = (RatingBar) findViewById(R.id.small_ratingbar);
-        
+
         // The different rating bars in the layout. Assign the listener to us.
-        ((RatingBar)findViewById(R.id.ratingbar1)).setOnRatingBarChangeListener(this);
-        ((RatingBar)findViewById(R.id.ratingbar2)).setOnRatingBarChangeListener(this);
+        ((RatingBar) findViewById(R.id.ratingbar1)).setOnRatingBarChangeListener(this);
+        ((RatingBar) findViewById(R.id.ratingbar2)).setOnRatingBarChangeListener(this);
     }
 
     public void onRatingChanged(RatingBar ratingBar, float rating, boolean fromTouch) {
         final int numStars = ratingBar.getNumStars();
-        mRatingText.setText( 
+        mRatingText.setText(
                 getString(R.string.ratingbar_rating) + " " + rating + "/" + numStars);
 
         // Since this rating bar is updated to reflect any of the other rating

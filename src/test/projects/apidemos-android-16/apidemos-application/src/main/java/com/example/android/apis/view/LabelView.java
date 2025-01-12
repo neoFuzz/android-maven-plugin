@@ -18,6 +18,7 @@ package com.example.android.apis.view;
 
 // Need the following import to get access to the app resources, since this
 // class is in a sub-package.
+
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
@@ -32,16 +33,16 @@ import com.example.android.apis.R;
  * Example of how to write a custom subclass of View. LabelView
  * is used to draw simple text views. Note that it does not handle
  * styled text or right-to-left writing systems.
- *
  */
 public class LabelView extends View {
     private Paint mTextPaint;
     private String mText;
     private int mAscent;
-    
+
     /**
      * Constructor.  This version is only needed if you will be instantiating
      * the object manually (not from a layout XML file).
+     *
      * @param context
      */
     public LabelView(Context context) {
@@ -53,7 +54,7 @@ public class LabelView extends View {
      * Construct object, initializing with any attributes we understand from a
      * layout file. These attributes are defined in
      * SDK/assets/res/any/classes.xml.
-     * 
+     *
      * @see android.view.View#View(android.content.Context, android.util.AttributeSet)
      */
     public LabelView(Context context, AttributeSet attrs) {
@@ -92,6 +93,7 @@ public class LabelView extends View {
 
     /**
      * Sets the text to display in this label
+     *
      * @param text The text to display. This will be drawn as one line.
      */
     public void setText(String text) {
@@ -102,6 +104,7 @@ public class LabelView extends View {
 
     /**
      * Sets the text size for this label
+     *
      * @param size Font size
      */
     public void setTextSize(int size) {
@@ -113,6 +116,7 @@ public class LabelView extends View {
 
     /**
      * Sets the text color for this label.
+     *
      * @param color ARGB value for the text
      */
     public void setTextColor(int color) {
@@ -131,6 +135,7 @@ public class LabelView extends View {
 
     /**
      * Determines the width of this view
+     *
      * @param measureSpec A measureSpec packed into an int
      * @return The width of the view, honoring constraints from measureSpec
      */
@@ -157,6 +162,7 @@ public class LabelView extends View {
 
     /**
      * Determines the height of this view
+     *
      * @param measureSpec A measureSpec packed into an int
      * @return The height of the view, honoring constraints from measureSpec
      */
@@ -183,7 +189,7 @@ public class LabelView extends View {
 
     /**
      * Render the text
-     * 
+     *
      * @see android.view.View#onDraw(android.graphics.Canvas)
      */
     @Override

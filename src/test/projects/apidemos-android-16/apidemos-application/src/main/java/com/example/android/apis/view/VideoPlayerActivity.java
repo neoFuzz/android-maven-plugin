@@ -72,7 +72,8 @@ public class VideoPlayerActivity extends Activity
         int mLastSystemUiVis;
 
         Runnable mNavHider = new Runnable() {
-            @Override public void run() {
+            @Override
+            public void run() {
                 setNavVisibility(false);
             }
         };
@@ -84,7 +85,7 @@ public class VideoPlayerActivity extends Activity
         }
 
         public void init(Activity activity, TextView title, Button playButton,
-                SeekBar seek) {
+                         SeekBar seek) {
             // This called by the containing activity to supply the surrounding
             // state of the video player that it will interact with.
             mActivity = activity;
@@ -95,7 +96,8 @@ public class VideoPlayerActivity extends Activity
             setPlayPaused(true);
         }
 
-        @Override protected void onAttachedToWindow() {
+        @Override
+        protected void onAttachedToWindow() {
             super.onAttachedToWindow();
             if (mActivity != null) {
                 mAddedMenuListener = true;
@@ -103,33 +105,37 @@ public class VideoPlayerActivity extends Activity
             }
         }
 
-        @Override protected void onDetachedFromWindow() {
+        @Override
+        protected void onDetachedFromWindow() {
             super.onDetachedFromWindow();
             if (mAddedMenuListener) {
                 mActivity.getActionBar().removeOnMenuVisibilityListener(this);
             }
         }
 
-        @Override public void onSystemUiVisibilityChange(int visibility) {
+        @Override
+        public void onSystemUiVisibilityChange(int visibility) {
             // Detect when we go out of nav-hidden mode, to clear our state
             // back to having the full UI chrome up.  Only do this when
             // the state is changing and nav is no longer hidden.
             int diff = mLastSystemUiVis ^ visibility;
             mLastSystemUiVis = visibility;
-            if ((diff&SYSTEM_UI_FLAG_HIDE_NAVIGATION) != 0
-                    && (visibility&SYSTEM_UI_FLAG_HIDE_NAVIGATION) == 0) {
+            if ((diff & SYSTEM_UI_FLAG_HIDE_NAVIGATION) != 0
+                    && (visibility & SYSTEM_UI_FLAG_HIDE_NAVIGATION) == 0) {
                 setNavVisibility(true);
             }
         }
 
-        @Override protected void onWindowVisibilityChanged(int visibility) {
+        @Override
+        protected void onWindowVisibilityChanged(int visibility) {
             super.onWindowVisibilityChanged(visibility);
 
             // When we become visible or invisible, play is paused.
             setPlayPaused(true);
         }
 
-        @Override public void onClick(View v) {
+        @Override
+        public void onClick(View v) {
             if (v == mPlayButton) {
                 // Clicking on the play/pause button toggles its state.
                 setPlayPaused(!mPaused);
@@ -139,7 +145,8 @@ public class VideoPlayerActivity extends Activity
             }
         }
 
-        @Override public void onMenuVisibilityChanged(boolean isVisible) {
+        @Override
+        public void onMenuVisibilityChanged(boolean isVisible) {
             mMenusOpen = isVisible;
             setNavVisibility(true);
         }
@@ -193,10 +200,10 @@ public class VideoPlayerActivity extends Activity
         getWindow().requestFeature(Window.FEATURE_ACTION_BAR_OVERLAY);
 
         setContentView(R.layout.video_player);
-        mContent = (Content)findViewById(R.id.content);
-        mContent.init(this, (TextView)findViewById(R.id.title),
-                (Button)findViewById(R.id.play),
-                (SeekBar)findViewById(R.id.seekbar));
+        mContent = (Content) findViewById(R.id.content);
+        mContent.init(this, (TextView) findViewById(R.id.title),
+                (Button) findViewById(R.id.play),
+                (SeekBar) findViewById(R.id.seekbar));
 
         ActionBar bar = getActionBar();
         bar.addTab(bar.newTab().setText("Tab 1").setTabListener(this));

@@ -46,14 +46,14 @@ public class Gallery1 extends Activity {
         Gallery g = (Gallery) findViewById(R.id.gallery);
         // Set the adapter to our custom adapter (below)
         g.setAdapter(new ImageAdapter(this));
-        
+
         // Set a item click listener, and just Toast the clicked position
         g.setOnItemClickListener(new OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
                 Toast.makeText(Gallery1.this, "" + position, Toast.LENGTH_SHORT).show();
             }
         });
-        
+
         // We also want to show context menu for longpressed items in the gallery
         registerForContextMenu(g);
     }
@@ -62,7 +62,7 @@ public class Gallery1 extends Activity {
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
         menu.add(R.string.gallery_2_text);
     }
-    
+
     @Override
     public boolean onContextItemSelected(MenuItem item) {
         AdapterContextMenuInfo info = (AdapterContextMenuInfo) item.getMenuInfo();
@@ -124,7 +124,7 @@ public class Gallery1 extends Activity {
                 imageView.setLayoutParams(new Gallery.LayoutParams(
                         (int) (ITEM_WIDTH * mDensity + 0.5f),
                         (int) (ITEM_HEIGHT * mDensity + 0.5f)));
-            
+
                 // The preferred Gallery item background
                 imageView.setBackgroundResource(mGalleryItemBackground);
             } else {

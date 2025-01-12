@@ -23,8 +23,7 @@ import org.apache.maven.plugins.annotations.Parameter;
  *
  * @author hugo.josefson@jayway.com
  */
-public class Sign
-{
+public class Sign {
 
     /**
      * Whether to sign with the debug keystore. Valid values are:
@@ -36,11 +35,10 @@ public class Sign
      * <a href="http://code.google.com/p/maven-android-plugin/issues/detail?id=2">Issue 2</a>.)
      * </ul>
      */
-    @Parameter (  property = "android.sign.debug", defaultValue = "auto" )
+    @Parameter(property = "android.sign.debug", defaultValue = "auto")
     private String debug;
 
-    public String getDebug()
-    {
+    public String getDebug() {
         return debug;
     }
 }

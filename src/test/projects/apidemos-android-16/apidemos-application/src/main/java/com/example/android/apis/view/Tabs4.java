@@ -20,4 +20,5 @@ package com.example.android.apis.view;
 /**
  * Identical to Tabs2. The change is in the theme used in the manifest file.
  */
-public class Tabs4 extends Tabs2 {}
+public class Tabs4 extends Tabs2 {
+}

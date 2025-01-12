@@ -1,7 +1,6 @@
 package com.github.cardforge.maven.plugins.android.configuration;
 
 
-
 /**
  * Configuration for the D8 execution. This class is only the definition of the parameters that are
  * shadowed in
@@ -9,8 +8,7 @@ package com.github.cardforge.maven.plugins.android.configuration;
  *
  * @author William Ferguson - william.ferguson@xandar.com.aui
  */
-public class D8
-{
+public class D8 {
     /**
      * Mirror of {@link D8Mojo#d8JvmArguments}
      */
@@ -39,33 +37,27 @@ public class D8
      */
     private Integer minApi;
 
-    public String[] getJvmArguments()
-    {
+    public String[] getJvmArguments() {
         return jvmArguments;
     }
 
-    public Boolean isIntermediate()
-    {
+    public Boolean isIntermediate() {
         return intermediate;
     }
 
-    public String getMainDexList()
-    {
+    public String getMainDexList() {
         return mainDexList;
     }
 
-    public String[] getArguments()
-    {
+    public String[] getArguments() {
         return arguments;
     }
 
-    public Boolean isRelease()
-    {
+    public Boolean isRelease() {
         return release;
     }
 
-    public Integer getMinApi()
-    {
+    public Integer getMinApi() {
         return minApi;
     }
 }

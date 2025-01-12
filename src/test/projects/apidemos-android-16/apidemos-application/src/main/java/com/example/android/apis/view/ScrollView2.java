@@ -26,7 +26,6 @@ import android.widget.Button;
 
 /**
  * Demonstrates wrapping a layout in a ScrollView.
- *
  */
 public class ScrollView2 extends Activity {
     @Override

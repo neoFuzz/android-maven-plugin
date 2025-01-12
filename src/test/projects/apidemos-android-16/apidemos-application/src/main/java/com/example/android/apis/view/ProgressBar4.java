@@ -39,7 +39,7 @@ public class ProgressBar4 extends Activity {
         requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
         setContentView(R.layout.progressbar_4);
         setProgressBarIndeterminateVisibility(mToggleIndeterminate);
-        
+
         Button button = (Button) findViewById(R.id.toggle);
         button.setOnClickListener(new Button.OnClickListener() {
             public void onClick(View v) {

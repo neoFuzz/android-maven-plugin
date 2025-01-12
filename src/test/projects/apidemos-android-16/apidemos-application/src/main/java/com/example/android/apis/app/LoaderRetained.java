@@ -66,7 +66,8 @@ public class LoaderRetained extends Activity {
         // If non-null, this is the current filter the user has provided.
         String mCurFilter;
 
-        @Override public void onActivityCreated(Bundle savedInstanceState) {
+        @Override
+        public void onActivityCreated(Bundle savedInstanceState) {
             super.onActivityCreated(savedInstanceState);
 
             // In this sample we are going to use a retained fragment.
@@ -82,8 +83,8 @@ public class LoaderRetained extends Activity {
             // Create an empty adapter we will use to display the loaded data.
             mAdapter = new SimpleCursorAdapter(getActivity(),
                     android.R.layout.simple_list_item_2, null,
-                    new String[] { Contacts.DISPLAY_NAME, Contacts.CONTACT_STATUS },
-                    new int[] { android.R.id.text1, android.R.id.text2 }, 0);
+                    new String[]{Contacts.DISPLAY_NAME, Contacts.CONTACT_STATUS},
+                    new int[]{android.R.id.text1, android.R.id.text2}, 0);
             setListAdapter(mAdapter);
 
             // Start out with a progress indicator.
@@ -94,7 +95,8 @@ public class LoaderRetained extends Activity {
             getLoaderManager().initLoader(0, null, this);
         }
 
-        @Override public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        @Override
+        public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
             // Place an action bar item for searching.
             MenuItem item = menu.add("Search");
             item.setIcon(android.R.drawable.ic_menu_search);
@@ -123,24 +125,26 @@ public class LoaderRetained extends Activity {
             return true;
         }
 
-        @Override public boolean onQueryTextSubmit(String query) {
+        @Override
+        public boolean onQueryTextSubmit(String query) {
             // Don't care about this.
             return true;
         }
 
-        @Override public void onListItemClick(ListView l, View v, int position, long id) {
+        @Override
+        public void onListItemClick(ListView l, View v, int position, long id) {
             // Insert desired behavior here.
             Log.i("FragmentComplexList", "Item clicked: " + id);
         }
 
         // These are the Contacts rows that we will retrieve.
-        static final String[] CONTACTS_SUMMARY_PROJECTION = new String[] {
-            Contacts._ID,
-            Contacts.DISPLAY_NAME,
-            Contacts.CONTACT_STATUS,
-            Contacts.CONTACT_PRESENCE,
-            Contacts.PHOTO_ID,
-            Contacts.LOOKUP_KEY,
+        static final String[] CONTACTS_SUMMARY_PROJECTION = new String[]{
+                Contacts._ID,
+                Contacts.DISPLAY_NAME,
+                Contacts.CONTACT_STATUS,
+                Contacts.CONTACT_PRESENCE,
+                Contacts.PHOTO_ID,
+                Contacts.LOOKUP_KEY,
         };
 
         public Loader<Cursor> onCreateLoader(int id, Bundle args) {

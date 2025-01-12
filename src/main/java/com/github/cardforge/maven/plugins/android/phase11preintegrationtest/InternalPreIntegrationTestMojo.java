@@ -17,7 +17,6 @@
 package com.github.cardforge.maven.plugins.android.phase11preintegrationtest;
 
 import com.github.cardforge.maven.plugins.android.AbstractInstrumentationMojo;
-
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
@@ -30,15 +29,12 @@ import org.apache.maven.plugins.annotations.Mojo;
  *
  * @author hugo.josefson@jayway.com
  */
-@Mojo( name = "internal-pre-integration-test", defaultPhase = LifecyclePhase.PRE_INTEGRATION_TEST )
-public class InternalPreIntegrationTestMojo extends AbstractInstrumentationMojo
-{
+@Mojo(name = "internal-pre-integration-test", defaultPhase = LifecyclePhase.PRE_INTEGRATION_TEST)
+public class InternalPreIntegrationTestMojo extends AbstractInstrumentationMojo {
 
     @Override
-    public void execute() throws MojoExecutionException, MojoFailureException
-    {
-        if ( isEnableIntegrationTest() )
-        {
+    public void execute() throws MojoExecutionException, MojoFailureException {
+        if (isEnableIntegrationTest()) {
             deployDependencies();
             deployBuiltApk();
         }

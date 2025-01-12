@@ -7,8 +7,7 @@ package com.github.cardforge.maven.plugins.android.configuration;
  *
  * @author Manfred Moser - manfred@simpligility.com
  */
-public class Push
-{
+public class Push {
     /**
      * Mirror of {@link PushMojo#source}
      */
@@ -18,13 +17,11 @@ public class Push
      */
     private String destination;
 
-    public String getSource()
-    {
+    public String getSource() {
         return source;
     }
 
-    public String getDestination()
-    {
+    public String getDestination() {
         return destination;
     }
 }

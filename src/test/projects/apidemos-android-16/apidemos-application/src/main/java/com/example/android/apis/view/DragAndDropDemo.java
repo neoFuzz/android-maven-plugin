@@ -54,7 +54,8 @@ public class DragAndDropDemo extends Activity {
                         // is properly notified about the ongoing drag, and lights up
                         // to indicate that it can handle the current content.
                         mHiddenDot.setVisibility(View.VISIBLE);
-                    } break;
+                    }
+                    break;
 
                     case DragEvent.ACTION_DRAG_ENDED: {
                         // Hide the surprise again
@@ -63,7 +64,8 @@ public class DragAndDropDemo extends Activity {
                         // Report the drop/no-drop result to the user
                         final boolean dropped = event.getResult();
                         mResultText.setText(dropped ? "Dropped!" : "No drop");
-                    } break;
+                    }
+                    break;
                 }
                 return false;
             }

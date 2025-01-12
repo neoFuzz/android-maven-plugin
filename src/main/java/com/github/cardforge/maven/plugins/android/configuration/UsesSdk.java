@@ -6,59 +6,48 @@ package com.github.cardforge.maven.plugins.android.configuration;
  * @author Francisco Javier Fernandez fjfernandez@tuenti.com
  */
 
-public class UsesSdk
-{
+public class UsesSdk {
+    private static final int PRIME_NUMBER = 31;
     private String minSdkVersion;
     private String maxSdkVersion;
     private String targetSdkVersion;
 
-    private static final int PRIME_NUMBER = 31;
-
-    public String getMinSdkVersion()
-    {
+    public String getMinSdkVersion() {
         return minSdkVersion;
     }
 
-    public String getMaxSdkVersion()
-    {
+    public String getMaxSdkVersion() {
         return maxSdkVersion;
     }
 
-    public String getTargetSdkVersion()
-    {
+    public String getTargetSdkVersion() {
         return targetSdkVersion;
     }
 
     @Override
-    public boolean equals( Object o )
-    {
-        if ( this == o )
-        {
+    public boolean equals(Object o) {
+        if (this == o) {
             return true;
         }
-        if ( o == null || getClass() != o.getClass() )
-        {
+        if (o == null || getClass() != o.getClass()) {
             return false;
         }
 
-        UsesSdk usesSdk = ( UsesSdk ) o;
+        UsesSdk usesSdk = (UsesSdk) o;
 
-        if ( maxSdkVersion != null
-                ? !maxSdkVersion.equals( usesSdk.maxSdkVersion )
-                : usesSdk.maxSdkVersion != null )
-        {
+        if (maxSdkVersion != null
+                ? !maxSdkVersion.equals(usesSdk.maxSdkVersion)
+                : usesSdk.maxSdkVersion != null) {
             return false;
         }
-        if ( minSdkVersion != null
-                ? !minSdkVersion.equals( usesSdk.minSdkVersion )
-                : usesSdk.minSdkVersion != null )
-        {
+        if (minSdkVersion != null
+                ? !minSdkVersion.equals(usesSdk.minSdkVersion)
+                : usesSdk.minSdkVersion != null) {
             return false;
         }
-        if ( targetSdkVersion != null
-                ? !targetSdkVersion.equals( usesSdk.targetSdkVersion )
-                : usesSdk.targetSdkVersion != null )
-        {
+        if (targetSdkVersion != null
+                ? !targetSdkVersion.equals(usesSdk.targetSdkVersion)
+                : usesSdk.targetSdkVersion != null) {
             return false;
         }
 
@@ -66,17 +55,15 @@ public class UsesSdk
     }
 
     @Override
-    public int hashCode()
-    {
+    public int hashCode() {
         int result = minSdkVersion != null ? minSdkVersion.hashCode() : 0;
-        result = PRIME_NUMBER * result + ( maxSdkVersion != null ? maxSdkVersion.hashCode() : 0 );
-        result = PRIME_NUMBER * result + ( targetSdkVersion != null ? targetSdkVersion.hashCode() : 0 );
+        result = PRIME_NUMBER * result + (maxSdkVersion != null ? maxSdkVersion.hashCode() : 0);
+        result = PRIME_NUMBER * result + (targetSdkVersion != null ? targetSdkVersion.hashCode() : 0);
         return result;
     }
 
     @Override
-    public String toString()
-    {
+    public String toString() {
         return minSdkVersion + " : " + maxSdkVersion + " : " + targetSdkVersion;
     }
 }

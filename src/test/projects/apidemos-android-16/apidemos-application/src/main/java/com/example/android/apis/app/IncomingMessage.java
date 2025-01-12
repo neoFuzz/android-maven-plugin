@@ -43,19 +43,18 @@ public class IncomingMessage extends Activity {
 
         Button button = (Button) findViewById(R.id.notify_app);
         button.setOnClickListener(new Button.OnClickListener() {
-                public void onClick(View v) {
-                    showAppNotification();
-                }
-            });
+            public void onClick(View v) {
+                showAppNotification();
+            }
+        });
 
         button = (Button) findViewById(R.id.notify_interstitial);
         button.setOnClickListener(new Button.OnClickListener() {
-                public void onClick(View v) {
-                    showInterstitialNotification();
-                }
-            });
+            public void onClick(View v) {
+                showInterstitialNotification();
+            }
+        });
     }
-
 
 
     /**
@@ -64,7 +63,7 @@ public class IncomingMessage extends Activity {
      * application should be in when launching it from a notification.
      */
     static Intent[] makeMessageIntentStack(Context context, CharSequence from,
-            CharSequence msg) {
+                                           CharSequence msg) {
         // A typical convention for notifications is to launch the user deeply
         // into an application representing the data in the notification; to
         // accomplish this, we can build an array of intents to insert the back
@@ -100,15 +99,21 @@ public class IncomingMessage extends Activity {
      */
     void showAppNotification() {
         // look up the notification manager service
-        NotificationManager nm = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
+        NotificationManager nm = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
 
         // The details of our fake message
         CharSequence from = "Joe";
         CharSequence message;
         switch ((new Random().nextInt()) % 3) {
-            case 0: message = "r u hungry?  i am starved"; break;
-            case 1: message = "im nearby u"; break;
-            default: message = "kthx. meet u for dinner. cul8r"; break;
+            case 0:
+                message = "r u hungry?  i am starved";
+                break;
+            case 1:
+                message = "im nearby u";
+                break;
+            default:
+                message = "kthx. meet u for dinner. cul8r";
+                break;
         }
 
         // The PendingIntent to launch our activity if the user selects this
@@ -142,22 +147,27 @@ public class IncomingMessage extends Activity {
     }
 
 
-
     /**
      * The notification is the icon and associated expanded entry in the
      * status bar.
      */
     void showInterstitialNotification() {
         // look up the notification manager service
-        NotificationManager nm = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
+        NotificationManager nm = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
 
         // The details of our fake message
         CharSequence from = "Dianne";
         CharSequence message;
         switch ((new Random().nextInt()) % 3) {
-            case 0: message = "i am ready for some dinner"; break;
-            case 1: message = "how about thai down the block?"; break;
-            default: message = "meet u soon. dont b late!"; break;
+            case 0:
+                message = "i am ready for some dinner";
+                break;
+            case 1:
+                message = "how about thai down the block?";
+                break;
+            default:
+                message = "meet u soon. dont b late!";
+                break;
         }
 
         // The PendingIntent to launch our activity if the user selects this

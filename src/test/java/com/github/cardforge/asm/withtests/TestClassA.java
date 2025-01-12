@@ -19,12 +19,13 @@ import junit.framework.TestCase;
 
 /**
  * A class which is a test.
- *
+ * <p>
  * For {@link com.github.cardforge.asm.AndroidTestFinderTest}.
+ *
  * @author hugo.josefson@jayway.com
  */
 public class TestClassA extends TestCase {
-    public void testSomethingToPleaseJunit(){
+    public void testSomethingToPleaseJunit() {
         assertTrue(true);
     }
 }

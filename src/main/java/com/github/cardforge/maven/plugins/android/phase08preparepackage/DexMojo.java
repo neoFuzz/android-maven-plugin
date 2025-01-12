@@ -16,18 +16,13 @@
  */
 package com.github.cardforge.maven.plugins.android.phase08preparepackage;
 
-import static com.github.cardforge.maven.plugins.android.InclusionExclusionResolver.filterArtifacts;
-import static com.github.cardforge.maven.plugins.android.common.AndroidExtension.AAR;
-import static com.github.cardforge.maven.plugins.android.common.AndroidExtension.APK;
-import static com.github.cardforge.maven.plugins.android.common.AndroidExtension.APKLIB;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
+import com.github.cardforge.maven.plugins.android.AbstractAndroidMojo;
+import com.github.cardforge.maven.plugins.android.CommandExecutor;
+import com.github.cardforge.maven.plugins.android.ExecutionException;
+import com.github.cardforge.maven.plugins.android.IncludeExcludeSet;
+import com.github.cardforge.maven.plugins.android.common.Const;
+import com.github.cardforge.maven.plugins.android.common.ZipExtractor;
+import com.github.cardforge.maven.plugins.android.configuration.Dex;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.artifact.Artifact;
@@ -42,13 +37,15 @@ import org.codehaus.plexus.archiver.ArchiverException;
 import org.codehaus.plexus.archiver.jar.JarArchiver;
 import org.codehaus.plexus.archiver.util.DefaultFileSet;
 
-import com.github.cardforge.maven.plugins.android.AbstractAndroidMojo;
-import com.github.cardforge.maven.plugins.android.CommandExecutor;
-import com.github.cardforge.maven.plugins.android.ExecutionException;
-import com.github.cardforge.maven.plugins.android.IncludeExcludeSet;
-import com.github.cardforge.maven.plugins.android.common.Const;
-import com.github.cardforge.maven.plugins.android.common.ZipExtractor;
-import com.github.cardforge.maven.plugins.android.configuration.Dex;
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+import static com.github.cardforge.maven.plugins.android.InclusionExclusionResolver.filterArtifacts;
+import static com.github.cardforge.maven.plugins.android.common.AndroidExtension.*;
 
 /**
  * Converts compiled Java classes to the Android dex format.
@@ -56,12 +53,11 @@ import com.github.cardforge.maven.plugins.android.configuration.Dex;
  * @author hugo.josefson@jayway.com
  */
 @Mojo(
-    name = "dex",
-    defaultPhase = LifecyclePhase.PREPARE_PACKAGE,
-    requiresDependencyResolution = ResolutionScope.COMPILE
+        name = "dex",
+        defaultPhase = LifecyclePhase.PREPARE_PACKAGE,
+        requiresDependencyResolution = ResolutionScope.COMPILE
 )
-public class DexMojo extends AbstractAndroidMojo
-{
+public class DexMojo extends AbstractAndroidMojo {
 
     /**
      * Configuration for the dex command execution. It can be configured in the plugin configuration like so
@@ -93,7 +89,7 @@ public class DexMojo extends AbstractAndroidMojo
     /**
      * The dex compiler to use. Allowed values are 'dex' (default) and 'd8'.
      */
-    @Parameter( property = "android.dex.compiler", defaultValue = "dex" )
+    @Parameter(property = "android.dex.compiler", defaultValue = "dex")
     private String dexCompiler;
 
     @Parameter
@@ -102,99 +98,99 @@ public class DexMojo extends AbstractAndroidMojo
     /**
      * Extra JVM Arguments. Using these you can e.g. increase memory for the jvm running the build.
      */
-    @Parameter( property = "android.dex.jvmArguments", defaultValue = "-Xmx1024M" )
+    @Parameter(property = "android.dex.jvmArguments", defaultValue = "-Xmx1024M")
     private String[] dexJvmArguments;
 
     /**
      * Decides whether to pass the --core-library flag to dx.
      */
-    @Parameter( property = "android.dex.coreLibrary", defaultValue = "false" )
+    @Parameter(property = "android.dex.coreLibrary", defaultValue = "false")
     private boolean dexCoreLibrary;
 
     /**
      * Decides whether to pass the --no-locals flag to dx.
      */
-    @Parameter( property = "android.dex.noLocals", defaultValue = "false" )
+    @Parameter(property = "android.dex.noLocals", defaultValue = "false")
     private boolean dexNoLocals;
 
     /**
      * Decides whether to pass the --no-optimize flag to dx.
      */
-    @Parameter( property = "android.dex.optimize", defaultValue = "true" )
+    @Parameter(property = "android.dex.optimize", defaultValue = "true")
     private boolean dexOptimize;
 
     /**
      * Decides whether to predex the jars.
      */
-    @Parameter( property = "android.dex.predex", defaultValue = "false" )
+    @Parameter(property = "android.dex.predex", defaultValue = "false")
     private boolean dexPreDex;
 
     /**
      * Decides whether to use force jumbo mode.
      */
-    @Parameter( property = "android.dex.forcejumbo", defaultValue = "false" )
+    @Parameter(property = "android.dex.forcejumbo", defaultValue = "false")
     private boolean dexForceJumbo;
 
     /**
      * Path to predexed libraries.
      */
     @Parameter(
-        property = "android.dex.dexPreDexLibLocation",
-        defaultValue = "${project.build.directory}${file.separator}dexedLibs"
+            property = "android.dex.dexPreDexLibLocation",
+            defaultValue = "${project.build.directory}${file.separator}dexedLibs"
     )
     private String dexPreDexLibLocation;
 
     /**
      * Decides whether to pass the --incremental flag to dx.
      */
-    @Parameter( property = "android.dex.incremental", defaultValue = "false" )
+    @Parameter(property = "android.dex.incremental", defaultValue = "false")
     private boolean dexIncremental;
 
     /**
      * The name of the obfuscated JAR.
      */
-    @Parameter( property = "android.proguard.obfuscatedJar" )
+    @Parameter(property = "android.proguard.obfuscatedJar")
     private File obfuscatedJar;
 
     /**
      * Decides whether to pass the --multi-dex flag to dx.
      */
-    @Parameter( property = "android.dex.multidex", defaultValue = "false" )
+    @Parameter(property = "android.dex.multidex", defaultValue = "false")
     private boolean dexMultiDex;
 
     /**
      * Full path to class list to multi dex
      */
-    @Parameter( property = "android.dex.maindexlist" )
+    @Parameter(property = "android.dex.maindexlist")
     private String dexMainDexList;
 
     /**
      * Decides whether to pass the --minimal-main-dex flag to dx.
      */
-    @Parameter( property = "android.dex.minimalmaindex", defaultValue = "false" )
+    @Parameter(property = "android.dex.minimalmaindex", defaultValue = "false")
     private boolean dexMinimalMainDex;
 
     /**
      * Decides whether to generate main dex list.
      * Supported from build tools version 22.0.0+
-     *
+     * <p>
      * Note: if set to true, dexMinimalMainDex is set to true, and dexMainDexList
      * is set to generated main dex list.
      */
-    @Parameter( property = "android.dex.generatemaindexlist", defaultValue = "false" )
+    @Parameter(property = "android.dex.generatemaindexlist", defaultValue = "false")
     private boolean dexGenerateMainDexList;
 
     /**
      * Additional command line parameters passed to dx.
      */
-    @Parameter( property = "android.dex.dexarguments" )
+    @Parameter(property = "android.dex.dexarguments")
     private String dexArguments;
 
     /**
      * Skips transitive dependencies. May be useful if the target classes directory is populated with the
      * {@code maven-dependency-plugin} and already contains all dependency classes.
      */
-    @Parameter( property = "skipDependencies", defaultValue = "false" )
+    @Parameter(property = "skipDependencies", defaultValue = "false")
     private boolean skipDependencies;
 
     /**
@@ -212,7 +208,7 @@ public class DexMojo extends AbstractAndroidMojo
      *     &lt;/artifactTypeSet&gt;
      * </pre>
      */
-    @Parameter( property = "artifactTypeSet" )
+    @Parameter(property = "artifactTypeSet")
     private IncludeExcludeSet artifactTypeSet;
 
     /**
@@ -235,7 +231,7 @@ public class DexMojo extends AbstractAndroidMojo
      *     &lt;/artifactTypeSet&gt;
      * </pre>
      */
-    @Parameter( property = "artifactSet" )
+    @Parameter(property = "artifactSet")
     private IncludeExcludeSet artifactSet;
 
     private String[] parsedJvmArguments;
@@ -254,64 +250,65 @@ public class DexMojo extends AbstractAndroidMojo
     private DexCompiler parsedDexCompiler;
 
     /**
+     * Figure out the full path to the current java executable.
+     *
+     * @return the full path to the current java executable.
+     */
+    private static File getJavaExecutable() {
+        final String javaHome = System.getProperty("java.home");
+        final String slash = File.separator;
+        return new File(javaHome + slash + "bin" + slash + "java");
+    }
+
+    /**
      * @throws MojoExecutionException
      * @throws MojoFailureException
      */
     @Override
-    public void execute() throws MojoExecutionException, MojoFailureException
-    {
+    public void execute() throws MojoExecutionException, MojoFailureException {
         parseConfiguration();
 
-        getLog().debug( "DexCompiler set to " + parsedDexCompiler );
-        if ( parsedDexCompiler != DexCompiler.DEX )
-        {
-            getLog().info( "Not executing DexMojo because DEX compiler is set to " + parsedDexCompiler );
+        getLog().debug("DexCompiler set to " + parsedDexCompiler);
+        if (parsedDexCompiler != DexCompiler.DEX) {
+            getLog().info("Not executing DexMojo because DEX compiler is set to " + parsedDexCompiler);
             return;
         }
 
-        if ( getJack().isEnabled() )
-        {
+        if (getJack().isEnabled()) {
             //Dexxing is handled by Jack
             return;
         }
 
         CommandExecutor executor = CommandExecutor.Factory.createDefaultCommmandExecutor();
-        executor.setLogger( getLog() );
+        executor.setLogger(getLog());
 
         File outputFile;
-        if ( parsedMultiDex )
-        {
+        if (parsedMultiDex) {
             outputFile = targetDirectory;
-            if ( parsedGenerateMainDexList )
-            {
+            if (parsedGenerateMainDexList) {
                 getAndroidSdk().assertThatBuildToolsVersionIsAtLeast(
-                    "22.0.0", "generate main dex list" );
-                File generatedMainDexClassesList = generateMainDexClassesList( executor );
+                        "22.0.0", "generate main dex list");
+                File generatedMainDexClassesList = generateMainDexClassesList(executor);
                 parsedMainDexList = generatedMainDexClassesList.getAbsolutePath();
                 parsedMinimalMainDex = true;
             }
+        } else {
+            outputFile = new File(targetDirectory, "classes.dex");
         }
-        else
-        {
-            outputFile = new File( targetDirectory, "classes.dex" );
-        }
-        if ( generateApk )
-        {
-            runDex( executor, outputFile );
+        if (generateApk) {
+            runDex(executor, outputFile);
         }
 
-        if ( attachJar )
-        {
-            File jarFile = new File( targetDirectory + File.separator
-                + finalName + ".jar" );
-            projectHelper.attachArtifact( project, "jar", project.getArtifact().getClassifier(), jarFile );
+        if (attachJar) {
+            File jarFile = new File(targetDirectory + File.separator
+                    + finalName + ".jar");
+            projectHelper.attachArtifact(project, "jar", project.getArtifact().getClassifier(), jarFile);
         }
 
-        if ( attachSources )
-        {
+        if (attachSources) {
             // Also attach an .apksources, containing sources from this project.
             final File apksources = createApkSourcesFile();
-            projectHelper.attachArtifact( project, "apksources", apksources );
+            projectHelper.attachArtifact(project, "apksources", apksources);
         }
     }
 
@@ -320,58 +317,44 @@ public class DexMojo extends AbstractAndroidMojo
      *
      * @return
      */
-    private Set< File > getDexInputFiles() throws MojoExecutionException
-    {
-        Set< File > inputs = new HashSet< File >();
+    private Set<File> getDexInputFiles() throws MojoExecutionException {
+        Set<File> inputs = new HashSet<File>();
 
-        if ( obfuscatedJar != null && obfuscatedJar.exists() )
-        {
+        if (obfuscatedJar != null && obfuscatedJar.exists()) {
             // proguard has been run, use this jar
-            getLog().debug( "Adding dex input (obfuscatedJar) : " + obfuscatedJar );
-            inputs.add( obfuscatedJar );
-        }
-        else
-        {
-            getLog().debug( "Using non-obfuscated input" );
+            getLog().debug("Adding dex input (obfuscatedJar) : " + obfuscatedJar);
+            inputs.add(obfuscatedJar);
+        } else {
+            getLog().debug("Using non-obfuscated input");
             // no proguard, use original config
-            inputs.add( projectOutputDirectory );
-            getLog().debug( "Adding dex input : " + project.getBuild().getOutputDirectory() );
-            for ( Artifact artifact : filterArtifacts( getTransitiveDependencyArtifacts(), skipDependencies,
-                artifactTypeSet.getIncludes(), artifactTypeSet.getExcludes(), artifactSet.getIncludes(),
-                artifactSet.getExcludes() ) )
-            {
-                if ( artifact.getType().equals( Const.ArtifactType.NATIVE_SYMBOL_OBJECT )
-                    || artifact.getType().equals( Const.ArtifactType.NATIVE_IMPLEMENTATION_ARCHIVE ) )
-                {
+            inputs.add(projectOutputDirectory);
+            getLog().debug("Adding dex input : " + project.getBuild().getOutputDirectory());
+            for (Artifact artifact : filterArtifacts(getTransitiveDependencyArtifacts(), skipDependencies,
+                    artifactTypeSet.getIncludes(), artifactTypeSet.getExcludes(), artifactSet.getIncludes(),
+                    artifactSet.getExcludes())) {
+                if (artifact.getType().equals(Const.ArtifactType.NATIVE_SYMBOL_OBJECT)
+                        || artifact.getType().equals(Const.ArtifactType.NATIVE_IMPLEMENTATION_ARCHIVE)) {
                     // Ignore native dependencies - no need for dexer to see those
-                }
-                else if ( artifact.getType().equals( APKLIB ) )
-                {
+                } else if (artifact.getType().equals(APKLIB)) {
                     // Any jars in the libs folder should now be
                     // automatically included because they will be a transitive dependency.
-                }
-                else if ( artifact.getType().equals( AAR ) )
-                {
+                } else if (artifact.getType().equals(AAR)) {
                     // The Aar classes.jar should now be automatically included
                     // because it will be a transitive dependency. As should any jars in the libs folder.
-                }
-                else if ( artifact.getType().equals( APK ) )
-                {
+                } else if (artifact.getType().equals(APK)) {
                     // We need to dex the APK classes including the APK R.
                     // But we don't want to add a second instance of the embedded Rs for any of the APK's dependencies
                     // as they will already have been generated to target/classes. The R values from the APK will be
                     // the correct ones, so best solution is to extract the APK classes (including all Rs) to
                     // target/classes overwriting any generated Rs and let dex pick up the values from there.
-                    getLog().debug( "Extracting APK classes to target/classes : " + artifact.getArtifactId() );
-                    final File apkClassesJar = getUnpackedLibHelper().getJarFileForApk( artifact );
-                    getLog().debug( "Extracting APK : " + apkClassesJar + " to " + targetDirectory );
-                    final ZipExtractor extractor = new ZipExtractor( getLog() );
-                    extractor.extract( apkClassesJar, targetDirectory, ".class" );
-                }
-                else
-                {
-                    getLog().debug( "Adding dex input : " + artifact.getFile() );
-                    inputs.add( artifact.getFile().getAbsoluteFile() );
+                    getLog().debug("Extracting APK classes to target/classes : " + artifact.getArtifactId());
+                    final File apkClassesJar = getUnpackedLibHelper().getJarFileForApk(artifact);
+                    getLog().debug("Extracting APK : " + apkClassesJar + " to " + targetDirectory);
+                    final ZipExtractor extractor = new ZipExtractor(getLog());
+                    extractor.extract(apkClassesJar, targetDirectory, ".class");
+                } else {
+                    getLog().debug("Adding dex input : " + artifact.getFile());
+                    inputs.add(artifact.getFile().getAbsoluteFile());
                 }
             }
         }
@@ -379,123 +362,80 @@ public class DexMojo extends AbstractAndroidMojo
         return inputs;
     }
 
-    private void parseConfiguration()
-    {
+    private void parseConfiguration() {
         // config in pom found
-        if ( dex != null )
-        {
+        if (dex != null) {
             // the if statements make sure that properties/command line
             // parameter overrides configuration
             // and that the dafaults apply in all cases;
-            if ( dex.getJvmArguments() == null )
-            {
+            if (dex.getJvmArguments() == null) {
                 parsedJvmArguments = dexJvmArguments;
-            }
-            else
-            {
+            } else {
                 parsedJvmArguments = dex.getJvmArguments();
             }
-            if ( dex.isCoreLibrary() == null )
-            {
+            if (dex.isCoreLibrary() == null) {
                 parsedCoreLibrary = dexCoreLibrary;
-            }
-            else
-            {
+            } else {
                 parsedCoreLibrary = dex.isCoreLibrary();
             }
-            if ( dex.isNoLocals() == null )
-            {
+            if (dex.isNoLocals() == null) {
                 parsedNoLocals = dexNoLocals;
-            }
-            else
-            {
+            } else {
                 parsedNoLocals = dex.isNoLocals();
             }
-            if ( dex.isOptimize() == null )
-            {
+            if (dex.isOptimize() == null) {
                 parsedOptimize = dexOptimize;
-            }
-            else
-            {
+            } else {
                 parsedOptimize = dex.isOptimize();
             }
-            if ( dex.isPreDex() == null )
-            {
+            if (dex.isPreDex() == null) {
                 parsedPreDex = dexPreDex;
-            }
-            else
-            {
+            } else {
                 parsedPreDex = dex.isPreDex();
             }
-            if ( dex.getPreDexLibLocation() == null )
-            {
+            if (dex.getPreDexLibLocation() == null) {
                 parsedPreDexLibLocation = dexPreDexLibLocation;
-            }
-            else
-            {
+            } else {
                 parsedPreDexLibLocation = dex.getPreDexLibLocation();
             }
-            if ( dex.isIncremental() == null )
-            {
+            if (dex.isIncremental() == null) {
                 parsedIncremental = dexIncremental;
-            }
-            else
-            {
+            } else {
                 parsedIncremental = dex.isIncremental();
             }
-            if ( dex.isForceJumbo() == null )
-            {
+            if (dex.isForceJumbo() == null) {
                 parsedForceJumbo = dexForceJumbo;
-            }
-            else
-            {
+            } else {
                 parsedForceJumbo = dex.isForceJumbo();
             }
-            if ( dex.isMultiDex() == null )
-            {
+            if (dex.isMultiDex() == null) {
                 parsedMultiDex = dexMultiDex;
-            }
-            else
-            {
+            } else {
                 parsedMultiDex = dex.isMultiDex();
             }
-            if ( dex.getMainDexList() == null )
-            {
+            if (dex.getMainDexList() == null) {
                 parsedMainDexList = dexMainDexList;
-            }
-            else
-            {
+            } else {
                 parsedMainDexList = dex.getMainDexList();
             }
-            if ( dex.isMinimalMainDex() == null )
-            {
+            if (dex.isMinimalMainDex() == null) {
                 parsedMinimalMainDex = dexMinimalMainDex;
-            }
-            else
-            {
+            } else {
                 parsedMinimalMainDex = dex.isMinimalMainDex();
             }
-            if ( dex.isGenerateMainDexList() == null )
-            {
+            if (dex.isGenerateMainDexList() == null) {
                 parsedGenerateMainDexList = dexGenerateMainDexList;
-            }
-            else
-            {
+            } else {
                 parsedGenerateMainDexList = dex.isGenerateMainDexList();
             }
-            if ( dex.getDexArguments() == null )
-            {
+            if (dex.getDexArguments() == null) {
                 parsedDexArguments = dexArguments;
-            }
-            else
-            {
+            } else {
                 parsedDexArguments = dex.getDexArguments();
             }
-            parsedDexCompiler = DexCompiler.valueOfIgnoreCase( dexCompiler );
+            parsedDexCompiler = DexCompiler.valueOfIgnoreCase(dexCompiler);
 
-        }
-        else
-        {
+        } else {
             parsedJvmArguments = dexJvmArguments;
             parsedCoreLibrary = dexCoreLibrary;
             parsedNoLocals = dexNoLocals;
@@ -509,230 +449,183 @@ public class DexMojo extends AbstractAndroidMojo
             parsedMinimalMainDex = dexMinimalMainDex;
             parsedGenerateMainDexList = dexGenerateMainDexList;
             parsedDexArguments = dexArguments;
-            parsedDexCompiler = DexCompiler.valueOfIgnoreCase( dexCompiler );
+            parsedDexCompiler = DexCompiler.valueOfIgnoreCase(dexCompiler);
         }
     }
 
-    private Set< File > preDex( CommandExecutor executor, Set< File > inputFiles ) throws MojoExecutionException
-    {
-        Set< File > filtered = new HashSet< File >();
-        getLog().info( "Pre dex-ing libraries for faster dex-ing of the final application." );
+    private Set<File> preDex(CommandExecutor executor, Set<File> inputFiles) throws MojoExecutionException {
+        Set<File> filtered = new HashSet<File>();
+        getLog().info("Pre dex-ing libraries for faster dex-ing of the final application.");
 
-        for ( File inputFile : inputFiles )
-        {
-            if ( inputFile.getName().matches( ".*\\.jar$" ) )
-            {
-                List< String > commands = dexDefaultCommands();
+        for (File inputFile : inputFiles) {
+            if (inputFile.getName().matches(".*\\.jar$")) {
+                List<String> commands = dexDefaultCommands();
 
-                File predexJar = predexJarPath( inputFile );
-                commands.add( "--output=" + predexJar.getAbsolutePath() );
-                commands.add( inputFile.getAbsolutePath() );
-                filtered.add( predexJar );
+                File predexJar = predexJarPath(inputFile);
+                commands.add("--output=" + predexJar.getAbsolutePath());
+                commands.add(inputFile.getAbsolutePath());
+                filtered.add(predexJar);
 
-                if ( !predexJar.isFile() || predexJar.lastModified() < inputFile.lastModified() )
-                {
-                    getLog().info( "Pre-dex ing jar: " + inputFile.getAbsolutePath() );
-                    executeJava( commands, executor );
+                if (!predexJar.isFile() || predexJar.lastModified() < inputFile.lastModified()) {
+                    getLog().info("Pre-dex ing jar: " + inputFile.getAbsolutePath());
+                    executeJava(commands, executor);
                 }
-            }
-            else
-            {
-                filtered.add( inputFile );
+            } else {
+                filtered.add(inputFile);
             }
         }
 
         return filtered;
     }
 
-    private File predexJarPath( File inputFile )
-    {
-        final File predexLibsDirectory = new File( parsedPreDexLibLocation.trim() );
+    private File predexJarPath(File inputFile) {
+        final File predexLibsDirectory = new File(parsedPreDexLibLocation.trim());
         predexLibsDirectory.mkdirs();
-        return new File( predexLibsDirectory, inputFile.getName() );
+        return new File(predexLibsDirectory, inputFile.getName());
     }
 
-    private List< String > dexDefaultCommands() throws MojoExecutionException
-    {
-        List< String > commands = jarDefaultCommands();
-        commands.add( getAndroidSdk().getDxJarPath() );
-        commands.add( "--dex" );
+    private List<String> dexDefaultCommands() throws MojoExecutionException {
+        List<String> commands = jarDefaultCommands();
+        commands.add(getAndroidSdk().getDxJarPath());
+        commands.add("--dex");
         return commands;
     }
 
-    private List<String> jarDefaultCommands()
-    {
-        List< String > commands = javaDefaultCommands();
-        commands.add( "-jar" );
+    private List<String> jarDefaultCommands() {
+        List<String> commands = javaDefaultCommands();
+        commands.add("-jar");
         return commands;
     }
 
-    private List<String> javaDefaultCommands()
-    {
-        List< String > commands = new ArrayList< String > ();
-        if ( parsedJvmArguments != null )
-        {
-            for ( String jvmArgument : parsedJvmArguments )
-            {
+    private List<String> javaDefaultCommands() {
+        List<String> commands = new ArrayList<String>();
+        if (parsedJvmArguments != null) {
+            for (String jvmArgument : parsedJvmArguments) {
                 // preserve backward compatibility allowing argument with or
                 // without dash (e.g. Xmx512m as well as
                 // -Xmx512m should work) (see
                 // http://code.google.com/p/maven-android-plugin/issues/detail?id=153)
-                if ( !jvmArgument.startsWith( "-" ) )
-                {
+                if (!jvmArgument.startsWith("-")) {
                     jvmArgument = "-" + jvmArgument;
                 }
-                getLog().debug( "Adding jvm argument " + jvmArgument );
-                commands.add( jvmArgument );
+                getLog().debug("Adding jvm argument " + jvmArgument);
+                commands.add(jvmArgument);
             }
         }
         return commands;
     }
 
-    private void runDex( CommandExecutor executor, File outputFile )
-        throws MojoExecutionException
-    {
-        final List< String > commands = dexDefaultCommands();
-        final Set< File > inputFiles = getDexInputFiles();
-        Set< File > filteredFiles = inputFiles;
-        if ( parsedPreDex )
-        {
-            filteredFiles = preDex( executor, inputFiles );
+    private void runDex(CommandExecutor executor, File outputFile)
+            throws MojoExecutionException {
+        final List<String> commands = dexDefaultCommands();
+        final Set<File> inputFiles = getDexInputFiles();
+        Set<File> filteredFiles = inputFiles;
+        if (parsedPreDex) {
+            filteredFiles = preDex(executor, inputFiles);
         }
-        if ( !parsedOptimize )
-        {
-            commands.add( "--no-optimize" );
+        if (!parsedOptimize) {
+            commands.add("--no-optimize");
         }
-        if ( parsedCoreLibrary )
-        {
-            commands.add( "--core-library" );
+        if (parsedCoreLibrary) {
+            commands.add("--core-library");
         }
-        if ( parsedIncremental )
-        {
-            commands.add( "--incremental" );
+        if (parsedIncremental) {
+            commands.add("--incremental");
         }
-        if ( parsedNoLocals )
-        {
-            commands.add( "--no-locals" );
+        if (parsedNoLocals) {
+            commands.add("--no-locals");
         }
-        if ( parsedForceJumbo )
-        {
-            commands.add( "--force-jumbo" );
+        if (parsedForceJumbo) {
+            commands.add("--force-jumbo");
         }
-        if ( parsedMultiDex )
-        {
-            commands.add( "--multi-dex" );
-            if ( parsedMainDexList != null )
-            {
-                commands.add( "--main-dex-list=" + parsedMainDexList );
+        if (parsedMultiDex) {
+            commands.add("--multi-dex");
+            if (parsedMainDexList != null) {
+                commands.add("--main-dex-list=" + parsedMainDexList);
             }
-            if ( parsedMinimalMainDex )
-            {
-                commands.add( "--minimal-main-dex" );
+            if (parsedMinimalMainDex) {
+                commands.add("--minimal-main-dex");
             }
         }
-        if ( parsedDexArguments != null )
-        {
-            commands.add( parsedDexArguments );
+        if (parsedDexArguments != null) {
+            commands.add(parsedDexArguments);
         }
-        commands.add( "--output=" + outputFile.getAbsolutePath() );
-        for ( File inputFile : filteredFiles )
-        {
-            commands.add( inputFile.getAbsolutePath() );
+        commands.add("--output=" + outputFile.getAbsolutePath());
+        for (File inputFile : filteredFiles) {
+            commands.add(inputFile.getAbsolutePath());
         }
 
-        getLog().info( "Convert classes to Dex : " + outputFile );
-        executeJava( commands, executor );
+        getLog().info("Convert classes to Dex : " + outputFile);
+        executeJava(commands, executor);
     }
 
-    private String executeJava( final List<String> commands, CommandExecutor executor ) throws MojoExecutionException
-    {
+    private String executeJava(final List<String> commands, CommandExecutor executor) throws MojoExecutionException {
         final String javaExecutable = getJavaExecutable().getAbsolutePath();
-        getLog().debug( javaExecutable + " " + commands.toString() );
-        try
-        {
-            executor.setCaptureStdOut( true );
-            executor.executeCommand( javaExecutable, commands, project.getBasedir(), false );
+        getLog().debug(javaExecutable + " " + commands.toString());
+        try {
+            executor.setCaptureStdOut(true);
+            executor.executeCommand(javaExecutable, commands, project.getBasedir(), false);
             return executor.getStandardOut();
-        }
-        catch ( ExecutionException e )
-        {
-            throw new MojoExecutionException( "", e );
+        } catch (ExecutionException e) {
+            throw new MojoExecutionException("", e);
         }
     }
 
-    /**
-     * Figure out the full path to the current java executable.
-     *
-     * @return the full path to the current java executable.
-     */
-    private static File getJavaExecutable()
-    {
-        final String javaHome = System.getProperty( "java.home" );
-        final String slash = File.separator;
-        return new File( javaHome + slash + "bin" + slash + "java" );
-    }
+    private File generateMainDexClassesJar(CommandExecutor executor) throws MojoExecutionException {
+        List<String> commands = jarDefaultCommands();
+        commands.add(getAndroidSdk().getProguardJarPath());
+        commands.add("-dontnote");
+        commands.add("-dontwarn");
+        commands.add("-forceprocessing");
+        commands.add("-dontoptimize");
+        commands.add("-dontpreverify");
+        commands.add("-dontobfuscate");
 
-    private File generateMainDexClassesJar( CommandExecutor executor ) throws MojoExecutionException
-    {
-        List< String> commands = jarDefaultCommands();
-        commands.add( getAndroidSdk().getProguardJarPath() );
-        commands.add( "-dontnote" );
-        commands.add( "-dontwarn" );
-        commands.add( "-forceprocessing" );
-        commands.add( "-dontoptimize" );
-        commands.add( "-dontpreverify" );
-        commands.add( "-dontobfuscate" );
-
-        Set< File> inputFiles = getDexInputFiles();
-        for ( File inputFile : inputFiles )
-        {
-            commands.add( "-injars" );
-            commands.add( inputFile.getAbsolutePath() + "(!META-INF/**)" );
+        Set<File> inputFiles = getDexInputFiles();
+        for (File inputFile : inputFiles) {
+            commands.add("-injars");
+            commands.add(inputFile.getAbsolutePath() + "(!META-INF/**)");
         }
 
-        commands.add( "-libraryjars" );
-        commands.add( getAndroidSdk().getShrinkedAndroidJarPath() );
+        commands.add("-libraryjars");
+        commands.add(getAndroidSdk().getShrinkedAndroidJarPath());
 
-        commands.add( "-include" );
-        commands.add( getAndroidSdk().getMainDexClassesRulesPath() );
+        commands.add("-include");
+        commands.add(getAndroidSdk().getMainDexClassesRulesPath());
 
-        commands.add( "-outjars" );
-        File mainDexClassesJar = new File( targetDirectory, "mainDexClasses.jar" );
-        commands.add( mainDexClassesJar.getAbsolutePath() );
+        commands.add("-outjars");
+        File mainDexClassesJar = new File(targetDirectory, "mainDexClasses.jar");
+        commands.add(mainDexClassesJar.getAbsolutePath());
 
-        getLog().info( "Generating main dex classes jar : " + mainDexClassesJar );
-        executeJava( commands, executor );
+        getLog().info("Generating main dex classes jar : " + mainDexClassesJar);
+        executeJava(commands, executor);
 
         return mainDexClassesJar;
     }
 
-    private File generateMainDexClassesList( CommandExecutor executor ) throws MojoExecutionException
-    {
-        File mainDexClassesJar = generateMainDexClassesJar( executor );
-        List< String> commands = javaDefaultCommands();
+    private File generateMainDexClassesList(CommandExecutor executor) throws MojoExecutionException {
+        File mainDexClassesJar = generateMainDexClassesJar(executor);
+        List<String> commands = javaDefaultCommands();
 
-        commands.add( "-Djava.ext.dirs=" + getAndroidSdk().getBuildToolsLibDirectoryPath() );
-        commands.add( "com.android.multidex.MainDexListBuilder" );
-        commands.add( mainDexClassesJar.getAbsolutePath() );
+        commands.add("-Djava.ext.dirs=" + getAndroidSdk().getBuildToolsLibDirectoryPath());
+        commands.add("com.android.multidex.MainDexListBuilder");
+        commands.add(mainDexClassesJar.getAbsolutePath());
 
-        Set< File> inputFiles = getDexInputFiles();
+        Set<File> inputFiles = getDexInputFiles();
         StringBuilder sb = new StringBuilder();
-        sb.append( StringUtils.join( inputFiles, File.pathSeparatorChar ) );
-        commands.add( sb.toString() );
+        sb.append(StringUtils.join(inputFiles, File.pathSeparatorChar));
+        commands.add(sb.toString());
 
-        File mainDexClassesList = new File( targetDirectory, "mainDexClasses.txt" );
+        File mainDexClassesList = new File(targetDirectory, "mainDexClasses.txt");
 
-        getLog().info( "Generating main dex classes list : " + mainDexClassesList );
+        getLog().info("Generating main dex classes list : " + mainDexClassesList);
 
-        String output = executeJava( commands, executor );
-        try
-        {
-            FileUtils.writeStringToFile( mainDexClassesList, output );
-        }
-        catch ( IOException ex )
-        {
-            throw new MojoExecutionException( "Failed to write command output with main dex classes list to "
-                + mainDexClassesList, ex );
+        String output = executeJava(commands, executor);
+        try {
+            FileUtils.writeStringToFile(mainDexClassesList, output);
+        } catch (IOException ex) {
+            throw new MojoExecutionException("Failed to write command output with main dex classes list to "
+                    + mainDexClassesList, ex);
         }
         return mainDexClassesList;
     }
@@ -741,31 +634,25 @@ public class DexMojo extends AbstractAndroidMojo
      * @return
      * @throws MojoExecutionException
      */
-    protected File createApkSourcesFile() throws MojoExecutionException
-    {
-        final File apksources = new File( targetDirectory, finalName
-            + ".apksources" );
-        FileUtils.deleteQuietly( apksources );
+    protected File createApkSourcesFile() throws MojoExecutionException {
+        final File apksources = new File(targetDirectory, finalName
+                + ".apksources");
+        FileUtils.deleteQuietly(apksources);
 
-        try
-        {
+        try {
             JarArchiver jarArchiver = new JarArchiver();
-            jarArchiver.setDestFile( apksources );
+            jarArchiver.setDestFile(apksources);
 
-            addDirectory( jarArchiver, assetsDirectory, "assets" );
-            addDirectory( jarArchiver, resourceDirectory, "res" );
-            addDirectory( jarArchiver, sourceDirectory, "src/main/java" );
-            addJavaResources( jarArchiver, resources );
+            addDirectory(jarArchiver, assetsDirectory, "assets");
+            addDirectory(jarArchiver, resourceDirectory, "res");
+            addDirectory(jarArchiver, sourceDirectory, "src/main/java");
+            addJavaResources(jarArchiver, resources);
 
             jarArchiver.createArchive();
-        }
-        catch ( ArchiverException e )
-        {
-            throw new MojoExecutionException( "ArchiverException while creating .apksource file.", e );
-        }
-        catch ( IOException e )
-        {
-            throw new MojoExecutionException( "IOException while creating .apksource file.", e );
+        } catch (ArchiverException e) {
+            throw new MojoExecutionException("ArchiverException while creating .apksource file.", e);
+        } catch (IOException e) {
+            throw new MojoExecutionException("IOException while creating .apksource file.", e);
         }
 
         return apksources;
@@ -774,15 +661,12 @@ public class DexMojo extends AbstractAndroidMojo
     /**
      * Makes sure the string ends with "/"
      *
-     * @param prefix
-     *            any string, or null.
+     * @param prefix any string, or null.
      * @return the prefix with a "/" at the end, never null.
      */
-    protected String endWithSlash( String prefix )
-    {
-        prefix = StringUtils.defaultIfEmpty( prefix, "/" );
-        if ( !prefix.endsWith( "/" ) )
-        {
+    protected String endWithSlash(String prefix) {
+        prefix = StringUtils.defaultIfEmpty(prefix, "/");
+        if (!prefix.endsWith("/")) {
             prefix = prefix + "/";
         }
         return prefix;
@@ -792,19 +676,15 @@ public class DexMojo extends AbstractAndroidMojo
      * Adds a directory to a {@link JarArchiver} with a directory prefix.
      *
      * @param jarArchiver
-     * @param directory
-     *            The directory to add.
-     * @param prefix
-     *            An optional prefix for where in the Jar file the directory's contents should go.
+     * @param directory   The directory to add.
+     * @param prefix      An optional prefix for where in the Jar file the directory's contents should go.
      */
-    protected void addDirectory( JarArchiver jarArchiver, File directory, String prefix )
-    {
-        if ( directory != null && directory.exists() )
-        {
+    protected void addDirectory(JarArchiver jarArchiver, File directory, String prefix) {
+        if (directory != null && directory.exists()) {
             final DefaultFileSet fileSet = new DefaultFileSet();
-            fileSet.setPrefix( endWithSlash( prefix ) );
-            fileSet.setDirectory( directory );
-            jarArchiver.addFileSet( fileSet );
+            fileSet.setPrefix(endWithSlash(prefix));
+            fileSet.setDirectory(directory);
+            jarArchiver.addFileSet(fileSet);
         }
     }
 
@@ -812,11 +692,9 @@ public class DexMojo extends AbstractAndroidMojo
      * @param jarArchiver
      * @param javaResources
      */
-    protected void addJavaResources( JarArchiver jarArchiver, List< Resource > javaResources )
-    {
-        for ( Resource javaResource : javaResources )
-        {
-            addJavaResource( jarArchiver, javaResource );
+    protected void addJavaResources(JarArchiver jarArchiver, List<Resource> javaResources) {
+        for (Resource javaResource : javaResources) {
+            addJavaResource(jarArchiver, javaResource);
         }
     }
 
@@ -824,20 +702,16 @@ public class DexMojo extends AbstractAndroidMojo
      * Adds a Java Resources directory (typically "src/main/resources") to a {@link JarArchiver}.
      *
      * @param jarArchiver
-     * @param javaResource
-     *            The Java resource to add.
+     * @param javaResource The Java resource to add.
      */
-    protected void addJavaResource( JarArchiver jarArchiver, Resource javaResource )
-    {
-        if ( javaResource != null )
-        {
-            final File javaResourceDirectory = new File( javaResource.getDirectory() );
-            if ( javaResourceDirectory.exists() )
-            {
+    protected void addJavaResource(JarArchiver jarArchiver, Resource javaResource) {
+        if (javaResource != null) {
+            final File javaResourceDirectory = new File(javaResource.getDirectory());
+            if (javaResourceDirectory.exists()) {
                 final DefaultFileSet javaResourceFileSet = new DefaultFileSet();
-                javaResourceFileSet.setDirectory( javaResourceDirectory );
-                javaResourceFileSet.setPrefix( endWithSlash( "src/main/resources" ) );
-                jarArchiver.addFileSet( javaResourceFileSet );
+                javaResourceFileSet.setDirectory(javaResourceDirectory);
+                javaResourceFileSet.setPrefix(endWithSlash("src/main/resources"));
+                jarArchiver.addFileSet(javaResourceFileSet);
             }
         }
     }

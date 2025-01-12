@@ -54,7 +54,6 @@ public class MediaPlayerDemo_Video extends Activity implements
     private boolean mIsVideoReadyToBePlayed = false;
 
     /**
-     * 
      * Called when the activity is first created.
      */
     @Override
@@ -99,7 +98,7 @@ public class MediaPlayerDemo_Video extends Activity implements
                      * contents" which basically means: 1. the movie atom has to
                      * precede all the media data atoms. 2. The clip has to be
                      * reasonably interleaved.
-                     * 
+                     *
                      */
                     path = "";
                     if (path == "") {

@@ -47,15 +47,15 @@ class CubeRenderer implements GLSurfaceView.Renderer {
         gl.glMatrixMode(GL10.GL_MODELVIEW);
         gl.glLoadIdentity();
         gl.glTranslatef(0, 0, -3.0f);
-        gl.glRotatef(mAngle,        0, 1, 0);
-        gl.glRotatef(mAngle*0.25f,  1, 0, 0);
+        gl.glRotatef(mAngle, 0, 1, 0);
+        gl.glRotatef(mAngle * 0.25f, 1, 0, 0);
 
         gl.glEnableClientState(GL10.GL_VERTEX_ARRAY);
         gl.glEnableClientState(GL10.GL_COLOR_ARRAY);
 
         mCube.draw(gl);
 
-        gl.glRotatef(mAngle*2.0f, 0, 1, 1);
+        gl.glRotatef(mAngle * 2.0f, 0, 1, 1);
         gl.glTranslatef(0.5f, 0.5f, 0.5f);
 
         mCube.draw(gl);
@@ -64,18 +64,18 @@ class CubeRenderer implements GLSurfaceView.Renderer {
     }
 
     public void onSurfaceChanged(GL10 gl, int width, int height) {
-         gl.glViewport(0, 0, width, height);
+        gl.glViewport(0, 0, width, height);
 
-         /*
-          * Set our projection matrix. This doesn't have to be done
-          * each time we draw, but usually a new projection needs to
-          * be set when the viewport is resized.
-          */
+        /*
+         * Set our projection matrix. This doesn't have to be done
+         * each time we draw, but usually a new projection needs to
+         * be set when the viewport is resized.
+         */
 
-         float ratio = (float) width / height;
-         gl.glMatrixMode(GL10.GL_PROJECTION);
-         gl.glLoadIdentity();
-         gl.glFrustumf(-ratio, ratio, -1, 1, 1, 10);
+        float ratio = (float) width / height;
+        gl.glMatrixMode(GL10.GL_PROJECTION);
+        gl.glLoadIdentity();
+        gl.glFrustumf(-ratio, ratio, -1, 1, 1, 10);
     }
 
     public void onSurfaceCreated(GL10 gl, EGLConfig config) {
@@ -90,18 +90,19 @@ class CubeRenderer implements GLSurfaceView.Renderer {
          * Some one-time OpenGL initialization can be made here
          * probably based on features of this particular context
          */
-         gl.glHint(GL10.GL_PERSPECTIVE_CORRECTION_HINT,
-                 GL10.GL_FASTEST);
+        gl.glHint(GL10.GL_PERSPECTIVE_CORRECTION_HINT,
+                GL10.GL_FASTEST);
 
-         if (mTranslucentBackground) {
-             gl.glClearColor(0,0,0,0);
-         } else {
-             gl.glClearColor(1,1,1,1);
-         }
-         gl.glEnable(GL10.GL_CULL_FACE);
-         gl.glShadeModel(GL10.GL_SMOOTH);
-         gl.glEnable(GL10.GL_DEPTH_TEST);
+        if (mTranslucentBackground) {
+            gl.glClearColor(0, 0, 0, 0);
+        } else {
+            gl.glClearColor(1, 1, 1, 1);
+        }
+        gl.glEnable(GL10.GL_CULL_FACE);
+        gl.glShadeModel(GL10.GL_SMOOTH);
+        gl.glEnable(GL10.GL_DEPTH_TEST);
     }
+
     private boolean mTranslucentBackground;
     private Cube mCube;
     private float mAngle;

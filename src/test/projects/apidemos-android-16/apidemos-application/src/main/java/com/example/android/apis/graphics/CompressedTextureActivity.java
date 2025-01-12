@@ -40,7 +40,6 @@ import com.example.android.apis.R;
  * This sample can be recompiled to use either resource-based
  * textures (compressed offline using the etc1tool), or
  * textures created on the fly by compressing images.
- *
  */
 public class CompressedTextureActivity extends Activity {
     private final static String TAG = "CompressedTextureActivity";
@@ -84,7 +83,6 @@ public class CompressedTextureActivity extends Activity {
 
     /**
      * Demonstrate how to load a compressed texture from an APK resource.
-     *
      */
     private class CompressedTextureLoader implements StaticTriangleRenderer.TextureLoader {
         public void load(GL10 gl) {
@@ -134,16 +132,16 @@ public class CompressedTextureActivity extends Activity {
         private Buffer createImage(int width, int height) {
             int stride = 3 * width;
             ByteBuffer image = ByteBuffer.allocateDirect(height * stride)
-                .order(ByteOrder.nativeOrder());
+                    .order(ByteOrder.nativeOrder());
 
             // Fill with a pretty "munching squares" pattern:
             for (int t = 0; t < height; t++) {
-                byte red = (byte)(255-2*t);
-                byte green = (byte)(2*t);
+                byte red = (byte) (255 - 2 * t);
+                byte green = (byte) (2 * t);
                 byte blue = 0;
                 for (int x = 0; x < width; x++) {
                     int y = x ^ t;
-                    image.position(stride*y+x*3);
+                    image.position(stride * y + x * 3);
                     image.put(red);
                     image.put(green);
                     image.put(blue);
@@ -153,5 +151,6 @@ public class CompressedTextureActivity extends Activity {
             return image;
         }
     }
+
     private GLSurfaceView mGLView;
 }

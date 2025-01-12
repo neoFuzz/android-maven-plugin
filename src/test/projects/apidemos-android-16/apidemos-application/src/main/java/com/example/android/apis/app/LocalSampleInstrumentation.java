@@ -31,6 +31,7 @@ import android.util.Log;
 public class LocalSampleInstrumentation extends Instrumentation {
     public abstract static class ActivityRunnable implements Runnable {
         public final Activity activity;
+
         public ActivityRunnable(Activity _activity) {
             activity = _activity;
         }
@@ -55,16 +56,16 @@ public class LocalSampleInstrumentation extends Instrumentation {
         Intent intent = new Intent(Intent.ACTION_MAIN);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         intent.setClass(getTargetContext(), SaveRestoreState.class);
-        SaveRestoreState activity = (SaveRestoreState)startActivitySync(intent);
+        SaveRestoreState activity = (SaveRestoreState) startActivitySync(intent);
 
         // This is the Activity object that was started, to do with as we want.
         Log.i("LocalSampleInstrumentation",
-              "Initial text: " + activity.getSavedText());
+                "Initial text: " + activity.getSavedText());
 
         // Clear the text so we start fresh.
         runOnMainSync(new ActivityRunnable(activity) {
             public void run() {
-                ((SaveRestoreState)activity).setSavedText("");
+                ((SaveRestoreState) activity).setSavedText("");
             }
         });
 
@@ -82,7 +83,7 @@ public class LocalSampleInstrumentation extends Instrumentation {
 
         // Retrieve the text we should have written...
         Log.i("LocalSampleInstrumentation",
-              "Final text: " + activity.getSavedText());
+                "Final text: " + activity.getSavedText());
 
         // And we are done!
         Log.i("ContactsFilterInstrumentation", "Done!");

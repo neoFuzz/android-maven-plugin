@@ -21,46 +21,43 @@ import com.android.ide.common.process.ProcessResult;
 /**
  * Internal implementation of ProcessResult used by DefaultProcessExecutor.
  */
-class ProcessResultImplCopy implements ProcessResult
-{
+class ProcessResultImplCopy implements ProcessResult {
     private final String mCommand;
     private final int mExitValue;
     private final Exception mFailure;
-    ProcessResultImplCopy( String command, int exitValue )
-    {
-        this( command, exitValue, null );
+
+    ProcessResultImplCopy(String command, int exitValue) {
+        this(command, exitValue, null);
     }
-    ProcessResultImplCopy( String command, Exception failure )
-    {
-        this( command, -1, failure );
+
+    ProcessResultImplCopy(String command, Exception failure) {
+        this(command, -1, failure);
     }
-    ProcessResultImplCopy( String command, int exitValue, Exception failure )
-    {
+
+    ProcessResultImplCopy(String command, int exitValue, Exception failure) {
         mCommand = command;
         mExitValue = exitValue;
         mFailure = failure;
     }
+
     @Override
-    public ProcessResult assertNormalExitValue() throws ProcessException
-    {
-        if ( mExitValue != 0 )
-        {
+    public ProcessResult assertNormalExitValue() throws ProcessException {
+        if (mExitValue != 0) {
             throw new ProcessException(
-                    String.format( "Return code %d for process '%s'", mExitValue, mCommand ) );
+                    String.format("Return code %d for process '%s'", mExitValue, mCommand));
         }
         return this;
     }
+
     @Override
-    public int getExitValue()
-    {
+    public int getExitValue() {
         return mExitValue;
     }
+
     @Override
-    public ProcessResult rethrowFailure() throws ProcessException
-    {
-        if ( mFailure != null )
-        {
-            throw new ProcessException( "", mFailure );
+    public ProcessResult rethrowFailure() throws ProcessException {
+        if (mFailure != null) {
+            throw new ProcessException("", mFailure);
         }
         return this;
     }

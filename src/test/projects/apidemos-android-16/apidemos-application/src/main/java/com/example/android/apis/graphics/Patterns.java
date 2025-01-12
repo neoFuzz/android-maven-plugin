@@ -68,13 +68,13 @@ public class Patterns extends GraphicsActivity {
             setFocusableInTouchMode(true);
 
             mFastDF = new PaintFlagsDrawFilter(Paint.FILTER_BITMAP_FLAG |
-                                               Paint.DITHER_FLAG,
-                                               0);
+                    Paint.DITHER_FLAG,
+                    0);
 
             mShader1 = new BitmapShader(makeBitmap1(), Shader.TileMode.REPEAT,
-                                        Shader.TileMode.REPEAT);
+                    Shader.TileMode.REPEAT);
             mShader2 = new BitmapShader(makeBitmap2(), Shader.TileMode.REPEAT,
-                                        Shader.TileMode.REPEAT);
+                    Shader.TileMode.REPEAT);
 
             Matrix m = new Matrix();
             m.setRotate(30);
@@ -83,14 +83,15 @@ public class Patterns extends GraphicsActivity {
             mPaint = new Paint(Paint.FILTER_BITMAP_FLAG);
         }
 
-        @Override protected void onDraw(Canvas canvas) {
+        @Override
+        protected void onDraw(Canvas canvas) {
             canvas.setDrawFilter(mDF);
 
             mPaint.setShader(mShader1);
             canvas.drawPaint(mPaint);
 
             canvas.translate(mTouchCurrX - mTouchStartX,
-                             mTouchCurrY - mTouchStartY);
+                    mTouchCurrY - mTouchStartY);
 
             mPaint.setShader(mShader2);
             canvas.drawPaint(mPaint);

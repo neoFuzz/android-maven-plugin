@@ -20,16 +20,16 @@ import android.widget.AdapterView.OnItemSelectedListener;
  */
 public class SoftInputModes extends Activity {
     Spinner mResizeMode;
-    final CharSequence[] mResizeModeLabels = new CharSequence[] {
+    final CharSequence[] mResizeModeLabels = new CharSequence[]{
             "Unspecified", "Resize", "Pan", "Nothing"
     };
-    final int[] mResizeModeValues = new int[] {
+    final int[] mResizeModeValues = new int[]{
             WindowManager.LayoutParams.SOFT_INPUT_ADJUST_UNSPECIFIED,
             WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE,
             WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN,
             WindowManager.LayoutParams.SOFT_INPUT_ADJUST_NOTHING,
     };
-    
+
     /**
      * Initialization of the Activity after it is first created.  Here we use
      * {@link android.app.Activity#setContentView setContentView()} to set up
@@ -45,8 +45,8 @@ public class SoftInputModes extends Activity {
         // view layout definition, which is being set here as
         // the content of our screen.
         setContentView(R.layout.soft_input_modes);
-        
-        mResizeMode = (Spinner)findViewById(R.id.resize_mode);
+
+        mResizeMode = (Spinner) findViewById(R.id.resize_mode);
         ArrayAdapter<CharSequence> adapter = new ArrayAdapter<CharSequence>(this,
                 android.R.layout.simple_spinner_item, mResizeModeLabels);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);

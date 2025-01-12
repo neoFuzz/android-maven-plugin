@@ -60,13 +60,13 @@ public class FixedGridLayout extends ViewGroup {
                 MeasureSpec.AT_MOST);
 
         int count = getChildCount();
-        for (int index=0; index<count; index++) {
+        for (int index = 0; index < count; index++) {
             final View child = getChildAt(index);
             child.measure(cellWidthSpec, cellHeightSpec);
         }
         // Use the size our parents gave us, but default to a minimum size to avoid
         // clipping transitioning children
-        int minCount =  count > 3 ? count : 3;
+        int minCount = count > 3 ? count : 3;
         setMeasuredDimension(resolveSize(mCellWidth * minCount, widthMeasureSpec),
                 resolveSize(mCellHeight * minCount, heightMeasureSpec));
     }
@@ -83,17 +83,17 @@ public class FixedGridLayout extends ViewGroup {
         int y = 0;
         int i = 0;
         int count = getChildCount();
-        for (int index=0; index<count; index++) {
+        for (int index = 0; index < count; index++) {
             final View child = getChildAt(index);
 
             int w = child.getMeasuredWidth();
             int h = child.getMeasuredHeight();
 
-            int left = x + ((cellWidth-w)/2);
-            int top = y + ((cellHeight-h)/2);
+            int left = x + ((cellWidth - w) / 2);
+            int top = y + ((cellHeight - h) / 2);
 
-            child.layout(left, top, left+w, top+h);
-            if (i >= (columns-1)) {
+            child.layout(left, top, left + w, top + h);
+            if (i >= (columns - 1)) {
                 // advance to next row
                 i = 0;
                 x = 0;

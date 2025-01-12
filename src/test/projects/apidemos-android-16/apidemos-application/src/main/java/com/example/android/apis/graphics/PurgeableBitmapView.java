@@ -30,7 +30,7 @@ import java.io.ByteArrayOutputStream;
 /**
  * PurgeableBitmapView works with PurgeableBitmap to demonstrate the effects of setting
  * Bitmaps as being purgeable.
- *
+ * <p>
  * PurgeableBitmapView decodes an encoded bitstream to a Bitmap each time update()
  * is invoked(), and its onDraw() draws the Bitmap and a number to screen.
  * The number is used to indicate the number of Bitmaps that has been decoded.
@@ -40,7 +40,7 @@ public class PurgeableBitmapView extends View {
 
     private Bitmap mBitmap;
     private final int mArraySize = 200;
-    private final Bitmap[] mBitmapArray = new Bitmap [mArraySize];
+    private final Bitmap[] mBitmapArray = new Bitmap[mArraySize];
     private final Options mOptions = new Options();
     private static final int WIDTH = 150;
     private static final int HEIGHT = 450;
@@ -81,7 +81,7 @@ public class PurgeableBitmapView extends View {
     public int update(PurgeableBitmap.RefreshHandler handler) {
         try {
             mBitmapArray[mDecodingCount] = BitmapFactory.decodeByteArray(
-                bitstream, 0, bitstream.length, mOptions);
+                    bitstream, 0, bitstream.length, mOptions);
             mBitmap = mBitmapArray[mDecodingCount];
             mDecodingCount++;
             if (mDecodingCount < mArraySize) {
@@ -99,15 +99,16 @@ public class PurgeableBitmapView extends View {
         }
     }
 
-    @Override protected void onDraw(Canvas canvas) {
+    @Override
+    protected void onDraw(Canvas canvas) {
         canvas.drawColor(Color.WHITE);
         canvas.drawBitmap(mBitmap, 0, 0, null);
         canvas.drawText(String.valueOf(mDecodingCount), WIDTH / 2 - 20,
-            HEIGHT / 2, mPaint);
+                HEIGHT / 2, mPaint);
     }
 
     private byte[] generateBitstream(Bitmap src, Bitmap.CompressFormat format,
-            int quality) {
+                                     int quality) {
         ByteArrayOutputStream os = new ByteArrayOutputStream();
         src.compress(format, quality, os);
         return os.toByteArray();

@@ -16,15 +16,6 @@
  */
 package com.github.cardforge.maven.plugins.android.standalonemojos;
 
-import java.io.File;
-import java.io.IOException;
-
-import org.apache.commons.lang3.StringUtils;
-import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugin.MojoFailureException;
-import org.apache.maven.plugins.annotations.Mojo;
-import org.apache.maven.plugins.annotations.Parameter;
-
 import com.android.ddmlib.AdbCommandRejectedException;
 import com.android.ddmlib.IDevice;
 import com.android.ddmlib.ShellCommandUnresponsiveException;
@@ -39,6 +30,14 @@ import com.github.cardforge.maven.plugins.android.config.ConfigHandler;
 import com.github.cardforge.maven.plugins.android.config.ConfigPojo;
 import com.github.cardforge.maven.plugins.android.config.PullParameter;
 import com.github.cardforge.maven.plugins.android.configuration.UIAutomator;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugin.MojoFailureException;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
+
+import java.io.File;
+import java.io.IOException;
 
 /**
  * Can execute tests using ui uiautomator.<br>
@@ -55,54 +54,53 @@ import com.github.cardforge.maven.plugins.android.configuration.UIAutomator;
  * <br>
  * A typical usage of this goal can be found at <a
  * href="https://github.com/stephanenicolas/Quality-Tools-for-Android">Quality tools for Android project</a>.
- * 
+ *
+ * @author Stéphane Nicolas - snicolas@octo.com
  * @see <a href="http://developer.android.com/tools/testing/testing_ui.html">Android UI testing doc</a>
  * @see <a href="http://developer.android.com/tools/help/uiautomator/index.html">UI Automator manual page</a>
- * @author Stéphane Nicolas - snicolas@octo.com
  */
-@SuppressWarnings( "unused" )
-@Mojo( name = "uiautomator", requiresProject = false )
-public class UIAutomatorMojo extends AbstractAndroidMojo
-{
+@SuppressWarnings("unused")
+@Mojo(name = "uiautomator", requiresProject = false)
+public class UIAutomatorMojo extends AbstractAndroidMojo {
     /**
      * -Dmaven.test.skip is commonly used with Maven to skip tests. We honor it.
      */
-    @Parameter( property = "maven.test.skip", defaultValue = "false", readonly = true )
+    @Parameter(property = "maven.test.skip", defaultValue = "false", readonly = true)
     private boolean mavenTestSkip;
 
     /**
      * -DskipTests is commonly used with Maven to skip tests. We honor it too.
      */
-    @Parameter( property = "skipTests", defaultValue = "false", readonly = true )
+    @Parameter(property = "skipTests", defaultValue = "false", readonly = true)
     private boolean mavenSkipTests;
 
     /**
      * -Dmaven.test.failure.ignore is commonly used with Maven to prevent failure of build when (some) tests fail. We
      * honor it too. Builds will still fail if tests can't complete or throw an exception.
      */
-    @Parameter( property = "maven.test.failure.ignore", defaultValue = "false", readonly = true )
+    @Parameter(property = "maven.test.failure.ignore", defaultValue = "false", readonly = true)
     private boolean mavenTestFailureIgnore;
 
     /**
      * -Dmaven.test.failure.ignore is commonly used with Maven to prevent failure of build when (some) tests fail. We
      * honor it too. Builds will still fail if tests can't complete or throw an exception.
      */
-    @Parameter( property = "testFailureIgnore", defaultValue = "false", readonly = true )
+    @Parameter(property = "testFailureIgnore", defaultValue = "false", readonly = true)
     private boolean mavenIgnoreTestFailure;
 
     /**
      * The configuration for the ui automator goal. As soon as a lint goal is invoked the command will be executed
      * unless the skip parameter is set. A minimal configuration that will run lint and produce a XML report in
      * ${project.build.directory}/lint/lint-results.xml is
-     * 
+     *
      * <pre>
      * &lt;uiautomator&gt;
      *   &lt;skip&gt;false&lt;/skip&gt;
      * &lt;/uiautomator&gt;
      * </pre>
-     * 
+     * <p>
      * Full configuration can use these parameters.
-     * 
+     *
      * <pre>
      * &lt;uiautomator&gt;
      *   &lt;skip&gt;false&lt;/skip&gt;
@@ -116,8 +114,8 @@ public class UIAutomatorMojo extends AbstractAndroidMojo
      *   &lt;propertiesKeyPrefix&gt;UIA&lt;/propertiesKeyPrefix&gt;
      * &lt;/uiautomator&gt;
      * </pre>
-     * 
-     * 
+     * <p>
+     * <p>
      * Alternatively to the plugin configuration values can also be configured as properties on the command line as
      * android.lint.* or in pom or settings file as properties like lint*.
      */
@@ -129,19 +127,19 @@ public class UIAutomatorMojo extends AbstractAndroidMojo
      * Enables or disables uiautomator test goal. If <code>true</code> it will be skipped; if <code>false</code>, it
      * will be run.
      */
-    @Parameter( property = "android.uiautomator.skip" )
+    @Parameter(property = "android.uiautomator.skip")
     private Boolean uiautomatorSkip;
 
-    @PullParameter( defaultValue = "true" )
+    @PullParameter(defaultValue = "true")
     private Boolean parsedSkip;
 
     /**
      * Jar file that will be run during ui uiautomator tests.
      */
-    @Parameter( property = "android.uiautomator.jarFile" )
+    @Parameter(property = "android.uiautomator.jarFile")
     private String uiautomatorJarFile;
 
-    @PullParameter( defaultValueGetterMethod = "getJarFile" )
+    @PullParameter(defaultValueGetterMethod = "getJarFile")
     private String parsedJarFile;
 
     /**
@@ -152,48 +150,48 @@ public class UIAutomatorMojo extends AbstractAndroidMojo
      * <li>package_name.class_name#method_name
      * </ul>
      */
-    @Parameter( property = "android.uiautomator.testClassOrMethod" )
+    @Parameter(property = "android.uiautomator.testClassOrMethod")
     private String[] uiautomatorTestClassOrMethods;
 
-    @PullParameter( required = false, defaultValueGetterMethod = "getTestClassOrMethods" )
+    @PullParameter(required = false, defaultValueGetterMethod = "getTestClassOrMethods")
     private String[] parsedTestClassOrMethods;
 
     /**
      * Decides whether to run the test to completion on the device even if its parent process is terminated (for
      * example, if the device is disconnected).
      */
-    @Parameter( property = "android.uiautomator.noHup" )
+    @Parameter(property = "android.uiautomator.noHup")
     private Boolean uiautomatorNoHup;
 
-    @PullParameter( defaultValue = "false" )
+    @PullParameter(defaultValue = "false")
     private Boolean parsedNoHup;
 
     /**
      * Decides whether to wait for debugger to connect before starting.
      */
-    @Parameter( property = "android.uiautomator.debug" )
+    @Parameter(property = "android.uiautomator.debug")
     private Boolean uiautomatorDebug = false;
 
-    @PullParameter( defaultValue = "false" )
+    @PullParameter(defaultValue = "false")
     private Boolean parsedDebug;
 
     /**
      * Decides whether to use a dump file or not.
      */
-    @Parameter( property = "android.uiautomator.useDump" )
+    @Parameter(property = "android.uiautomator.useDump")
     private Boolean uiautomatorUseDump;
 
-    @PullParameter( defaultValue = "false" )
+    @PullParameter(defaultValue = "false")
     private Boolean parsedUseDump;
 
     /**
      * Generate an XML file with a dump of the current UI hierarchy. If a filepath is not specified, by default, the
      * generated dump file is stored on the device in this location /storage/sdcard0/window_dump.xml.
      */
-    @Parameter( property = "android.uiautomator.dumpFilePath" )
+    @Parameter(property = "android.uiautomator.dumpFilePath")
     private String uiautomatorDumpFilePath;
 
-    @PullParameter( required = false, defaultValue = "/storage/sdcard0/window_dump.xml" )
+    @PullParameter(required = false, defaultValue = "/storage/sdcard0/window_dump.xml")
     private String parsedDumpFilePath;
 
     /**
@@ -212,222 +210,192 @@ public class UIAutomatorMojo extends AbstractAndroidMojo
      * The file contains a single TestSuite for all tests and a TestCase for each test method. Errors and failures are
      * logged in the file and the system log with full stack traces and other details available.
      */
-    @Parameter( property = "android.uiautomator.createReport" )
+    @Parameter(property = "android.uiautomator.createReport")
     private Boolean uiautomatorCreateReport;
 
-    @PullParameter( defaultValue = "false" )
+    @PullParameter(defaultValue = "false")
     private Boolean parsedCreateReport;
 
     /**
      * Adds a suffix to the report name. For example if parameter reportSuffix is "-mySpecialReport",
      * the name of the report will be TEST-deviceid-mySpecialReport.xml
-     *
+     * <p>
      * Defaults to null. Hence, in the default case, the name of the report will be TEST-deviceid.xml.
      */
-    @Parameter( property = "android.uiautomator.reportSuffix" )
+    @Parameter(property = "android.uiautomator.reportSuffix")
     private String uiautomatorReportSuffix;
 
-    @PullParameter( required = false, defaultValueGetterMethod = "getReportSuffix" )
+    @PullParameter(required = false, defaultValueGetterMethod = "getReportSuffix")
     private String parsedReportSuffix;
 
     /**
      * Decides whether or not to take screenshots when tests execution results in failure or error. Screenshots use the
      * utiliy screencap that is usually available within emulator/devices with SDK >= 16.
      */
-    @Parameter( property = "android.uiautomator.takeScreenshotOnFailure" )
+    @Parameter(property = "android.uiautomator.takeScreenshotOnFailure")
     private Boolean uiautomatorTakeScreenshotOnFailure;
 
-    @PullParameter( defaultValue = "false" )
+    @PullParameter(defaultValue = "false")
     private Boolean parsedTakeScreenshotOnFailure;
 
     /**
      * Location of the screenshots on device. This value is only taken into account if takeScreenshotOnFailure = true.
      * If a filepath is not specified, by default, the screenshots will be located at /sdcard/uiautomator-screenshots/.
      */
-    @Parameter( property = "android.uiautomator.screenshotsPathOnDevice" )
+    @Parameter(property = "android.uiautomator.screenshotsPathOnDevice")
     private String uiautomatorScreenshotsPathOnDevice;
 
-    @PullParameter( required = false, defaultValue = "/sdcard/uiautomator-screenshots/" )
+    @PullParameter(required = false, defaultValue = "/sdcard/uiautomator-screenshots/")
     private String parsedScreenshotsPathOnDevice;
-    
+
     /**
-     * <p>Specifies a prefix for custom user properties that will be sent 
+     * <p>Specifies a prefix for custom user properties that will be sent
      * through to UIAutomator with the <code>"-e key value"</code> parameter.</p>
-     * 
+     *
      * <p>If any user property is needed in a test case, this is the way to send it through.
      * User credentials for example.</p>
-     * 
+     *
      * <p>If no prefix value is specified no user property will be sent.</p>
-     * 
+     *
      * <p>Usage example:</p>
      * <p><code>&lt;propertiesKeyPrefix&gt;UIA&lt;/propertiesKeyPrefix&gt;</code></p>
      * <p>And run it with:</p>
      * <p><code>&gt; mvn &lt;goal&gt; "-DUIAkey=value"</code></p>
      * <p>would become <code>"-e key value"</code> as it would be runned from adb</p>
      */
-    @Parameter( property = "android.uiautomator.propertiesKeyPrefix" )
+    @Parameter(property = "android.uiautomator.propertiesKeyPrefix")
     private String uiautomatorPropertiesKeyPrefix;
 
-    @PullParameter( required = false, defaultValueGetterMethod = "getPropertiesKeyPrefix" )
+    @PullParameter(required = false, defaultValueGetterMethod = "getPropertiesKeyPrefix")
     private String parsedPropertiesKeyPrefix;
 
+    /**
+     * Helper method to build a comma separated string from a list. Blank strings are filtered out
+     *
+     * @param lines A list of strings
+     * @return Comma separated String from given list
+     */
+    protected static String buildSpaceSeparatedString(String[] lines) {
+        if (lines == null || lines.length == 0) {
+            return null;
+        }
+
+        return StringUtils.join(lines, " ");
+    }
+
     @Override
-    public void execute() throws MojoExecutionException, MojoFailureException
-    {
-        ConfigHandler configHandler = new ConfigHandler( this, this.session, this.execution );
+    public void execute() throws MojoExecutionException, MojoFailureException {
+        ConfigHandler configHandler = new ConfigHandler(this, this.session, this.execution);
         configHandler.parseConfiguration();
 
-        if ( isEnableIntegrationTest() )
-        {
+        if (isEnableIntegrationTest()) {
             playTests();
         }
     }
 
     /**
      * Whether or not tests are enabled.
-     * 
+     *
      * @return a boolean indicating whether or not tests are enabled.
      */
-    protected boolean isEnableIntegrationTest()
-    {
+    protected boolean isEnableIntegrationTest() {
         return !parsedSkip && !mavenTestSkip && !mavenSkipTests;
     }
 
     /**
      * Whether or not test failures should be ignored.
-     * 
+     *
      * @return a boolean indicating whether or not test failures should be ignored.
      */
-    protected boolean isIgnoreTestFailures()
-    {
+    protected boolean isIgnoreTestFailures() {
         return mavenIgnoreTestFailure || mavenTestFailureIgnore;
     }
 
     /**
      * Actually plays tests.
-     * 
-     * @throws MojoExecutionException
-     *             if at least a test threw an exception and isIgnoreTestFailures is false..
-     * @throws MojoFailureException
-     *             if at least a test failed and isIgnoreTestFailures is false.
+     *
+     * @throws MojoExecutionException if at least a test threw an exception and isIgnoreTestFailures is false..
+     * @throws MojoFailureException   if at least a test failed and isIgnoreTestFailures is false.
      */
-    protected void playTests() throws MojoExecutionException, MojoFailureException
-    {
+    protected void playTests() throws MojoExecutionException, MojoFailureException {
 
-        getLog().debug( "Parsed values for Android UI UIAutomator invocation: " );
-        getLog().debug( "jarFile:" + parsedJarFile );
-        String testClassOrMethodString = buildSpaceSeparatedString( parsedTestClassOrMethods );
-        getLog().debug( "testClassOrMethod:" + testClassOrMethodString );
-        getLog().debug( "createReport:" + parsedCreateReport );
+        getLog().debug("Parsed values for Android UI UIAutomator invocation: ");
+        getLog().debug("jarFile:" + parsedJarFile);
+        String testClassOrMethodString = buildSpaceSeparatedString(parsedTestClassOrMethods);
+        getLog().debug("testClassOrMethod:" + testClassOrMethodString);
+        getLog().debug("createReport:" + parsedCreateReport);
 
-        DeviceCallback instrumentationTestExecutor = new DeviceCallback()
-        {
+        DeviceCallback instrumentationTestExecutor = new DeviceCallback() {
             @Override
-            public void doWithDevice( final IDevice device ) throws MojoExecutionException, MojoFailureException
-            {
-                String deviceLogLinePrefix = DeviceHelper.getDeviceLogLinePrefix( device );
+            public void doWithDevice(final IDevice device) throws MojoExecutionException, MojoFailureException {
+                String deviceLogLinePrefix = DeviceHelper.getDeviceLogLinePrefix(device);
 
                 UIAutomatorRemoteAndroidTestRunner automatorRemoteAndroidTestRunner //
-                = new UIAutomatorRemoteAndroidTestRunner( parsedJarFile, device );
+                        = new UIAutomatorRemoteAndroidTestRunner(parsedJarFile, device);
 
-                automatorRemoteAndroidTestRunner.setRunName( "ui uiautomator tests" );
-                automatorRemoteAndroidTestRunner.setDebug( uiautomatorDebug );
-                automatorRemoteAndroidTestRunner.setTestClassOrMethods( parsedTestClassOrMethods );
-                automatorRemoteAndroidTestRunner.setNoHup( parsedNoHup );
-                automatorRemoteAndroidTestRunner.setUserProperties( session.getUserProperties(), 
-                        parsedPropertiesKeyPrefix );
-                
-                if ( parsedUseDump )
-                {
-                    automatorRemoteAndroidTestRunner.setDumpFilePath( parsedDumpFilePath );
+                automatorRemoteAndroidTestRunner.setRunName("ui uiautomator tests");
+                automatorRemoteAndroidTestRunner.setDebug(uiautomatorDebug);
+                automatorRemoteAndroidTestRunner.setTestClassOrMethods(parsedTestClassOrMethods);
+                automatorRemoteAndroidTestRunner.setNoHup(parsedNoHup);
+                automatorRemoteAndroidTestRunner.setUserProperties(session.getUserProperties(),
+                        parsedPropertiesKeyPrefix);
+
+                if (parsedUseDump) {
+                    automatorRemoteAndroidTestRunner.setDumpFilePath(parsedDumpFilePath);
                 }
 
-                getLog().info( deviceLogLinePrefix + "Running ui uiautomator tests in" + parsedJarFile );
-                try
-                {
-                    AndroidTestRunListener testRunListener = new AndroidTestRunListener( device, getLog(),
+                getLog().info(deviceLogLinePrefix + "Running ui uiautomator tests in" + parsedJarFile);
+                try {
+                    AndroidTestRunListener testRunListener = new AndroidTestRunListener(device, getLog(),
                             parsedCreateReport, parsedTakeScreenshotOnFailure, parsedScreenshotsPathOnDevice,
-                            parsedReportSuffix, targetDirectory );
-                    automatorRemoteAndroidTestRunner.run( testRunListener );
-                    if ( testRunListener.hasFailuresOrErrors() && !isIgnoreTestFailures() )
-                    {
-                        throw new MojoFailureException( deviceLogLinePrefix + "Tests failed on device." );
+                            parsedReportSuffix, targetDirectory);
+                    automatorRemoteAndroidTestRunner.run(testRunListener);
+                    if (testRunListener.hasFailuresOrErrors() && !isIgnoreTestFailures()) {
+                        throw new MojoFailureException(deviceLogLinePrefix + "Tests failed on device.");
                     }
-                    if ( testRunListener.testRunFailed() )
-                    {
-                        throw new MojoFailureException( deviceLogLinePrefix + "Test run failed to complete: "
-                                + testRunListener.getTestRunFailureCause() );
+                    if (testRunListener.testRunFailed()) {
+                        throw new MojoFailureException(deviceLogLinePrefix + "Test run failed to complete: "
+                                + testRunListener.getTestRunFailureCause());
                     }
-                    if ( testRunListener.threwException() && !isIgnoreTestFailures() )
-                    {
-                        throw new MojoFailureException( deviceLogLinePrefix + testRunListener.getExceptionMessages() );
+                    if (testRunListener.threwException() && !isIgnoreTestFailures()) {
+                        throw new MojoFailureException(deviceLogLinePrefix + testRunListener.getExceptionMessages());
                     }
-                }
-                catch ( TimeoutException e )
-                {
-                    throw new MojoExecutionException( deviceLogLinePrefix + "timeout", e );
-                }
-                catch ( AdbCommandRejectedException e )
-                {
-                    throw new MojoExecutionException( deviceLogLinePrefix + "adb command rejected", e );
-                }
-                catch ( ShellCommandUnresponsiveException e )
-                {
-                    throw new MojoExecutionException( deviceLogLinePrefix + "shell command " + "unresponsive", e );
-                }
-                catch ( IOException e )
-                {
-                    throw new MojoExecutionException( deviceLogLinePrefix + "IO problem", e );
+                } catch (TimeoutException e) {
+                    throw new MojoExecutionException(deviceLogLinePrefix + "timeout", e);
+                } catch (AdbCommandRejectedException e) {
+                    throw new MojoExecutionException(deviceLogLinePrefix + "adb command rejected", e);
+                } catch (ShellCommandUnresponsiveException e) {
+                    throw new MojoExecutionException(deviceLogLinePrefix + "shell command " + "unresponsive", e);
+                } catch (IOException e) {
+                    throw new MojoExecutionException(deviceLogLinePrefix + "IO problem", e);
                 }
             }
         };
 
-        instrumentationTestExecutor = new ScreenshotServiceWrapper( instrumentationTestExecutor, project, getLog() );
+        instrumentationTestExecutor = new ScreenshotServiceWrapper(instrumentationTestExecutor, project, getLog());
 
-        doWithDevices( instrumentationTestExecutor );
+        doWithDevices(instrumentationTestExecutor);
     }
 
-    private String getJarFile()
-    {
-        if ( parsedJarFile == null )
-        {
-            File jarFilePath = new File( targetDirectory + File.separator
-                    + finalName + ".jar" );
+    private String getJarFile() {
+        if (parsedJarFile == null) {
+            File jarFilePath = new File(targetDirectory + File.separator
+                    + finalName + ".jar");
             return jarFilePath.getName();
         }
         return parsedJarFile;
     }
 
-    private String[] getTestClassOrMethods()
-    {
+    private String[] getTestClassOrMethods() {
         // null if not overriden by configuration
         return parsedTestClassOrMethods;
     }
 
-    private String getReportSuffix()
-    {
+    private String getReportSuffix() {
         return parsedReportSuffix;
     }
-    
-    private String getPropertiesKeyPrefix()
-    {
+
+    private String getPropertiesKeyPrefix() {
         return parsedPropertiesKeyPrefix;
-    }
-
-    /**
-     * Helper method to build a comma separated string from a list. Blank strings are filtered out
-     * 
-     * @param lines
-     *            A list of strings
-     * @return Comma separated String from given list
-     */
-    protected static String buildSpaceSeparatedString( String[] lines )
-    {
-        if ( lines == null || lines.length == 0 )
-        {
-            return null;
-        }
-
-        return StringUtils.join( lines, " " );
     }
 }

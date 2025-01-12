@@ -39,8 +39,8 @@ import java.util.function.Predicate;
  * @author hugo.josefson@jayway.com
  * @author Manfred Moser - manfred@simpligility.com
  */
-public class AndroidSdk
-{
+public class AndroidSdk {
+    public static final String CANNOT_FIND_S = "Cannot find ";
     /**
      * the default API level for the SDK used as a fall back if none is supplied,
      * should ideally point to the latest available version
@@ -54,50 +54,40 @@ public class AndroidSdk
      * property name for the sdk tools revision in sdk/tools/lib source.properties
      */
     private static final String SDK_TOOLS_REVISION_PROPERTY = "Pkg.Revision";
-
     /**
      * folder name for the sdk sub folder that contains the different platform versions.
      */
     private static final String PLATFORMS_FOLDER_NAME = "platforms";
-
     private static final String BIN_FOLDER_NAME_IN_TOOLS = "bin";
-
     private static final String PARAMETER_MESSAGE = "Please provide a proper Android SDK directory path as "
             + "configuration parameter <sdk><path>...</path></sdk> in the plugin <configuration/>. As an alternative,"
             + " you may add the parameter to commandline: -Dandroid.sdk.path=... or set environment variable "
             + AbstractAndroidMojo.ENV_ANDROID_HOME + ".";
-    public static final String CANNOT_FIND_S = "Cannot find ";
-
     private final File sdkPath;
-    private File platformToolsPath;
-    private File toolsPath;
-
     private final IAndroidTarget androidTarget;
-    private AndroidSdkHandler sdkManager;
-    private int sdkMajorVersion;
     private final String buildToolsVersion;
     private final ProgressIndicatorImpl progressIndicator;
+    private File platformToolsPath;
+    private File toolsPath;
+    private AndroidSdkHandler sdkManager;
+    private int sdkMajorVersion;
 
-    public AndroidSdk( File sdkPath, String apiLevel )
-    {
-        this( sdkPath, apiLevel, null );
+    public AndroidSdk(File sdkPath, String apiLevel) {
+        this(sdkPath, apiLevel, null);
     }
 
-    public AndroidSdk( File sdkPath, String apiLevel, @Nullable String buildToolsVersion )
-    {
+    public AndroidSdk(File sdkPath, String apiLevel, @Nullable String buildToolsVersion) {
         this.sdkPath = sdkPath;
         this.buildToolsVersion = buildToolsVersion;
         this.progressIndicator = new ProgressIndicatorImpl();
 
-        if ( sdkPath != null )
-        {
-            sdkManager = AndroidSdkHandler.getInstance( sdkPath );
-            platformToolsPath = new File( sdkPath, SdkConstants.FD_PLATFORM_TOOLS );
-            toolsPath = new File( sdkPath, SdkConstants.FD_TOOLS );
+        if (sdkPath != null) {
+            sdkManager = AndroidSdkHandler.getInstance(sdkPath);
+            platformToolsPath = new File(sdkPath, SdkConstants.FD_PLATFORM_TOOLS);
+            toolsPath = new File(sdkPath, SdkConstants.FD_TOOLS);
 
-            if ( sdkManager == null )
-            {
-                throw invalidSdkException( sdkPath, apiLevel );
+            if (sdkManager == null) {
+                throw invalidSdkException(sdkPath, apiLevel);
             }
         }
 
@@ -111,70 +101,65 @@ public class AndroidSdk
          */
         //loadSDKToolsMajorVersion();
 
-        if ( apiLevel == null )
-        {
+        if (apiLevel == null) {
             apiLevel = DEFAULT_ANDROID_API_LEVEL;
         }
-        System.out.println( "API: " + apiLevel + " | SDK Path: " + sdkPath.getPath() + " | Buildtools: "
-                + buildToolsVersion );
+        System.out.println("API: " + apiLevel + " | SDK Path: " + sdkPath.getPath() + " | Buildtools: "
+                + buildToolsVersion);
 
-        androidTarget = findPlatformByApiLevel( apiLevel );
-        if ( androidTarget == null )
-        {
-            throw invalidSdkException( sdkPath, apiLevel );
+        androidTarget = findPlatformByApiLevel(apiLevel);
+        if (androidTarget == null) {
+            throw invalidSdkException(sdkPath, apiLevel);
         }
     }
 
-    private InvalidSdkException invalidSdkException( File sdkPath, String platformOrApiLevel )
-    {
-        throw new InvalidSdkException( "Invalid SDK: Platform/API level " + platformOrApiLevel
-                + " not available. This command should give you all you need:\n" + sdkPath.getAbsolutePath()
-                + File.separator + "tools" + File.separator + "android update sdk --no-ui --obsolete --force" );
+    private static String ext(String windowsExtension, String nonWindowsExtension) {
+        if (SdkConstants.currentPlatform() == SdkConstants.PLATFORM_WINDOWS) {
+            return windowsExtension;
+        } else {
+            return nonWindowsExtension;
+        }
     }
 
-    private IAndroidTarget findPlatformByApiLevel( String apiLevel )
-    {
+    private InvalidSdkException invalidSdkException(File sdkPath, String platformOrApiLevel) {
+        throw new InvalidSdkException("Invalid SDK: Platform/API level " + platformOrApiLevel
+                + " not available. This command should give you all you need:\n" + sdkPath.getAbsolutePath()
+                + File.separator + "tools" + File.separator + "android update sdk --no-ui --obsolete --force");
+    }
+
+    private IAndroidTarget findPlatformByApiLevel(String apiLevel) {
         // try find by api level first
         AndroidVersion version;
-        try
-        {
-            version = new AndroidVersion( apiLevel );
-            String hashString = AndroidTargetHash.getPlatformHashString( version );
-            IAndroidTarget target = sdkManager.getAndroidTargetManager( progressIndicator )
-                    .getTargetFromHashString( hashString, progressIndicator );
+        try {
+            version = new AndroidVersion(apiLevel);
+            String hashString = AndroidTargetHash.getPlatformHashString(version);
+            IAndroidTarget target = sdkManager.getAndroidTargetManager(progressIndicator)
+                    .getTargetFromHashString(hashString, progressIndicator);
 
             // SdkManager may return a non-null IAndroidTarget that references nothing.
             // I suspect it points to an SDK that has been removed.
-            if ( target != null && target.getLocation() != null )
-            {
+            if (target != null && target.getLocation() != null) {
                 return target;
             }
-        }
-        catch ( AndroidVersion.AndroidVersionException e )
-        {
-            throw new InvalidSdkException( "Error AndroidVersion: " + e.getMessage() );
+        } catch (AndroidVersion.AndroidVersionException e) {
+            throw new InvalidSdkException("Error AndroidVersion: " + e.getMessage());
         }
 
         // fallback to searching for platform on standard Android platforms (isPlatform() is true)
-        for ( IAndroidTarget t: sdkManager.getAndroidTargetManager( null ).getTargets( null ) )
-        {
-            if ( t.isPlatform() && apiLevel.equals( t.getVersionName() ) )
-            {
+        for (IAndroidTarget t : sdkManager.getAndroidTargetManager(null).getTargets(null)) {
+            if (t.isPlatform() && apiLevel.equals(t.getVersionName())) {
                 return t;
             }
         }
         return null;
     }
 
-    private void assertPathIsDirectory( final File path )
-    {
-        if ( path == null )
-        {
-            throw new InvalidSdkException( PARAMETER_MESSAGE );
+    private void assertPathIsDirectory(final File path) {
+        if (path == null) {
+            throw new InvalidSdkException(PARAMETER_MESSAGE);
         }
-        if ( !path.isDirectory() )
-        {
-            throw new InvalidSdkException( "Path \"" + path + "\" is not a directory. " + PARAMETER_MESSAGE );
+        if (!path.isDirectory()) {
+            throw new InvalidSdkException("Path \"" + path + "\" is not a directory. " + PARAMETER_MESSAGE);
         }
     }
 
@@ -183,105 +168,97 @@ public class AndroidSdk
      *
      * @return the path to the aapt tool
      */
-    public String getAaptPath()
-    {
-        return getPathForBuildTool( BuildToolInfo.PathId.AAPT );
+    public String getAaptPath() {
+        return getPathForBuildTool(BuildToolInfo.PathId.AAPT);
     }
 
     /**
      * Get the aild tool path
+     *
      * @return the path to the aidl tool
      */
-    public String getAidlPath()
-    {
-        return getPathForBuildTool( BuildToolInfo.PathId.AIDL );
+    public String getAidlPath() {
+        return getPathForBuildTool(BuildToolInfo.PathId.AIDL);
     }
 
     /**
      * Get the path for dx.jar
+     *
      * @return the path to the dx.jar
      */
-    public String getDxJarPath()
-    {
-        return getPathForBuildTool( BuildToolInfo.PathId.DX_JAR );
+    public String getDxJarPath() {
+        return getPathForBuildTool(BuildToolInfo.PathId.DX_JAR);
     }
 
     /**
      * @return the path to the dx.jar
      */
-    public String getD8JarPath()
-    {
-        final File pathToDexJar = new File( getPathForBuildTool( BuildToolInfo.PathId.DX_JAR ) );
-        final File pathToD8Jar = new File( pathToDexJar.getParent(), "d8.jar" );
+    public String getD8JarPath() {
+        final File pathToDexJar = new File(getPathForBuildTool(BuildToolInfo.PathId.DX_JAR));
+        final File pathToD8Jar = new File(pathToDexJar.getParent(), "d8.jar");
         return pathToD8Jar.getAbsolutePath();
     }
 
     /**
      * Get the path for proguard.jar
+     *
      * @return the path to the proguard.jar
      */
-    public String getProguardJarPath()
-    {
-        File directory = new File( getToolsPath(), "proguard" + File.separator + "lib" + File.separator );
-        File proguardJar = new File( directory, "proguard.jar" );
-        if ( proguardJar.exists() )
-        {
+    public String getProguardJarPath() {
+        File directory = new File(getToolsPath(), "proguard" + File.separator + "lib" + File.separator);
+        File proguardJar = new File(directory, "proguard.jar");
+        if (proguardJar.exists()) {
             return proguardJar.getAbsolutePath();
         }
-        throw new InvalidSdkException( CANNOT_FIND_S + proguardJar );
+        throw new InvalidSdkException(CANNOT_FIND_S + proguardJar);
     }
 
     /**
      * Get the path for shrinkedAndroid.jar
+     *
      * @return the path to the shrinkedAndroid.jar
      */
-    public String getShrinkedAndroidJarPath()
-    {
-        File shrinkedAndroidJar = new File( getBuildToolsLibDirectoryPath(), "shrinkedAndroid.jar" );
-        if ( shrinkedAndroidJar.exists() )
-        {
+    public String getShrinkedAndroidJarPath() {
+        File shrinkedAndroidJar = new File(getBuildToolsLibDirectoryPath(), "shrinkedAndroid.jar");
+        if (shrinkedAndroidJar.exists()) {
             return shrinkedAndroidJar.getAbsolutePath();
         }
-        throw new InvalidSdkException( CANNOT_FIND_S + shrinkedAndroidJar );
+        throw new InvalidSdkException(CANNOT_FIND_S + shrinkedAndroidJar);
     }
 
     /**
      * Get the path for build-tools lib directory
+     *
      * @return the path to the build-tools lib directory
      */
-    public String getBuildToolsLibDirectoryPath()
-    {
-        File buildToolsLib = new File( getBuildToolInfo().getLocation(), "lib" );
-        if ( buildToolsLib.exists() )
-        {
+    public String getBuildToolsLibDirectoryPath() {
+        File buildToolsLib = new File(getBuildToolInfo().getLocation(), "lib");
+        if (buildToolsLib.exists()) {
             return buildToolsLib.getAbsolutePath();
         }
-        throw new InvalidSdkException( CANNOT_FIND_S + buildToolsLib );
+        throw new InvalidSdkException(CANNOT_FIND_S + buildToolsLib);
     }
 
     /**
      * Get the path for mainDexClasses.rules
+     *
      * @return the path to the mainDexClasses.rules
      */
-    public String getMainDexClassesRulesPath()
-    {
-        File mainDexClassesRules = new File( getBuildToolInfo().getLocation(),
-                "mainDexClasses.rules" );
-        if ( mainDexClassesRules.exists() )
-        {
+    public String getMainDexClassesRulesPath() {
+        File mainDexClassesRules = new File(getBuildToolInfo().getLocation(),
+                "mainDexClasses.rules");
+        if (mainDexClassesRules.exists()) {
             return mainDexClassesRules.getAbsolutePath();
         }
-        throw new InvalidSdkException( CANNOT_FIND_S + mainDexClassesRules );
+        throw new InvalidSdkException(CANNOT_FIND_S + mainDexClassesRules);
     }
 
-    public void assertThatBuildToolsVersionIsAtLeast( String version, String feature )
-            throws InvalidSdkException, NumberFormatException
-    {
-        if ( getBuildToolInfo().getRevision().
-                compareTo( Revision.parseRevision( version ) ) < 0 )
-        {
-            throw new InvalidSdkException( "Version of build tools must be at least "
-                    + version + " for " + feature + " to work" );
+    public void assertThatBuildToolsVersionIsAtLeast(String version, String feature)
+            throws InvalidSdkException, NumberFormatException {
+        if (getBuildToolInfo().getRevision().
+                compareTo(Revision.parseRevision(version)) < 0) {
+            throw new InvalidSdkException("Version of build tools must be at least "
+                    + version + " for " + feature + " to work");
         }
     }
 
@@ -290,9 +267,8 @@ public class AndroidSdk
      *
      * @return the path to the adb tool
      */
-    public String getAdbPath()
-    {
-        return getPathForPlatformTool( SdkConstants.FN_ADB );
+    public String getAdbPath() {
+        return getPathForPlatformTool(SdkConstants.FN_ADB);
     }
 
     /**
@@ -300,9 +276,8 @@ public class AndroidSdk
      *
      * @return the path to the zipalign tool
      */
-    public String getZipalignPath()
-    {
-        return getPathForBuildTool( BuildToolInfo.PathId.ZIP_ALIGN );
+    public String getZipalignPath() {
+        return getPathForBuildTool(BuildToolInfo.PathId.ZIP_ALIGN);
     }
 
     /**
@@ -310,9 +285,8 @@ public class AndroidSdk
      *
      * @return the path to the lint tool
      */
-    public String getLintPath()
-    {
-        return getPathForTool( BIN_FOLDER_NAME_IN_TOOLS + "/" + "lint" + ext( ".bat", "" ) );
+    public String getLintPath() {
+        return getPathForTool(BIN_FOLDER_NAME_IN_TOOLS + "/" + "lint" + ext(".bat", ""));
     }
 
     /**
@@ -320,9 +294,8 @@ public class AndroidSdk
      *
      * @return the path to the monkeyrunner tool
      */
-    public String getMonkeyRunnerPath()
-    {
-        return getPathForTool( BIN_FOLDER_NAME_IN_TOOLS + "/" + "monkeyrunner" + ext( ".bat", "" ) );
+    public String getMonkeyRunnerPath() {
+        return getPathForTool(BIN_FOLDER_NAME_IN_TOOLS + "/" + "monkeyrunner" + ext(".bat", ""));
     }
 
     /**
@@ -330,9 +303,8 @@ public class AndroidSdk
      *
      * @return the path to the apkbuilder tool
      */
-    public String getApkBuilderPath()
-    {
-        return getPathForTool( "apkbuilder" + ext( ".bat", "" ) );
+    public String getApkBuilderPath() {
+        return getPathForTool("apkbuilder" + ext(".bat", ""));
     }
 
     /**
@@ -340,94 +312,71 @@ public class AndroidSdk
      *
      * @return the path to the android tool
      */
-    public String getAndroidPath()
-    {
+    public String getAndroidPath() {
         String cmd = "android";
         String ext = SdkConstants.currentPlatform() == 2 ? ".bat" : "";
 
-        return getPathForTool( cmd + ext );
+        return getPathForTool(cmd + ext);
     }
 
     /**
      * Get the path to the tools directory.
+     *
      * @return the path to the tools directory
      */
-    public File getToolsPath()
-    {
+    public File getToolsPath() {
         return toolsPath;
     }
 
-    private String getPathForBuildTool( BuildToolInfo.PathId pathId )
-    {
-        return getBuildToolInfo().getPath( pathId );
+    private String getPathForBuildTool(BuildToolInfo.PathId pathId) {
+        return getBuildToolInfo().getPath(pathId);
     }
 
-    private BuildToolInfo getBuildToolInfo()
-    {
+    private BuildToolInfo getBuildToolInfo() {
         //First we use the build tools specified in the pom file
-        if ( buildToolsVersion != null && !buildToolsVersion.equals( "" ) )
-        {
-            BuildToolInfo buildToolInfo = sdkManager.getBuildToolInfo( Revision.parseRevision( buildToolsVersion ),
-                    progressIndicator );
-            if ( buildToolInfo != null )
-            {
+        if (buildToolsVersion != null && !buildToolsVersion.equals("")) {
+            BuildToolInfo buildToolInfo = sdkManager.getBuildToolInfo(Revision.parseRevision(buildToolsVersion),
+                    progressIndicator);
+            if (buildToolInfo != null) {
                 return buildToolInfo;
             } else {
                 //If the build tools specified by the user is not installed, we try to find the latest
                 //installed revision of the build tools
                 BuildToolInfo latestBuildToolInfo = BuildToolInfo.fromLocalPackage(
                         getLatestBuildToolForMajorVersion(Integer.parseInt(buildToolsVersion)));
-                if ( latestBuildToolInfo != null )
-                {
+                if (latestBuildToolInfo != null) {
                     return latestBuildToolInfo;
                 }
             }
             //Since we cannot find the build tool specified by the user we make it fail
             // instead of using the latest build tool version
-            throw new InvalidSdkException( "Invalid SDK: Build-tools " + buildToolsVersion + " not found."
-                    + " Check your Android SDK to install the build tools " + buildToolsVersion );
+            throw new InvalidSdkException("Invalid SDK: Build-tools " + buildToolsVersion + " not found."
+                    + " Check your Android SDK to install the build tools " + buildToolsVersion);
         }
 
-        if ( androidTarget != null )
-        {
+        if (androidTarget != null) {
             BuildToolInfo buildToolInfo = androidTarget.getBuildToolInfo();
-            if ( buildToolInfo != null )
-            {
+            if (buildToolInfo != null) {
                 return buildToolInfo;
             }
         }
         // if no valid target is defined, or it has no build tools installed, try to use the latest
-        BuildToolInfo latestBuildToolInfo = sdkManager.getLatestBuildTool( progressIndicator, true );
-        if ( latestBuildToolInfo == null )
-        {
-            throw new InvalidSdkException( "Invalid SDK: Build-tools not found. Check the content of '"
-                + sdkPath.getAbsolutePath() + File.separator + "build-tools', or run '"
-                + sdkPath.getAbsolutePath() + File.separator + "tools" + File.separator
-                + "android sdk' to install them" );
+        BuildToolInfo latestBuildToolInfo = sdkManager.getLatestBuildTool(progressIndicator, true);
+        if (latestBuildToolInfo == null) {
+            throw new InvalidSdkException("Invalid SDK: Build-tools not found. Check the content of '"
+                    + sdkPath.getAbsolutePath() + File.separator + "build-tools', or run '"
+                    + sdkPath.getAbsolutePath() + File.separator + "tools" + File.separator
+                    + "android sdk' to install them");
         }
         return latestBuildToolInfo;
     }
 
-    private String getPathForPlatformTool( String tool )
-    {
-        return new File( platformToolsPath, tool ).getAbsolutePath();
+    private String getPathForPlatformTool(String tool) {
+        return new File(platformToolsPath, tool).getAbsolutePath();
     }
 
-    private String getPathForTool( String tool )
-    {
-        return new File( toolsPath, tool ).getAbsolutePath();
-    }
-
-    private static String ext( String windowsExtension, String nonWindowsExtension )
-    {
-        if ( SdkConstants.currentPlatform() == SdkConstants.PLATFORM_WINDOWS )
-        {
-            return windowsExtension;
-        }
-        else
-        {
-            return nonWindowsExtension;
-        }
+    private String getPathForTool(String tool) {
+        return new File(toolsPath, tool).getAbsolutePath();
     }
 
     public LocalPackage getLatestBuildToolForMajorVersion(int majorVersion) {
@@ -453,85 +402,71 @@ public class AndroidSdk
      *
      * @return the complete path as a <code>String</code>, including the filename.
      */
-    public String getPathForFrameworkAidl()
-    {
-        return androidTarget.getPath( IAndroidTarget.ANDROID_AIDL );
+    public String getPathForFrameworkAidl() {
+        return androidTarget.getPath(IAndroidTarget.ANDROID_AIDL);
     }
 
     /**
      * Resolves the android.jar from this SDK.
      *
      * @return a <code>File</code> pointing to the android.jar file.
-     * @throws org.apache.maven.plugin.MojoExecutionException
-     *             if the file can not be resolved.
+     * @throws org.apache.maven.plugin.MojoExecutionException if the file can not be resolved.
      */
-    public File getAndroidJar() throws MojoExecutionException
-    {
-        final String androidJarPath = androidTarget.getPath( IAndroidTarget.ANDROID_JAR );
-        if ( androidJarPath == null )
-        {
-            throw new MojoExecutionException( "No AndroidJar found for " + androidTarget.getLocation() );
+    public File getAndroidJar() throws MojoExecutionException {
+        final String androidJarPath = androidTarget.getPath(IAndroidTarget.ANDROID_JAR);
+        if (androidJarPath == null) {
+            throw new MojoExecutionException("No AndroidJar found for " + androidTarget.getLocation());
         }
-        return new File ( androidJarPath );
+        return new File(androidJarPath);
     }
 
     /**
      * Resolves the path for this SDK.
      *
      * @return a <code>File</code> pointing to the SDk Directory.
-     * @throws org.apache.maven.plugin.MojoExecutionException
-     *             if the file can not be resolved.
+     * @throws org.apache.maven.plugin.MojoExecutionException if the file can not be resolved.
      */
-    public File getSdkPath() throws MojoExecutionException
-    {
-        if ( sdkPath.exists() )
-        {
+    public File getSdkPath() throws MojoExecutionException {
+        if (sdkPath.exists()) {
             return sdkPath;
         }
-        throw new MojoExecutionException( "Can't find the SDK directory : " + sdkPath.getAbsolutePath() );
+        throw new MojoExecutionException("Can't find the SDK directory : " + sdkPath.getAbsolutePath());
     }
 
     /**
      * This method returns the previously specified version. However, if none have been specified it returns the
      * "latest" version.
      */
-    public File getPlatform()
-    {
-        assertPathIsDirectory( sdkPath );
+    public File getPlatform() {
+        assertPathIsDirectory(sdkPath);
 
-        final File platformsDirectory = new File( sdkPath, PLATFORMS_FOLDER_NAME );
-        assertPathIsDirectory( platformsDirectory );
+        final File platformsDirectory = new File(sdkPath, PLATFORMS_FOLDER_NAME);
+        assertPathIsDirectory(platformsDirectory);
 
         final File platformDirectory;
-        if ( androidTarget == null )
-        {
+        if (androidTarget == null) {
             IAndroidTarget latestTarget = null;
-            AndroidTargetManager targetManager = sdkManager.getAndroidTargetManager( progressIndicator );
-            for ( IAndroidTarget target: targetManager.getTargets( progressIndicator ) )
-            {
-                if ( target.isPlatform() && (latestTarget == null
-                            || target.getVersion().getApiLevel() > latestTarget.getVersion().getApiLevel()) )
-                    {
-                        latestTarget = target;
-                    }
+            AndroidTargetManager targetManager = sdkManager.getAndroidTargetManager(progressIndicator);
+            for (IAndroidTarget target : targetManager.getTargets(progressIndicator)) {
+                if (target.isPlatform() && (latestTarget == null
+                        || target.getVersion().getApiLevel() > latestTarget.getVersion().getApiLevel())) {
+                    latestTarget = target;
+                }
 
             }
-            platformDirectory = new File ( latestTarget.getLocation() );
+            platformDirectory = new File(latestTarget.getLocation());
+        } else {
+            platformDirectory = new File(androidTarget.getLocation());
         }
-        else
-        {
-            platformDirectory = new File( androidTarget.getLocation() );
-        }
-        assertPathIsDirectory( platformDirectory );
+        assertPathIsDirectory(platformDirectory);
         return platformDirectory;
     }
 
     /**
      * Loads the SDK Tools version
      */
-    private void loadSDKToolsMajorVersion()
-    {
-        File propFile = new File( sdkPath, "tools/" + SOURCE_PROPERTIES_FILENAME );
+    private void loadSDKToolsMajorVersion() {
+        File propFile = new File(sdkPath, "tools/" + SOURCE_PROPERTIES_FILENAME);
         Properties properties = new Properties();
 
         try (FileInputStream fis = new FileInputStream(propFile)) {
@@ -540,28 +475,21 @@ public class AndroidSdk
             throw new InvalidSdkException("Error reading " + propFile.getAbsoluteFile());
         }
 
-        if ( properties.containsKey( SDK_TOOLS_REVISION_PROPERTY ) )
-        {
-            try
-            {
-                String versionString = properties.getProperty( SDK_TOOLS_REVISION_PROPERTY );
+        if (properties.containsKey(SDK_TOOLS_REVISION_PROPERTY)) {
+            try {
+                String versionString = properties.getProperty(SDK_TOOLS_REVISION_PROPERTY);
                 String majorVersion;
-                if ( versionString.matches( ".*[\\.| ].*" ) )
-                {
-                    String[] versions = versionString.split( "[\\.| ]" );
-                    majorVersion = versions[ 0 ];
-                }
-                else
-                {
+                if (versionString.matches(".*[\\.| ].*")) {
+                    String[] versions = versionString.split("[\\.| ]");
+                    majorVersion = versions[0];
+                } else {
                     majorVersion = versionString;
                 }
-                sdkMajorVersion = Integer.parseInt( majorVersion );
-            }
-            catch ( NumberFormatException e )
-            {
-                throw new InvalidSdkException( "Error - The property '" + SDK_TOOLS_REVISION_PROPERTY
+                sdkMajorVersion = Integer.parseInt(majorVersion);
+            } catch (NumberFormatException e) {
+                throw new InvalidSdkException("Error - The property '" + SDK_TOOLS_REVISION_PROPERTY
                         + "' in the SDK source.properties file  number is not an Integer: "
-                        + properties.getProperty( SDK_TOOLS_REVISION_PROPERTY ) );
+                        + properties.getProperty(SDK_TOOLS_REVISION_PROPERTY));
             }
         }
     }
@@ -571,8 +499,7 @@ public class AndroidSdk
      *
      * @return the version of the SDK Tools as an <code>int</code>.
      */
-    public int getSdkMajorVersion()
-    {
+    public int getSdkMajorVersion() {
         return sdkMajorVersion;
     }
 }
