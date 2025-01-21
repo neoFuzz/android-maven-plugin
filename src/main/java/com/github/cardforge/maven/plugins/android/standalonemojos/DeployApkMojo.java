@@ -31,12 +31,13 @@ import java.io.File;
 
 /**
  * Deploys a specified Android application apk to attached devices and emulators.
- * By default it will deploy to all, but a subset or single one can be configured
+ * By default, it will deploy to all, but a subset or single one can be configured
  * with the device and devices parameters.This goal can be used in non-android
  * projects and as standalone execution on the command line. <br>
  *
  * @author Manfred Moser - manfred@simpligility.com
  */
+@SuppressWarnings("unused") // used in Maven goals
 @Mojo(name = "deploy-apk", requiresProject = false)
 public class DeployApkMojo extends AbstractAndroidMojo {
     /**
@@ -61,8 +62,8 @@ public class DeployApkMojo extends AbstractAndroidMojo {
     /**
      * Deploy the app to the attached devices and emulators.
      *
-     * @throws MojoExecutionException
-     * @throws MojoFailureException
+     * @throws MojoExecutionException if the execution fails
+     * @throws MojoFailureException   if the apk file does not exist
      */
     public void execute() throws MojoExecutionException, MojoFailureException {
         ConfigHandler configHandler = new ConfigHandler(this, this.session, this.execution);

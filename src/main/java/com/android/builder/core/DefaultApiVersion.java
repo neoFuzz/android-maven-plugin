@@ -20,6 +20,8 @@ import com.android.annotations.NonNull;
 import com.android.annotations.Nullable;
 import com.android.builder.model.ApiVersion;
 
+import java.util.Objects;
+
 /**
  * Basic implementation of ApiVersion
  */
@@ -45,10 +47,10 @@ public class DefaultApiVersion implements ApiVersion {
 
     @NonNull
     public static ApiVersion create(@NonNull Object value) {
-        if (value instanceof Integer) {
-            return new DefaultApiVersion((Integer) value, null);
-        } else if (value instanceof String) {
-            return new DefaultApiVersion(1, (String) value);
+        if (value instanceof Integer i) {
+            return new DefaultApiVersion(i, null);
+        } else if (value instanceof String s) {
+            return new DefaultApiVersion(1, s);
         }
 
         return new DefaultApiVersion(1, null);
@@ -85,11 +87,7 @@ public class DefaultApiVersion implements ApiVersion {
         if (mApiLevel != that.mApiLevel) {
             return false;
         }
-        if (mCodename != null ? !mCodename.equals(that.mCodename) : that.mCodename != null) {
-            return false;
-        }
-
-        return true;
+        return Objects.equals(mCodename, that.mCodename);
     }
 
     @Override

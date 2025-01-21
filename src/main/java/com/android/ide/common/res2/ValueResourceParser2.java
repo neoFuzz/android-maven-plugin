@@ -65,15 +65,15 @@ class ValueResourceParser2 {
      * @param node the node representing the resource.
      * @return a ResourceItem object or null.
      */
+    @Nullable
     static ResourceItem getResource(@NonNull Node node, @Nullable File from) {
         ResourceType type = getType(node, from);
         String name = getName(node);
 
-        if (name != null) {
-            if (type != null) {
+        if (name != null && type != null) {
                 return new ResourceItem(name, type, node);
             }
-        }
+
 
         return null;
     }
@@ -84,6 +84,7 @@ class ValueResourceParser2 {
      * @param node the node
      * @return the ResourceType or null if it could not be inferred.
      */
+    @Nullable
     static ResourceType getType(@NonNull Node node, @Nullable File from) {
         String nodeName = node.getLocalName();
         String typeString = null;
@@ -124,7 +125,8 @@ class ValueResourceParser2 {
      * @param node the node.
      * @return the name or null if it could not be inferred.
      */
-    static String getName(Node node) {
+    @Nullable
+    static String getName(@NonNull Node node) {
         Attr attribute = (Attr) node.getAttributes().getNamedItemNS(null, ATTR_NAME);
 
         if (attribute != null) {
@@ -155,11 +157,7 @@ class ValueResourceParser2 {
                 exception.setColumn(e.getColumnNumber() - 1);
             }
             throw exception;
-        } catch (ParserConfigurationException e) {
-            throw new MergingException(e).setFile(file);
-        } catch (SAXException e) {
-            throw new MergingException(e).setFile(file);
-        } catch (IOException e) {
+        } catch (ParserConfigurationException | SAXException | IOException e) {
             throw new MergingException(e).setFile(file);
         }
     }
@@ -192,13 +190,13 @@ class ValueResourceParser2 {
                 assert resource.getType() == ResourceType.ATTR;
 
                 // is the attribute in the android namespace?
-                if (!resource.getName().startsWith(ANDROID_NS_NAME_PREFIX)) {
-                    if (hasFormatAttribute(node) || XmlUtils.hasElementChildren(node)) {
+                if (!resource.getName().startsWith(ANDROID_NS_NAME_PREFIX) &&
+                        (hasFormatAttribute(node) || XmlUtils.hasElementChildren(node))) {
                         checkDuplicate(resource, map);
                         resource.setIgnoredFromDiskMerge(true);
                         list.add(resource);
                     }
-                }
+
             }
         }
     }

@@ -17,11 +17,13 @@
 package com.android.jack.api.v01;
 
 import javax.annotation.Nonnull;
+import java.io.Serial;
 
 /**
  * Thrown when something is wrong in Jack's configuration.
  */
 public class ConfigurationException extends ChainedException {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     public ConfigurationException(@Nonnull String message) {

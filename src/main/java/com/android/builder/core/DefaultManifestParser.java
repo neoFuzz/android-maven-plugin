@@ -19,11 +19,15 @@ package com.android.builder.core;
 import com.android.annotations.NonNull;
 import com.android.annotations.Nullable;
 import com.android.io.FileWrapper;
+import com.android.io.IAbstractFile;
 import com.android.io.StreamException;
 import com.android.utils.XmlUtils;
-import com.android.xml.AndroidManifest;
 import com.android.xml.AndroidXPathFactory;
-import com.google.common.base.Optional;
+
+import java.io.InputStream;
+import java.util.Optional;
+
+import com.google.common.io.Closeables;
 import org.xml.sax.InputSource;
 
 import javax.xml.xpath.XPath;
@@ -39,6 +43,7 @@ public class DefaultManifestParser implements ManifestParser {
     Optional<String> mPackage;
     Optional<String> mVersionName;
 
+    @Nullable
     private static String getStringValue(@NonNull File file, @NonNull String xPath) {
         XPath xpath = AndroidXPathFactory.newXPath();
 
@@ -55,38 +60,79 @@ public class DefaultManifestParser implements ManifestParser {
     }
 
     @Nullable
+    public static Object getTargetSdkVersionAM(IAbstractFile manifestFile) throws StreamException {
+        String result = getStringValueAM(manifestFile);
+
+        try {
+            return Integer.valueOf(result);
+        } catch (NumberFormatException var3) {
+            return !result.isEmpty() ? result : null;
+        }
+    }
+
+    private static String getStringValueAM(@NonNull IAbstractFile file) throws StreamException {
+        String strXPath = "/manifest/uses-sdk/@android:targetSdkVersion"; // NOSONAR
+        XPath xpath = AndroidXPathFactory.newXPath();
+        InputStream is = null;
+
+        String e;
+        try {
+            is = file.getContents();
+            e = xpath.evaluate(strXPath, new InputSource(is));
+        } catch (XPathExpressionException ex) {
+            throw new RuntimeException(
+                    "Malformed XPath expression when reading the attribute from the manifest,exp = " + strXPath, ex);
+        } finally {
+            Closeables.closeQuietly(is);
+        }
+
+        return e;
+    }
+
+    @Nullable
+    public static Object getMinSdkVersionAM(IAbstractFile manifestFile) {
+        String result = getStringValue((File) manifestFile, "/manifest/uses-sdk/@android:minSdkVersion");
+
+        try {
+            return Integer.valueOf(result);
+        } catch (NumberFormatException ignored) {
+            return !result.isEmpty() ? result : null;
+        }
+    }
+
+    @Nullable
     @Override
     public synchronized String getPackage(@NonNull File manifestFile) {
         if (mPackage == null) {
-            mPackage = Optional.fromNullable(getStringValue(manifestFile, "/manifest/@package"));
+            mPackage = Optional.ofNullable(getStringValue(manifestFile, "/manifest/@package"));
         }
-        return mPackage.orNull();
+        return mPackage.orElse(null);
     }
 
     @Nullable
     @Override
     public synchronized String getVersionName(@NonNull File manifestFile) {
         if (mVersionName == null) {
-            mVersionName = Optional.fromNullable(
+            mVersionName = Optional.ofNullable(
                     getStringValue(manifestFile, "/manifest/@android:versionName"));
         }
-        return mVersionName.orNull();
+        return mVersionName.orElse(null);
     }
 
     @Override
-    @NonNull
     public synchronized int getVersionCode(@NonNull File manifestFile) {
         if (mVersionCode == null) {
-            mVersionCode = Optional.absent();
+            mVersionCode = Optional.empty();
             try {
                 String value = getStringValue(manifestFile, "/manifest/@android:versionCode");
                 if (value != null) {
                     mVersionCode = Optional.of(Integer.valueOf(value));
                 }
             } catch (NumberFormatException ignored) {
+                // ignored
             }
         }
-        return mVersionCode.or(-1);
+        return mVersionCode.orElse(-1);
     }
 
     @Override
@@ -94,13 +140,13 @@ public class DefaultManifestParser implements ManifestParser {
     public synchronized Object getMinSdkVersion(@NonNull File manifestFile) {
         if (mMinSdkVersion == null) {
             try {
-                mMinSdkVersion = Optional.fromNullable(
-                        AndroidManifest.getMinSdkVersion(new FileWrapper(manifestFile)));
-            } catch (StreamException e) {
+                mMinSdkVersion = Optional.ofNullable(
+                        getMinSdkVersionAM(new FileWrapper(manifestFile)));
+            } catch (Exception e) {
                 throw new RuntimeException(e);
             }
         }
-        return mMinSdkVersion.or(1);
+        return mMinSdkVersion.orElse(1);
     }
 
     @Override
@@ -109,12 +155,13 @@ public class DefaultManifestParser implements ManifestParser {
         if (mTargetSdkVersion == null) {
             try {
                 mTargetSdkVersion =
-                        Optional.fromNullable(AndroidManifest.getTargetSdkVersion(
+                        Optional.ofNullable(getTargetSdkVersionAM(
                                 new FileWrapper(manifestFile)));
             } catch (StreamException e) {
                 throw new RuntimeException(e);
             }
         }
-        return mTargetSdkVersion.or(-1);
+        return mTargetSdkVersion.orElse(-1);
     }
+
 }

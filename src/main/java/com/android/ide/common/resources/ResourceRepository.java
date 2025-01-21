@@ -52,12 +52,12 @@ public abstract class ResourceRepository {
     private final IAbstractFolder mResourceFolder;
     private final boolean mFrameworkRepository;
     protected Map<ResourceFolderType, List<ResourceFolder>> mFolderMap =
-            new EnumMap<ResourceFolderType, List<ResourceFolder>>(ResourceFolderType.class);
+            new EnumMap<>(ResourceFolderType.class);
     protected Map<ResourceType, Map<String, ResourceItem>> mResourceMap =
-            new EnumMap<ResourceType, Map<String, ResourceItem>>(
+            new EnumMap<>(
                     ResourceType.class);
     private Map<Map<String, ResourceItem>, Collection<ResourceItem>> mReadOnlyListMap =
-            new IdentityHashMap<Map<String, ResourceItem>, Collection<ResourceItem>>();
+            new IdentityHashMap<>();
     private boolean mCleared = true;
     private boolean mInitializing = false;
 
@@ -83,13 +83,13 @@ public abstract class ResourceRepository {
 
     public synchronized void clear() {
         mCleared = true;
-        mFolderMap = new EnumMap<ResourceFolderType, List<ResourceFolder>>(
+        mFolderMap = new EnumMap<>(
                 ResourceFolderType.class);
-        mResourceMap = new EnumMap<ResourceType, Map<String, ResourceItem>>(
+        mResourceMap = new EnumMap<>(
                 ResourceType.class);
 
         mReadOnlyListMap =
-                new IdentityHashMap<Map<String, ResourceItem>, Collection<ResourceItem>>();
+                new IdentityHashMap<>();
     }
 
     /**
@@ -106,8 +106,7 @@ public abstract class ResourceRepository {
             IAbstractResource[] resources = mResourceFolder.listMembers();
 
             for (IAbstractResource res : resources) {
-                if (res instanceof IAbstractFolder) {
-                    IAbstractFolder folder = (IAbstractFolder) res;
+                if (res instanceof IAbstractFolder folder) {
                     ResourceFolder resFolder = processFolder(folder);
 
                     if (resFolder != null) {
@@ -115,9 +114,7 @@ public abstract class ResourceRepository {
                         IAbstractResource[] files = folder.listMembers();
 
                         for (IAbstractResource fileRes : files) {
-                            if (fileRes instanceof IAbstractFile) {
-                                IAbstractFile file = (IAbstractFile) fileRes;
-
+                            if (fileRes instanceof IAbstractFile file) {
                                 resFolder.processFile(file, ResourceDeltaKind.ADDED, context);
                             }
                         }
@@ -141,6 +138,7 @@ public abstract class ResourceRepository {
      * @param folder The workspace folder object.
      * @return the {@link ResourceFolder} object associated to this folder.
      */
+    @NonNull
     private ResourceFolder add(
             @NonNull ResourceFolderType type,
             @NonNull FolderConfiguration config,
@@ -149,7 +147,7 @@ public abstract class ResourceRepository {
         List<ResourceFolder> list = mFolderMap.get(type);
 
         if (list == null) {
-            list = new ArrayList<ResourceFolder>();
+            list = new ArrayList<>();
 
             ResourceFolder cf = new ResourceFolder(type, config, folder, this);
             list.add(cf);
@@ -294,9 +292,7 @@ public abstract class ResourceRepository {
         if (map != null) {
 
             ResourceItem resourceItem = map.get(name);
-            if (resourceItem != null) {
-                return true;
-            }
+            return resourceItem != null;
         }
 
         return false;
@@ -331,84 +327,36 @@ public abstract class ResourceRepository {
                     // Pick initial size for the maps. Also change the load factor to 1.0
                     // to avoid rehashing the whole table when we (as expected) get near
                     // the known rough size of each resource type map.
-                    int size;
-                    switch (type) {
+                    int size = switch (type) {
                         // Based on counts in API 16. Going back to API 10, the counts
-                        // are roughly 25-50% smaller (e.g. compared to the top 5 types below
+                        // are roughly 25-50% smaller; e.g. compared to the top 5 types below
                         // the fractions are 1107 vs 1734, 831 vs 1508, 895 vs 1255,
                         // 733 vs 1064 and 171 vs 783.
-                        case PUBLIC:
-                            size = 1734;
-                            break;
-                        case DRAWABLE:
-                            size = 1508;
-                            break;
-                        case STRING:
-                            size = 1255;
-                            break;
-                        case ATTR:
-                            size = 1064;
-                            break;
-                        case STYLE:
-                            size = 783;
-                            break;
-                        case ID:
-                            size = 347;
-                            break;
-                        case DECLARE_STYLEABLE:
-                            size = 210;
-                            break;
-                        case LAYOUT:
-                            size = 187;
-                            break;
-                        case COLOR:
-                            size = 120;
-                            break;
-                        case ANIM:
-                            size = 95;
-                            break;
-                        case DIMEN:
-                            size = 81;
-                            break;
-                        case BOOL:
-                            size = 54;
-                            break;
-                        case INTEGER:
-                            size = 52;
-                            break;
-                        case ARRAY:
-                            size = 51;
-                            break;
-                        case PLURALS:
-                            size = 20;
-                            break;
-                        case XML:
-                            size = 14;
-                            break;
-                        case INTERPOLATOR:
-                            size = 13;
-                            break;
-                        case ANIMATOR:
-                            size = 8;
-                            break;
-                        case RAW:
-                            size = 4;
-                            break;
-                        case MENU:
-                            size = 2;
-                            break;
-                        case MIPMAP:
-                            size = 2;
-                            break;
-                        case FRACTION:
-                            size = 1;
-                            break;
-                        default:
-                            size = 2;
-                    }
-                    map = new HashMap<String, ResourceItem>(size, 1.0f);
+                        case PUBLIC -> 1734;
+                        case DRAWABLE -> 1508;
+                        case STRING -> 1255;
+                        case ATTR -> 1064;
+                        case STYLE -> 783;
+                        case ID -> 347;
+                        case DECLARE_STYLEABLE -> 210;
+                        case LAYOUT -> 187;
+                        case COLOR -> 120;
+                        case ANIM -> 95;
+                        case DIMEN -> 81;
+                        case BOOL -> 54;
+                        case INTEGER -> 52;
+                        case ARRAY -> 51;
+                        case PLURALS -> 20;
+                        case XML -> 14;
+                        case INTERPOLATOR -> 13;
+                        case ANIMATOR -> 8;
+                        case RAW -> 4;
+                        case FRACTION -> 1;
+                        default -> 2; // MIPMAP and MENU as well
+                    };
+                    map = new HashMap<>(size, 1.0f);
                 } else {
-                    map = new HashMap<String, ResourceItem>();
+                    map = new HashMap<>();
                 }
                 mResourceMap.put(type, map);
             }
@@ -477,7 +425,7 @@ public abstract class ResourceRepository {
     public List<ResourceType> getAvailableResourceTypes() {
         ensureInitialized();
 
-        List<ResourceType> list = new ArrayList<ResourceType>();
+        List<ResourceType> list = new ArrayList<>();
 
         // For each key, we check if there's a single ResourceType match.
         // If not, we look for the actual content to give us the resource type.
@@ -489,7 +437,7 @@ public abstract class ResourceRepository {
                 // could be created from multiple folders, even for the folders that only create
                 // one type of resource (drawable for instance, can be created from drawable/ and
                 // values/)
-                if (list.contains(types.get(0)) == false) {
+                if (!list.contains(types.get(0))) {
                     list.add(types.get(0));
                 }
             } else {
@@ -502,7 +450,7 @@ public abstract class ResourceRepository {
 
                         // then we add them, but only if they aren't already in the list.
                         for (ResourceType folderResType : folderContent) {
-                            if (list.contains(folderResType) == false) {
+                            if (!list.contains(folderResType)) {
                                 list.add(folderResType);
                             }
                         }
@@ -518,7 +466,7 @@ public abstract class ResourceRepository {
      * Returns a list of {@link ResourceItem} matching a given {@link ResourceType}.
      *
      * @param type the type of the resource items to return
-     * @return a non null collection of resource items
+     * @return a non-null collection of resource items
      */
     @NonNull
     public Collection<ResourceItem> getResourceItemsOfType(@NonNull ResourceType type) {
@@ -530,13 +478,8 @@ public abstract class ResourceRepository {
             return Collections.emptyList();
         }
 
-        Collection<ResourceItem> roList = mReadOnlyListMap.get(map);
-        if (roList == null) {
-            roList = Collections.unmodifiableCollection(map.values());
-            mReadOnlyListMap.put(map, roList);
-        }
-
-        return roList;
+        return mReadOnlyListMap.computeIfAbsent(map, m ->
+                Collections.unmodifiableCollection(m.values()));
     }
 
     /**
@@ -549,7 +492,7 @@ public abstract class ResourceRepository {
         ensureInitialized();
 
         Map<String, ResourceItem> items = mResourceMap.get(type);
-        return (items != null && items.size() > 0);
+        return (items != null && !items.isEmpty());
     }
 
     /**
@@ -661,10 +604,7 @@ public abstract class ResourceRepository {
                                     // No; look up the resource file from the full path
                                     File file = new File(v);
                                     if (file.exists()) {
-                                        ResourceFile f = findResourceFile(file);
-                                        if (f != null) {
-                                            return f;
-                                        }
+                                        return findResourceFile(file);
                                     }
                                 }
                             }
@@ -707,10 +647,7 @@ public abstract class ResourceRepository {
                 }
             }
             if (resourceFolder != null) {
-                ResourceFile resourceFile = resourceFolder.getFile(file.getName());
-                if (resourceFile != null) {
-                    return resourceFile;
-                }
+                return resourceFolder.getFile(file.getName());
             }
         }
 
@@ -740,8 +677,8 @@ public abstract class ResourceRepository {
                     Configurable match = referenceConfig.findMatchingConfigurable(
                             item.getSourceFileList());
 
-                    if (match instanceof ResourceFile) {
-                        return Collections.singletonList((ResourceFile) match);
+                    if (match instanceof ResourceFile rf) {
+                        return Collections.singletonList(rf);
                     }
 
                     return null;
@@ -780,7 +717,7 @@ public abstract class ResourceRepository {
         ensureInitialized();
 
         Map<ResourceType, Map<String, ResourceValue>> map =
-                new EnumMap<ResourceType, Map<String, ResourceValue>>(ResourceType.class);
+                new EnumMap<>(ResourceType.class);
 
         for (ResourceType key : ResourceType.values()) {
             // get the local results and put them in the map
@@ -797,7 +734,7 @@ public abstract class ResourceRepository {
     public SortedSet<String> getLanguages() {
         ensureInitialized();
 
-        SortedSet<String> set = new TreeSet<String>();
+        SortedSet<String> set = new TreeSet<>();
 
         Collection<List<ResourceFolder>> folderList = mFolderMap.values();
         for (List<ResourceFolder> folderSubList : folderList) {
@@ -822,7 +759,7 @@ public abstract class ResourceRepository {
     public SortedSet<String> getRegions(@NonNull String currentLanguage) {
         ensureInitialized();
 
-        SortedSet<String> set = new TreeSet<String>();
+        SortedSet<String> set = new TreeSet<>();
 
         Collection<List<ResourceFolder>> folderList = mFolderMap.values();
         for (List<ResourceFolder> folderSubList : folderList) {
@@ -843,14 +780,6 @@ public abstract class ResourceRepository {
         return set;
     }
 
-    /**
-     * Loads the resources.
-     */
-    public void loadResources() {
-        clear();
-        ensureInitialized();
-    }
-
     protected void removeFile(@NonNull Collection<ResourceType> types,
                               @NonNull ResourceFile file) {
         ensureInitialized();
@@ -869,7 +798,7 @@ public abstract class ResourceRepository {
                 item.removeFile(file);
                 if (item.hasNoSourceFile()) {
                     if (toDelete == null) {
-                        toDelete = new ArrayList<ResourceItem>(values.size());
+                        toDelete = new ArrayList<>(values.size());
                     }
                     toDelete.add(item);
                 }
@@ -897,11 +826,11 @@ public abstract class ResourceRepository {
         // get the resource item for the given type
         Map<String, ResourceItem> items = mResourceMap.get(type);
         if (items == null) {
-            return new HashMap<String, ResourceValue>();
+            return new HashMap<>();
         }
 
         // create the map
-        HashMap<String, ResourceValue> map = new HashMap<String, ResourceValue>(items.size());
+        HashMap<String, ResourceValue> map = new HashMap<>(items.size());
 
         for (ResourceItem item : items.values()) {
             ResourceValue value = item.getResourceValue(type, referenceConfig,

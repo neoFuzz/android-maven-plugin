@@ -1,5 +1,6 @@
 package com.github.cardforge.maven.plugins.android.phase_prebuild;
 
+import com.android.annotations.NonNull;
 import org.apache.maven.artifact.Artifact;
 import org.codehaus.plexus.logging.Logger;
 
@@ -9,8 +10,8 @@ import java.util.Set;
 
 class ProvidedDependencyChecker {
 
-    void checkProvidedDependencies(Set<Artifact> artifacts, Logger log) {
-        List<Artifact> conflictingArtifacts = new ArrayList<Artifact>();
+    void checkProvidedDependencies(@NonNull Set<Artifact> artifacts, Logger log) {
+        List<Artifact> conflictingArtifacts = new ArrayList<>();
 
         for (Artifact artifact : artifacts) {
             if (artifact.getScope().equals(Artifact.SCOPE_TEST)) {
@@ -20,10 +21,7 @@ class ProvidedDependencyChecker {
             String group = artifact.getGroupId();
             String name = artifact.getArtifactId();
 
-            if (("org.apache.httpcomponents".equals(group) && "httpclient".equals(name))
-                    || ("xpp3".equals(group) && name.equals("xpp3"))
-                    || ("commons-logging".equals(group) && "commons-logging".equals(name))
-                    || ("xerces".equals(group) && "xmlParserAPIs".equals(name))) {
+            if (isXpp3(group, name)) {
                 conflictingArtifacts.add(artifact);
             }
             if ("org.json".equals(group) && "json".equals(name)) {
@@ -42,5 +40,12 @@ class ProvidedDependencyChecker {
                     + "Alternatively, you can disable this warning with the"
                     + "'disableConflictingDependenciesWarning' parameter.");
         }
+    }
+
+    private static boolean isXpp3(String group, String name) {
+        return ("org.apache.httpcomponents".equals(group) && "httpclient".equals(name))
+                || ("xpp3".equals(group) && name.equals("xpp3"))
+                || ("commons-logging".equals(group) && "commons-logging".equals(name))
+                || ("xerces".equals(group) && "xmlParserAPIs".equals(name));
     }
 }

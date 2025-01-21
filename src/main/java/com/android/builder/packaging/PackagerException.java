@@ -16,10 +16,13 @@
 
 package com.android.builder.packaging;
 
+import java.io.Serial;
+
 /**
  * An exception thrown during packaging of an APK file.
  */
 public final class PackagerException extends Exception {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     public PackagerException(String format, Object... args) {

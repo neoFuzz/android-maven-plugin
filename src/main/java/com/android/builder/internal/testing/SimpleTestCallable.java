@@ -119,40 +119,24 @@ public class SimpleTestCallable implements Callable<Boolean> {
                 }
                 if (device.getApiLevel() >= 21) {
                     device.installPackages(testedApks,
-                            ImmutableList.<String>of() /* installOptions */, timeoutInMs, logger);
+                            ImmutableList.of() /* installOptions */, timeoutInMs, logger);
                 } else {
                     device.installPackage(testedApks.get(0),
-                            ImmutableList.<String>of() /* installOptions */, timeoutInMs, logger);
+                            ImmutableList.of() /* installOptions */, timeoutInMs, logger);
                 }
             }
 
             logger.verbose("DeviceConnector '%s': installing %s", deviceName, testApk);
             if (device.getApiLevel() >= 21) {
                 device.installPackages(ImmutableList.of(testApk),
-                        ImmutableList.<String>of() /* installOptions */, timeoutInMs, logger);
+                        ImmutableList.of() /* installOptions */, timeoutInMs, logger);
             } else {
                 device.installPackage(testApk,
-                        ImmutableList.<String>of() /* installOptions */, timeoutInMs, logger);
+                        ImmutableList.of() /* installOptions */, timeoutInMs, logger);
             }
             isInstalled = true;
 
-            RemoteAndroidTestRunner runner = new RemoteAndroidTestRunner(
-                    testData.getApplicationId(),
-                    testData.getInstrumentationRunner(),
-                    device);
-
-            for (Map.Entry<String, String> argument :
-                    testData.getInstrumentationRunnerArguments().entrySet()) {
-                runner.addInstrumentationArg(argument.getKey(), argument.getValue());
-            }
-
-            if (testData.isTestCoverageEnabled()) {
-                runner.addInstrumentationArg("coverage", "true");
-                runner.addInstrumentationArg("coverageFile", coverageFile);
-            }
-
-            runner.setRunName(deviceName);
-            runner.setMaxtimeToOutputResponse(timeoutInMs);
+            RemoteAndroidTestRunner runner = getRemoteAndroidTestRunner(coverageFile, deviceName);
 
             runner.run(runListener);
 
@@ -188,12 +172,12 @@ public class SimpleTestCallable implements Callable<Boolean> {
             Map<String, String> emptyMetrics = Collections.emptyMap();
 
             // create a fake test output
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            PrintWriter pw = new PrintWriter(baos, true);
+            ByteArrayOutputStream stream = new ByteArrayOutputStream();
+            PrintWriter pw = new PrintWriter(stream, true);
             e.printStackTrace(pw);
             TestIdentifier fakeTest = new TestIdentifier(device.getClass().getName(), "runTests");
             runListener.testStarted(fakeTest);
-            runListener.testFailed(fakeTest, baos.toString());
+            runListener.testFailed(fakeTest, stream.toString());
             runListener.testEnded(fakeTest, emptyMetrics);
 
             // end the run to generate the XML file.
@@ -210,7 +194,7 @@ public class SimpleTestCallable implements Callable<Boolean> {
 
                     MultiLineReceiver outputReceiver = new MultiLineReceiver() {
                         @Override
-                        public void processNewLines(String[] lines) {
+                        public void processNewLines(@NonNull String[] lines) {
                             for (String line : lines) {
                                 logger.info(line);
                             }
@@ -250,6 +234,28 @@ public class SimpleTestCallable implements Callable<Boolean> {
 
             device.disconnect(timeoutInMs, logger);
         }
+    }
+
+    @NonNull
+    private RemoteAndroidTestRunner getRemoteAndroidTestRunner(String coverageFile, String deviceName) {
+        RemoteAndroidTestRunner runner = new RemoteAndroidTestRunner(
+                testData.getApplicationId(),
+                testData.getInstrumentationRunner(),
+                device);
+
+        for (Map.Entry<String, String> argument :
+                testData.getInstrumentationRunnerArguments().entrySet()) {
+            runner.addInstrumentationArg(argument.getKey(), argument.getValue());
+        }
+
+        if (testData.isTestCoverageEnabled()) {
+            runner.addInstrumentationArg("coverage", "true");
+            runner.addInstrumentationArg("coverageFile", coverageFile);
+        }
+
+        runner.setRunName(deviceName);
+        runner.setMaxtimeToOutputResponse(timeoutInMs);
+        return runner;
     }
 
     private void uninstall(@NonNull File apkFile, @Nullable String packageName,

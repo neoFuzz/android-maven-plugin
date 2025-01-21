@@ -16,24 +16,23 @@
 package com.android.utils;
 
 import com.android.annotations.NonNull;
-import com.google.common.base.Function;
+
 import com.google.common.base.Joiner;
-import com.google.common.collect.Iterables;
 import com.google.common.hash.Hashing;
 import com.google.common.io.Files;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.function.Function;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
 public class FileUtils {
-    private static final Function<File, String> GET_NAME = new Function<File, String>() {
-        @Override
-        public String apply(File file) {
-            return file.getName();
-        }
-    };
+    private static final Function<File, String> GET_NAME = File::getName;
+
+    private FileUtils() {
+        // empty
+    }
 
     public static void deleteFolder(@NonNull final File folder) throws IOException {
         if (!folder.exists()) {
@@ -60,11 +59,10 @@ public class FileUtils {
     public static void copyFile(@NonNull File from, File to) throws IOException {
         to = new File(to, from.getName());
         if (from.isDirectory()) {
-            if (!to.exists()) {
-                if (!to.mkdirs()) {
-                    throw new IOException(String.format("Could not create directory %s", to));
-                }
+            if (!to.exists() && !to.mkdirs()) {
+                throw new IOException(String.format("Could not create directory %s", to));
             }
+
             File[] children = from.listFiles();
             if (children != null) {
                 for (File child : children) {
@@ -90,10 +88,5 @@ public class FileUtils {
     @NonNull
     public static String sha1(@NonNull File file) throws IOException {
         return Hashing.sha1().hashBytes(Files.toByteArray(file)).toString();
-    }
-
-    @NonNull
-    public static String getNamesAsCommaSeparatedList(Iterable<File> files) {
-        return Joiner.on(", ").join(Iterables.transform(files, GET_NAME));
     }
 }

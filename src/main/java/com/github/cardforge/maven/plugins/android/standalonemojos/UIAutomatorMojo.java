@@ -44,7 +44,7 @@ import java.io.IOException;
  * Implements parsing parameters from pom or command line arguments and sets useful defaults as well. This goal is meant
  * to execute a special <i>java project</i> dedicated to UI testing via UIAutomator. It will build the jar of the
  * project, dex it and send it to dalvik cache of a rooted device or to an emulator. If you use a rooted device, refer
- * to <a href="http://stackoverflow.com/a/13805869/693752">this thread on stack over flow</a>. <br>
+ * to <a href="http://stackoverflow.com/a/13805869/693752">this thread on stack overflow</a>. <br>
  * <br>
  * The tests are executed via ui automator. A surefire compatible test report can be generated and its location will be
  * logged during build. <br>
@@ -90,7 +90,7 @@ public class UIAutomatorMojo extends AbstractAndroidMojo {
 
     /**
      * The configuration for the ui automator goal. As soon as a lint goal is invoked the command will be executed
-     * unless the skip parameter is set. A minimal configuration that will run lint and produce a XML report in
+     * unless the skip parameter is set. A minimal configuration that will run lint and produce an XML report in
      * ${project.build.directory}/lint/lint-results.xml is
      *
      * <pre>
@@ -229,7 +229,7 @@ public class UIAutomatorMojo extends AbstractAndroidMojo {
     private String parsedReportSuffix;
 
     /**
-     * Decides whether or not to take screenshots when tests execution results in failure or error. Screenshots use the
+     * Decides whether to take screenshots when tests execution results in failure or error. Screenshots use the
      * utiliy screencap that is usually available within emulator/devices with SDK >= 16.
      */
     @Parameter(property = "android.uiautomator.takeScreenshotOnFailure")
@@ -294,18 +294,18 @@ public class UIAutomatorMojo extends AbstractAndroidMojo {
     }
 
     /**
-     * Whether or not tests are enabled.
+     * Whether tests are enabled.
      *
-     * @return a boolean indicating whether or not tests are enabled.
+     * @return a boolean indicating whether tests are enabled.
      */
     protected boolean isEnableIntegrationTest() {
         return !parsedSkip && !mavenTestSkip && !mavenSkipTests;
     }
 
     /**
-     * Whether or not test failures should be ignored.
+     * Whether test failures should be ignored.
      *
-     * @return a boolean indicating whether or not test failures should be ignored.
+     * @return a boolean indicating whether test failures should be ignored.
      */
     protected boolean isIgnoreTestFailures() {
         return mavenIgnoreTestFailure || mavenTestFailureIgnore;
@@ -314,7 +314,7 @@ public class UIAutomatorMojo extends AbstractAndroidMojo {
     /**
      * Actually plays tests.
      *
-     * @throws MojoExecutionException if at least a test threw an exception and isIgnoreTestFailures is false..
+     * @throws MojoExecutionException if at least a test threw an exception and isIgnoreTestFailures is false.
      * @throws MojoFailureException   if at least a test failed and isIgnoreTestFailures is false.
      */
     protected void playTests() throws MojoExecutionException, MojoFailureException {
@@ -325,50 +325,47 @@ public class UIAutomatorMojo extends AbstractAndroidMojo {
         getLog().debug("testClassOrMethod:" + testClassOrMethodString);
         getLog().debug("createReport:" + parsedCreateReport);
 
-        DeviceCallback instrumentationTestExecutor = new DeviceCallback() {
-            @Override
-            public void doWithDevice(final IDevice device) throws MojoExecutionException, MojoFailureException {
-                String deviceLogLinePrefix = DeviceHelper.getDeviceLogLinePrefix(device);
+        DeviceCallback instrumentationTestExecutor = device -> {
+            String deviceLogLinePrefix = DeviceHelper.getDeviceLogLinePrefix(device);
 
-                UIAutomatorRemoteAndroidTestRunner automatorRemoteAndroidTestRunner //
-                        = new UIAutomatorRemoteAndroidTestRunner(parsedJarFile, device);
+            UIAutomatorRemoteAndroidTestRunner automatorRemoteAndroidTestRunner //
+                    = new UIAutomatorRemoteAndroidTestRunner(parsedJarFile, device);
 
-                automatorRemoteAndroidTestRunner.setRunName("ui uiautomator tests");
-                automatorRemoteAndroidTestRunner.setDebug(uiautomatorDebug);
-                automatorRemoteAndroidTestRunner.setTestClassOrMethods(parsedTestClassOrMethods);
-                automatorRemoteAndroidTestRunner.setNoHup(parsedNoHup);
-                automatorRemoteAndroidTestRunner.setUserProperties(session.getUserProperties(),
-                        parsedPropertiesKeyPrefix);
+            automatorRemoteAndroidTestRunner.setRunName("ui uiautomator tests");
+            automatorRemoteAndroidTestRunner.setDebug(uiautomatorDebug);
+            automatorRemoteAndroidTestRunner.setTestClassOrMethods(parsedTestClassOrMethods);
+            automatorRemoteAndroidTestRunner.setNoHup(parsedNoHup);
+            automatorRemoteAndroidTestRunner.setUserProperties(session.getUserProperties(),
+                    parsedPropertiesKeyPrefix);
 
-                if (parsedUseDump) {
-                    automatorRemoteAndroidTestRunner.setDumpFilePath(parsedDumpFilePath);
+            if (parsedUseDump) {
+                automatorRemoteAndroidTestRunner.setDumpFilePath(parsedDumpFilePath);
+            }
+
+            getLog().info(deviceLogLinePrefix + "Running ui uiautomator tests in" + parsedJarFile);
+            try {
+                AndroidTestRunListener testRunListener = new AndroidTestRunListener(device, getLog(),
+                        parsedCreateReport, parsedTakeScreenshotOnFailure, parsedScreenshotsPathOnDevice,
+                        parsedReportSuffix, targetDirectory);
+                automatorRemoteAndroidTestRunner.run(testRunListener);
+                if (testRunListener.hasFailuresOrErrors() && !isIgnoreTestFailures()) {
+                    throw new MojoFailureException(deviceLogLinePrefix + "Tests failed on device.");
                 }
-
-                getLog().info(deviceLogLinePrefix + "Running ui uiautomator tests in" + parsedJarFile);
-                try {
-                    AndroidTestRunListener testRunListener = new AndroidTestRunListener(device, getLog(),
-                            parsedCreateReport, parsedTakeScreenshotOnFailure, parsedScreenshotsPathOnDevice,
-                            parsedReportSuffix, targetDirectory);
-                    automatorRemoteAndroidTestRunner.run(testRunListener);
-                    if (testRunListener.hasFailuresOrErrors() && !isIgnoreTestFailures()) {
-                        throw new MojoFailureException(deviceLogLinePrefix + "Tests failed on device.");
-                    }
-                    if (testRunListener.testRunFailed()) {
-                        throw new MojoFailureException(deviceLogLinePrefix + "Test run failed to complete: "
-                                + testRunListener.getTestRunFailureCause());
-                    }
-                    if (testRunListener.threwException() && !isIgnoreTestFailures()) {
-                        throw new MojoFailureException(deviceLogLinePrefix + testRunListener.getExceptionMessages());
-                    }
-                } catch (TimeoutException e) {
-                    throw new MojoExecutionException(deviceLogLinePrefix + "timeout", e);
-                } catch (AdbCommandRejectedException e) {
-                    throw new MojoExecutionException(deviceLogLinePrefix + "adb command rejected", e);
-                } catch (ShellCommandUnresponsiveException e) {
-                    throw new MojoExecutionException(deviceLogLinePrefix + "shell command " + "unresponsive", e);
-                } catch (IOException e) {
-                    throw new MojoExecutionException(deviceLogLinePrefix + "IO problem", e);
+                if (testRunListener.testRunFailed()) {
+                    throw new MojoFailureException(deviceLogLinePrefix + "Test run failed to complete: "
+                            + testRunListener.getTestRunFailureCause());
                 }
+                if (testRunListener.threwException() && !isIgnoreTestFailures()) {
+                    throw new MojoFailureException(deviceLogLinePrefix + testRunListener.getExceptionMessages());
+                }
+            } catch (TimeoutException e) {
+                throw new MojoExecutionException(deviceLogLinePrefix + "timeout", e);
+            } catch (AdbCommandRejectedException e) {
+                throw new MojoExecutionException(deviceLogLinePrefix + "adb command rejected", e);
+            } catch (ShellCommandUnresponsiveException e) {
+                throw new MojoExecutionException(deviceLogLinePrefix + "shell command " + "unresponsive", e);
+            } catch (IOException e) {
+                throw new MojoExecutionException(deviceLogLinePrefix + "IO problem", e);
             }
         };
 

@@ -24,7 +24,6 @@ import com.android.sdklib.io.IFileOp;
 import java.io.File;
 import java.io.InputStream;
 import java.util.Arrays;
-import java.util.Comparator;
 import java.util.Map;
 import java.util.zip.Adler32;
 
@@ -39,7 +38,7 @@ import java.util.zip.Adler32;
  * changing. To have a consistent behavior between OSes, we compute a quick
  * checksum using all the files & directories modified timestamps.
  * The content of files is not included though, except for the checksum on
- * the source.property file since this one is the most important for the SDK.
+ * the {@code source.property} file since this one is the most important for the SDK.
  * <p/>
  * The {@link #hashCode()} and {@link #equals(Object)} methods directly
  * defer to the underlying File object. This allows the DirInfo to be placed
@@ -85,7 +84,7 @@ class LocalDirInfo {
      * Checks whether the directory/source.properties attributes have changed.
      *
      * @return True if the directory modified timestamp or
-     * its source.property files have changed.
+     * its {@code source.property} files have changed.
      */
     public boolean hasChanged() {
         // Does platform directory still exist?
@@ -103,7 +102,7 @@ class LocalDirInfo {
         // if mPropsModifiedTS is 0.
         boolean hadProps = mPropsModifiedTS != 0;
 
-        // Was there a props file and it vanished, or there wasn't and there's one now?
+        // Was there a props file and it vanished? or there wasn't and there's one now?
         if (hadProps != mFileOp.isFile(props)) {
             return true;
         }
@@ -120,11 +119,7 @@ class LocalDirInfo {
         }
 
         // Has the deep directory checksum changed?
-        if (mDirChecksum != getDirChecksum(mDir)) {
-            return true;
-        }
-
-        return false;
+        return mDirChecksum != getDirChecksum(mDir);
     }
 
     /**
@@ -132,9 +127,7 @@ class LocalDirInfo {
      * should be OK with an acceptable collision rate.)
      */
     private long getFileChecksum(@NonNull File file) {
-        InputStream fis = null;
-        try {
-            fis = mFileOp.newFileInputStream(file);
+        try (InputStream fis = mFileOp.newFileInputStream(file)) {
             Adler32 a = new Adler32();
             byte[] buf = new byte[1024];
             int n;
@@ -143,13 +136,7 @@ class LocalDirInfo {
             }
             return a.getValue();
         } catch (Exception ignore) {
-        } finally {
-            try {
-                if (fis != null) {
-                    fis.close();
-                }
-            } catch (Exception ignore) {
-            }
+            // ignore
         }
         return 0;
     }
@@ -169,12 +156,7 @@ class LocalDirInfo {
         // Get the file & directory list sorted by case-insensitive name
         // to make the checksum more consistent.
         File[] files = mFileOp.listFiles(dir);
-        Arrays.sort(files, new Comparator<File>() {
-            @Override
-            public int compare(File o1, File o2) {
-                return o1.getName().compareToIgnoreCase(o2.getName());
-            }
-        });
+        Arrays.sort(files, (o1, o2) -> o1.getName().compareToIgnoreCase(o2.getName()));
         for (File file : files) {
             checksum = 31 * checksum | mFileOp.lastModified(file);
         }
@@ -198,7 +180,7 @@ class LocalDirInfo {
      * Returns the hashCode of the underlying File object.
      * <p/>
      * When a {@link LocalDirInfo} is placed in a map, what matters is to use the underlying
-     * File object as the key so {@link #hashCode()} and {@link #equals(Object)} both
+     * File object as the key so {@code #hashCode()} and {@link #equals(Object)} both
      * return the properties of the underlying File object.
      *
      * @see File#hashCode()
@@ -212,7 +194,7 @@ class LocalDirInfo {
      * Checks equality of the underlying File object.
      * <p/>
      * When a {@link LocalDirInfo} is placed in a map, what matters is to use the underlying
-     * File object as the key so {@link #hashCode()} and {@link #equals(Object)} both
+     * File object as the key so {@link #hashCode()} and {@code #equals(Object)} both
      * return the properties of the underlying File object.
      *
      * @see File#equals(Object)
@@ -221,15 +203,13 @@ class LocalDirInfo {
     public boolean equals(Object obj) {
         if (obj instanceof File) {
             return mDir.equals(obj);
-        } else if (obj instanceof LocalDirInfo) {
-            return mDir.equals(((LocalDirInfo) obj).mDir);
-        } else if (obj instanceof MapComparator) {
-            return mDir.equals(((MapComparator) obj).mDir);
+        } else if (obj instanceof LocalDirInfo l) {
+            return mDir.equals(l.mDir);
+        } else if (obj instanceof MapComparator m) {
+            return mDir.equals(m.mDir);
         }
         return false;
     }
-
-    ;
 
     /**
      * Helper for Map.contains() to make sure we're comparing the inner directory File
@@ -246,7 +226,7 @@ class LocalDirInfo {
          * Returns the hashCode of the underlying File object.
          * <p/>
          * When a {@link LocalDirInfo} is placed in a map, what matters is to use the underlying
-         * File object as the key so {@link #hashCode()} and {@link #equals(Object)} both
+         * File object as the key so {@code #hashCode()} and {@link #equals(Object)} both
          * return the properties of the underlying File object.
          *
          * @see File#hashCode()
@@ -260,7 +240,7 @@ class LocalDirInfo {
          * Checks equality of the underlying File object.
          * <p/>
          * When a {@link LocalDirInfo} is placed in a map, what matters is to use the underlying
-         * File object as the key so {@link #hashCode()} and {@link #equals(Object)} both
+         * File object as the key so {@link #hashCode()} and {@code #equals(Object)} both
          * return the properties of the underlying File object.
          *
          * @see File#equals(Object)
@@ -269,14 +249,12 @@ class LocalDirInfo {
         public boolean equals(Object obj) {
             if (obj instanceof File) {
                 return mDir.equals(obj);
-            } else if (obj instanceof LocalDirInfo) {
-                return mDir.equals(((LocalDirInfo) obj).mDir);
-            } else if (obj instanceof MapComparator) {
-                return mDir.equals(((MapComparator) obj).mDir);
+            } else if (obj instanceof LocalDirInfo l) {
+                return mDir.equals(l.mDir);
+            } else if (obj instanceof MapComparator m) {
+                return mDir.equals(m.mDir);
             }
             return false;
         }
-
-        ;
     }
 }

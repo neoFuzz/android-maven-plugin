@@ -25,6 +25,9 @@ import java.util.regex.Matcher;
  * encode all non resolved placeholders key names.
  */
 public class PlaceholderEncoder {
+    private PlaceholderEncoder() {
+        // no instantiation.
+    }
 
     /**
      * Visits a document's entire tree and check each attribute for a placeholder existence. If one
@@ -55,20 +58,20 @@ public class PlaceholderEncoder {
         NodeList childNodes = element.getChildNodes();
         for (int i = 0; i < childNodes.getLength(); i++) {
             Node childNode = childNodes.item(i);
-            if (childNode instanceof Element) {
-                visit((Element) childNode);
-            } else if (childNode instanceof Attr) {
-                handleAttribute((Attr) childNode);
+            if (childNode instanceof Element el) {
+                visit(el);
+            } else if (childNode instanceof Attr at) {
+                handleAttribute(at);
             }
         }
     }
 
     /**
-     * Handles an XML attribute, by subsituting placeholders to an AAPT friendly encoding.
+     * Handles an XML attribute, by substituting placeholders to an AAPT friendly encoding.
      *
      * @param attr attribute potentially containing a placeholder.
      */
-    private static void handleAttribute(Attr attr) {
+    private static void handleAttribute(@NonNull Attr attr) {
         Matcher matcher = PlaceholderHandler.PATTERN.matcher(attr.getValue());
         if (matcher.matches()) {
             String encodedValue =

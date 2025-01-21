@@ -10,7 +10,7 @@ import org.apache.maven.plugins.annotations.Parameter;
 public class BuildConfigConstant {
     /**
      * Name of the constant.
-     * Eg.: SERVER_URL, etc
+     * E.g.: SERVER_URL, etc
      */
     @Parameter(property = "android.buildConfigConstants[].name", required = true)
     private String name;

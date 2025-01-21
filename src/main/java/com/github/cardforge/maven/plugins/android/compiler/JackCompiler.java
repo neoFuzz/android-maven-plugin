@@ -1,19 +1,20 @@
 package com.github.cardforge.maven.plugins.android.compiler;
 
+import com.android.annotations.NonNull;
 import com.google.api.client.repackaged.com.google.common.base.Strings;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+//import java.lang.Compiler; // unsure if replaced
 import org.codehaus.plexus.compiler.*;
+import org.codehaus.plexus.compiler.Compiler;
 import org.codehaus.plexus.compiler.CompilerMessage.Kind;
 import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.cli.*;
 
 import javax.annotation.Nullable;
 import java.io.*;
-import java.lang.Compiler;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -32,9 +33,10 @@ public class JackCompiler extends AbstractCompiler {
         super(CompilerOutputStyle.ONE_OUTPUT_FILE_FOR_ALL_INPUT_FILES, ".java", ".dex", null);
     }
 
-    public static List<CompilerMessage> parseCompilerOutput(BufferedReader bufferedReader)
+    @NonNull
+    public static List<CompilerMessage> parseCompilerOutput(@NonNull BufferedReader bufferedReader)
             throws IOException {
-        List<CompilerMessage> messages = new ArrayList<CompilerMessage>();
+        List<CompilerMessage> messages = new ArrayList<>();
 
         String line = bufferedReader.readLine();
 
@@ -48,7 +50,7 @@ public class JackCompiler extends AbstractCompiler {
     }
 
     @Override
-    public String[] createCommandLine(CompilerConfiguration cc) throws CompilerException {
+    public String[] createCommandLine(@NonNull CompilerConfiguration cc) throws CompilerException {
         String androidHome = System.getenv("ANDROID_HOME");
         String jackJarPath = androidHome + "/build-tools/24.0.2/jack.jar";
         String androidJarPath = androidHome + "/platforms/android-24/android.jar";
@@ -91,29 +93,21 @@ public class JackCompiler extends AbstractCompiler {
         return "classes.dex";
     }
 
-    @SuppressWarnings("deprecation")
     private List<CompilerMessage> compileOutOfProcess(File workingDirectory, File target, String executable,
-                                                      String[] args)
-            throws CompilerException {        // ----------------------------------------------------------------------
+                                                      @NonNull String[] args)
+            throws CompilerException {
+        // ----------------------------------------------------------------------
         // Build the @arguments file
         // ----------------------------------------------------------------------
 
-        File file;
-
-        PrintWriter output = null;
-
-        try {
-            file = new File(target, "jack-argmuents");
-
-            output = new PrintWriter(new FileWriter(file));
+        File file = new File(target, "jack-argmuents");
+        try (PrintWriter output = new PrintWriter(new FileWriter(file))) {
 
             for (String arg : args) {
                 output.println(arg);
             }
         } catch (IOException e) {
             throw new CompilerException("Error writing arguments file.", e);
-        } finally {
-            IOUtil.close(output);
         }
 
         // ----------------------------------------------------------------------
@@ -141,9 +135,7 @@ public class JackCompiler extends AbstractCompiler {
             returnCode = CommandLineUtils.executeCommandLine(cli, out, err);
 
             messages = parseCompilerOutput(new BufferedReader(new StringReader(stringWriter.toString())));
-        } catch (CommandLineException e) {
-            throw new CompilerException("Error while executing the external compiler.", e);
-        } catch (IOException e) {
+        } catch (CommandLineException | IOException e) {
             throw new CompilerException("Error while executing the external compiler.", e);
         }
 
@@ -160,10 +152,11 @@ public class JackCompiler extends AbstractCompiler {
         return messages;
     }
 
+    @NonNull
     private String[] trim(String[] split) {
         Iterable<String> filtered = Iterables.filter(
                 Arrays.asList(split),
-                new Predicate<String>() {
+                new Predicate<>() {
                     @Override
                     public boolean apply(String t) {
                         return !Strings.isNullOrEmpty(t);

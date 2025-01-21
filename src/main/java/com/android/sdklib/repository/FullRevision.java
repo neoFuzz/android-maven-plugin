@@ -185,34 +185,40 @@ public class FullRevision extends Revision {
         throw n;
     }
 
+    @Override
     public int getMajor() {
         return mMajor;
     }
 
+    @Override
     public int getMinor() {
         return mMinor;
     }
 
+    @Override
     public int getMicro() {
         return mMicro;
     }
 
+    @Override
     @NonNull
     protected String getSeparator() {
         return mPreviewSeparator;
     }
 
+    @Override
     public boolean isPreview() {
         return mPreview > NOT_A_PREVIEW;
     }
 
+    @Override
     public int getPreview() {
         return mPreview;
     }
 
     /**
      * Returns the version in a fixed format major.minor.micro
-     * with an optional "rc preview#". For example it would
+     * with an optional "rc preview#". For example, it would
      * return "18.0.0", "18.1.0" or "18.1.2 rc5".
      */
     @Override
@@ -233,9 +239,10 @@ public class FullRevision extends Revision {
      * Returns the version in a dynamic format "major.minor.micro rc#".
      * This is similar to {@link #toString()} except it omits minor, micro
      * or preview versions when they are zero.
-     * For example it would return "18 rc1" instead of "18.0.0 rc1",
+     * For example, it would return "18 rc1" instead of "18.0.0 rc1",
      * or "18.1 rc2" instead of "18.1.0 rc2".
      */
+    @Override
     public String toShortString() {
         StringBuilder sb = new StringBuilder();
         sb.append(mMajor);
@@ -265,6 +272,7 @@ public class FullRevision extends Revision {
      *                       will contain only 3 fields (major, minor and micro.)
      * @return A new int array, never null, with either 3 or 4 fields.
      */
+    @Override
     public int[] toIntArray(boolean includePreview) {
         int size = includePreview ? 4 : 3;
         int[] result = new int[size];
@@ -296,10 +304,9 @@ public class FullRevision extends Revision {
         if (rhs == null) {
             return false;
         }
-        if (!(rhs instanceof FullRevision)) {
+        if (!(rhs instanceof FullRevision other)) {
             return false;
         }
-        FullRevision other = (FullRevision) rhs;
         if (mMajor != other.mMajor) {
             return false;
         }
@@ -309,19 +316,16 @@ public class FullRevision extends Revision {
         if (mMicro != other.mMicro) {
             return false;
         }
-        if (mPreview != other.mPreview) {
-            return false;
-        }
-        return true;
+        return mPreview == other.mPreview;
     }
 
     /**
-     * Trivial comparison of a version, e.g 17.1.2 < 18.0.0.
+     * Trivial comparison of a version, e.g. 17.1.2 < 18.0.0.
      * <p>
      * Note that preview/release candidate are released before their final version,
      * so "18.0.0 rc1" comes below "18.0.0". The best way to think of it as if the
      * lack of preview number was "+inf":
-     * "18.1.2 rc5" => "18.1.2.5" so its less than "18.1.2.+INF" but more than "18.1.1.0"
+     * "18.1.2 rc5" => "18.1.2.5" so it's less than "18.1.2.+INF" but more than "18.1.1.0"
      * and more than "18.1.2.4"
      *
      * @param rhs The right-hand side {@link FullRevision} to compare with.
@@ -332,12 +336,12 @@ public class FullRevision extends Revision {
     }
 
     /**
-     * Trivial comparison of a version, e.g 17.1.2 < 18.0.0.
+     * Trivial comparison of a version, e.g. 17.1.2 < 18.0.0.
      * <p>
      * Note that preview/release candidate are released before their final version,
      * so "18.0.0 rc1" comes below "18.0.0". The best way to think of it as if the
      * lack of preview number was "+inf":
-     * "18.1.2 rc5" => "18.1.2.5" so its less than "18.1.2.+INF" but more than "18.1.1.0"
+     * "18.1.2 rc5" => "18.1.2.5" so it's less than "18.1.2.+INF" but more than "18.1.1.0"
      * and more than "18.1.2.4"
      *
      * @param rhs            The right-hand side {@link FullRevision} to compare with.
@@ -360,7 +364,8 @@ public class FullRevision extends Revision {
             return delta;
         }
 
-        int p1, p2;
+        int p1;
+        int p2;
         switch (comparePreview) {
             case IGNORE:
                 // Nothing to compare.

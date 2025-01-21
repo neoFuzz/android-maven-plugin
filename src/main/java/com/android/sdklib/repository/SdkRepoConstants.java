@@ -53,14 +53,14 @@ public class SdkRepoConstants extends RepoConstants {
             "https://dl.google.com/android/repository/";                        //$NON-NLS-1$
 
     /**
-     * The default name looked for by {@link SdkSource} when trying to load an
+     * The default name looked for by {@link SdkSource} when trying to load a
      * sdk-repository XML if the URL doesn't match an existing resource.
      */
     public static final String URL_DEFAULT_FILENAME = "repository.xml";         //$NON-NLS-1$
 
     /**
      * The pattern name looked by {@link SdkSource} when trying to load
-     * an sdk-repository XML that is specific to a given XSD revision.
+     * a sdk-repository XML that is specific to a given XSD revision.
      * <p/>
      * This must be used with {@link String#format(String, Object...)} with
      * one integer parameter between 1 and {@link #NS_LATEST_VERSION}.
@@ -142,6 +142,10 @@ public class SdkRepoConstants extends RepoConstants {
      */
     public static final String NS_URI = getSchemaUri(NS_LATEST_VERSION);
 
+    private SdkRepoConstants() {
+        // Not instantiable
+    }
+
     /**
      * Returns a stream to the requested {@code sdk-repository} XML Schema.
      *
@@ -158,6 +162,7 @@ public class SdkRepoConstants extends RepoConstants {
      *
      * @param version Between 1 and {@link #NS_LATEST_VERSION} included.
      */
+    @NonNull
     public static String getSchemaUri(int version) {
         return String.format(NS_BASE + "%d", version);           //$NON-NLS-1$
     }
@@ -176,7 +181,8 @@ public class SdkRepoConstants extends RepoConstants {
             String version = m.group(1);
             try {
                 return Integer.parseInt(version) >= minVersion;
-            } catch (NumberFormatException e) {
+            } catch (NumberFormatException ignored) {
+                // Ignored
             }
         }
         return false;

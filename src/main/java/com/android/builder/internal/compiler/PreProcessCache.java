@@ -26,7 +26,6 @@ import com.android.sdklib.repository.FullRevision;
 import com.android.utils.ILogger;
 import com.android.utils.Pair;
 import com.android.utils.XmlUtils;
-import com.google.common.base.Charsets;
 import com.google.common.base.Objects;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -41,6 +40,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -48,7 +48,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.logging.Logger;
 
 /**
- *
+ * Pre Process Cache. This class is used to cache the pre-processing of libraries.
  */
 public abstract class PreProcessCache<T extends PreProcessCache.Key> {
 
@@ -78,6 +78,7 @@ public abstract class PreProcessCache<T extends PreProcessCache.Key> {
         try {
             return Files.hash(file, Hashing.sha1());
         } catch (IOException ignored) {
+            // ignored
         }
 
         return null;
@@ -125,11 +126,11 @@ public abstract class PreProcessCache<T extends PreProcessCache.Key> {
                 if (storedItem.areOutputFilesPresent() &&
                         storedItem.getSourceHash().equals(getHash(inputFile))) {
 
-                    Logger.getAnonymousLogger().info("Cached result for getItem(" + inputFile + "): "
-                            + storedItem.getOutputFiles());
+                    String s = "Cached result for getItem(" + inputFile + "): " + storedItem.getOutputFiles();
+                    Logger.getAnonymousLogger().info(s);
                     for (File f : storedItem.getOutputFiles()) {
-                        Logger.getAnonymousLogger().info(
-                                String.format("%s l:%d ts:%d", f, f.length(), f.lastModified()));
+                        s = String.format("%s l:%d ts:%d", f, f.length(), f.lastModified());
+                        Logger.getAnonymousLogger().info(s);
                     }
 
                     // create an item where the outFile is the one stored since it
@@ -295,8 +296,9 @@ public abstract class PreProcessCache<T extends PreProcessCache.Key> {
             String content = XmlPrettyPrinter.prettyPrint(document, true);
 
             itemStorage.getParentFile().mkdirs();
-            Files.write(content, itemStorage, Charsets.UTF_8);
+            Files.write(content, itemStorage, StandardCharsets.UTF_8);
         } catch (ParserConfigurationException e) {
+            // no action
         }
     }
 
@@ -557,11 +559,7 @@ public abstract class PreProcessCache<T extends PreProcessCache.Key> {
             if (!mBuildToolsRevision.equals(key.mBuildToolsRevision)) {
                 return false;
             }
-            if (!mSourceFile.equals(key.mSourceFile)) {
-                return false;
-            }
-
-            return true;
+            return mSourceFile.equals(key.mSourceFile);
         }
 
         @Override

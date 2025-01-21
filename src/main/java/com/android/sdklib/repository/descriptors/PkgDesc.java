@@ -27,7 +27,6 @@ import com.android.sdklib.internal.repository.packages.Package;
 import com.android.sdklib.io.FileOp;
 import com.android.sdklib.repository.*;
 import com.android.sdklib.repository.FullRevision.PreviewComparison;
-import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.util.Locale;
@@ -46,6 +45,7 @@ import java.util.Locale;
  */
 public class PkgDesc implements IPkgDesc {
     public static final char[] PREVIEW_SUFFIX = {'a'};
+    public static final String ANDROID = "android";
     private final PkgType mType;
     private final FullRevision mFullRevision;
     private final MajorRevision mMajorRevision;
@@ -231,7 +231,9 @@ public class PkgDesc implements IPkgDesc {
         return mMinPlatformToolsRev;
     }
 
+    @SuppressWarnings("all")  // For the equals() method.
     @Override
+    @NonNull
     public String getInstallId() {
         StringBuilder sb = new StringBuilder();
 
@@ -247,8 +249,7 @@ public class PkgDesc implements IPkgDesc {
         */
 
         switch (mType) {
-            case PKG_TOOLS:
-            case PKG_PLATFORM_TOOLS:
+            case PKG_TOOLS, PKG_PLATFORM_TOOLS:
                 sb.append(mType.getFolderName());
                 if (getFullRevision().isPreview()) {
                     sb.append("-preview");
@@ -260,9 +261,7 @@ public class PkgDesc implements IPkgDesc {
                 sb.append('-').append(getFullRevision().toString());
                 break;
 
-            case PKG_DOC:
-            case PKG_SAMPLE:
-            case PKG_SOURCE:
+            case PKG_DOC, PKG_SAMPLE, PKG_SOURCE:
                 sb.append(mType.toString().toLowerCase(Locale.US).replace("pkg_", ""));
                 sb.append('-').append(getAndroidVersion().getApiString());
                 break;
@@ -291,7 +290,7 @@ public class PkgDesc implements IPkgDesc {
                 sb.append("sys-img-")
                         .append(getPath())    // path==ABI for sys-img
                         .append('-')
-                        .append(SystemImage.DEFAULT_TAG.equals(getTag()) ? "android" : getTag().getId())
+                        .append(SystemImage.DEFAULT_TAG.equals(getTag()) ? ANDROID : getTag().getId())
                         .append('-')
                         .append(getAndroidVersion().getApiString());
                 break;
@@ -300,7 +299,7 @@ public class PkgDesc implements IPkgDesc {
                 sb.append("sys-img-")
                         .append(getPath())    // path==ABI for sys-img
                         .append("-addon-")
-                        .append(SystemImage.DEFAULT_TAG.equals(getTag()) ? "android" : getTag().getId())
+                        .append(SystemImage.DEFAULT_TAG.equals(getTag()) ? ANDROID : getTag().getId())
                         .append('-')
                         .append(getVendor().getId())
                         .append('-')
@@ -308,7 +307,7 @@ public class PkgDesc implements IPkgDesc {
                 break;
 
             default:
-                throw new IllegalArgumentException("IID not defined for type " + mType.toString());
+                throw new IllegalArgumentException("IID not defined for type " + mType);
         }
 
         return sanitize(sb.toString());
@@ -317,6 +316,7 @@ public class PkgDesc implements IPkgDesc {
     //---- Updating ----
 
     @Override
+    @NonNull
     public File getCanonicalInstallFolder(@NonNull File sdkLocation) {
         File f = FileOp.append(sdkLocation, mType.getFolderName());
 
@@ -330,33 +330,28 @@ public class PkgDesc implements IPkgDesc {
         */
 
         switch (mType) {
-            case PKG_TOOLS:
-            case PKG_PLATFORM_TOOLS:
-            case PKG_DOC:
+            case PKG_TOOLS, PKG_PLATFORM_TOOLS, PKG_DOC:
                 // no-op, top-folder is all what is needed here
                 break;
 
-            case PKG_BUILD_TOOLS:
-            case PKG_ADDON:
+            case PKG_BUILD_TOOLS, PKG_ADDON:
                 f = FileOp.append(f, getInstallId());
                 break;
 
-            case PKG_PLATFORM:
-            case PKG_SAMPLE:
-            case PKG_SOURCE:
+            case PKG_PLATFORM, PKG_SAMPLE, PKG_SOURCE:
                 f = FileOp.append(f, AndroidTargetHash.PLATFORM_HASH_PREFIX + sanitize(getAndroidVersion().getApiString()));
                 break;
 
             case PKG_SYS_IMAGE:
                 f = FileOp.append(f,
                         AndroidTargetHash.PLATFORM_HASH_PREFIX + sanitize(getAndroidVersion().getApiString()),
-                        sanitize(SystemImage.DEFAULT_TAG.equals(getTag()) ? "android" : getTag().getId()),
+                        sanitize(SystemImage.DEFAULT_TAG.equals(getTag()) ? ANDROID : getTag().getId()),
                         sanitize(getPath()));   // path==abi
                 break;
 
             case PKG_ADDON_SYS_IMAGE:
                 String name = "addon-"
-                        + (SystemImage.DEFAULT_TAG.equals(getTag()) ? "android" : getTag().getId())
+                        + (SystemImage.DEFAULT_TAG.equals(getTag()) ? ANDROID : getTag().getId())
                         + '-'
                         + getVendor().getId()
                         + '-'
@@ -373,13 +368,13 @@ public class PkgDesc implements IPkgDesc {
                 break;
 
             default:
-                throw new IllegalArgumentException("CanonicalFolder not defined for type " + mType.toString());
+                throw new IllegalArgumentException("CanonicalFolder not defined for type " + mType);
         }
 
         return f;
     }
 
-    @NotNull
+    @NonNull
     @Override
     public PreciseRevision getPreciseRevision() {
         FullRevision fr = this.getFullRevision();
@@ -387,7 +382,7 @@ public class PkgDesc implements IPkgDesc {
     }
 
     /**
-     * Computes the most general case of {@link #isUpdateFor(IPkgDesc)}.
+     * Computes the most general case of {@code #isUpdateFor(IPkgDesc)}.
      * Individual package types use this and complement with their own specific cases
      * as needed.
      *
@@ -537,9 +532,7 @@ public class PkgDesc implements IPkgDesc {
 
         if (hasMinPlatformToolsRev() && o.hasMinPlatformToolsRev()) {
             t1 = getMinPlatformToolsRev().compareTo(o.getMinPlatformToolsRev());
-            if (t1 != 0) {
-                return t1;
-            }
+            return t1;
         }
 
         return 0;
@@ -695,18 +688,28 @@ public class PkgDesc implements IPkgDesc {
     }
 
     @Override
+    @SuppressWarnings("all")  // For the hashCode() method.
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = prime * result + (hasAndroidVersion() ? getAndroidVersion().hashCode() : 0);
-        result = prime * result + (hasVendor() ? getVendor().hashCode() : 0);
-        result = prime * result + (hasTag() ? getTag().hashCode() : 0);
-        result = prime * result + (hasPath() ? getPath().hashCode() : 0);
-        result = prime * result + (hasFullRevision() ? getFullRevision().hashCode() : 0);
-        result = prime * result + (hasMajorRevision() ? getMajorRevision().hashCode() : 0);
-        result = prime * result + (hasMinToolsRev() ? getMinToolsRev().hashCode() : 0);
-        result = prime * result + (hasMinPlatformToolsRev() ?
-                getMinPlatformToolsRev().hashCode() : 0);
+
+        try {
+            result = prime * result + (hasAndroidVersion() ? getAndroidVersion().hashCode() : 0);
+            result = prime * result + (hasVendor() ? getVendor().hashCode() : 0);
+            result = prime * result + (hasTag() ? getTag().hashCode() : 0);
+            result = prime * result + (hasPath() ? getPath().hashCode() : 0);
+            result = prime * result + (hasFullRevision() ? getFullRevision().hashCode() : 0);
+            result = prime * result + (hasMajorRevision() ? getMajorRevision().hashCode() : 0);
+            result = prime * result + (hasMinToolsRev() ? getMinToolsRev().hashCode() : 0);
+            result = prime * result + (hasMinPlatformToolsRev() ?
+                    getMinPlatformToolsRev().hashCode() : 0);
+        } catch (NullPointerException e) {
+            // This is a hashcode. It should not throw exceptions.
+            // If it does, we want to know about it.
+            throw new RuntimeException(e);
+        } catch (Exception ignored) {
+            // nothing
+        }
 
         return result;
     }
@@ -715,9 +718,9 @@ public class PkgDesc implements IPkgDesc {
     // ---- Constructors -----
 
     @Override
+    @SuppressWarnings("all")  // For the equals() method.
     public boolean equals(Object obj) {
-        if (!(obj instanceof IPkgDesc)) return false;
-        IPkgDesc rhs = (IPkgDesc) obj;
+        if (!(obj instanceof IPkgDesc rhs)) return false;
 
         if (hasAndroidVersion() != rhs.hasAndroidVersion()) {
             return false;
@@ -764,20 +767,16 @@ public class PkgDesc implements IPkgDesc {
         if (hasMinPlatformToolsRev() != rhs.hasMinPlatformToolsRev()) {
             return false;
         }
-        if (hasMinPlatformToolsRev() &&
-                !getMinPlatformToolsRev().equals(rhs.getMinPlatformToolsRev())) {
-            return false;
-        }
-
-        return true;
+        return !hasMinPlatformToolsRev() ||
+                getMinPlatformToolsRev().equals(rhs.getMinPlatformToolsRev());
     }
 
     public interface IIsUpdateFor {
-        public boolean isUpdateFor(@NonNull PkgDesc thisPkgDesc, @NonNull IPkgDesc existingDesc);
+        boolean isUpdateFor(PkgDesc thisPkgDesc, IPkgDesc existingDesc);
     }
 
     public interface IGetPath {
-        public String getPath(@NonNull PkgDesc thisPkgDesc);
+        String getPath(@NonNull PkgDesc thisPkgDesc);
     }
 
     // ---- Helpers -----
@@ -849,17 +848,14 @@ public class PkgDesc implements IPkgDesc {
         public static Builder newBuildTool(@NonNull FullRevision revision) {
             Builder p = new Builder(PkgType.PKG_BUILD_TOOLS);
             p.mFullRevision = revision;
-            p.mCustomIsUpdateFor = new IIsUpdateFor() {
-                @Override
-                public boolean isUpdateFor(PkgDesc thisPkgDesc, IPkgDesc existingDesc) {
-                    // Generic test checks that the preview type is the same (both previews or not).
-                    // Build tool is different in that the full revision must be an exact match
-                    // and not an increase.
-                    return thisPkgDesc.isGenericUpdateFor(existingDesc) &&
-                            thisPkgDesc.getFullRevision().compareTo(
-                                    existingDesc.getFullRevision(),
-                                    PreviewComparison.COMPARE_TYPE) == 0;
-                }
+            p.mCustomIsUpdateFor = (thisPkgDesc, existingDesc) -> {
+                // Generic test checks that the preview type is the same (both previews or not).
+                // Build tool is different in that the full revision must be an exact match
+                // and not an increase.
+                return thisPkgDesc.isGenericUpdateFor(existingDesc) &&
+                        thisPkgDesc.getFullRevision().compareTo(
+                                existingDesc.getFullRevision(),
+                                PreviewComparison.COMPARE_TYPE) == 0;
             };
             return p;
         }
@@ -876,22 +872,19 @@ public class PkgDesc implements IPkgDesc {
             Builder p = new Builder(PkgType.PKG_DOC);
             p.mAndroidVersion = version;
             p.mMajorRevision = revision;
-            p.mCustomIsUpdateFor = new IIsUpdateFor() {
-                @Override
-                public boolean isUpdateFor(PkgDesc thisPkgDesc, IPkgDesc existingDesc) {
-                    if (existingDesc == null ||
-                            !thisPkgDesc.getType().equals(existingDesc.getType())) {
-                        return false;
-                    }
-
-                    // This package is unique in the SDK. It's an update if the API is newer
-                    // or the revision is newer for the same API.
-                    int diff = thisPkgDesc.getAndroidVersion().compareTo(
-                            existingDesc.getAndroidVersion());
-                    return diff > 0 ||
-                            (diff == 0 && thisPkgDesc.getMajorRevision().compareTo(
-                                    existingDesc.getMajorRevision()) > 0);
+            p.mCustomIsUpdateFor = (thisPkgDesc, existingDesc) -> {
+                if (existingDesc == null ||
+                        !thisPkgDesc.getType().equals(existingDesc.getType())) {
+                    return false;
                 }
+
+                // This package is unique in the SDK. It's an update if the API is newer
+                // or the revision is newer for the same API.
+                int diff = thisPkgDesc.getAndroidVersion().compareTo(
+                        existingDesc.getAndroidVersion());
+                return diff > 0 ||
+                        (diff == 0 && thisPkgDesc.getMajorRevision().compareTo(
+                                existingDesc.getMajorRevision()) > 0);
             };
             return p;
         }
@@ -940,9 +933,9 @@ public class PkgDesc implements IPkgDesc {
             p.mMajorRevision = revision;
             p.mMinToolsRev = minToolsRev;
             p.mCustomPath = new IGetPath() {
+                /** The "path" of a Platform is its Target Hash. */
                 @Override
-                public String getPath(PkgDesc thisPkgDesc) {
-                    /** The "path" of a Platform is its Target Hash. */
+                public String getPath(@NonNull PkgDesc thisPkgDesc) {
                     return AndroidTargetHash.getPlatformHashString(thisPkgDesc.getAndroidVersion());
                 }
             };
@@ -952,7 +945,7 @@ public class PkgDesc implements IPkgDesc {
         /**
          * Create a new add-on package descriptor.
          * <p/>
-         * The vendor id and the name id provided are used to compute the add-on's
+         * The vendor id and the name id provided are used to compute the addon's
          * target hash.
          *
          * @param version     The android version of the add-on package.

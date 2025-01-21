@@ -14,7 +14,7 @@ public final class AndroidExtension {
      *
      * @deprecated Use {@link #AAR} instead.
      */
-    @Deprecated(since = "4.8", forRemoval = false)
+    @Deprecated(since = "4.8")
     public static final String APKLIB = "apklib";
 
     /**
@@ -27,7 +27,7 @@ public final class AndroidExtension {
     /**
      * @deprecated Use {@link #APKLIB} instead.
      */
-    @Deprecated(since = "4.8", forRemoval = false)
+    @Deprecated(since = "4.8")
     public static final String APKSOURCES = "apksources";
 
     //No instances
@@ -42,7 +42,7 @@ public final class AndroidExtension {
      * @return True if an Android project.
      */
     public static boolean isAndroidPackaging(String packaging) {
-        return APK.equals(packaging) || APKLIB.equals(packaging) || APKSOURCES.equals(packaging)
-                || AAR.equalsIgnoreCase(packaging);
+        return APK.equals(packaging)|| AAR.equalsIgnoreCase(packaging) ||
+                APKLIB.equals(packaging) || APKSOURCES.equals(packaging);
     }
 }

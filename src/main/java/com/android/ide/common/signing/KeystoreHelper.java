@@ -37,6 +37,9 @@ import java.util.ArrayList;
  * A Helper to create and read keystore/keys.
  */
 public final class KeystoreHelper {
+    private KeystoreHelper() {
+        // private constructor to prevent instantiation.
+    }
 
     // Certificate CN value. This is a hard-coded value for the debug key.
     // Android Market checks against this value in order to refuse applications signed with
@@ -58,13 +61,18 @@ public final class KeystoreHelper {
         return folder + "debug.keystore";
     }
 
+
     /**
-     * Creates a new debug store with the location, keyalias, and passwords specified in the
-     * config.
+     * Creates a new debug store with the location, keyalias, and passwords specified in the config.
      *
-     * @param signingConfig The signing config
+     * @param storeType     the type of the store to create.
+     * @param storeFile     the file to create.
+     * @param storePassword the password for the store.
+     * @param keyPassword   the password for the key.
+     * @param keyAlias      the alias of the key to create.
      * @param logger        a logger object to receive the log of the creation.
-     * @throws KeytoolException
+     * @return true if success.
+     * @throws KeytoolException if the keystore cannot be created.
      */
     public static boolean createDebugStore(@Nullable String storeType, @NonNull File storeFile,
                                            @NonNull String storePassword, @NonNull String keyPassword,
@@ -78,11 +86,16 @@ public final class KeystoreHelper {
     /**
      * Creates a new store
      *
-     * @param signingConfig the Signing Configuration
-     * @param description   description
-     * @param validityYears
-     * @param logger
-     * @throws KeytoolException
+     * @param storeType     the type of the store to create.
+     * @param storeFile     the file to create.
+     * @param storePassword the password for the store.
+     * @param keyPassword   the password for the key.
+     * @param keyAlias      the alias of the key to create.
+     * @param description   the description of the key.
+     * @param validityYears the validity of the key in years.
+     * @param logger        a logger object to receive the log of the creation.
+     * @return true if success.
+     * @throws KeytoolException if the keystore cannot be created.
      */
     private static boolean createNewStore(
             @Nullable String storeType,
@@ -107,12 +120,12 @@ public final class KeystoreHelper {
 
         String javaHome = System.getProperty("java.home");
 
-        if (javaHome != null && javaHome.length() > 0) {
+        if (javaHome != null && !javaHome.isEmpty()) {
             keytoolCommand = javaHome + File.separator + "bin" + File.separator + keytoolCommand;
         }
 
         // create the command line to call key tool to build the key with no user input.
-        ArrayList<String> commandList = new ArrayList<String>();
+        ArrayList<String> commandList = new ArrayList<>();
         commandList.add(keytoolCommand);
         commandList.add("-genkey");
         commandList.add("-alias");
@@ -137,7 +150,7 @@ public final class KeystoreHelper {
         String[] commandArray = commandList.toArray(new String[commandList.size()]);
 
         // launch the command line process
-        int result = 0;
+        int result;
         try {
             Process process = Runtime.getRuntime().exec(commandArray);
             result = GrabProcessOutput.grabProcessOutput(
@@ -195,24 +208,27 @@ public final class KeystoreHelper {
      * Returns null if the key could not be found. If the passwords are wrong,
      * it throws an exception
      *
-     * @param signingConfig the signing configuration
+     * @param storeType     the type of the store to create. If null, the default type is used.
+     * @param storeFile     the file to create.
+     * @param storePassword the password for the store.
+     * @param keyPassword   the password for the key.
+     * @param keyAlias      the alias of the key to create.
      * @return the certificate info if it could be loaded.
-     * @throws KeytoolException
-     * @throws FileNotFoundException
+     * @throws KeytoolException      if the keystore cannot be created.
+     * @throws FileNotFoundException if the keystore file cannot be found.
      */
+    @Nullable
     public static CertificateInfo getCertificateInfo(@Nullable String storeType, @NonNull File storeFile,
                                                      @NonNull String storePassword, @NonNull String keyPassword,
                                                      @NonNull String keyAlias)
             throws KeytoolException, FileNotFoundException {
 
-        try {
+        try (FileInputStream fis = new FileInputStream(storeFile)) {
             KeyStore keyStore = KeyStore.getInstance(storeType != null ?
                     storeType : KeyStore.getDefaultType());
 
-            FileInputStream fis = new FileInputStream(storeFile);
             //noinspection ConstantConditions
             keyStore.load(fis, storePassword.toCharArray());
-            fis.close();
 
             //noinspection ConstantConditions
             char[] keyPasswordArray = keyPassword.toCharArray();
@@ -228,8 +244,7 @@ public final class KeystoreHelper {
         } catch (Exception e) {
             throw new KeytoolException(
                     String.format("Failed to read key %1$s from store \"%2$s\": %3$s",
-                            keyAlias, storeFile, e.getMessage()),
-                    e);
+                            keyAlias, storeFile, e.getMessage()), e);
         }
 
         return null;

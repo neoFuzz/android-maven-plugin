@@ -46,7 +46,7 @@ public interface Api01Config extends JillConfig {
      * will be overwritten.
      *
      * @param outputJackFile The output Jack library file
-     * @throws ConfigurationException
+     * @throws ConfigurationException If there is an error in the configuration
      */
     void setOutputJackFile(@Nonnull File outputJackFile) throws ConfigurationException;
 

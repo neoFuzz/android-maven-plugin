@@ -26,12 +26,13 @@ import org.apache.maven.plugins.annotations.Mojo;
  *
  * @author hugo.josefson@jayway.com
  */
+@SuppressWarnings("unused") // used in Maven goals
 @Mojo(name = "instrument")
 public class InstrumentMojo extends AbstractInstrumentationMojo {
 
     /**
-     * @throws MojoExecutionException
-     * @throws MojoFailureException
+     * @throws MojoExecutionException if the execution fails
+     * @throws MojoFailureException   if the apk file does not exist
      */
     public void execute() throws MojoExecutionException, MojoFailureException {
         instrument();

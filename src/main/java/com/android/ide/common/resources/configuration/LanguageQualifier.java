@@ -16,7 +16,11 @@
 
 package com.android.ide.common.resources.configuration;
 
+import com.android.annotations.NonNull;
+import com.android.annotations.Nullable;
+
 import java.util.Locale;
+import java.util.Objects;
 import java.util.regex.Pattern;
 
 /**
@@ -29,11 +33,7 @@ public final class LanguageQualifier extends ResourceQualifier {
     private String mValue;
 
     public LanguageQualifier() {
-
-    }
-
-    public LanguageQualifier(String value) {
-        mValue = value;
+        // Nothing to do.
     }
 
     /**
@@ -43,6 +43,7 @@ public final class LanguageQualifier extends ResourceQualifier {
      * @param segment the folder segment from which to create a qualifier.
      * @return a new {@link LanguageQualifier} object or <code>null</code>
      */
+    @Nullable
     public static LanguageQualifier getQualifier(String segment) {
         if (sLanguagePattern.matcher(segment).matches()) {
             LanguageQualifier qualifier = new LanguageQualifier();
@@ -59,7 +60,8 @@ public final class LanguageQualifier extends ResourceQualifier {
      *
      * @param value the value of the qualifier, as returned by {@link #getValue()}.
      */
-    public static String getFolderSegment(String value) {
+    @Nullable
+    public static String getFolderSegment(@NonNull String value) {
         String segment = value.toLowerCase(Locale.US);
         if (sLanguagePattern.matcher(segment).matches()) {
             return segment;
@@ -69,11 +71,7 @@ public final class LanguageQualifier extends ResourceQualifier {
     }
 
     public String getValue() {
-        if (mValue != null) {
-            return mValue;
-        }
-
-        return ""; //$NON-NLS-1$
+        return Objects.requireNonNullElse(mValue, "");
     }
 
     @Override
@@ -114,11 +112,11 @@ public final class LanguageQualifier extends ResourceQualifier {
 
     @Override
     public boolean equals(Object qualifier) {
-        if (qualifier instanceof LanguageQualifier) {
+        if (qualifier instanceof LanguageQualifier lq) {
             if (mValue == null) {
-                return ((LanguageQualifier) qualifier).mValue == null;
+                return lq.mValue == null;
             }
-            return mValue.equals(((LanguageQualifier) qualifier).mValue);
+            return mValue.equals(lq.mValue);
         }
 
         return false;
@@ -147,14 +145,12 @@ public final class LanguageQualifier extends ResourceQualifier {
 
     @Override
     public String getShortDisplayValue() {
-        if (mValue != null) {
-            return mValue;
-        }
+        return Objects.requireNonNullElse(mValue, "");
 
-        return ""; //$NON-NLS-1$
     }
 
     @Override
+    @NonNull
     public String getLongDisplayValue() {
         if (mValue != null) {
             return String.format("Language %s", mValue);

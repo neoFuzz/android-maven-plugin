@@ -96,7 +96,7 @@ public enum PkgType implements IPkgCapabilities {
     /**
      * Filter the SDK/addons.
      * Has {@link AndroidVersion}. Has {@link MajorRevision}.
-     * Path returns the add-on's target hash.
+     * Path returns the addon's target hash.
      */
     PKG_ADDON(0x0400, SdkConstants.FD_ADDONS,
             "{|$NAME|$VEND $PATH|}, Android $API{?$MAJ>1:, rev $MAJ}",
@@ -156,8 +156,8 @@ public enum PkgType implements IPkgCapabilities {
     private final boolean mHasMinToolsRev;
     private final boolean mHasMinPlatformToolsRev;
     private final String mListDisplayPattern;
-    private int mIntValue;
-    private String mFolderName;
+    private final int mIntValue;
+    private final String mFolderName;
 
     PkgType(int intValue,
             @NonNull String folderName,

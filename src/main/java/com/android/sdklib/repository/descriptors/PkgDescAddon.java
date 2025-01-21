@@ -24,7 +24,6 @@ import com.android.sdklib.repository.FullRevision;
 import com.android.sdklib.repository.License;
 import com.android.sdklib.repository.MajorRevision;
 import com.android.sdklib.repository.PreciseRevision;
-import org.jetbrains.annotations.NotNull;
 
 /**
  * Implementation detail of {@link PkgDesc} for add-ons.
@@ -77,7 +76,7 @@ final class PkgDescAddon extends PkgDesc implements IPkgDescAddon {
         return mAddonName;
     }
 
-    @NotNull
+    @NonNull
     @Override
     public PreciseRevision getPreciseRevision() {
         FullRevision fr = this.getFullRevision();

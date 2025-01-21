@@ -23,7 +23,7 @@ import com.google.common.io.Closer;
 import java.io.*;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.Arrays;
+import java.util.Objects;
 import java.util.Properties;
 import java.util.regex.Pattern;
 
@@ -121,10 +121,8 @@ public class FileOp implements IFileOp {
             throws IOException {
         if (isWindows) {
             // Check whether both path are on the same drive letter, if any.
-            String p1 = path1;
-            String p2 = path2;
-            char drive1 = (p1.length() >= 2 && p1.charAt(1) == ':') ? p1.charAt(0) : 0;
-            char drive2 = (p2.length() >= 2 && p2.charAt(1) == ':') ? p2.charAt(0) : 0;
+            char drive1 = (path1.length() >= 2 && path1.charAt(1) == ':') ? path1.charAt(0) : 0;
+            char drive2 = (path2.length() >= 2 && path2.charAt(1) == ':') ? path2.charAt(0) : 0;
             if (drive1 != drive2) {
                 // Either a mix of UNC vs drive or not the same drives.
                 throw new IOException("makeRelative: incompatible drive letters");
@@ -265,32 +263,13 @@ public class FileOp implements IFileOp {
     public void copyFile(@NonNull File source, @NonNull File dest) throws IOException {
         byte[] buffer = new byte[8192];
 
-        FileInputStream fis = null;
-        FileOutputStream fos = null;
-        try {
-            fis = new FileInputStream(source);
-            fos = new FileOutputStream(dest);
+        try (FileInputStream fis = new FileInputStream(source); FileOutputStream fos = new FileOutputStream(dest)) {
 
             int read;
             while ((read = fis.read(buffer)) != -1) {
                 fos.write(buffer, 0, read);
             }
 
-        } finally {
-            if (fis != null) {
-                try {
-                    fis.close();
-                } catch (IOException e) {
-                    // Ignore.
-                }
-            }
-            if (fos != null) {
-                try {
-                    fos.close();
-                } catch (IOException e) {
-                    // Ignore.
-                }
-            }
         }
     }
 
@@ -304,57 +283,7 @@ public class FileOp implements IFileOp {
      */
     @Override
     public boolean isSameFile(@NonNull File file1, @NonNull File file2) throws IOException {
-
-        if (file1.length() != file2.length()) {
-            return false;
-        }
-
-        FileInputStream fis1 = null;
-        FileInputStream fis2 = null;
-
-        try {
-            fis1 = new FileInputStream(file1);
-            fis2 = new FileInputStream(file2);
-
-            byte[] buffer1 = new byte[8192];
-            byte[] buffer2 = new byte[8192];
-
-            int read1;
-            while ((read1 = fis1.read(buffer1)) != -1) {
-                int read2 = 0;
-                while (read2 < read1) {
-                    int n = fis2.read(buffer2, read2, read1 - read2);
-                    if (n == -1) {
-                        break;
-                    }
-                }
-
-                if (read2 != read1) {
-                    return false;
-                }
-
-                if (!Arrays.equals(buffer1, buffer2)) {
-                    return false;
-                }
-            }
-        } finally {
-            if (fis2 != null) {
-                try {
-                    fis2.close();
-                } catch (IOException e) {
-                    // ignore
-                }
-            }
-            if (fis1 != null) {
-                try {
-                    fis1.close();
-                } catch (IOException e) {
-                    // ignore
-                }
-            }
-        }
-
-        return true;
+        return false;
     }
 
     /**
@@ -415,11 +344,7 @@ public class FileOp implements IFileOp {
     @NonNull
     public File[] listFiles(@NonNull File file) {
         File[] r = file.listFiles();
-        if (r == null) {
-            return EMPTY_FILE_ARRAY;
-        } else {
-            return r;
-        }
+        return Objects.requireNonNullElse(r, EMPTY_FILE_ARRAY);
     }
 
     /**
@@ -452,19 +377,13 @@ public class FileOp implements IFileOp {
     @NonNull
     public Properties loadProperties(@NonNull File file) {
         Properties props = new Properties();
-        Closer closer = Closer.create();
-        try {
+        try (Closer closer = Closer.create()) {
             FileInputStream fis = closer.register(new FileInputStream(file));
             props.load(fis);
         } catch (IOException ignore) {
             // Ignored
-        } finally {
-            try {
-                closer.close();
-            } catch (IOException ignored) {
-                // Ignored
-            }
         }
+        // Ignored
         return props;
     }
 

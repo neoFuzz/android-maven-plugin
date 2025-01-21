@@ -16,6 +16,7 @@
  */
 package com.github.cardforge.maven.plugins.android.phase08preparepackage;
 
+import com.android.annotations.NonNull;
 import com.github.cardforge.maven.plugins.android.AbstractAndroidMojo;
 import com.github.cardforge.maven.plugins.android.CommandExecutor;
 import com.github.cardforge.maven.plugins.android.ExecutionException;
@@ -197,6 +198,7 @@ public class D8Mojo extends AbstractAndroidMojo {
      *
      * @return the full path to the current java executable.
      */
+    @NonNull
     private static File getJavaExecutable() {
         final String javaHome = System.getProperty("java.home");
         final String slash = File.separator;
@@ -249,6 +251,7 @@ public class D8Mojo extends AbstractAndroidMojo {
         }
     }
 
+    @NonNull
     private List<File> getDependencies() {
         final List<File> libraries = new ArrayList<>();
         for (Artifact artifact : filterArtifacts(getTransitiveDependencyArtifacts(), skipDependencies,
@@ -265,6 +268,7 @@ public class D8Mojo extends AbstractAndroidMojo {
     /**
      * @return Set of input files for dex. This is a combination of directories and jar files.
      */
+    @NonNull
     private Set<File> getD8InputFiles() {
         final Set<File> inputs = new HashSet<>();
 
@@ -296,7 +300,7 @@ public class D8Mojo extends AbstractAndroidMojo {
         if (d8 != null) {
             // the if statements make sure that properties/command line
             // parameter overrides configuration
-            // and that the dafaults apply in all cases:
+            // and that the defaults apply in all cases:
             if (d8.getJvmArguments() == null) {
                 parsedJvmArguments = d8JvmArguments;
             } else {
@@ -339,6 +343,7 @@ public class D8Mojo extends AbstractAndroidMojo {
         }
     }
 
+    @NonNull
     private List<String> javaDefaultCommands() {
         List<String> commands = new ArrayList<>();
         if (parsedJvmArguments != null) {
@@ -428,9 +433,10 @@ public class D8Mojo extends AbstractAndroidMojo {
         }
     }
 
-    private String executeJava(final List<String> commands, CommandExecutor executor) throws MojoExecutionException {
+    private String executeJava(@NonNull final List<String> commands, @NonNull CommandExecutor executor)
+            throws MojoExecutionException {
         final String javaExecutable = getJavaExecutablePath();
-        getLog().debug(javaExecutable + " " + commands.toString());
+        getLog().debug(javaExecutable + " " + commands);
         try {
             executor.setCaptureStdOut(true);
             executor.executeCommand(javaExecutable, commands, project.getBasedir(), false);

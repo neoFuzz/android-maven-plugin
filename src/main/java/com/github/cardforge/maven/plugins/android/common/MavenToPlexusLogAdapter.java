@@ -1,5 +1,6 @@
 package com.github.cardforge.maven.plugins.android.common;
 
+import com.android.annotations.Nullable;
 import org.apache.maven.plugin.logging.Log;
 import org.codehaus.plexus.logging.Logger;
 
@@ -108,6 +109,7 @@ public final class MavenToPlexusLogAdapter implements Logger {
     }
 
     @Override
+    @Nullable
     public Logger getChildLogger(String s) {
         return null;
     }

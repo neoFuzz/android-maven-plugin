@@ -18,7 +18,9 @@ package com.android.manifmerger;
 
 import com.android.annotations.NonNull;
 import com.android.annotations.concurrency.Immutable;
-import com.google.common.base.Optional;
+
+import java.util.Optional;
+
 import com.google.common.base.Preconditions;
 
 /**

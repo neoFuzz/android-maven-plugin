@@ -35,20 +35,20 @@ public interface TestRunner {
     /**
      * Returns true if the tests succeeded.
      *
-     * @param projectName
-     * @param variantName
-     * @param testApk
-     * @param testData
-     * @param deviceList
+     * @param projectName    the project name
+     * @param variantName    the variant name
+     * @param testApk        the test apk
+     * @param testData       the test data
+     * @param deviceList     the list of devices to run the tests on
      * @param maxThreads     the max number of threads to run in parallel. 0 means unlimited.
      * @param timeoutInMs    time out in milliseconds
-     * @param installOptions parameters passed to the pm install command.
-     * @param resultsDir
-     * @param coverageDir
-     * @param logger
+     * @param installOptions parameters passed to the {@code pm install} command.
+     * @param resultsDir     the directory to store the results in.
+     * @param coverageDir    the directory to store coverage reports in.
+     * @param logger         the logger
      * @return true if the test succeed
-     * @throws TestException
-     * @throws InterruptedException
+     * @throws TestException        if an unexpected error occurred
+     * @throws InterruptedException if the test is interrupted
      */
     boolean runTests(
             @NonNull String projectName,

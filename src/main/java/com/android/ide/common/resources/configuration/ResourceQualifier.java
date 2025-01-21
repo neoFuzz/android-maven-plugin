@@ -17,6 +17,8 @@
 package com.android.ide.common.resources.configuration;
 
 
+import com.android.annotations.NonNull;
+
 /**
  * Base class for resource qualifiers.
  * <p/>The resource qualifier classes are designed as immutable.
@@ -24,12 +26,12 @@ package com.android.ide.common.resources.configuration;
 public abstract class ResourceQualifier implements Comparable<ResourceQualifier> {
 
     /**
-     * Returns the human readable name of the qualifier.
+     * Returns the human-readable name of the qualifier.
      */
     public abstract String getName();
 
     /**
-     * Returns a shorter human readable name for the qualifier.
+     * Returns a shorter human-readable name for the qualifier.
      *
      * @see #getName()
      */
@@ -132,7 +134,7 @@ public abstract class ResourceQualifier implements Comparable<ResourceQualifier>
     public abstract int hashCode();
 
     @Override
-    public final int compareTo(ResourceQualifier o) {
+    public final int compareTo(@NonNull ResourceQualifier o) {
         return toString().compareTo(o.toString());
     }
 }

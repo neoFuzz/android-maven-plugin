@@ -29,22 +29,37 @@ public class Emulator {
     private String executable;
     private String location;
 
+    /**
+     * @return the location
+     */
     public String getLocation() {
         return location;
     }
 
+    /**
+     * @return the Android Virtual Device name
+     */
     public String getAvd() {
         return avd;
     }
 
+    /**
+     * @return the wait time
+     */
     public String getWait() {
         return wait;
     }
 
+    /**
+     * @return the emulator options
+     */
     public String getOptions() {
         return options;
     }
 
+    /**
+     * @return the emulator executable
+     */
     public String getExecutable() {
         return executable;
     }

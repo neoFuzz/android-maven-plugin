@@ -85,7 +85,7 @@ public interface TestData {
             ILogger logger) throws ProcessException;
 
     /**
-     * Returns the flavor name being test.
+     * Returns the flavor name being tested.
      *
      * @return the tested flavor name.
      */

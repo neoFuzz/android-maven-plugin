@@ -28,7 +28,7 @@ import com.google.common.base.Preconditions;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
-import com.google.common.base.Function;
+import java.util.function.Function;
 
 /**
  * Common behavior of any xml declaration.
@@ -77,7 +77,7 @@ public abstract class XmlNode {
     }
 
     /**
-     * Returns a constant Nodekey that can be used throughout the lifecycle of the xml element.
+     * Returns a constant {@code NodeKey} that can be used throughout the lifecycle of the XML element.
      * The {@link #getId} can return different values over time as the key of the element can be
      * for instance, changed through placeholder replacement.
      */
@@ -90,7 +90,7 @@ public abstract class XmlNode {
     }
 
     /**
-     * Returns an unique id within the manifest file for the element.
+     * Returns a unique id within the manifest file for the element.
      */
     @NonNull
     public abstract NodeKey getId();
@@ -132,7 +132,7 @@ public abstract class XmlNode {
      * location as this xml fragment does not exist in any xml file but is the temporary result
      * of the merging process.
      *
-     * @return a human readable position.
+     * @return a human-readable position.
      */
     @NonNull
     public String printPosition() {
@@ -140,18 +140,18 @@ public abstract class XmlNode {
     }
 
     /**
-     * Abstraction to an xml name to isolate whether the name has a namespace or not.
+     * Abstraction to an XML name to isolate whether the name has a namespace or not.
      */
     public interface NodeName {
 
         /**
-         * Returns true if this attribute name has a namespace declaration and that namespapce is
+         * Returns true if this attribute name has a namespace declaration and that namespace is
          * the same as provided, false otherwise.
          */
         boolean isInNamespace(@NonNull String namespaceURI);
 
         /**
-         * Adds a new attribute of this name to a xml element with a value.
+         * Adds a new attribute of this name to an XML element with a value.
          *
          * @param to        the xml element to add the attribute to.
          * @param withValue the new attribute's value.
@@ -165,7 +165,7 @@ public abstract class XmlNode {
     }
 
     /**
-     * Implementation of {@link com.android.manifmerger.XmlNode.NodeName} for an
+     * Implementation of {@link com.android.manifmerger.XmlNode.NodeName} for a
      * node's declaration not using a namespace.
      */
     public static final class Name implements NodeName {
@@ -187,7 +187,7 @@ public abstract class XmlNode {
 
         @Override
         public boolean equals(@Nullable Object o) {
-            return (o != null && o instanceof Name && ((Name) o).mName.equals(this.mName));
+            return (o instanceof Name n && n.mName.equals(this.mName));
         }
 
         @Override
@@ -214,7 +214,7 @@ public abstract class XmlNode {
         @NonNull
         private final String mNamespaceURI;
 
-        // ignore for comparison and hashcoding since different documents can use different
+        // ignore for comparison and hash coding since different documents can use different
         // prefixes for the same namespace URI.
         @NonNull
         private final String mPrefix;
@@ -242,7 +242,6 @@ public abstract class XmlNode {
 
         @Override
         public void addToNode(@NonNull Element to, String withValue) {
-            // TODO: consider standardizing everything on "android:"
             to.setAttributeNS(mNamespaceURI, mPrefix + ":" + mLocalName, withValue);
         }
 
@@ -253,9 +252,9 @@ public abstract class XmlNode {
 
         @Override
         public boolean equals(@Nullable Object o) {
-            return (o != null && o instanceof NamespaceAwareName
-                    && ((NamespaceAwareName) o).mLocalName.equals(this.mLocalName)
-                    && ((NamespaceAwareName) o).mNamespaceURI.equals(this.mNamespaceURI));
+            return (o instanceof NamespaceAwareName name
+                    && name.mLocalName.equals(this.mLocalName)
+                    && name.mNamespaceURI.equals(this.mNamespaceURI));
         }
 
         @NonNull
@@ -272,7 +271,7 @@ public abstract class XmlNode {
     }
 
     /**
-     * A xml element or attribute key.
+     * an XML element or attribute key.
      */
     @Immutable
     public static class NodeKey {
@@ -284,6 +283,7 @@ public abstract class XmlNode {
             mKey = key;
         }
 
+        @NonNull
         public static NodeKey fromXml(@NonNull Element element) {
             return new OrphanXmlElement(element).getId();
         }
@@ -296,7 +296,7 @@ public abstract class XmlNode {
 
         @Override
         public boolean equals(@Nullable Object o) {
-            return (o != null && o instanceof NodeKey && ((NodeKey) o).mKey.equals(this.mKey));
+            return (o instanceof NodeKey nk && nk.mKey.equals(this.mKey));
         }
 
         @Override

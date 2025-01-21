@@ -1,10 +1,12 @@
 package com.github.cardforge.maven.plugins.android.common;
 
+import com.android.annotations.NonNull;
 import com.github.cardforge.maven.plugins.android.PluginInfo;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.project.MavenProject;
-import org.codehaus.plexus.util.xml.Xpp3Dom;
+import org.codehaus.plexus.configuration.PlexusConfiguration;
+import org.codehaus.plexus.configuration.xml.XmlPlexusConfiguration;
 
 /**
  * A helper class to access plugin configuration from the pom.
@@ -13,13 +15,19 @@ import org.codehaus.plexus.util.xml.Xpp3Dom;
  * @author Manfred Moser
  */
 public final class PomConfigurationHelper {
-    public static String getPluginConfigParameter(MavenProject project, String parameter, String defaultValue) {
+    private PomConfigurationHelper() {
+        // private constructor
+    }
+    public static String getPluginConfigParameter(@NonNull MavenProject project, String parameter, String defaultValue) {
         String value = null;
         for (Plugin plugin : project.getBuild().getPlugins()) {
             if (plugin.getArtifactId().equals(PluginInfo.getArtifactId())) {
-                Xpp3Dom configuration = getMojoConfiguration(plugin);
-                if (configuration != null && configuration.getChild(parameter) != null) {
-                    value = configuration.getChild(parameter).getValue();
+                PlexusConfiguration configuration = getMojoConfiguration(plugin);
+                if (configuration != null) {
+                    PlexusConfiguration param = configuration.getChild(parameter);
+                    if (param != null) {
+                        value = param.getValue();
+                    }
                 }
             }
         }
@@ -29,20 +37,21 @@ public final class PomConfigurationHelper {
 
     public static boolean getPluginConfigParameter(MavenProject project, String parameter, boolean defaultValue) {
         String value = getPluginConfigParameter(project, parameter, Boolean.toString(defaultValue));
-        return Boolean.valueOf(value);
+        return Boolean.parseBoolean(value);
     }
 
-    private static Xpp3Dom getMojoConfiguration(Plugin plugin) {
-        //
-        // We need to look in the configuration element, and then look for configuration elements
-        // within the executions.
-        //
-        Xpp3Dom configuration = (Xpp3Dom) plugin.getConfiguration();
-        if (configuration == null) {
-            if (!plugin.getExecutions().isEmpty()) {
-                configuration = (Xpp3Dom) plugin.getExecutions().get(0).getConfiguration();
-            }
+    private static PlexusConfiguration getMojoConfiguration(@NonNull Plugin plugin) {
+        PlexusConfiguration configuration = null;
+        // Try to retrieve the configuration from the plugin
+        if (plugin.getConfiguration() instanceof XmlPlexusConfiguration xpc) {
+            configuration = xpc;
         }
+        // Fall back to checking plugin executions
+        if (configuration == null && !plugin.getExecutions().isEmpty() &&
+                plugin.getExecutions().get(0).getConfiguration() instanceof XmlPlexusConfiguration xpc) {
+            configuration = xpc;
+        }
+
         return configuration;
     }
 }

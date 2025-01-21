@@ -16,6 +16,9 @@
 
 package com.android.ide.common.resources.configuration;
 
+import com.android.annotations.NonNull;
+import com.android.annotations.Nullable;
+
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -46,12 +49,13 @@ public final class VersionQualifier extends ResourceQualifier {
      * @param segment the folder segment from which to create a qualifier.
      * @return a new {@link VersionQualifier} object or <code>null</code>
      */
+    @Nullable
     public static VersionQualifier getQualifier(String segment) {
         Matcher m = sVersionPattern.matcher(segment);
         if (m.matches()) {
             String v = m.group(1);
 
-            int code = -1;
+            int code;
             try {
                 code = Integer.parseInt(v);
             } catch (NumberFormatException e) {
@@ -73,6 +77,7 @@ public final class VersionQualifier extends ResourceQualifier {
      *
      * @param version the value of the qualifier, as returned by {@link #getVersion()}.
      */
+    @NonNull
     public static String getFolderSegment(int version) {
         if (version != DEFAULT_VERSION) {
             return String.format("v%1$d", version); //$NON-NLS-1$
@@ -91,6 +96,7 @@ public final class VersionQualifier extends ResourceQualifier {
     }
 
     @Override
+    @NonNull
     public String getShortName() {
         return "Version";
     }
@@ -123,8 +129,8 @@ public final class VersionQualifier extends ResourceQualifier {
 
     @Override
     public boolean equals(Object qualifier) {
-        if (qualifier instanceof VersionQualifier) {
-            return mVersion == ((VersionQualifier) qualifier).mVersion;
+        if (qualifier instanceof VersionQualifier vq) {
+            return mVersion == vq.mVersion;
         }
 
         return false;
@@ -132,11 +138,10 @@ public final class VersionQualifier extends ResourceQualifier {
 
     @Override
     public boolean isMatchFor(ResourceQualifier qualifier) {
-        if (qualifier instanceof VersionQualifier) {
+        if (qualifier instanceof VersionQualifier vq) {
             // it is considered a match if our api level is equal or lower to the given qualifier,
             // or the given qualifier doesn't specify an API Level.
-            return mVersion <= ((VersionQualifier) qualifier).mVersion
-                    || ((VersionQualifier) qualifier).mVersion == -1;
+            return mVersion <= vq.mVersion || vq.mVersion == -1;
         }
 
         return false;
@@ -173,11 +178,13 @@ public final class VersionQualifier extends ResourceQualifier {
      * Returns the string used to represent this qualifier in the folder name.
      */
     @Override
+    @NonNull
     public String getFolderSegment() {
         return getFolderSegment(mVersion);
     }
 
     @Override
+    @NonNull
     public String getShortDisplayValue() {
         if (mVersion != DEFAULT_VERSION) {
             return String.format("API %1$d", mVersion);
@@ -187,6 +194,7 @@ public final class VersionQualifier extends ResourceQualifier {
     }
 
     @Override
+    @NonNull
     public String getLongDisplayValue() {
         if (mVersion != DEFAULT_VERSION) {
             return String.format("API Level %1$d", mVersion);

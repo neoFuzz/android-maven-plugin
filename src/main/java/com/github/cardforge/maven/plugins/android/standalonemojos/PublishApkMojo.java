@@ -24,6 +24,7 @@ import static com.github.cardforge.maven.plugins.android.common.AndroidExtension
  * @author Joris de Groot
  * @author Benoit Billington
  */
+@SuppressWarnings("unused") // used in Maven goal
 @Mojo(name = "publish-apk", requiresProject = false)
 public class PublishApkMojo extends AbstractPublisherMojo {
 
@@ -39,8 +40,10 @@ public class PublishApkMojo extends AbstractPublisherMojo {
     private String fileNameWhatsnew;
 
     /**
-     * @throws org.apache.maven.plugin.MojoExecutionException
-     * @throws org.apache.maven.plugin.MojoFailureException
+     * Executes this mojo.
+     *
+     * @throws org.apache.maven.plugin.MojoExecutionException if an error occurs
+     * @throws org.apache.maven.plugin.MojoFailureException   if an error occurs
      */
     public void execute() throws MojoExecutionException, MojoFailureException {
         if (apkFile == null) {
@@ -60,7 +63,7 @@ public class PublishApkMojo extends AbstractPublisherMojo {
             FileContent newApkFile = new FileContent(AndroidPublisherHelper.MIME_TYPE_APK, apkFile);
             Apk apk = edits.apks().upload(packageName, editId, newApkFile).execute();
 
-            List<Integer> versionCodes = new ArrayList<Integer>();
+            List<Integer> versionCodes = new ArrayList<>();
             versionCodes.add(apk.getVersionCode());
             Track newTrack = new Track().setVersionCodes(versionCodes);
             edits.tracks().update(packageName, editId, track, newTrack).execute();

@@ -42,6 +42,9 @@ public class LocalExtraPkgInfo extends LocalPkgInfo {
                              @NonNull String[] oldPaths,
                              @NonNull NoPreviewRevision revision) {
         super(localSdk, localDir, sourceProps);
+        if (displayName == null) {
+            displayName = getPrettyName(vendor, path);
+        }
         mDesc = (IPkgDescExtra) PkgDesc.Builder.newExtra(
                 vendor,
                 path,
@@ -58,6 +61,7 @@ public class LocalExtraPkgInfo extends LocalPkgInfo {
      * @param extraPath The non-null path of the extra.
      * @return A non-null display name based on the extra's path id.
      */
+    @NonNull
     public static String getPrettyName(@Nullable IdDisplay vendor, @NonNull String extraPath) {
         String name = extraPath;
 
@@ -65,28 +69,28 @@ public class LocalExtraPkgInfo extends LocalPkgInfo {
         // and that "vendor" would end up in the path when we reload the extra from
         // disk. Detect this and compensate.
         String disp = vendor == null ? null : vendor.getDisplay();
-        if (disp != null && disp.length() > 0) {
-            if (name.startsWith(disp + "-")) {  //$NON-NLS-1$
-                name = name.substring(disp.length() + 1);
-            }
+        if (disp != null && !disp.isEmpty() &&
+                name.startsWith(disp + "-")) {  //$NON-NLS-1$
+            name = name.substring(disp.length() + 1);
         }
+
 
         // Uniformize all spaces in the name
         if (name != null) {
             name = name.replaceAll("[ _\t\f-]+", " ").trim();   //$NON-NLS-1$ //$NON-NLS-2$
         }
-        if (name == null || name.length() == 0) {
+        if (name == null || name.isEmpty()) {
             name = "Unknown Extra";
         }
 
-        if (disp != null && disp.length() > 0) {
+        if (disp != null && !disp.isEmpty()) {
             name = disp + " " + name;  //$NON-NLS-1$
             name = name.replaceAll("[ _\t\f-]+", " ").trim();   //$NON-NLS-1$ //$NON-NLS-2$
         }
 
-        // Look at all lower case characters in range [1..n-1] and replace them by an upper
-        // case if they are preceded by a space. Also upper cases the first character of the
-        // string.
+        /* Look at all lower case characters in range {@code [1..n-1]} and replace them by an upper
+         * case if they are preceded by a space. Also, upper cases the first character of the string.
+         */
         boolean changed = false;
         char[] chars = name.toCharArray();
         for (int n = chars.length - 1, i = 0; i < n; i++) {

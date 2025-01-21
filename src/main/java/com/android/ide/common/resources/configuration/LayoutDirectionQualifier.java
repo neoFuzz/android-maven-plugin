@@ -71,4 +71,14 @@ public class LayoutDirectionQualifier extends EnumBasedResourceQualifier {
 
         return false;
     }
+
+    @Override
+    public boolean equals(Object qualifier) {
+        return qualifier instanceof LayoutDirectionQualifier l && mValue == l.mValue;
+    }
+
+    @Override
+    public int hashCode() {
+        return mValue.hashCode();
+    }
 }

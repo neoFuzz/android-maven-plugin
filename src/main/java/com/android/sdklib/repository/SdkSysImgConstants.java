@@ -17,6 +17,7 @@
 package com.android.sdklib.repository;
 
 
+import com.android.annotations.NonNull;
 import com.android.sdklib.internal.repository.sources.SdkSource;
 
 import java.io.InputStream;
@@ -27,7 +28,7 @@ import java.io.InputStream;
 public class SdkSysImgConstants extends RepoConstants {
 
     /**
-     * The default name looked for by {@link SdkSource} when trying to load an
+     * The default name looked for by {@link SdkSource} when trying to load n
      * sdk-sys-img XML if the URL doesn't match an existing resource.
      */
     public static final String URL_DEFAULT_FILENAME = "sys-img.xml";       //$NON-NLS-1$
@@ -74,6 +75,10 @@ public class SdkSysImgConstants extends RepoConstants {
      */
     public static final String NS_URI = getSchemaUri(NS_LATEST_VERSION);
 
+    private SdkSysImgConstants() {
+        // Not instantiable
+    }
+
     /**
      * Returns a stream to the requested {@code sdk-sys-img} XML Schema.
      *
@@ -90,6 +95,7 @@ public class SdkSysImgConstants extends RepoConstants {
      *
      * @param version Between 1 and {@link #NS_LATEST_VERSION} included.
      */
+    @NonNull
     public static String getSchemaUri(int version) {
         return String.format(NS_BASE + "%d", version);           //$NON-NLS-1$
     }

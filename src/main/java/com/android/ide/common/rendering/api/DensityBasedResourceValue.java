@@ -20,7 +20,7 @@ import com.android.resources.ResourceType;
 
 @SuppressWarnings("deprecation")
 public class DensityBasedResourceValue extends ResourceValue implements IDensityBasedResourceValue {
-    private com.android.resources.Density mDensity;
+    private final com.android.resources.Density mDensity;
 
     public DensityBasedResourceValue(ResourceType type, String name, String value,
                                      com.android.resources.Density density, boolean isFramework) {
@@ -43,7 +43,7 @@ public class DensityBasedResourceValue extends ResourceValue implements IDensity
      * @deprecated use {@link #getResourceDensity()} instead.
      */
     @Override
-    @Deprecated
+    @Deprecated(since = "4.7")
     public Density getDensity() {
         return Density.getEnum(mDensity.getDpiValue());
     }
@@ -79,15 +79,7 @@ public class DensityBasedResourceValue extends ResourceValue implements IDensity
             return false;
         DensityBasedResourceValue other = (DensityBasedResourceValue) obj;
         if (mDensity == null) {
-            if (other.mDensity != null)
-                return false;
-        } else if (!mDensity.equals(other.mDensity))
-            return false;
-        return true;
-    }
-
-    @Override
-    public String getType() {
-        return "";
+            return other.mDensity == null;
+        } else return mDensity.equals(other.mDensity);
     }
 }

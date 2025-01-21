@@ -16,9 +16,9 @@
  */
 package com.github.cardforge.maven.plugins.android.standalonemojos;
 
+import com.android.annotations.NonNull;
 import com.android.ddmlib.*;
 import com.github.cardforge.maven.plugins.android.AbstractAndroidMojo;
-import com.github.cardforge.maven.plugins.android.DeviceCallback;
 import com.github.cardforge.maven.plugins.android.common.DeviceHelper;
 import com.github.cardforge.maven.plugins.android.common.LogSyncProgressMonitor;
 import com.github.cardforge.maven.plugins.android.config.ConfigHandler;
@@ -101,36 +101,28 @@ public class PushMojo extends AbstractAndroidMojo {
 
         final Map<String, String> sourceDestinationMap = calculateSourceDestinationMapping();
 
-        doWithDevices(new DeviceCallback() {
-            public void doWithDevice(final IDevice device) throws MojoExecutionException {
-                String deviceLogLinePrefix = DeviceHelper.getDeviceLogLinePrefix(device);
+        doWithDevices(device -> {
+            String deviceLogLinePrefix = DeviceHelper.getDeviceLogLinePrefix(device);
 
-                // message will be set in for each loop according to the processed files
-                String message = "";
+            // message will be set in for each loop according to the processed files
+            String message = "";
 
-                try {
-                    SyncService syncService = device.getSyncService();
+            try {
+                SyncService syncService = device.getSyncService();
 
-                    for (Map.Entry<String, String> pushFileEntry : sourceDestinationMap.entrySet()) {
-                        String sourcePath = pushFileEntry.getKey();
-                        String destinationPath = pushFileEntry.getValue();
+                for (Map.Entry<String, String> pushFileEntry : sourceDestinationMap.entrySet()) {
+                    String sourcePath = pushFileEntry.getKey();
+                    String destinationPath = pushFileEntry.getValue();
 
-                        message = deviceLogLinePrefix + "Push of " + sourcePath + " to " + destinationPath + " on "
-                                + DeviceHelper.getDescriptiveName(device);
+                    message = deviceLogLinePrefix + "Push of " + sourcePath + " to " + destinationPath + " on "
+                            + DeviceHelper.getDescriptiveName(device);
 
-                        syncService.pushFile(sourcePath, destinationPath, new LogSyncProgressMonitor(getLog()));
+                    syncService.pushFile(sourcePath, destinationPath, new LogSyncProgressMonitor(getLog()));
 
-                        getLog().info(message + " successful.");
-                    }
-                } catch (SyncException e) {
-                    throw new MojoExecutionException(message + " failed.", e);
-                } catch (IOException e) {
-                    throw new MojoExecutionException(message + " failed.", e);
-                } catch (TimeoutException e) {
-                    throw new MojoExecutionException(message + " failed.", e);
-                } catch (AdbCommandRejectedException e) {
-                    throw new MojoExecutionException(message + " failed.", e);
+                    getLog().info(message + " successful.");
                 }
+            } catch (SyncException | IOException | TimeoutException | AdbCommandRejectedException e) {
+                throw new MojoExecutionException(message + " failed.", e);
             }
         });
     }
@@ -141,10 +133,11 @@ public class PushMojo extends AbstractAndroidMojo {
      * destination.
      *
      * @return a map with file source -> destination pairs
-     * @throws MojoExecutionException
+     * @throws MojoExecutionException if the source file or directory does not exist
      */
+    @NonNull
     private Map<String, String> calculateSourceDestinationMapping() throws MojoExecutionException {
-        Map<String, String> result = new HashMap<String, String>();
+        Map<String, String> result = new HashMap<>();
 
         File sourceFile = new File(parsedSource);
         final String destinationPath;
@@ -161,10 +154,10 @@ public class PushMojo extends AbstractAndroidMojo {
         } else {
             if (sourceFile.isDirectory()) {
                 // find recursively all files to be pushed
-                @SuppressWarnings("unchecked") Collection<File> filesList = FileUtils
+                Collection<File> filesList = FileUtils
                         .listFiles(sourceFile, null, true);
                 for (File file : filesList) {
-                    // make the file's path relative - this is kind of a hack but it
+                    // make the file's path relative - this is kind of a hack, but it
                     // works just fine in this controlled environment
                     String filePath = file.getAbsolutePath().substring(sourceFile.getAbsolutePath().length());
                     filePath = filePath.replace(System.getProperty("file.separator"), "/");

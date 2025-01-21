@@ -24,6 +24,9 @@ package com.android.sdklib.repository;
  * of our build process depend on them.
  */
 public class AddonManifestIniProps {
+    private AddonManifestIniProps() {
+        // Not instantiable
+    }
 
     /**
      * The <em>display</em> name of the add-on. Always present. <br/>

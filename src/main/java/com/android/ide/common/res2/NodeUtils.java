@@ -32,6 +32,9 @@ import java.util.List;
  * - compare Nodes and attributes.
  */
 class NodeUtils {
+    private NodeUtils() {
+        // empty constructor
+    }
 
     /**
      * Makes a new document adopt a node from a different document, and correctly reassign namespace
@@ -41,7 +44,7 @@ class NodeUtils {
      * @param node     the node to adopt.
      * @return the adopted node.
      */
-    static Node adoptNode(Document document, Node node) {
+    static Node adoptNode(@NonNull Document document, Node node) {
         Node newNode = document.adoptNode(node);
 
         updateNamespace(newNode, document);
@@ -49,7 +52,7 @@ class NodeUtils {
         return newNode;
     }
 
-    static Node duplicateNode(Document document, Node node) {
+    static Node duplicateNode(Document document, @NonNull Node node) {
         Node newNode;
         if (node.getNamespaceURI() != null) {
             newNode = document.createElementNS(node.getNamespaceURI(), node.getLocalName());
@@ -152,7 +155,7 @@ class NodeUtils {
      * @param document the new document
      * @return false if the attribute is to be dropped
      */
-    private static boolean processSingleNodeNamespace(Node node, Document document) {
+    private static boolean processSingleNodeNamespace(@NonNull Node node, Document document) {
         if ("xmlns".equals(node.getLocalName())) {
             return false;
         }
@@ -178,7 +181,7 @@ class NodeUtils {
     }
 
     /**
-     * Looks for an existing prefix for a a given namespace.
+     * Looks for an existing prefix for a given namespace.
      * The prefix must start with "xmlns:". The whole prefix is returned.
      *
      * @param attributes the list of attributes to look through
@@ -198,6 +201,7 @@ class NodeUtils {
         return null;
     }
 
+    @NonNull
     private static String getUniqueNsAttribute(NamedNodeMap attributes) {
         if (attributes == null) {
             return "xmlns:ns1";
@@ -255,9 +259,8 @@ class NodeUtils {
                         return false;
                     }
                     break;
-                case Node.CDATA_SECTION_NODE:
-                case Node.TEXT_NODE:
-                case Node.COMMENT_NODE:
+                case Node.CDATA_SECTION_NODE, Node.TEXT_NODE, Node.COMMENT_NODE:
+                default:
                     if (!child1.getNodeValue().equals(child2.getNodeValue())) {
                         return false;
                     }

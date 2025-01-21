@@ -77,6 +77,7 @@ public class LocalAddonPkgInfo extends LocalPlatformPkgInfo {
      * @param displayName A name-display field or an old-style name field.
      * @return A non-null sanitized name-id that fits in the {@code [a-zA-Z0-9_-]+} pattern.
      */
+    @NonNull
     public static String sanitizeDisplayToNameId(@NonNull String displayName) {
         String name = displayName.toLowerCase(Locale.US);
         name = name.replaceAll("[^a-z0-9_-]+", "_");      //$NON-NLS-1$ //$NON-NLS-2$

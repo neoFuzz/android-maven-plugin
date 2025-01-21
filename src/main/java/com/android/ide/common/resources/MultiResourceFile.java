@@ -16,6 +16,8 @@
 
 package com.android.ide.common.resources;
 
+import com.android.annotations.NonNull;
+import com.android.annotations.Nullable;
 import com.android.ide.common.rendering.api.ResourceValue;
 import com.android.ide.common.resources.ValueResourceParser.IValueResourceRepository;
 import com.android.io.IAbstractFile;
@@ -40,7 +42,7 @@ public final class MultiResourceFile extends ResourceFile implements IValueResou
     private static final SAXParserFactory sParserFactory = SAXParserFactory.newInstance();
 
     private final Map<ResourceType, Map<String, ResourceValue>> mResourceItems =
-            new EnumMap<ResourceType, Map<String, ResourceValue>>(ResourceType.class);
+            new EnumMap<>(ResourceType.class);
 
     private Collection<ResourceType> mResourceTypeList = null;
     // Boolean flag to track whether a named element has been added or removed, thus requiring
@@ -73,7 +75,7 @@ public final class MultiResourceFile extends ResourceFile implements IValueResou
 
         // Copy the previous version of our list of ResourceItems and types
         Map<ResourceType, Map<String, ResourceValue>> oldResourceItems
-                = new EnumMap<ResourceType, Map<String, ResourceValue>>(mResourceItems);
+                = new EnumMap<>(mResourceItems);
 
         // reset current content.
         mResourceItems.clear();
@@ -90,8 +92,8 @@ public final class MultiResourceFile extends ResourceFile implements IValueResou
             for (ResourceType type : mResourceTypeList) {
                 // We just need to check the names of the items.
                 // If there are new or removed names then we'll have to regenerate IDs
-                if (mResourceItems.get(type).keySet()
-                        .equals(oldResourceItems.get(type).keySet()) == false) {
+                if (!mResourceItems.get(type).keySet()
+                        .equals(oldResourceItems.get(type).keySet())) {
                     mNeedIdRefresh = true;
                 }
             }
@@ -104,7 +106,7 @@ public final class MultiResourceFile extends ResourceFile implements IValueResou
     }
 
     @Override
-    protected void dispose(ScanningContext context) {
+    protected void dispose(@NonNull ScanningContext context) {
         ResourceRepository repository = getRepository();
 
         // only remove this file from all existing ResourceItem.
@@ -114,7 +116,7 @@ public final class MultiResourceFile extends ResourceFile implements IValueResou
         context.requestFullAapt();
 
         // don't need to touch the content, it'll get reclaimed as this objects disappear.
-        // In the mean time other objects may need to access it.
+        // In the meantime, other objects may need to access it.
     }
 
     @Override
@@ -125,7 +127,7 @@ public final class MultiResourceFile extends ResourceFile implements IValueResou
     @Override
     public boolean hasResources(ResourceType type) {
         Map<String, ResourceValue> list = mResourceItems.get(type);
-        return (list != null && list.size() > 0);
+        return (list != null && !list.isEmpty());
     }
 
     private void updateResourceItems(ScanningContext context) {
@@ -161,10 +163,8 @@ public final class MultiResourceFile extends ResourceFile implements IValueResou
         try {
             SAXParser parser = sParserFactory.newSAXParser();
             parser.parse(getFile().getContents(), new ValueResourceParser(this, isFramework()));
-        } catch (ParserConfigurationException e) {
-        } catch (SAXException e) {
-        } catch (IOException e) {
-        } catch (StreamException e) {
+        } catch (ParserConfigurationException | SAXException | IOException | StreamException ignored) {
+            // pass
         }
     }
 
@@ -174,14 +174,14 @@ public final class MultiResourceFile extends ResourceFile implements IValueResou
      * @param value The value of the resource.
      */
     @Override
-    public void addResourceValue(ResourceValue value) {
+    public void addResourceValue(@NonNull ResourceValue value) {
         ResourceType resType = value.getResourceType();
 
         Map<String, ResourceValue> list = mResourceItems.get(resType);
 
         // if the list does not exist, create it.
         if (list == null) {
-            list = new HashMap<String, ResourceValue>();
+            list = new HashMap<>();
             mResourceItems.put(resType, list);
         } else {
             // look for a possible value already existing.
@@ -204,6 +204,7 @@ public final class MultiResourceFile extends ResourceFile implements IValueResou
     }
 
     @Override
+    @Nullable
     public ResourceValue getValue(ResourceType type, String name) {
         // get the list for the given type
         Map<String, ResourceValue> list = mResourceItems.get(type);

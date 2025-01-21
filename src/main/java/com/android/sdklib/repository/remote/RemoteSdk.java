@@ -28,7 +28,6 @@ import com.android.sdklib.internal.repository.archives.Archive;
 import com.android.sdklib.internal.repository.packages.Package;
 import com.android.sdklib.internal.repository.sources.*;
 import com.android.sdklib.internal.repository.updater.SettingsController;
-import com.android.sdklib.internal.repository.updater.SettingsController.OnChangedListener;
 import com.android.sdklib.repository.SdkAddonsListConstants;
 import com.android.sdklib.repository.SdkRepoConstants;
 import com.android.sdklib.repository.descriptors.IPkgDesc;
@@ -37,32 +36,30 @@ import com.android.utils.ILogger;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 
+import java.util.Objects;
 
 /**
  * This class keeps information on the remote SDK repository.
  */
+@SuppressWarnings("deprecation")
 public class RemoteSdk {
 
     /**
      * Default expiration delay is 24 hours.
      */
-    public final static long DEFAULT_EXPIRATION_PERIOD_MS = 24 * 3600 * 1000;
+    public static final long DEFAULT_EXPIRATION_PERIOD_MS = (long) 24 * 3600 * 1000;
 
     private final SettingsController mSettingsController;
     private final SdkSources mSdkSources = new SdkSources();
     private long mSdkSourceTS;
     private DownloadCache mDownloadCache;
 
-    public RemoteSdk(SettingsController settingsController) {
+    public RemoteSdk(@NonNull SettingsController settingsController) {
         mSettingsController = settingsController;
-        settingsController.registerOnChangedListener(new OnChangedListener() {
-            @Override
-            public void onSettingsChanged(@NonNull SettingsController controller,
-                                          @NonNull SettingsController.Settings oldSettings) {
-                // Reset the download cache if it doesn't match the right strategy.
-                // The cache instance gets lazily recreated later in getDownloadCache().
-                mDownloadCache = null;
-            }
+        settingsController.registerOnChangedListener((controller, oldSettings) -> {
+            // Reset the download cache if it doesn't match the right strategy.
+            // The cache instance gets lazily recreated later in getDownloadCache().
+            mDownloadCache = null;
         });
     }
 
@@ -91,7 +88,7 @@ public class RemoteSdk {
         // Implementation detail: right now this reuses the SdkSource(s) classes
         // from the sdk-repository v2. The problem with that is that the sources are
         // mutable and hold the fetch logic and hold the packages array.
-        // Instead I'd prefer to have the sources be immutable descriptors and move
+        // Instead, I'd prefer to have the sources be immutable descriptors and move
         // the fetch logic here. Eventually my goal is to get rid of them
         // and include the logic directly here instead but for right now lets
         // just start with what we have to avoid implementing it all at once.
@@ -103,7 +100,7 @@ public class RemoteSdk {
                     new NullTaskMonitor(logger),
                     forceHttp);
             Package[] pkgs = source.getPackages();
-            if (pkgs == null || pkgs.length == 0) {
+            if (pkgs == null) {
                 continue;
             }
 
@@ -124,8 +121,8 @@ public class RemoteSdk {
 
     /**
      * Returns the {@link SdkSources} object listing all sources to load from.
-     * This includes the main repository.xml, the main addon.xml as well as all the
-     * add-ons or sys-img xmls listed in the addons-list.xml.
+     * This includes the main {@code repository.xml}, the main {@code addon.xml} as well as all the
+     * add-ons or sys-img XMLs listed in the {@code addons-list.xml}.
      * <p/>
      * The method caches the last access and only refresh it if data is either not
      * present or the expiration time has be passed.
@@ -143,12 +140,12 @@ public class RemoteSdk {
 
         // Load the conventional sources.
         // For testing, the env var can be set to replace the default root download URL.
-        // It must end with a / and its the location where the updater will look for
+        // It must end with a / and it's the location where the updater will look for
         // the repository.xml, addons_list.xml and such files.
 
         if (expired || !mSdkSources.hasSources(SdkSourceCategory.ANDROID_REPO)) {
             String baseUrl = System.getenv("SDK_TEST_BASE_URL");                        //$NON-NLS-1$
-            if (baseUrl == null || baseUrl.length() <= 0 || !baseUrl.endsWith("/")) {   //$NON-NLS-1$
+            if (baseUrl == null || !baseUrl.endsWith("/")) {   //$NON-NLS-1$
                 baseUrl = SdkRepoConstants.URL_GOOGLE_SDK_SITE;
             }
 
@@ -173,7 +170,7 @@ public class RemoteSdk {
             // We override SdkRepoConstants.URL_GOOGLE_SDK_SITE if this is defined
             String baseUrl = System.getenv("SDK_TEST_BASE_URL");            //$NON-NLS-1$
             if (baseUrl != null) {
-                if (baseUrl.length() > 0 && baseUrl.endsWith("/")) {        //$NON-NLS-1$
+                if (baseUrl.endsWith("/")) {        //$NON-NLS-1$
                     if (url.startsWith(SdkRepoConstants.URL_GOOGLE_SDK_SITE)) {
                         url = baseUrl + url.substring(SdkRepoConstants.URL_GOOGLE_SDK_SITE.length());
                     }
@@ -197,15 +194,12 @@ public class RemoteSdk {
 
                 if (fetch3rdParties) {
                     for (Site s : sites) {
-                        switch (s.getType()) {
-                            case ADDON_SITE:
-                                mSdkSources.add(SdkSourceCategory.ADDONS_3RD_PARTY,
-                                        new SdkAddonSource(s.getUrl(), s.getUiName()));
-                                break;
-                            case SYS_IMG_SITE:
-                                mSdkSources.add(SdkSourceCategory.ADDONS_3RD_PARTY,
-                                        new SdkSysImgSource(s.getUrl(), s.getUiName()));
-                                break;
+                        if (Objects.requireNonNull(s.getType()) == AddonsListFetcher.SiteType.ADDON_SITE) {
+                            mSdkSources.add(SdkSourceCategory.ADDONS_3RD_PARTY,
+                                    new SdkAddonSource(s.getUrl(), s.getUiName()));
+                        } else if (s.getType() == AddonsListFetcher.SiteType.SYS_IMG_SITE) {
+                            mSdkSources.add(SdkSourceCategory.ADDONS_3RD_PARTY,
+                                    new SdkSysImgSource(s.getUrl(), s.getUiName()));
                         }
                     }
                 }

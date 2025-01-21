@@ -33,7 +33,6 @@ import com.google.common.io.Closeables;
 import com.google.common.io.Files;
 
 import java.io.*;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.Collection;
@@ -50,12 +49,14 @@ import static com.android.SdkConstants.FN_APK_CLASSES_N_DEX;
  * Class making the final app package.
  * The inputs are:
  * - packaged resources (output of aapt)
- * - code file (ouput of dx)
+ * - code file (output of dx)
  * - Java resources coming from the project, its libraries, and its jar files
  * - Native libraries from the project or its library.
  */
 public final class Packager implements IArchiveBuilder {
 
+    public static final String FAILED_TO_ADD_S = "Failed to add %s";
+    public static final String ALREADY_SEALED = "APK is already sealed";
     private static final Pattern PATTERN_NATIVELIB_EXT = Pattern.compile("^.+\\.so$",
             Pattern.CASE_INSENSITIVE);
     private final ILogger mLogger;
@@ -63,8 +64,8 @@ public final class Packager implements IArchiveBuilder {
     private final NoBinaryZipFilter mNoBinaryZipFilter = new NoBinaryZipFilter(mNoDuplicateFilter);
     @Nullable
     private final SignedJarBuilder.IZipEntryFilter mPackagingOptionsFilter;
-    private final HashMap<String, File> mAddedFiles = new HashMap<String, File>();
-    private final HashMap<String, File> mMergeFiles = new HashMap<String, File>();
+    private final HashMap<String, File> mAddedFiles = new HashMap<>();
+    private final HashMap<String, File> mMergeFiles = new HashMap<>();
     private SignedJarBuilder mBuilder = null;
     private boolean mJniDebugMode = false;
     private boolean mIsSealed = false;
@@ -76,7 +77,7 @@ public final class Packager implements IArchiveBuilder {
      * mandatory given input files.
      * <p>
      * An optional debug keystore can be provided. If set, it is expected that the store password
-     * is 'android' and the key alias and password are 'androiddebugkey' and 'android'.
+     * is {@code android} and the key alias and password are {@code androiddebugkey} and {@code android}.
      * <p>
      * An optional {@link ILogger} can also be provided for verbose output. If null, there will
      * be no output.
@@ -86,7 +87,7 @@ public final class Packager implements IArchiveBuilder {
      * @param mergingFolder   the folder to store files that are being merged.
      * @param certificateInfo the signing information used to sign the package. Optional the OS path to the debug keystore, if needed or null.
      * @param logger          the logger.
-     * @throws com.android.builder.packaging.PackagerException
+     * @throws com.android.builder.packaging.PackagerException if an error occurred
      */
     public Packager(
             @NonNull String apkLocation,
@@ -145,12 +146,12 @@ public final class Packager implements IArchiveBuilder {
      * This checks the following:
      * - the file is not an existing directory.
      * - if the file exists, that it can be modified.
-     * - if it doesn't exists, that a new file can be created.
+     * - if it doesn't exist, that a new file can be created.
      *
      * @param file the File to check
      * @throws PackagerException If the check fails
      */
-    private static void checkOutputFile(File file) throws PackagerException {
+    private static void checkOutputFile(@NonNull File file) throws PackagerException {
         if (file.isDirectory()) {
             throw new PackagerException("%s is a directory!", file);
         }
@@ -175,21 +176,20 @@ public final class Packager implements IArchiveBuilder {
      * Checks the merger folder is:
      * - a directory.
      * - if the folder exists, that it can be modified.
-     * - if it doesn't exists, that a new folder can be created.
+     * - if it doesn't exist, that a new folder can be created.
      *
      * @param file the File to check
      * @throws PackagerException If the check fails
      */
-    private static void checkMergingFolder(File file) throws PackagerException {
+    private static void checkMergingFolder(@NonNull File file) throws PackagerException {
         if (file.isFile()) {
             throw new PackagerException("%s is a file!", file);
         }
 
-        if (file.exists()) { // will be a directory in this case.
-            if (!file.canWrite()) {
-                throw new PackagerException("Cannot write %s", file);
-            }
+        if (file.exists() && !file.canWrite()) {
+            throw new PackagerException("Cannot write %s", file);
         }
+
 
         try {
             FileUtils.emptyFolder(file);
@@ -209,7 +209,7 @@ public final class Packager implements IArchiveBuilder {
      * @throws FileNotFoundException if the file is not here.
      * @throws PackagerException     If the file is a folder or a file that cannot be read.
      */
-    private static void checkInputFile(File file) throws FileNotFoundException, PackagerException {
+    private static void checkInputFile(@NonNull File file) throws FileNotFoundException, PackagerException {
         if (file.isDirectory()) {
             throw new PackagerException("%s is a directory!", file);
         }
@@ -223,6 +223,7 @@ public final class Packager implements IArchiveBuilder {
         }
     }
 
+    @Nullable
     public static String getLocalVersion() {
         Class clazz = Packager.class;
         String className = clazz.getSimpleName() + ".class";
@@ -241,8 +242,8 @@ public final class Packager implements IArchiveBuilder {
             Attributes attr = new Manifest(jarInputStream).getMainAttributes();
             jarInputStream.close();
             return attr.getValue("Builder-Version");
-        } catch (MalformedURLException ignored) {
         } catch (IOException ignored) {
+            // Ignored
         }
 
         return null;
@@ -251,16 +252,11 @@ public final class Packager implements IArchiveBuilder {
     public void addDexFiles(@NonNull File mainDexFolder, @NonNull Collection<File> extraDexFiles)
             throws DuplicateFileException, SealedPackageException, PackagerException {
 
-        File[] mainDexFiles = mainDexFolder.listFiles(new FilenameFilter() {
-            @Override
-            public boolean accept(File file, String name) {
-                return name.endsWith(SdkConstants.DOT_DEX);
-            }
-        });
+        File[] mainDexFiles = mainDexFolder.listFiles((file, name) -> name.endsWith(SdkConstants.DOT_DEX));
 
         if (mainDexFiles != null && mainDexFiles.length > 0) {
             // Never rename the dex files in the main dex folder, in case we are in legacy mode
-            // we requires the main dex files to not be renamed.
+            // we require the main dex files to not be renamed.
             for (File dexFile : mainDexFiles) {
                 addFile(dexFile, dexFile.getName());
             }
@@ -305,7 +301,7 @@ public final class Packager implements IArchiveBuilder {
     public void addFile(File file, String archivePath) throws PackagerException,
             SealedPackageException, DuplicateFileException {
         if (mIsSealed) {
-            throw new SealedPackageException("APK is already sealed");
+            throw new SealedPackageException(ALREADY_SEALED);
         }
 
         try {
@@ -315,7 +311,7 @@ public final class Packager implements IArchiveBuilder {
             throw e;
         } catch (Exception e) {
             mBuilder.cleanUp();
-            throw new PackagerException(e, "Failed to add %s", file);
+            throw new PackagerException(e, FAILED_TO_ADD_S, file);
         }
     }
 
@@ -332,7 +328,7 @@ public final class Packager implements IArchiveBuilder {
     void addZipFile(File zipFile) throws PackagerException, SealedPackageException,
             DuplicateFileException {
         if (mIsSealed) {
-            throw new SealedPackageException("APK is already sealed");
+            throw new SealedPackageException(ALREADY_SEALED);
         }
 
         FileInputStream fis = null;
@@ -350,7 +346,7 @@ public final class Packager implements IArchiveBuilder {
             throw e;
         } catch (Exception e) {
             mBuilder.cleanUp();
-            throw new PackagerException(e, "Failed to add %s", zipFile);
+            throw new PackagerException(e, FAILED_TO_ADD_S, zipFile);
         } finally {
             try {
                 Closeables.close(fis, true /* swallowIOException */);
@@ -363,7 +359,7 @@ public final class Packager implements IArchiveBuilder {
     /**
      * Adds all resources from a merged folder or jar file. There cannot be any duplicates and all
      * files present must be added unless it is a "binary" file like a .class or .dex (jack
-     * produces the classes.dex in the same location as the obfuscated resources).
+     * produces the {@code classes.dex} in the same location as the obfuscated resources).
      *
      * @param jarFileOrDirectory a jar file or directory reference.
      * @throws PackagerException      could not add an entry to the package.
@@ -387,7 +383,7 @@ public final class Packager implements IArchiveBuilder {
             throw e;
         } catch (Exception e) {
             mBuilder.cleanUp();
-            throw new PackagerException(e, "Failed to add %s", jarFileOrDirectory);
+            throw new PackagerException(e, FAILED_TO_ADD_S, jarFileOrDirectory);
         } finally {
             try {
                 if (fis != null) {
@@ -399,6 +395,14 @@ public final class Packager implements IArchiveBuilder {
         }
     }
 
+    /**
+     * Adds all resources from a directory.
+     *
+     * @param directory the directory to add.
+     * @param path      the path of the directory inside the APK archive.
+     * @throws IZipEntryFilter.ZipAbortException if the file should not be added.
+     * @throws IOException                       if an error occurred
+     */
     private void addResourcesFromDirectory(@NonNull File directory, String path)
             throws IOException, IZipEntryFilter.ZipAbortException {
         File[] directoryFiles = directory.listFiles();
@@ -425,23 +429,18 @@ public final class Packager implements IArchiveBuilder {
      * @param abiFilters   a list of abi filters to include. If null or empty, all abis are included.
      * @throws PackagerException      if an error occurred
      * @throws SealedPackageException if the APK is already sealed.
-     * @throws DuplicateFileException if a file conflicts with another already added to the APK
-     *                                at the same location inside the APK archive.
      * @see #setJniDebugMode(boolean)
      */
     public void addNativeLibraries(@NonNull File nativeFolder, @Nullable Set<String> abiFilters)
-            throws PackagerException, SealedPackageException, DuplicateFileException {
+            throws PackagerException, SealedPackageException {
         if (mIsSealed) {
-            throw new SealedPackageException("APK is already sealed");
+            throw new SealedPackageException(ALREADY_SEALED);
         }
 
         if (!nativeFolder.isDirectory()) {
             // not a directory? check if it's a file or doesn't exist
-            if (nativeFolder.exists()) {
-                throw new PackagerException("%s is not a folder", nativeFolder);
-            } else {
-                throw new PackagerException("%s does not exist", nativeFolder);
-            }
+            throw new PackagerException(nativeFolder.exists() ?
+                    "%s is not a folder" : "%s does not exist", nativeFolder);
         }
 
         File[] abiList = nativeFolder.listFiles();
@@ -455,7 +454,6 @@ public final class Packager implements IArchiveBuilder {
                 }
 
                 if (abi.isDirectory()) { // ignore files
-
                     File[] libs = abi.listFiles();
                     if (libs != null) {
                         for (File lib : libs) {
@@ -468,19 +466,17 @@ public final class Packager implements IArchiveBuilder {
                                                     (SdkConstants.FN_GDBSERVER.equals(libName) ||
                                                             SdkConstants.FN_GDB_SETUP.equals(libName))))) {
 
-                                String path =
-                                        SdkConstants.FD_APK_NATIVE_LIBS + "/" +
-                                                abi.getName() + "/" + libName;
+                                String path = SdkConstants.FD_APK_NATIVE_LIBS + File.separatorChar +
+                                        abi.getName() + File.separatorChar + libName;
 
                                 try {
-
                                     if (mPackagingOptionsFilter == null
                                             || mPackagingOptionsFilter.checkEntry(path)) {
                                         doAddFile(lib, path);
                                     }
                                 } catch (Exception e) {
                                     mBuilder.cleanUp();
-                                    throw new PackagerException(e, "Failed to add %s", lib);
+                                    throw new PackagerException(e, FAILED_TO_ADD_S, lib);
                                 }
                             }
                         }
@@ -498,7 +494,7 @@ public final class Packager implements IArchiveBuilder {
      */
     public void sealApk() throws PackagerException, SealedPackageException {
         if (mIsSealed) {
-            throw new SealedPackageException("APK is already sealed");
+            throw new SealedPackageException(ALREADY_SEALED);
         }
 
         // Add all the merged files that are pending to be packaged.
@@ -526,6 +522,14 @@ public final class Packager implements IArchiveBuilder {
         }
     }
 
+    /**
+     * Adds a file to the APK at a given path
+     *
+     * @param file        the file to add
+     * @param archivePath the path of the file inside the APK archive.
+     * @throws IZipEntryFilter.ZipAbortException if the file should not be added.
+     * @throws IOException                       if an error occurred
+     */
     private void doAddFile(File file, String archivePath) throws IZipEntryFilter.ZipAbortException,
             IOException {
 
@@ -533,11 +537,8 @@ public final class Packager implements IArchiveBuilder {
         if (mMergeFiles.keySet().contains(archivePath)) {
             File mergingFile = mMergeFiles.get(archivePath);
             Files.createParentDirs(mergingFile);
-            FileOutputStream fos = new FileOutputStream(mMergeFiles.get(archivePath), true);
-            try {
+            try (FileOutputStream fos = new FileOutputStream(mMergeFiles.get(archivePath), true)) {
                 fos.write(Files.toByteArray(file));
-            } finally {
-                fos.close();
             }
         } else {
             if (!mNoBinaryZipFilter.checkEntry(archivePath)) {
@@ -594,7 +595,7 @@ public final class Packager implements IArchiveBuilder {
 
             File duplicate = checkFileForDuplicate(archivePath);
             if (duplicate != null) {
-                // we have a duplicate but it might be the same source file, in this case,
+                // we have a duplicate, but it might be the same source file, in this case,
                 // we just ignore the duplicate, and of course, we don't add it again.
                 File potentialDuplicate = new File(mInputFile, archivePath);
                 if (!duplicate.getAbsolutePath().equals(potentialDuplicate.getAbsolutePath())) {

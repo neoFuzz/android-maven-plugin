@@ -33,7 +33,7 @@ public abstract class AbstractPublisherMojo extends AbstractAndroidMojo {
 
     protected void initializePublisher(@NonNull String packageName) throws MojoExecutionException {
         getLog().debug("Initializing publisher");
-        if (projectName == null || projectName.equals("")) {
+        if (projectName == null || projectName.isEmpty()) {
             projectName = this.session.getCurrentProject().getName();
         }
 
@@ -90,13 +90,10 @@ public abstract class AbstractPublisherMojo extends AbstractAndroidMojo {
             getLog().warn("Play directory is missing.");
             return null;
         }
-        File[] localeDirs = listingDirectory.listFiles(new FilenameFilter() {
-            @Override
-            public boolean accept(File dir, String name) {
-                Pattern pattern = Pattern.compile(LOCALE_DIR_PATTERN);
-                Matcher matcher = pattern.matcher(name);
-                return matcher.matches();
-            }
+        File[] localeDirs = listingDirectory.listFiles((dir, name) -> {
+            Pattern pattern = Pattern.compile(LOCALE_DIR_PATTERN);
+            Matcher matcher = pattern.matcher(name);
+            return matcher.matches();
         });
 
         if (localeDirs == null || localeDirs.length == 0) {

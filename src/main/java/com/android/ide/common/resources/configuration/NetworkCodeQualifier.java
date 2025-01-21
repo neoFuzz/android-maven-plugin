@@ -16,6 +16,8 @@
 
 package com.android.ide.common.resources.configuration;
 
+import com.android.annotations.NonNull;
+
 import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -47,12 +49,13 @@ public final class NetworkCodeQualifier extends ResourceQualifier {
      * @param segment the folder segment from which to create a qualifier.
      * @return a new {@link CountryCodeQualifier} object or <code>null</code>
      */
+    @NonNull
     public static NetworkCodeQualifier getQualifier(String segment) {
         Matcher m = sNetworkCodePattern.matcher(segment);
         if (m.matches()) {
             String v = m.group(1);
 
-            int code = -1;
+            int code;
             try {
                 code = Integer.parseInt(v);
             } catch (NumberFormatException e) {
@@ -60,8 +63,7 @@ public final class NetworkCodeQualifier extends ResourceQualifier {
                 return null;
             }
 
-            NetworkCodeQualifier qualifier = new NetworkCodeQualifier(code);
-            return qualifier;
+            return new NetworkCodeQualifier(code);
         }
 
         return null;
@@ -73,6 +75,7 @@ public final class NetworkCodeQualifier extends ResourceQualifier {
      *
      * @param code the value of the qualifier, as returned by {@link #getCode()}.
      */
+    @NonNull
     public static String getFolderSegment(int code) {
         if (code != DEFAULT_CODE && code >= 1 && code <= 999) { // code is 1-3 digit.
             return String.format(Locale.US, "mnc%1$03d", code); //$NON-NLS-1$
@@ -91,6 +94,7 @@ public final class NetworkCodeQualifier extends ResourceQualifier {
     }
 
     @Override
+    @NonNull
     public String getShortName() {
         return "Network Code";
     }
@@ -116,7 +120,7 @@ public final class NetworkCodeQualifier extends ResourceQualifier {
         if (m.matches()) {
             String v = m.group(1);
 
-            int code = -1;
+            int code;
             try {
                 code = Integer.parseInt(v);
             } catch (NumberFormatException e) {
@@ -134,8 +138,8 @@ public final class NetworkCodeQualifier extends ResourceQualifier {
 
     @Override
     public boolean equals(Object qualifier) {
-        if (qualifier instanceof NetworkCodeQualifier) {
-            return mCode == ((NetworkCodeQualifier) qualifier).mCode;
+        if (qualifier instanceof NetworkCodeQualifier nc) {
+            return mCode == nc.mCode;
         }
 
         return false;
@@ -150,11 +154,13 @@ public final class NetworkCodeQualifier extends ResourceQualifier {
      * Returns the string used to represent this qualifier in the folder name.
      */
     @Override
+    @NonNull
     public String getFolderSegment() {
         return getFolderSegment(mCode);
     }
 
     @Override
+    @NonNull
     public String getShortDisplayValue() {
         if (mCode != DEFAULT_CODE) {
             return String.format("MNC %1$d", mCode);
@@ -164,6 +170,7 @@ public final class NetworkCodeQualifier extends ResourceQualifier {
     }
 
     @Override
+    @NonNull
     public String getLongDisplayValue() {
         return getShortDisplayValue();
     }

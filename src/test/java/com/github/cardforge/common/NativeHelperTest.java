@@ -45,7 +45,7 @@ public class NativeHelperTest {
         };
         apklib.setArtifactId("some-apklib");
         apklib.setGroupId("group");
-        apklib.setType(AndroidExtension.APKLIB);
+        apklib.setType(AndroidExtension.AAR);
         project.addAttachedArtifact(apklib);
 
         final DependencyGraphBuilder dependencyGraphBuilder = new DefaultDependencyGraphBuilder();

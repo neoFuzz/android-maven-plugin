@@ -22,7 +22,7 @@ import com.android.annotations.Nullable;
 import java.util.List;
 
 /**
- *
+ * Exception thrown when a command line operation fails and the output is logged.
  */
 public class LoggedErrorException extends Exception {
 

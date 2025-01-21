@@ -35,7 +35,7 @@ public interface Api01Config extends JackConfig {
      *
      * @param reporterKind   The type of reporter
      * @param reporterStream The stream where to write
-     * @throws ConfigurationException
+     * @throws ConfigurationException If there is an error in the configuration
      */
     void setReporter(@Nonnull ReporterKind reporterKind, @Nonnull OutputStream reporterStream)
             throws ConfigurationException;
@@ -44,7 +44,7 @@ public interface Api01Config extends JackConfig {
      * Sets the policy to follow when there is a collision between imported types.
      *
      * @param typeImportCollisionPolicy the collision policy for imported types
-     * @throws ConfigurationException
+     * @throws ConfigurationException If there is an error in the configuration
      */
     void setTypeImportCollisionPolicy(@Nonnull TypeCollisionPolicy typeImportCollisionPolicy)
             throws ConfigurationException;
@@ -53,7 +53,7 @@ public interface Api01Config extends JackConfig {
      * Sets the policy to follow when there is a collision between imported resources.
      *
      * @param resourceImportCollisionPolicy the collision policy for imported resources
-     * @throws ConfigurationException
+     * @throws ConfigurationException If there is an error in the configuration
      */
     void setResourceImportCollisionPolicy(
             @Nonnull ResourceCollisionPolicy resourceImportCollisionPolicy) throws ConfigurationException;
@@ -62,7 +62,7 @@ public interface Api01Config extends JackConfig {
      * Sets the Java source version.
      *
      * @param javaSourceVersion the Java source version
-     * @throws ConfigurationException
+     * @throws ConfigurationException If there is an error in the configuration
      */
     void setJavaSourceVersion(@Nonnull JavaSourceVersion javaSourceVersion)
             throws ConfigurationException;
@@ -72,7 +72,7 @@ public interface Api01Config extends JackConfig {
      * overwritten.
      *
      * @param obfuscationMappingOutputFile the obfuscation mapping output file
-     * @throws ConfigurationException
+     * @throws ConfigurationException If there is an error in the configuration
      */
     void setObfuscationMappingOutputFile(@Nonnull File obfuscationMappingOutputFile)
             throws ConfigurationException;
@@ -81,7 +81,7 @@ public interface Api01Config extends JackConfig {
      * Sets the classpath.
      *
      * @param classpath The classpath as a list
-     * @throws ConfigurationException
+     * @throws ConfigurationException If there is an error in the configuration
      */
     void setClasspath(@Nonnull List<File> classpath) throws ConfigurationException;
 
@@ -89,7 +89,7 @@ public interface Api01Config extends JackConfig {
      * Sets the Jack library files that will be imported into the output.
      *
      * @param importedJackLibraryFiles The Jack library files to import
-     * @throws ConfigurationException
+     * @throws ConfigurationException If there is an error in the configuration
      */
     void setImportedJackLibraryFiles(@Nonnull List<File> importedJackLibraryFiles)
             throws ConfigurationException;
@@ -98,7 +98,7 @@ public interface Api01Config extends JackConfig {
      * Sets the directories containing files to import into the output as meta-files.
      *
      * @param metaDirs The directories containing the meta-files
-     * @throws ConfigurationException
+     * @throws ConfigurationException If there is an error in the configuration
      */
     void setMetaDirs(@Nonnull List<File> metaDirs) throws ConfigurationException;
 
@@ -106,7 +106,7 @@ public interface Api01Config extends JackConfig {
      * Sets the directories containing files to import into the output as resources.
      *
      * @param resourceDirs The directories containing the resources
-     * @throws ConfigurationException
+     * @throws ConfigurationException If there is an error in the configuration
      */
     void setResourceDirs(@Nonnull List<File> resourceDirs) throws ConfigurationException;
 
@@ -115,7 +115,7 @@ public interface Api01Config extends JackConfig {
      * already exist.
      *
      * @param incrementalDir The directory used for incremental data
-     * @throws ConfigurationException
+     * @throws ConfigurationException If there is an error in the configuration
      */
     void setIncrementalDir(@Nonnull File incrementalDir) throws ConfigurationException;
 
@@ -124,7 +124,7 @@ public interface Api01Config extends JackConfig {
      * already exist.
      *
      * @param outputDexDir The output directory for dex files and resources
-     * @throws ConfigurationException
+     * @throws ConfigurationException If there is an error in the configuration
      */
     void setOutputDexDir(@Nonnull File outputDexDir) throws ConfigurationException;
 
@@ -133,7 +133,7 @@ public interface Api01Config extends JackConfig {
      * will be overwritten.
      *
      * @param outputJackFile The output Jack library file
-     * @throws ConfigurationException
+     * @throws ConfigurationException If there is an error in the configuration
      */
     void setOutputJackFile(@Nonnull File outputJackFile) throws ConfigurationException;
 
@@ -141,7 +141,7 @@ public interface Api01Config extends JackConfig {
      * Sets JarJar configuration files to use for repackaging.
      *
      * @param jarjarConfigFiles The JarJar configuration files
-     * @throws ConfigurationException
+     * @throws ConfigurationException If there is an error in the configuration
      */
     void setJarJarConfigFiles(@Nonnull List<File> jarjarConfigFiles) throws ConfigurationException;
 
@@ -149,7 +149,7 @@ public interface Api01Config extends JackConfig {
      * Sets ProGuard configuration files.
      *
      * @param proguardConfigFiles The ProGuard configuration files
-     * @throws ConfigurationException
+     * @throws ConfigurationException If there is an error in the configuration
      */
     void setProguardConfigFiles(@Nonnull List<File> proguardConfigFiles)
             throws ConfigurationException;
@@ -158,7 +158,7 @@ public interface Api01Config extends JackConfig {
      * Set how much debug info should be emitted.
      *
      * @param debugInfoLevel The level of debug info to emit
-     * @throws ConfigurationException
+     * @throws ConfigurationException If there is an error in the configuration
      */
     void setDebugInfoLevel(@Nonnull DebugInfoLevel debugInfoLevel) throws ConfigurationException;
 
@@ -166,7 +166,7 @@ public interface Api01Config extends JackConfig {
      * Sets whether to allow splitting the output in several dex files, and which method to use.
      *
      * @param multiDexKind the multidex kind
-     * @throws ConfigurationException
+     * @throws ConfigurationException If there is an error in the configuration
      */
     void setMultiDexKind(@Nonnull MultiDexKind multiDexKind) throws ConfigurationException;
 
@@ -174,7 +174,7 @@ public interface Api01Config extends JackConfig {
      * Sets the verbosity level.
      *
      * @param verbosityLevel the verbosity level
-     * @throws ConfigurationException
+     * @throws ConfigurationException If there is an error in the configuration
      */
     void setVerbosityLevel(@Nonnull VerbosityLevel verbosityLevel) throws ConfigurationException;
 
@@ -182,7 +182,7 @@ public interface Api01Config extends JackConfig {
      * Sets the class names of the annotation processors to run.
      *
      * @param processorNames Annotation processor class names
-     * @throws ConfigurationException
+     * @throws ConfigurationException If there is an error in the configuration
      */
     void setProcessorNames(@Nonnull List<String> processorNames) throws ConfigurationException;
 
@@ -190,7 +190,7 @@ public interface Api01Config extends JackConfig {
      * Sets the path where to find annotation processors.
      *
      * @param processorPath The processor path as a list
-     * @throws ConfigurationException
+     * @throws ConfigurationException If there is an error in the configuration
      */
     void setProcessorPath(@Nonnull List<File> processorPath) throws ConfigurationException;
 
@@ -198,7 +198,7 @@ public interface Api01Config extends JackConfig {
      * Sets options for the annotation processors.
      *
      * @param processorOptions The processor options as a map
-     * @throws ConfigurationException
+     * @throws ConfigurationException If there is an error in the configuration
      */
     void setProcessorOptions(@Nonnull Map<String, String> processorOptions)
             throws ConfigurationException;
@@ -207,7 +207,7 @@ public interface Api01Config extends JackConfig {
      * Sets the Java source files entries to compile.
      *
      * @param sourceEntries The source entries
-     * @throws ConfigurationException
+     * @throws ConfigurationException If there is an error in the configuration
      */
     void setSourceEntries(@Nonnull Collection<File> sourceEntries) throws ConfigurationException;
 
@@ -216,7 +216,7 @@ public interface Api01Config extends JackConfig {
      *
      * @param key   The name of the property
      * @param value The value to set the property to
-     * @throws ConfigurationException
+     * @throws ConfigurationException If there is an error in the configuration
      */
     void setProperty(@Nonnull String key, @Nonnull String value) throws ConfigurationException;
 
@@ -224,7 +224,7 @@ public interface Api01Config extends JackConfig {
      * Creates an instance of the {@link Api01CompilationTask} according to this configuration.
      *
      * @return The {@link Api01CompilationTask}
-     * @throws ConfigurationException
+     * @throws ConfigurationException If there is an error in the configuration
      */
     @Nonnull
     Api01CompilationTask getTask() throws ConfigurationException;

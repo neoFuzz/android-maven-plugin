@@ -47,7 +47,7 @@ public interface ISystemImage extends Comparable<ISystemImage> {
     IdDisplay getTag();
 
     /**
-     * Returns the vendor for an add-on's system image, or null for a platform system-image.
+     * Returns the vendor for an addon's system image, or null for a platform system-image.
      */
     @Nullable
     IdDisplay getAddonVendor();
@@ -82,7 +82,7 @@ public interface ISystemImage extends Comparable<ISystemImage> {
          */
         IN_LEGACY_FOLDER,
         /**
-         * The system image is located in a sub-directory of the platform's
+         * The system image is located in a subdirectory of the platform's
          * {@link SdkConstants#FD_IMAGES} folder, allowing for multiple system
          * images within the platform.
          * <p/>

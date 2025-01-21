@@ -16,6 +16,7 @@
 
 package com.android.ide.common.resources.configuration;
 
+import com.android.annotations.NonNull;
 import com.android.resources.ResourceEnum;
 import com.android.resources.ScreenOrientation;
 
@@ -50,6 +51,7 @@ public final class ScreenOrientationQualifier extends EnumBasedResourceQualifier
     }
 
     @Override
+    @NonNull
     public String getShortName() {
         return "Orientation";
     }
@@ -69,5 +71,16 @@ public final class ScreenOrientationQualifier extends EnumBasedResourceQualifier
         }
 
         return false;
+    }
+
+    @Override
+    public boolean equals(Object qualifier) {
+        return qualifier instanceof ScreenOrientationQualifier s &&
+                s.mValue == mValue;
+    }
+
+    @Override
+    public int hashCode() {
+        return mValue.hashCode();
     }
 }

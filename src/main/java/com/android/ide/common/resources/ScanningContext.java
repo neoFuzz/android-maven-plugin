@@ -61,7 +61,7 @@ public class ScanningContext {
      */
     public void addError(@NonNull String error) {
         if (mErrors == null) {
-            mErrors = new ArrayList<String>();
+            mErrors = new ArrayList<>();
         }
         mErrors.add(error);
     }

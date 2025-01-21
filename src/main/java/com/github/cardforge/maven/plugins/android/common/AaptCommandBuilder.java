@@ -1,5 +1,6 @@
 package com.github.cardforge.maven.plugins.android.common;
 
+import com.android.annotations.NonNull;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.plugin.logging.Log;
 
@@ -20,9 +21,12 @@ public class AaptCommandBuilder {
     protected final List<String> commands;
     protected final Log log;
 
+    /**
+     * @param log instance of {@link Log} to use for logging
+     */
     protected AaptCommandBuilder(Log log) {
         this.log = log;
-        this.commands = new ArrayList<String>();
+        this.commands = new ArrayList<>();
     }
 
     /**
@@ -30,26 +34,31 @@ public class AaptCommandBuilder {
      *
      * @return instance of {@link AaptPackageCommandBuilder}
      */
+    @NonNull
     public static AaptPackageCommandBuilder packageResources(Log log) {
         return new AaptPackageCommandBuilder(log);
     }
 
     /**
-     * Dump label, icon, permissions, compiled xmls etc.
+     * Dump label, icon, permissions, compiled XMLs etc.
      *
      * @return instance of {@link AaptDumpCommandBuilder}
      */
-    public static final AaptDumpCommandBuilder dump(Log log) {
+    @NonNull
+    public static AaptDumpCommandBuilder dump(Log log) {
         return new AaptDumpCommandBuilder(log);
     }
 
+    /**
+     * @return commands as a string.
+     */
     @Override
     public String toString() {
         return commands.toString();
     }
 
     /**
-     * Provides unmodifiable list of a aapt commands
+     * Provides unmodifiable list of aapt commands
      *
      * @return unmodifiable {@link List} of {@link String} commands
      */
@@ -58,7 +67,7 @@ public class AaptCommandBuilder {
     }
 
     /**
-     * Class that responsible for building appt commands for packaging resources
+     * Class that responsible for building aapt commands for packaging resources
      */
     public static final class AaptPackageCommandBuilder extends AaptCommandBuilder {
         public AaptPackageCommandBuilder(Log log) {
@@ -67,7 +76,7 @@ public class AaptCommandBuilder {
         }
 
         /**
-         * Make the resources ID non constant.
+         * Make the resources ID non-constant.
          * <p>
          * This is required to make an R java class
          * that does not contain the final value but is used to make reusable compiled
@@ -80,13 +89,13 @@ public class AaptCommandBuilder {
         }
 
         /**
-         * Make the resources ID non constant.
+         * Make the resources ID non-constant.
          * <p>
          * This is required to make an R java class
          * that does not contain the final value but is used to make reusable compiled
          * libraries that need to access resources.
          *
-         * @param make if true make resources ID non constant, otherwise ignore
+         * @param make if true make resources ID non-constant, otherwise ignore
          * @return current instance of {@link AaptPackageCommandBuilder}
          */
         public AaptPackageCommandBuilder makeResourcesNonConstant(boolean make) {
@@ -113,7 +122,7 @@ public class AaptCommandBuilder {
          * @param path path to resource constants folder.
          * @return current instance of {@link AaptCommandBuilder}
          */
-        public AaptPackageCommandBuilder setResourceConstantsFolder(File path) {
+        public AaptPackageCommandBuilder setResourceConstantsFolder(@NonNull File path) {
             commands.add("-J");
             commands.add(path.getAbsolutePath());
             return this;
@@ -139,7 +148,7 @@ public class AaptCommandBuilder {
          * @param path Path to AndroidManifest.xml
          * @return current instance of {@link AaptCommandBuilder}
          */
-        public AaptPackageCommandBuilder setPathToAndroidManifest(File path) {
+        public AaptPackageCommandBuilder setPathToAndroidManifest(@NonNull File path) {
             commands.add("-M");
             commands.add(path.getAbsolutePath());
             return this;
@@ -226,7 +235,7 @@ public class AaptCommandBuilder {
          * @param path Path to existing package to add.
          * @return current instance of {@link AaptCommandBuilder}
          */
-        public AaptPackageCommandBuilder addExistingPackageToBaseIncludeSet(File path) {
+        public AaptPackageCommandBuilder addExistingPackageToBaseIncludeSet(@NonNull File path) {
             commands.add("-I");
             commands.add(path.getAbsolutePath());
             return this;
@@ -245,7 +254,7 @@ public class AaptCommandBuilder {
          * <li>port,land,en_US</li></ul>
          *
          * <p>If you put the special locale, zz_ZZ on the list, it will perform
-         * pseudolocalization on the default locale, modifying all of the
+         * pseudo-localization on the default locale, modifying all the
          * strings so you can look for strings that missed the
          * internationalization process.
          * <p>For example:<ul>
@@ -296,7 +305,7 @@ public class AaptCommandBuilder {
          * @param folderForR folder in which text file will be generated
          * @return current instance of {@link AaptCommandBuilder}
          */
-        public AaptPackageCommandBuilder generateRTextFile(File folderForR) {
+        public AaptPackageCommandBuilder generateRTextFile(@NonNull File folderForR) {
             commands.add("--output-text-symbols");
             commands.add(folderForR.getAbsolutePath());
             return this;
@@ -327,7 +336,7 @@ public class AaptCommandBuilder {
          *
          * @return current instance of {@link AaptCommandBuilder}
          */
-        public AaptPackageCommandBuilder setOutputApkFile(File outputFile) {
+        public AaptPackageCommandBuilder setOutputApkFile(@NonNull File outputFile) {
             commands.add("-F");
             commands.add(outputFile.getAbsolutePath());
             return this;
@@ -410,7 +419,7 @@ public class AaptCommandBuilder {
         }
 
         /**
-         * Print the compiled xmls in the given assets.
+         * Print the compiled XMLs in the given assets.
          *
          * @return current instance of {@link AaptDumpCommandBuilder}
          */

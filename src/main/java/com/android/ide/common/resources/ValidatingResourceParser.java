@@ -35,7 +35,7 @@ import java.io.InputStream;
  */
 public class ValidatingResourceParser {
     private final boolean mIsFramework;
-    private ScanningContext mContext;
+    private final ScanningContext mContext;
 
     /**
      * Creates a new {@link ValidatingResourceParser}
@@ -123,7 +123,7 @@ public class ValidatingResourceParser {
         }
     }
 
-    private boolean parse(String path, KXmlParser parser)
+    private boolean parse(String path, @NonNull KXmlParser parser)
             throws XmlPullParserException, IOException {
         boolean checkForErrors = !mIsFramework && !mContext.needsFullAapt();
 

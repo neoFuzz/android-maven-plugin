@@ -29,6 +29,7 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
 import java.io.File;
+import java.io.Serial;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Map;
@@ -43,15 +44,16 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * do not contain any flavors.
  */
 public class DefaultProductFlavor extends BaseConfigImpl implements ProductFlavor {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     private final String mName;
     @Nullable
     private String mDimension;
     @Nullable
-    private ApiVersion mMinSdkVersion;
+    private transient ApiVersion mMinSdkVersion;
     @Nullable
-    private ApiVersion mTargetSdkVersion;
+    private transient ApiVersion mTargetSdkVersion;
     @Nullable
     private Integer mMaxSdkVersion;
     @Nullable
@@ -77,7 +79,7 @@ public class DefaultProductFlavor extends BaseConfigImpl implements ProductFlavo
     @Nullable
     private Boolean mTestFunctionalTest;
     @Nullable
-    private SigningConfig mSigningConfig;
+    private transient SigningConfig mSigningConfig;
     @Nullable
     private Set<String> mResourceConfiguration;
 
@@ -468,7 +470,7 @@ public class DefaultProductFlavor extends BaseConfigImpl implements ProductFlavo
      * Test instrumentation runner custom arguments.
      * <p>
      * e.g. <code>[key: "value"]</code> will give
-     * <code>adb shell am instrument -w <b>-e key value</b> com.example</code>...".
+     * <code>adb shell am instrument -w <b>-e key value</b> com.example</code>...
      *
      * <p>See <a href="http://developer.android.com/guide/topics/manifest/instrumentation-element.html">
      * instrumentation</a>.

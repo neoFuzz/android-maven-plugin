@@ -38,6 +38,7 @@ public class MavenErrorReporter extends ErrorReporter implements MessageReceiver
     }
 
     @NonNull
+    @Override
     public EvaluationMode getMode() {
         return mMode;
     }
@@ -52,11 +53,7 @@ public class MavenErrorReporter extends ErrorReporter implements MessageReceiver
         return new SyncIssueImpl(0, type, data, msg);
     }
 
-    public boolean hasSyncIssue(int i) {
-        return false;
-    }
-
-    public void receiveMessage(Message message) {
+    public void receiveMessage(@NonNull Message message) {
         logger.info(message.toString());
     }
 
@@ -91,6 +88,7 @@ class SyncIssueImpl implements SyncIssue {
     }
 
     @Override
+    @NonNull
     public String getMessage() {
         return message;
     }

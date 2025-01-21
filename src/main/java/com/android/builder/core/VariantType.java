@@ -22,7 +22,7 @@ import com.android.builder.model.ArtifactMetaData;
 import com.google.common.collect.ImmutableList;
 
 /**
- * Type of a variant.
+ * Type of variant.
  */
 public enum VariantType {
     DEFAULT,
@@ -77,6 +77,7 @@ public enum VariantType {
         this.isSingleBuildType = isSingleBuildType;
     }
 
+    @NonNull
     public static ImmutableList<VariantType> getTestingTypes() {
         ImmutableList.Builder<VariantType> result = ImmutableList.builder();
         for (VariantType variantType : values()) {

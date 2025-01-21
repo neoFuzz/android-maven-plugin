@@ -77,26 +77,25 @@ public class MergingReport {
      * dumps all logging records to a logger.
      */
     public void log(@NonNull ILogger logger) {
-        for (Record record : records) {
-            switch (record.mSeverity) {
+        for (Record rec : records) {
+            switch (rec.mSeverity) {
                 case WARNING:
-                    logger.warning(record.toString());
+                    logger.warning(rec.toString());
                     break;
                 case ERROR:
-                    logger.error(null /* throwable */, record.toString());
+                    logger.error(null /* throwable */, rec.toString());
                     break;
                 case INFO:
-                    logger.verbose(record.toString());
+                    logger.verbose(rec.toString());
                     break;
                 default:
-                    logger.error(null /* throwable */, "Unhandled record type " + record.mSeverity);
+                    logger.error(null /* throwable */, "Unhandled record type " + rec.mSeverity);
             }
         }
         actions.log(logger);
 
         if (!result.isSuccess()) {
-            logger.warning("\nSee http://g.co/androidstudio/manifest-merger for more information"
-                    + " about the manifest merger.\n");
+            logger.warning("\nSee http://g.co/androidstudio/manifest-merger for more information about the manifest merger.\n");
         }
     }
 
@@ -137,20 +136,16 @@ public class MergingReport {
 
     @NonNull
     public String getReportString() {
-        switch (result) {
-            case SUCCESS:
-                return "Manifest merger executed successfully";
-            case WARNING:
-                return records.size() > 1
-                        ? "Manifest merger exited with warnings, see logs"
-                        : "Manifest merger warning : " + records.get(0).mLog;
-            case ERROR:
-                return records.size() > 1
-                        ? "Manifest merger failed with multiple errors, see logs"
-                        : "Manifest merger failed : " + records.get(0).mLog;
-            default:
-                return "Manifest merger returned an invalid result " + result;
-        }
+        return switch (result) {
+            case SUCCESS -> "Manifest merger executed successfully";
+            case WARNING -> records.size() > 1
+                    ? "Manifest merger exited with warnings, see logs"
+                    : "Manifest merger warning : " + records.get(0).mLog;
+            case ERROR -> records.size() > 1
+                    ? "Manifest merger failed with multiple errors, see logs"
+                    : "Manifest merger failed : " + records.get(0).mLog;
+            default -> "Manifest merger returned an invalid result " + result;
+        };
     }
 
     @NonNull
@@ -244,7 +239,7 @@ public class MergingReport {
         @NonNull
         @Override
         public String toString() {
-            return mSourceLocation.toString() // needs short string.
+            return mSourceLocation // needs short string.
                     + " "
                     + CaseFormat.UPPER_UNDERSCORE.to(CaseFormat.UPPER_CAMEL, mSeverity.toString())
                     + ":\n\t"
@@ -261,24 +256,24 @@ public class MergingReport {
      * Once the merging is finished, the {@link #build()} is called to return an immutable version
      * of itself with all the logging, action recordings and xml files obtainable.
      */
-    static class Builder {
+    public static class Builder {
 
         @NonNull
         private final ILogger mLogger;
         @Nullable
         private final ManifestMerger2 mManifestMerger;
-        private Map<MergedManifestKind, String> mergedDocuments =
-                new EnumMap<MergedManifestKind, String>(MergedManifestKind.class);
-        private Map<MergedManifestKind, XmlDocument> mergedXmlDocuments =
-                new EnumMap<MergedManifestKind, XmlDocument>(MergedManifestKind.class);
+        private final Map<MergedManifestKind, String> mergedDocuments =
+                new EnumMap<>(MergedManifestKind.class);
+        private final Map<MergedManifestKind, XmlDocument> mergedXmlDocuments =
+                new EnumMap<>(MergedManifestKind.class);
         @NonNull
-        private ImmutableList.Builder<Record> mRecordBuilder = new ImmutableList.Builder<Record>();
+        private final ImmutableList.Builder<Record> mRecordBuilder = new ImmutableList.Builder<>();
         @NonNull
-        private ImmutableList.Builder<String> mIntermediaryStages = new ImmutableList.Builder<String>();
+        private final ImmutableList.Builder<String> mIntermediaryStages = new ImmutableList.Builder<>();
+        @NonNull
+        private final ActionRecorder mActionRecorder = new ActionRecorder();
         private boolean mHasWarnings = false;
         private boolean mHasErrors = false;
-        @NonNull
-        private ActionRecorder mActionRecorder = new ActionRecorder();
         private String packageName;
 
         @VisibleForTesting
@@ -329,13 +324,11 @@ public class MergingReport {
         Builder addMessage(@NonNull SourceFilePosition sourceFilePosition,
                            @NonNull Record.Severity severity,
                            @NonNull String message) {
-            switch (severity) {
-                case ERROR:
-                    mHasErrors = true;
-                    break;
-                case WARNING:
-                    mHasWarnings = true;
-                    break;
+            if (severity == Record.Severity.ERROR) {
+                mHasErrors = true;
+            }
+            if (severity == Record.Severity.WARNING) {
+                mHasWarnings = true;
             }
             mRecordBuilder.add(new Record(sourceFilePosition, severity, message));
             return this;

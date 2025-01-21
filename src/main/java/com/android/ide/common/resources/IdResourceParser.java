@@ -40,7 +40,7 @@ import java.io.InputStream;
 public class IdResourceParser {
     private final IValueResourceRepository mRepository;
     private final boolean mIsFramework;
-    private ScanningContext mContext;
+    private final ScanningContext mContext;
 
     /**
      * Creates a new {@link IdResourceParser}
@@ -114,7 +114,7 @@ public class IdResourceParser {
         }
     }
 
-    private boolean parse(ResourceType type, String path, KXmlParser parser)
+    private boolean parse(ResourceType type, String path, @NonNull KXmlParser parser) // NOSONAR
             throws XmlPullParserException, IOException {
         boolean valid = true;
         boolean checkForErrors = !mIsFramework && !mContext.needsFullAapt();

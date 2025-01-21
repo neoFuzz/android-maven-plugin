@@ -32,9 +32,9 @@ public abstract class MergeWriter<I extends DataItem> implements MergeConsumer<I
     @NonNull
     private final WaitableExecutor<Void> mExecutor;
 
-    public MergeWriter(@NonNull File rootFolder) {
+    protected MergeWriter(@NonNull File rootFolder) {
         mRootFolder = rootFolder;
-        mExecutor = new WaitableExecutor<Void>();
+        mExecutor = new WaitableExecutor<>();
     }
 
     @Override
@@ -57,7 +57,7 @@ public abstract class MergeWriter<I extends DataItem> implements MergeConsumer<I
     /**
      * Called after all the items have been added/removed. This is called by {@link #end()}.
      *
-     * @throws ConsumerException
+     * @throws ConsumerException if an error occurred.
      */
     protected void postWriteAction() throws ConsumerException {
     }

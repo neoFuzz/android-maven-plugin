@@ -16,10 +16,10 @@
  */
 package com.github.cardforge.maven.plugins.android.standalonemojos;
 
+import com.android.annotations.NonNull;
 import com.android.ddmlib.*;
 import com.android.ddmlib.FileListingService.FileEntry;
 import com.github.cardforge.maven.plugins.android.AbstractAndroidMojo;
-import com.github.cardforge.maven.plugins.android.DeviceCallback;
 import com.github.cardforge.maven.plugins.android.common.DeviceHelper;
 import com.github.cardforge.maven.plugins.android.common.LogSyncProgressMonitor;
 import com.github.cardforge.maven.plugins.android.config.ConfigHandler;
@@ -42,6 +42,7 @@ import java.io.IOException;
  *
  * @author Manfred Moser - manfred@simpligility.com
  */
+@SuppressWarnings("unused") // maven goal
 @Mojo(name = "pull", requiresProject = false)
 public class PullMojo extends AbstractAndroidMojo {
 
@@ -80,7 +81,7 @@ public class PullMojo extends AbstractAndroidMojo {
      * The path of the destination to copy the file to.
      * <p>
      * If destination ends with {@link File#separator}, it is supposed to be a
-     * directory. Therefore the source - whether it refers to a file or
+     * directory. Therefore, the source - whether it refers to a file or
      * directory - will be copied into the destination directory.
      * <p>
      * If destination does not end with {@link File#separator}, the last path
@@ -100,77 +101,69 @@ public class PullMojo extends AbstractAndroidMojo {
         ConfigHandler configHandler = new ConfigHandler(this, this.session, this.execution);
         configHandler.parseConfiguration();
 
-        doWithDevices(new DeviceCallback() {
-            public void doWithDevice(final IDevice device) throws MojoExecutionException {
-                String deviceLogLinePrefix = DeviceHelper.getDeviceLogLinePrefix(device);
+        doWithDevices(device -> {
+            String deviceLogLinePrefix = DeviceHelper.getDeviceLogLinePrefix(device);
 
-                // message will be set later according to the processed files
-                String message = "";
-                try {
-                    SyncService syncService = device.getSyncService();
-                    FileListingService fileListingService = device.getFileListingService();
+            // message will be set later according to the processed files
+            String message = "";
+            try {
+                SyncService syncService = device.getSyncService();
+                FileListingService fileListingService = device.getFileListingService();
 
-                    FileEntry sourceFileEntry = getFileEntry(parsedSource, fileListingService);
+                FileEntry sourceFileEntry = getFileEntry(parsedSource, fileListingService);
 
-                    if (sourceFileEntry.isDirectory()) {
-                        // pulling directory
-                        File destinationDir = new File(parsedDestination);
-                        if (!destinationDir.exists()) {
-                            getLog().info("Creating destination directory " + destinationDir);
-                            destinationDir.mkdirs();
-                            destinationDir.mkdir();
-                        }
-                        String destinationDirPath = destinationDir.getAbsolutePath();
+                if (sourceFileEntry.isDirectory()) {
+                    // pulling directory
+                    File destinationDir = new File(parsedDestination);
+                    if (!destinationDir.exists()) {
+                        getLog().info("Creating destination directory " + destinationDir);
+                        destinationDir.mkdirs();
+                        destinationDir.mkdir();
+                    }
+                    String destinationDirPath = destinationDir.getAbsolutePath();
 
-                        FileEntry[] fileEntries;
-                        if (parsedDestination.endsWith(File.separator)) {
-                            // pull source directory directly
-                            fileEntries = new FileEntry[]{sourceFileEntry};
-                        } else {
-                            // pull the children of source directory only
-                            fileEntries = fileListingService.getChildren(sourceFileEntry, true, null);
-                        }
-
-                        message = deviceLogLinePrefix + "Pull of " + parsedSource + " to " + destinationDirPath
-                                + " from ";
-
-                        syncService.pull(fileEntries, destinationDirPath, new LogSyncProgressMonitor(getLog()));
+                    FileEntry[] fileEntries;
+                    if (parsedDestination.endsWith(File.separator)) {
+                        // pull source directory directly
+                        fileEntries = new FileEntry[]{sourceFileEntry};
                     } else {
-                        // pulling file
-                        File parentDir = new File(FilenameUtils.getFullPath(parsedDestination));
-                        if (!parentDir.exists()) {
-                            getLog().info(deviceLogLinePrefix + "Creating destination directory " + parentDir);
-                            parentDir.mkdirs();
-                        }
-
-                        String destinationFileName;
-                        if (parsedDestination.endsWith(File.separator)) {
-                            // keep original filename
-                            destinationFileName = FilenameUtils.getName(parsedSource);
-                        } else {
-                            // rename filename
-                            destinationFileName = FilenameUtils.getName(parsedDestination);
-                        }
-
-                        File destinationFile = new File(parentDir, destinationFileName);
-                        String destinationFilePath = destinationFile.getAbsolutePath();
-                        message = deviceLogLinePrefix + "Pull of " + parsedSource + " to " + destinationFilePath
-                                + " from " + DeviceHelper.getDescriptiveName(device);
-
-                        syncService.pullFile(sourceFileEntry, destinationFilePath,
-                                new LogSyncProgressMonitor(getLog()));
+                        // pull the children of source directory only
+                        fileEntries = fileListingService.getChildren(sourceFileEntry, true, null);
                     }
 
-                    getLog().info(message + " successful.");
-                } catch (SyncException e) {
-                    throw new MojoExecutionException(message + " failed.", e);
-                } catch (IOException e) {
-                    throw new MojoExecutionException(message + " failed.", e);
-                } catch (TimeoutException e) {
-                    throw new MojoExecutionException(message + " failed.", e);
-                } catch (AdbCommandRejectedException e) {
-                    throw new MojoExecutionException(message + " failed.", e);
+                    message = deviceLogLinePrefix + "Pull of " + parsedSource + " to " + destinationDirPath
+                            + " from ";
+
+                    syncService.pull(fileEntries, destinationDirPath, new LogSyncProgressMonitor(getLog()));
+                } else {
+                    // pulling file
+                    File parentDir = new File(FilenameUtils.getFullPath(parsedDestination));
+                    if (!parentDir.exists()) {
+                        getLog().info(deviceLogLinePrefix + "Creating destination directory " + parentDir);
+                        parentDir.mkdirs();
+                    }
+
+                    String destinationFileName;
+                    if (parsedDestination.endsWith(File.separator)) {
+                        // keep original filename
+                        destinationFileName = FilenameUtils.getName(parsedSource);
+                    } else {
+                        // rename filename
+                        destinationFileName = FilenameUtils.getName(parsedDestination);
+                    }
+
+                    File destinationFile = new File(parentDir, destinationFileName);
+                    String destinationFilePath = destinationFile.getAbsolutePath();
+                    message = deviceLogLinePrefix + "Pull of " + parsedSource + " to " + destinationFilePath
+                            + " from " + DeviceHelper.getDescriptiveName(device);
+
+                    syncService.pullFile(sourceFileEntry, destinationFilePath,
+                            new LogSyncProgressMonitor(getLog()));
                 }
+
+                getLog().info(message + " successful.");
+            } catch (SyncException | IOException | TimeoutException | AdbCommandRejectedException e) {
+                throw new MojoExecutionException(message + " failed.", e);
             }
         });
     }
@@ -188,7 +181,7 @@ public class PullMojo extends AbstractAndroidMojo {
      * @return a {@link FileEntry} object for the given file path
      * @throws MojoExecutionException if the file path could not be found on the device
      */
-    private FileEntry getFileEntry(String filePath, FileListingService fileListingService)
+    private FileEntry getFileEntry(@NonNull String filePath, FileListingService fileListingService)
             throws MojoExecutionException {
         // static resolution of symlink
         if (filePath.startsWith("/sdcard")) {

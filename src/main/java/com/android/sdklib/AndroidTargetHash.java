@@ -28,28 +28,29 @@ import java.util.List;
  * Helper methods to manipulate hash strings used by {@link IAndroidTarget#hashString()}.
  */
 public abstract class AndroidTargetHash {
-
     /**
      * Prefix used to build hash strings for platform targets
      *
      * @see SdkManager#getTargetFromHashString(String)
      */
     public static final String PLATFORM_HASH_PREFIX = "android-";
-
     /**
      * String to compute hash for add-on targets. <br/>
      * Format is {@code vendor:name:apiVersion}. <br/>
      *
-     * <em>Important<em/>: the vendor and name compontents are the display strings, not the
+     * <em>Important<em/>: the vendor and name components are the display strings, not the
      * newer id strings.
      */
     public static final String ADD_ON_FORMAT = "%s:%s:%s"; //$NON-NLS-1$
-
     /**
      * String used to get a hash to the platform target.
      * This format is compatible with the PlatformPackage.installId().
      */
     static final String PLATFORM_HASH = PLATFORM_HASH_PREFIX + "%s";
+
+    private AndroidTargetHash() {
+        // not instantiable
+    }
 
     /**
      * Returns the hash string for a given platform version.
@@ -82,24 +83,31 @@ public abstract class AndroidTargetHash {
                         int api = Integer.parseInt(suffix);
                         return new AndroidVersion(api, null);
                     } catch (NumberFormatException ignore) {
+                        // Not a number, must be a code name.
                     }
                 } else {
-                    int api = SdkVersionInfo.getApiByBuildCode(suffix, false);
-                    if (api < 1) {
-                        api = 1;
-                    }
+                    int api = Math.max(SdkVersionInfo.getApiByBuildCode(suffix, false), 1);
                     return new AndroidVersion(api, suffix);
                 }
             }
-        } else if (!hashString.isEmpty() && Character.isDigit(hashString.charAt(0))) {
+        } else {
+            return checkAndroidVersion(hashString);
+        }
+
+        return null;
+    }
+
+    @Nullable
+    private static AndroidVersion checkAndroidVersion(@NonNull String hashString) {
+        if (!hashString.isEmpty() && Character.isDigit(hashString.charAt(0))) {
             // For convenience, interpret a single integer as the proper "android-NN" form.
             try {
                 int api = Integer.parseInt(hashString);
                 return new AndroidVersion(api, null);
             } catch (NumberFormatException ignore) {
+                // Not a number, must be a code name.
             }
         }
-
         return null;
     }
 

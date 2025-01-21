@@ -16,6 +16,9 @@
 
 package com.android.ide.common.resources.configuration;
 
+import com.android.annotations.NonNull;
+import com.android.annotations.Nullable;
+
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -29,7 +32,7 @@ public final class ScreenHeightQualifier extends ResourceQualifier {
      */
     static final int DEFAULT_SIZE = -1;
     private static final Pattern sParsePattern = Pattern.compile("^h(\\d+)dp$");//$NON-NLS-1$
-    private static final String sPrintPattern = "h%1$ddp";
+    private static final String S_PRINT_PATTERN = "h%1$ddp";
     private int mValue = DEFAULT_SIZE;
 
     public ScreenHeightQualifier() {
@@ -40,6 +43,7 @@ public final class ScreenHeightQualifier extends ResourceQualifier {
         mValue = value;
     }
 
+    @Nullable
     public static ScreenHeightQualifier getQualifier(String value) {
         try {
             int dp = Integer.parseInt(value);
@@ -49,6 +53,7 @@ public final class ScreenHeightQualifier extends ResourceQualifier {
             return qualifier;
 
         } catch (NumberFormatException e) {
+            // Ignored
         }
 
         return null;
@@ -102,8 +107,8 @@ public final class ScreenHeightQualifier extends ResourceQualifier {
     @Override
     public boolean isMatchFor(ResourceQualifier qualifier) {
         // this is the match only of the current dp value is lower or equal to the
-        if (qualifier instanceof ScreenHeightQualifier) {
-            return mValue <= ((ScreenHeightQualifier) qualifier).mValue;
+        if (qualifier instanceof ScreenHeightQualifier s) {
+            return mValue <= s.mValue;
         }
 
         return false;
@@ -126,17 +131,19 @@ public final class ScreenHeightQualifier extends ResourceQualifier {
             return true;
         } else {
             // get the qualifier that has the width that is the closest to the reference, but not
-            // above. (which is guaranteed when this is called as isMatchFor is called first.
+            // above. which is guaranteed when this is called as isMatchFor is called first.
             return mValue > compareQ.mValue;
         }
     }
 
     @Override
+    @NonNull
     public String getFolderSegment() {
-        return String.format(sPrintPattern, mValue);
+        return String.format(S_PRINT_PATTERN, mValue);
     }
 
     @Override
+    @NonNull
     public String getShortDisplayValue() {
         if (isValid()) {
             return getFolderSegment();
@@ -146,12 +153,9 @@ public final class ScreenHeightQualifier extends ResourceQualifier {
     }
 
     @Override
+    @NonNull
     public String getLongDisplayValue() {
-        if (isValid()) {
-            return getFolderSegment();
-        }
-
-        return ""; //$NON-NLS-1$
+        return getShortDisplayValue();
     }
 
 
@@ -172,9 +176,6 @@ public final class ScreenHeightQualifier extends ResourceQualifier {
             return false;
         }
         ScreenHeightQualifier other = (ScreenHeightQualifier) obj;
-        if (mValue != other.mValue) {
-            return false;
-        }
-        return true;
+        return mValue == other.mValue;
     }
 }

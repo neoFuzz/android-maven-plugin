@@ -16,6 +16,7 @@
 
 package com.android.ide.common.resources;
 
+import com.android.annotations.NonNull;
 import com.android.ide.common.rendering.api.DensityBasedResourceValue;
 import com.android.ide.common.rendering.api.ResourceValue;
 import com.android.ide.common.resources.configuration.DensityQualifier;
@@ -46,7 +47,7 @@ public class SingleResourceFile extends ResourceFile {
 
     private final String mResourceName;
     private final ResourceType mType;
-    private ResourceValue mValue;
+    private final ResourceValue mValue;
 
     public SingleResourceFile(IAbstractFile file, ResourceFolder folder) {
         super(file, folder);
@@ -76,7 +77,7 @@ public class SingleResourceFile extends ResourceFile {
     }
 
     @Override
-    protected void load(ScanningContext context) {
+    protected void load(@NonNull ScanningContext context) {
         // get a resource item matching the given type and name
         ResourceItem item = getRepository().getResourceItem(mType, mResourceName);
 
@@ -98,7 +99,7 @@ public class SingleResourceFile extends ResourceFile {
     }
 
     @Override
-    protected void dispose(ScanningContext context) {
+    protected void dispose(@NonNull ScanningContext context) {
         // only remove this file from the existing ResourceItem.
         getFolder().getRepository().removeFile(mType, this);
 
@@ -106,7 +107,7 @@ public class SingleResourceFile extends ResourceFile {
         context.requestFullAapt();
 
         // don't need to touch the content, it'll get reclaimed as this objects disappear.
-        // In the mean time other objects may need to access it.
+        // In the meantime, other objects may need to access it.
     }
 
     @Override
@@ -153,7 +154,7 @@ public class SingleResourceFile extends ResourceFile {
      * @return true if parsing succeeds and false if it fails
      */
     private boolean validateAttributes(ScanningContext context) {
-        // We only need to check if it's a non-framework file (and an XML file; skip .png's)
+        // We only need to check if it's a non-framework file (and an XML file; skip .png files)
         if (!isFramework() && SdkUtils.endsWith(getFile().getName(), DOT_XML)) {
             ValidatingResourceParser parser = new ValidatingResourceParser(context, false);
             try {

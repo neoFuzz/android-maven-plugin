@@ -130,7 +130,7 @@ public class SdkManager {
      * since we last loaded the SDK. This does not reload the SDK nor does it
      * change the underlying targets.
      *
-     * @return True if at least one directory or source.prop has changed.
+     * @return True if at least one directory or {@code source.prop} has changed.
      */
     public boolean hasChanged() {
         return hasChanged(null);
@@ -142,7 +142,7 @@ public class SdkManager {
      * change the underlying targets.
      *
      * @param log An optional logger used to print verbose info on what changed. Can be null.
-     * @return True if at least one directory or source.prop has changed.
+     * @return True if at least one directory or {@code source.prop} has changed.
      */
     public boolean hasChanged(@Nullable ILogger log) {
         return mLocalSdk.hasChanged(EnumSet.of(PkgType.PKG_PLATFORM,
@@ -175,13 +175,15 @@ public class SdkManager {
 
     /**
      * Returns an unmodifiable set of known build-tools revisions. Can be empty but not null.
-     * Deprecated. I don't think anything uses this.
+     *
+     * @deprecated I don't think anything uses this.
      */
-    @Deprecated
+    // todo: 19/01/2025 Remove this method.
+    @Deprecated(since = "4.7")
     @NonNull
     public Set<FullRevision> getBuildTools() {
         LocalPkgInfo[] pkgs = mLocalSdk.getPkgsInfos(PkgType.PKG_BUILD_TOOLS);
-        TreeSet<FullRevision> bt = new TreeSet<FullRevision>();
+        TreeSet<FullRevision> bt = new TreeSet<>();
         for (LocalPkgInfo pkg : pkgs) {
             IPkgDesc d = pkg.getDesc();
             if (d.hasFullRevision()) {
@@ -206,7 +208,7 @@ public class SdkManager {
      *
      * @param revision The requested revision.
      * @return A {@link BuildToolInfo}. Can be null if {@code revision} is null or is
-     * not part of the known set returned by {@link #getBuildTools()}.
+     * not part of the known set returned by {@code #getBuildTools()}.
      */
     @Nullable
     public BuildToolInfo getBuildTool(@Nullable FullRevision revision) {
@@ -227,8 +229,8 @@ public class SdkManager {
     /**
      * Updates adb with the USB devices declared in the SDK add-ons.
      *
-     * @throws AndroidLocationException
-     * @throws IOException
+     * @throws AndroidLocationException if there's a problem getting the android prefs location.
+     * @throws IOException              if there's a problem writing the file.
      */
     public void updateAdb() throws AndroidLocationException, IOException {
         FileWriter writer = null;
@@ -237,19 +239,19 @@ public class SdkManager {
             File adbIni = new File(AndroidLocation.getFolder(), ADB_INI_FILE);
             writer = new FileWriter(adbIni);
             // first, put all the vendor id in an HashSet to remove duplicate.
-            HashSet<Integer> set = new HashSet<Integer>();
-            IAndroidTarget[] targets = getTargets();
-            for (IAndroidTarget target : targets) {
+//            HashSet<Integer> set = new HashSet<>();
+//            IAndroidTarget[] targets = getTargets();
+//            for (IAndroidTarget target : targets) {
 //                if (target.getUsbVendorId() != IAndroidTarget.NO_USB_ID) {
 //                    set.add(target.getUsbVendorId());
 //                }
-            }
+//            }
             // write file header.
             writer.write(ADB_INI_HEADER);
             // now write the Id in a text file, one per line.
-            for (Integer i : set) {
-                writer.write(String.format("0x%04x\n", i));                            //$NON-NLS-1$
-            }
+//            for (Integer i : set) {
+//                writer.write(String.format("0x%04x\n", i));                            //$NON-NLS-1$
+//            }
         } finally {
             if (writer != null) {
                 writer.close();
@@ -261,25 +263,24 @@ public class SdkManager {
      * Returns the greatest {@link LayoutlibVersion} found amongst all platform
      * targets currently loaded in the SDK.
      * <p/>
-     * We only started recording Layoutlib Versions recently in the platform meta data
+     * We only started recording Layoutlib Versions recently in the platform metadata
      * so it's possible to have an SDK with many platforms loaded but no layoutlib
      * version defined.
      *
      * @return The greatest {@link LayoutlibVersion} or null if none is found.
      * @deprecated This does NOT solve the right problem and will be changed later.
      */
-    @Deprecated
+    @Deprecated(since = "4.7")
     @Nullable
     public LayoutlibVersion getMaxLayoutlibVersion() {
         LayoutlibVersion maxVersion = null;
         for (IAndroidTarget target : getTargets()) {
             if (target instanceof PlatformTarget) {
                 LayoutlibVersion lv = ((PlatformTarget) target).getLayoutlibVersion();
-                if (lv != null) {
-                    if (maxVersion == null || lv.compareTo(maxVersion) > 0) {
-                        maxVersion = lv;
-                    }
+                if (lv != null && (maxVersion == null || lv.compareTo(maxVersion) > 0)) {
+                    maxVersion = lv;
                 }
+
             }
         }
         return maxVersion;
@@ -332,11 +333,10 @@ public class SdkManager {
     @NonNull
     public Map<String, Integer> getExtrasVersions() {
         LocalPkgInfo[] pkgsInfos = mLocalSdk.getPkgsInfos(PkgType.PKG_EXTRA);
-        Map<String, Integer> extraVersions = new TreeMap<String, Integer>();
+        Map<String, Integer> extraVersions = new TreeMap<>();
         for (LocalPkgInfo info : pkgsInfos) {
             assert info instanceof LocalExtraPkgInfo;
-            if (info instanceof LocalExtraPkgInfo) {
-                LocalExtraPkgInfo ei = (LocalExtraPkgInfo) info;
+            if (info instanceof LocalExtraPkgInfo ei) {
                 IPkgDesc d = ei.getDesc();
                 String vendor = d.getVendor().getId();
                 String path = d.getPath();

@@ -49,7 +49,8 @@ public class ResourceSet extends DataSet<ResourceItem, ResourceFile> {
         super(name);
     }
 
-    private static ResourceFile createResourceFile(File file, FolderData folderData, ILogger logger)
+    @NonNull
+    private static ResourceFile createResourceFile(File file, @NonNull FolderData folderData, ILogger logger)
             throws MergingException {
         if (folderData.type != null) {
             int pos;// get the resource name based on the filename
@@ -84,7 +85,7 @@ public class ResourceSet extends DataSet<ResourceItem, ResourceFile> {
      * @return the FolderData object.
      */
     @Nullable
-    private static FolderData getFolderData(File folder) {
+    private static FolderData getFolderData(@NonNull File folder) {
         FolderData fd = new FolderData();
 
         String folderName = folder.getName();
@@ -124,7 +125,7 @@ public class ResourceSet extends DataSet<ResourceItem, ResourceFile> {
     }
 
     @Override
-    protected ResourceFile createFileAndItems(File sourceFolder, File file, ILogger logger)
+    protected ResourceFile createFileAndItems(File sourceFolder, @NonNull File file, ILogger logger)
             throws MergingException {
         // get the type.
         FolderData folderData = getFolderData(file.getParentFile());
@@ -162,9 +163,9 @@ public class ResourceSet extends DataSet<ResourceItem, ResourceFile> {
                         // Need to also create ATTR items for its children
                         try {
                             ValueResourceParser2.addStyleableItems(resNode, resourceList, null, file);
-                        } catch (MergingException ignored) {
+                        } catch (MergingException e) {
                             // since we are not passing a dup map, this will never be thrown
-                            assert false : file + ": " + ignored.getMessage();
+                            assert false : file + ": " + e.getMessage();
                         }
                     }
                 }
@@ -190,7 +191,7 @@ public class ResourceSet extends DataSet<ResourceItem, ResourceFile> {
     }
 
     @Override
-    protected void readSourceFolder(File sourceFolder, ILogger logger)
+    protected void readSourceFolder(@NonNull File sourceFolder, ILogger logger)
             throws MergingException {
         File[] folders = sourceFolder.listFiles();
         if (folders != null) {
@@ -250,7 +251,7 @@ public class ResourceSet extends DataSet<ResourceItem, ResourceFile> {
             Map<String, ResourceItem> oldItems = Maps.newHashMap(resourceFile.getItemMap());
             Map<String, ResourceItem> newItems = Maps.newHashMap();
 
-            // create a fake ResourceFile to be able to call resource.getKey();
+            // create a fake ResourceFile to be able to call {@code resource.getKey();}
             // It's ok because we never use this instance anyway.
             ResourceFile fakeResourceFile = new ResourceFile(changedFile, parsedItems,
                     resourceFile.getQualifiers());
@@ -265,7 +266,6 @@ public class ResourceSet extends DataSet<ResourceItem, ResourceFile> {
                     newItems.put(newKey, newItem);
                 } else {
                     // remove it from the list of oldItems (this is to detect deletion)
-                    //noinspection SuspiciousMethodCalls
                     oldItems.remove(oldItem.getKey());
 
                     // now compare the items
@@ -304,10 +304,10 @@ public class ResourceSet extends DataSet<ResourceItem, ResourceFile> {
      * @param logger       a logger object
      * @throws MergingException if something goes wrong
      */
-    private void parseFolder(File sourceFolder, File folder, FolderData folderData, ILogger logger)
+    private void parseFolder(File sourceFolder, @NonNull File folder, FolderData folderData, ILogger logger)
             throws MergingException {
         File[] files = folder.listFiles();
-        if (files != null && files.length > 0) {
+        if (files != null) {
             for (File file : files) {
                 if (!file.isFile() || isIgnored(file)) {
                     continue;

@@ -32,7 +32,7 @@ import java.nio.charset.Charset;
  */
 public abstract class BaseProcessOutputHandler implements ProcessOutputHandler {
 
-    public BaseProcessOutputHandler() {
+    protected BaseProcessOutputHandler() {
     }
 
     private static String getString(@NonNull ByteArrayOutputStream stream) throws ProcessException {
@@ -69,11 +69,5 @@ public abstract class BaseProcessOutputHandler implements ProcessOutputHandler {
         public String getStandardOutputAsString() throws ProcessException {
             return getString(mStandardOutput);
         }
-
-        @NonNull
-        public String getErrorOutputAsString() throws ProcessException {
-            return getString(mErrorOutput);
-        }
     }
-
 }

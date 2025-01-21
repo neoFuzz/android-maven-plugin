@@ -16,6 +16,7 @@
 
 package com.github.cardforge.maven.plugins.android.common;
 
+import com.android.annotations.NonNull;
 import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.client.googleapis.auth.oauth2.GoogleClientSecrets;
 import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
@@ -41,7 +42,7 @@ import java.util.Collections;
  * <p>
  * Before making any calls to the API through the client library you need to
  * call the {@link AndroidPublisherHelper#init(String)} method. This will run
- * all precondition checks for for client id and secret setup properly in
+ * all precondition checks for client id and secret setup properly in
  * resources/client_secrets.json and authorize this client against the API.
  * </p>
  */
@@ -83,6 +84,22 @@ public class AndroidPublisherHelper {
      */
     private static HttpTransport httpTransport;
 
+    /**
+     * Prevent instantiation.
+     */
+    private AndroidPublisherHelper() {
+        // no instance
+    }
+
+    /**
+     * Performs all necessary setup steps for running requests against the API.
+     *
+     * @param serviceAccountEmail the Service Account Email (empty if using
+     *                            installed application)
+     * @return the {@link Credential} object
+     * @throws GeneralSecurityException if the API client could not be initialized
+     * @throws IOException              if there's a problem reading the client secrets file
+     */
     private static Credential authorizeWithServiceAccount(String serviceAccountEmail)
             throws GeneralSecurityException, IOException {
         LOG.info(String.format("Authorizing using Service Account: %s", serviceAccountEmail));
@@ -95,7 +112,7 @@ public class AndroidPublisherHelper {
         LOG.info(String.format("Authorizing using Service Account: %s", serviceAccountEmail));
 
         // Build service account credential.
-        GoogleCredential credential = new GoogleCredential.Builder()
+        return new GoogleCredential.Builder()
                 .setTransport(httpTransport)
                 .setJsonFactory(JSON_FACTORY)
                 .setServiceAccountId(serviceAccountEmail)
@@ -103,7 +120,6 @@ public class AndroidPublisherHelper {
                 .setServiceAccountPrivateKeyFromP12File(pk12File == null ? new File(SRC_RESOURCES_KEY_P12)
                         : pk12File)
                 .build();
-        return credential;
     }
 
     /**
@@ -112,7 +128,7 @@ public class AndroidPublisherHelper {
      * @param clientSecrets the GoogleClientSecrets containing data from the
      *                      file
      */
-    private static void checkClientSecretsFile(GoogleClientSecrets clientSecrets) {
+    private static void checkClientSecretsFile(@NonNull GoogleClientSecrets clientSecrets) {
         if (clientSecrets.getDetails().getClientId().startsWith("[[INSERT")
                 || clientSecrets.getDetails().getClientSecret().startsWith("[[INSERT")) {
             LOG.error("Enter Client ID and Secret from "
@@ -126,8 +142,9 @@ public class AndroidPublisherHelper {
      * using the Installed Application auth method.
      *
      * @param applicationName the name of the application: com.example.app
-     * @return the {@Link AndroidPublisher} service
+     * @return the {@link AndroidPublisher} service
      */
+    @NonNull
     public static AndroidPublisher init(String applicationName) throws Exception {
         return init(applicationName, null);
     }
@@ -138,10 +155,11 @@ public class AndroidPublisherHelper {
      * @param applicationName     the name of the application: com.example.app
      * @param serviceAccountEmail the Service Account Email (empty if using
      *                            installed application)
-     * @return the {@Link AndroidPublisher} service
-     * @throws GeneralSecurityException
-     * @throws IOException
+     * @return the {@link AndroidPublisher} service
+     * @throws GeneralSecurityException if the API client could not be initialized
+     * @throws IOException              if there's a problem reading the client_secrets.json file
      */
+    @NonNull
     public static AndroidPublisher init(String applicationName,
                                         @Nullable String serviceAccountEmail) throws IOException, GeneralSecurityException {
         Preconditions.checkArgument(!Strings.isNullOrEmpty(applicationName),
@@ -163,10 +181,11 @@ public class AndroidPublisherHelper {
      *
      * @param serviceAccountEmail the Service Account Email (empty if using
      *                            installed application)
-     * @return the {@Link AndroidPublisher} service
-     * @throws GeneralSecurityException
-     * @throws IOException
+     * @return the {@link AndroidPublisher} service
+     * @throws GeneralSecurityException if the API client could not be initialized
+     * @throws IOException              if there's a problem reading the client_secrets.json file
      */
+    @NonNull
     public static AndroidPublisher init(String applicationName, String serviceAccountEmail, File pk12File)
             throws IOException, GeneralSecurityException {
 
@@ -180,6 +199,12 @@ public class AndroidPublisherHelper {
                 .build();
     }
 
+    /**
+     * Creates a new trusted transport object. This avoids the need to add the certificate to the key store.
+     *
+     * @throws GeneralSecurityException if the API client could not be initialized
+     * @throws IOException              if there's a problem reading the client_secrets.json file
+     */
     private static void newTrustedTransport() throws GeneralSecurityException,
             IOException {
         if (null == httpTransport) {

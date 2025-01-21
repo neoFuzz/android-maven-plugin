@@ -25,6 +25,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 import java.io.File;
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
@@ -33,6 +34,7 @@ import java.util.Map;
  * An object that contain a BuildConfig configuration
  */
 public abstract class BaseConfigImpl implements Serializable, BaseConfig {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     private final Map<String, ClassField> mBuildConfigFields = Maps.newTreeMap();
@@ -255,11 +257,9 @@ public abstract class BaseConfigImpl implements Serializable, BaseConfig {
         if (this == o) {
             return true;
         }
-        if (!(o instanceof BaseConfigImpl)) {
+        if (!(o instanceof BaseConfigImpl that)) {
             return false;
         }
-
-        BaseConfigImpl that = (BaseConfigImpl) o;
 
         return Objects.equal(mBuildConfigFields, that.mBuildConfigFields) &&
                 Objects.equal(mConsumerProguardFiles, that.mConsumerProguardFiles) &&

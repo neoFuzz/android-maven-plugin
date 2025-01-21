@@ -23,7 +23,7 @@ package com.android.manifmerger;
 public interface ConvertibleName {
 
     /**
-     * Returns a xml lower-hyphen separated name of itself.
+     * Returns an XML lower-hyphen separated name of itself.
      */
     String toXmlName();
 

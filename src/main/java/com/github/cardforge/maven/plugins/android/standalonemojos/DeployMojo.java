@@ -34,6 +34,7 @@ import org.apache.maven.plugins.annotations.ResolutionScope;
  * @author hugo.josefson@jayway.com
  * @author Manfred Moser - manfred@simpligility.com
  */
+@SuppressWarnings("unused") // used in Maven goals
 @Mojo(
         name = "deploy",
         defaultPhase = LifecyclePhase.PRE_INTEGRATION_TEST,
@@ -43,8 +44,8 @@ public class DeployMojo extends AbstractAndroidMojo {
     /**
      * Deploy the apk built with the current projects to all attached devices and emulators.
      *
-     * @throws MojoExecutionException
-     * @throws MojoFailureException
+     * @throws MojoExecutionException if the execution fails
+     * @throws MojoFailureException   if the apk file does not exist
      */
     public void execute() throws MojoExecutionException, MojoFailureException {
         deployBuiltApk();

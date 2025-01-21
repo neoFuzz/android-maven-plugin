@@ -40,8 +40,9 @@ import java.util.List;
  */
 public class MergingException extends Exception {
     public static final String MULTIPLE_ERRORS = "Multiple errors:";
+    public static final String STRERROR = "Error: ";
     @NonNull
-    private final List<Message> mMessages;
+    private final transient List<Message> mMessages;
     private String mMessage; // Keeping our own copy since parent prepends exception class name
     private File mFile;
     private int mLine = -1;
@@ -75,7 +76,7 @@ public class MergingException extends Exception {
         return new Builder().withMessage(message, args);
     }
 
-    public static void throwIfNonEmpty(Collection<Message> messages) throws MergingException {
+    public static void throwIfNonEmpty(@NonNull Collection<Message> messages) throws MergingException {
         if (!messages.isEmpty()) {
             throw new MergingException(null, Iterables.toArray(messages, Message.class));
         }
@@ -130,18 +131,18 @@ public class MergingException extends Exception {
                 sb.append(Joiner.on('\t').join(sourceFilePositions));
             }
             String text = message.getText();
-            if (sb.length() > 0) {
+            if (!sb.isEmpty()) {
                 sb.append(':').append(' ');
                 // ALWAYS insert the string "Error:" between the path and the message.
                 // This is done to make the error messages more simple to detect
                 // (since a generic path: message pattern can match a lot of output, basically
                 // any labeled output, and we don't want to do file existence checks on any random
                 // string to the left of a colon.)
-                if (!text.startsWith("Error: ")) {
-                    sb.append("Error: ");
+                if (!text.startsWith(STRERROR)) {
+                    sb.append(STRERROR);
                 }
-            } else if (!text.contains("Error: ")) {
-                sb.append("Error: ");
+            } else if (!text.contains(STRERROR)) {
+                sb.append(STRERROR);
             }
             // If the error message already starts with the path, strip it out.
             // This avoids redundant looking error messages you can end up with
@@ -211,7 +212,7 @@ public class MergingException extends Exception {
             return this;
         }
 
-        public Builder withMessage(@NonNull String messageText, Object... args) {
+        public Builder withMessage(@NonNull String messageText, @NonNull Object... args) {
             mMessageText = args.length == 0 ? messageText : String.format(messageText, args);
             return this;
         }
@@ -222,8 +223,8 @@ public class MergingException extends Exception {
                     mMessageText = Objects.firstNonNull(
                             mCause.getLocalizedMessage(), mCause.getClass().getCanonicalName());
                 }
-                if (mPosition == SourcePosition.UNKNOWN && mCause instanceof SAXParseException) {
-                    SAXParseException exception = (SAXParseException) mCause;
+                if (mPosition == SourcePosition.UNKNOWN &&
+                        mCause instanceof SAXParseException exception) {
                     int lineNumber = exception.getLineNumber();
                     if (lineNumber != -1) {
                         // Convert positions to be 0-based for SourceFilePosition.

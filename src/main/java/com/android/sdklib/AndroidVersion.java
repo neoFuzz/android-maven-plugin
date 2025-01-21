@@ -21,6 +21,7 @@ import com.android.annotations.NonNull;
 import com.android.annotations.Nullable;
 import com.android.sdklib.repository.PkgProps;
 
+import java.io.Serial;
 import java.util.Properties;
 import java.util.regex.Pattern;
 
@@ -110,7 +111,7 @@ public final class AndroidVersion implements Comparable<AndroidVersion> {
      * Creates an {@link AndroidVersion} from a string that may be an integer API
      * level or a string codename.
      * <p/>
-     * <Em>Important</em>: An important limitation of this method is that cannot possible
+     * <Em>Important</em>: An important limitation of this method is that cannot possibly
      * recreate the API level integer from a pure string codename. This is only OK to use
      * if the caller can guarantee that only {@link #getApiString()} will be used later.
      * Wrong things will happen if the caller then tries to resolve the numeric
@@ -130,11 +131,11 @@ public final class AndroidVersion implements Comparable<AndroidVersion> {
             // We don't know the API level. Android platform codenames are all caps.
             // REL is a release-reserved keyword which we can use here.
 
-            if (!SdkConstants.CODENAME_RELEASE.equals(apiOrCodename)) {
-                if (Pattern.matches("[A-Z_]+", apiOrCodename)) {
-                    codename = apiOrCodename;
-                }
+            if (!SdkConstants.CODENAME_RELEASE.equals(apiOrCodename) &&
+                    Pattern.matches("[A-Z_]+", apiOrCodename)) {
+                codename = apiOrCodename;
             }
+
         }
 
         mApiLevel = apiLevel;
@@ -149,7 +150,7 @@ public final class AndroidVersion implements Comparable<AndroidVersion> {
 
     /**
      * Sanitizes the codename string according to the following rules:
-     * - A codename should be {@code null} for a release version or it should be a non-empty
+     * - A codename should be {@code null} for a release version, or it should be a non-empty
      * string for an actual preview.
      * - In input, spacing is trimmed since it is irrelevant.
      * - An empty string or the special codename "REL" means a release version
@@ -228,7 +229,7 @@ public final class AndroidVersion implements Comparable<AndroidVersion> {
     }
 
     /**
-     * Returns whether or not the version is a preview version.
+     * Returns whether the version is a preview version.
      */
     public boolean isPreview() {
         return mCodename != null;
@@ -277,8 +278,7 @@ public final class AndroidVersion implements Comparable<AndroidVersion> {
      */
     @Override
     public boolean equals(Object obj) {
-        if (obj instanceof AndroidVersion) {
-            AndroidVersion version = (AndroidVersion) obj;
+        if (obj instanceof AndroidVersion version) {
 
             if (mCodename == null) {
                 return version.mCodename == null &&
@@ -288,15 +288,15 @@ public final class AndroidVersion implements Comparable<AndroidVersion> {
                         mApiLevel == version.mApiLevel;
             }
 
-        } else if (obj instanceof String) {
+        } else if (obj instanceof String str) {
             // if we have a code name, this must match.
             if (mCodename != null) {
                 return mCodename.equals(obj);
             }
 
-            // else we try to convert to a int and compare to the api level
+            // else we try to convert to an int and compare to the api level
             try {
-                int value = Integer.parseInt((String) obj);
+                int value = Integer.parseInt(str);
                 return value == mApiLevel;
             } catch (NumberFormatException e) {
                 // not a number? we'll return false below.
@@ -312,7 +312,7 @@ public final class AndroidVersion implements Comparable<AndroidVersion> {
             return mCodename.hashCode();
         }
 
-        // there may be some collisions between the hashcode of the codename and the api level
+        // there may be some collisions between the hashcode of the codename and the api level,
         // but it's acceptable.
         return mApiLevel;
     }
@@ -347,15 +347,10 @@ public final class AndroidVersion implements Comparable<AndroidVersion> {
 
     public int compareTo(int apiLevel, @Nullable String codename) {
         if (mCodename == null) {
-            if (codename == null) {
-                return mApiLevel - apiLevel;
-            } else {
-                if (mApiLevel == apiLevel) {
-                    return -1; // same api level but argument is a preview for next version
-                }
-
-                return mApiLevel - apiLevel;
+            if (codename != null && mApiLevel == apiLevel) {
+                return -1; // same api level but argument is a preview for next version
             }
+            return mApiLevel - apiLevel;
         } else {
             // 'this' is a preview
             if (mApiLevel == apiLevel) {
@@ -386,6 +381,7 @@ public final class AndroidVersion implements Comparable<AndroidVersion> {
      * @see AndroidVersion#AndroidVersion(Properties)
      */
     public static final class AndroidVersionException extends Exception {
+        @Serial
         private static final long serialVersionUID = 1L;
 
         AndroidVersionException(String message, Throwable cause) {

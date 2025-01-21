@@ -63,8 +63,9 @@ public class ApkInfoParser {
     @VisibleForTesting
     @NonNull
     static ApkInfo getApkInfo(@NonNull List<String> aaptOutput) {
-
-        String pkgName = null, versionCode = null, versionName = null;
+        String pkgName = null;
+        String versionCode = null;
+        String versionName = null;
 
         for (String line : aaptOutput) {
             Matcher m = PATTERN.matcher(line);
@@ -95,7 +96,7 @@ public class ApkInfoParser {
      *
      * @param apkFile the APK to parse
      * @return a non-null ApkInfo object.
-     * @throws ProcessException
+     * @throws ProcessException if the aapt command failed.
      */
     @NonNull
     public ApkInfo parseApk(@NonNull File apkFile)
@@ -114,7 +115,7 @@ public class ApkInfoParser {
      *
      * @param apkFile the apk file to call aapt on.
      * @return the output as a list of files.
-     * @throws ProcessException
+     * @throws ProcessException if the aapt command failed.
      */
     @NonNull
     private List<String> getAaptOutput(@NonNull File apkFile)
@@ -146,7 +147,7 @@ public class ApkInfoParser {
         @Nullable
         private final String mVersionName;
 
-        private ApkInfo(@NonNull String packageName, Integer versionCode, String versionName) {
+        private ApkInfo(@NonNull String packageName, @Nullable Integer versionCode, @Nullable String versionName) {
             mPackageName = packageName;
             mVersionCode = versionCode;
             mVersionName = versionName;

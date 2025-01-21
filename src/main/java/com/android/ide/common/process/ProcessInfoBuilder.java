@@ -41,10 +41,11 @@ public class ProcessInfoBuilder extends ProcessEnvBuilder<ProcessInfoBuilder> {
     private String mMain;
 
     public ProcessInfoBuilder() {
+        // nothing to do
     }
 
     /**
-     * Creates a ProcessInfo from the the information added to the builder.
+     * Creates a ProcessInfo from the information added to the builder.
      *
      * @return the ProcessInfo
      */
@@ -59,7 +60,7 @@ public class ProcessInfoBuilder extends ProcessEnvBuilder<ProcessInfoBuilder> {
     }
 
     /**
-     * Creates a JavaProcessInfo from the the information added to the builder.
+     * Creates a JavaProcessInfo from the information added to the builder.
      *
      * @return the JavaProcessInfo
      */
@@ -125,7 +126,7 @@ public class ProcessInfoBuilder extends ProcessEnvBuilder<ProcessInfoBuilder> {
     }
 
     /**
-     * Adds an command line argument.
+     * Adds a command line argument.
      *
      * @param arg the argument
      * @return this
@@ -216,7 +217,7 @@ public class ProcessInfoBuilder extends ProcessEnvBuilder<ProcessInfoBuilder> {
     }
 
     /**
-     * Adds an command line argument.
+     * Adds a command line argument.
      *
      * @param arg the argument
      * @return this

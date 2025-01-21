@@ -219,7 +219,7 @@ public class MissingTarget implements IAndroidTarget {
     }
 
     @Override
-    public int compareTo(IAndroidTarget o) {
+    public int compareTo(@NonNull IAndroidTarget o) {
         return 0;
     }
 

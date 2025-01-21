@@ -73,4 +73,18 @@ public final class TouchScreenQualifier extends EnumBasedResourceQualifier {
 
         return false;
     }
+
+    @Override
+    public int hashCode() {
+        return mValue.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object qualifier) {
+        if (qualifier instanceof TouchScreenQualifier q) {
+            return mValue == q.mValue;
+        }
+
+        return false;
+    }
 }

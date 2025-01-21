@@ -34,7 +34,7 @@ public interface ProcessOutputHandler {
      * before {@link ProcessExecutor#execute(ProcessInfo, ProcessOutputHandler)} returns.
      *
      * @param processOutput the process output to handle
-     * @throws ProcessException
+     * @throws ProcessException if the output handling failed.
      */
     void handleOutput(@NonNull ProcessOutput processOutput) throws ProcessException;
 }

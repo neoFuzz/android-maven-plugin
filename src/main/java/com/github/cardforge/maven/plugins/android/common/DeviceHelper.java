@@ -1,5 +1,6 @@
 package com.github.cardforge.maven.plugins.android.common;
 
+import com.android.annotations.NonNull;
 import com.android.ddmlib.IDevice;
 import org.apache.commons.lang3.StringUtils;
 
@@ -14,32 +15,38 @@ public class DeviceHelper {
     private static final String MODEL_PROPERTY = "ro.product.model";
     private static final String SEPARATOR = "_";
 
+    private DeviceHelper() {
+        // no instances
+    }
+
     /**
      * Get a device identifier string that is suitable for filenames as well as log messages.
-     * This means it is human readable and contains no spaces.
+     * This means it is human-readable and contains no spaces.
      * Used for instrumentation test report file names so see more at
      * AbstractInstrumentationMojo#testCreateReport javadoc since
      * that is the public documentation.
      */
-    public static String getDescriptiveName(IDevice device) {
+    @NonNull
+    public static String getDescriptiveName(@NonNull IDevice device) {
         // if any of this logic changes update javadoc for
         // AbstractInstrumentationMojo#testCreateReport
-        StringBuilder identfier = new StringBuilder().append(device.getSerialNumber());
+        StringBuilder builder = new StringBuilder().append(device.getSerialNumber());
         if (device.getAvdName() != null) {
-            identfier.append(SEPARATOR).append(device.getAvdName());
+            builder.append(SEPARATOR).append(device.getAvdName());
         }
         String manufacturer = getManufacturer(device);
         if (StringUtils.isNotBlank(manufacturer)) {
-            identfier.append(SEPARATOR).append(manufacturer);
+            builder.append(SEPARATOR).append(manufacturer);
         }
         String model = getModel(device);
         if (StringUtils.isNotBlank(model)) {
-            identfier.append(SEPARATOR).append(model);
+            builder.append(SEPARATOR).append(model);
         }
 
-        return FileNameHelper.fixFileName(identfier.toString());
+        return FileNameHelper.fixFileName(builder.toString());
     }
 
+    @NonNull
     public static String getDeviceLogLinePrefix(IDevice device) {
         return getDescriptiveName(device) + " :   ";
     }
@@ -47,21 +54,23 @@ public class DeviceHelper {
     /**
      * @return the manufacturer of the device as set in #MANUFACTURER_PROPERTY, typically "unknown" for emulators
      */
-    public static String getManufacturer(IDevice device) {
+    @NonNull
+    public static String getManufacturer(@NonNull IDevice device) {
         return StringUtils.deleteWhitespace(device.getProperty(MANUFACTURER_PROPERTY));
     }
 
     /**
      * @return the model of the device as set in #MODEL_PROPERTY, typically "sdk" for emulators
      */
-    public static String getModel(IDevice device) {
+    public static String getModel(@NonNull IDevice device) {
         return StringUtils.deleteWhitespace(device.getProperty(MODEL_PROPERTY));
     }
 
     /**
      * @return the descriptive name with online/offline/unknown status string appended.
      */
-    public static String getDescriptiveNameWithStatus(IDevice device) {
+    @NonNull
+    public static String getDescriptiveNameWithStatus(@NonNull IDevice device) {
         String status;
         if (device.isOnline()) {
             status = "Online";

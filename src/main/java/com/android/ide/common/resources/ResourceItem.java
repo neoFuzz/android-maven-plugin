@@ -16,6 +16,7 @@
 
 package com.android.ide.common.resources;
 
+import com.android.annotations.NonNull;
 import com.android.ide.common.rendering.api.ResourceValue;
 import com.android.ide.common.resources.configuration.FolderConfiguration;
 import com.android.resources.ResourceType;
@@ -34,15 +35,12 @@ import java.util.List;
  */
 public class ResourceItem implements Comparable<ResourceItem> {
 
-    private static final Comparator<ResourceFile> sComparator = new Comparator<ResourceFile>() {
-        @Override
-        public int compare(ResourceFile file1, ResourceFile file2) {
-            // get both FolderConfiguration and compare them
-            FolderConfiguration fc1 = file1.getFolder().getConfiguration();
-            FolderConfiguration fc2 = file2.getFolder().getConfiguration();
+    private static final Comparator<ResourceFile> sComparator = (file1, file2) -> {
+        // get both FolderConfiguration and compare them
+        FolderConfiguration fc1 = file1.getFolder().getConfiguration();
+        FolderConfiguration fc2 = file2.getFolder().getConfiguration();
 
-            return fc1.compareTo(fc2);
-        }
+        return fc1.compareTo(fc2);
     };
 
     private final String mName;
@@ -50,7 +48,7 @@ public class ResourceItem implements Comparable<ResourceItem> {
     /**
      * List of files generating this ResourceItem.
      */
-    private final List<ResourceFile> mFiles = new ArrayList<ResourceFile>();
+    private final List<ResourceFile> mFiles = new ArrayList<>();
 
     /**
      * Constructs a new ResourceItem.
@@ -74,7 +72,7 @@ public class ResourceItem implements Comparable<ResourceItem> {
      * @param other the ResourceItem to be compared to.
      */
     @Override
-    public int compareTo(ResourceItem other) {
+    public int compareTo(@NonNull ResourceItem other) {
         return mName.compareTo(other.mName);
     }
 
@@ -85,7 +83,7 @@ public class ResourceItem implements Comparable<ResourceItem> {
      * of type {@link ResourceType#ID} that aren't declared inline.
      */
     public boolean isEditableDirectly() {
-        return hasAlternates() == false;
+        return !hasAlternates();
     }
 
     /**
@@ -106,7 +104,7 @@ public class ResourceItem implements Comparable<ResourceItem> {
      * @param isFramework     whether the resource is a framework value. Same as the type.
      * @return a ResourceValue or null if none match the config.
      */
-    public ResourceValue getResourceValue(ResourceType type, FolderConfiguration referenceConfig,
+    public ResourceValue getResourceValue(ResourceType type, @NonNull FolderConfiguration referenceConfig,
                                           boolean isFramework) {
         // look for the best match for the given configuration
         // the match has to be of type ResourceFile since that's what the input list contains
@@ -158,8 +156,7 @@ public class ResourceItem implements Comparable<ResourceItem> {
      * Returns the sorted list of {@link ResourceItem} objects for this resource item.
      */
     public ResourceFile[] getSourceFileArray() {
-        ArrayList<ResourceFile> list = new ArrayList<ResourceFile>();
-        list.addAll(mFiles);
+        ArrayList<ResourceFile> list = new ArrayList<>(mFiles);
 
         Collections.sort(list, sComparator);
 
@@ -181,7 +178,7 @@ public class ResourceItem implements Comparable<ResourceItem> {
      */
     public boolean hasAlternates() {
         for (ResourceFile file : mFiles) {
-            if (file.getFolder().getConfiguration().isDefault() == false) {
+            if (!file.getFolder().getConfiguration().isDefault()) {
                 return true;
             }
         }
@@ -203,7 +200,7 @@ public class ResourceItem implements Comparable<ResourceItem> {
         }
 
         // We only want to return false if there's no default and more than 0 items.
-        return (mFiles.size() == 0);
+        return (mFiles.isEmpty());
     }
 
     /**
@@ -215,7 +212,7 @@ public class ResourceItem implements Comparable<ResourceItem> {
     public int getAlternateCount() {
         int count = 0;
         for (ResourceFile file : mFiles) {
-            if (file.getFolder().getConfiguration().isDefault() == false) {
+            if (!file.getFolder().getConfiguration().isDefault()) {
                 count++;
             }
         }

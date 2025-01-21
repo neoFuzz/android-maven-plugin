@@ -17,25 +17,40 @@
 package com.android.jack.api;
 
 import javax.annotation.Nonnull;
+import java.io.Serial;
 
 /**
  * Thrown when the requested Jack configuration for a given API version is not supported.
  */
 public class ConfigNotSupportedException extends Exception {
+    @Serial
     private static final long serialVersionUID = 1L;
 
+    /**
+     * Constructs a new {@link ConfigNotSupportedException} with no detail message.
+     */
     public ConfigNotSupportedException() {
         super();
     }
 
+    /**
+     * @param message the detail message. The detail message is saved for later retrieval by the
+     */
     public ConfigNotSupportedException(@Nonnull String message) {
         super(message);
     }
 
+    /**
+     * @param message the detail message. The detail message is saved for later retrieval by the
+     * @param cause the cause (which is saved for later retrieval by the {@link #getCause()} method).
+     */
     public ConfigNotSupportedException(@Nonnull String message, @Nonnull Throwable cause) {
         super(message, cause);
     }
 
+    /**
+     * @param cause the cause (which is saved for later retrieval by the {@link #getCause()} method).
+     */
     public ConfigNotSupportedException(@Nonnull Throwable cause) {
         super(cause);
     }

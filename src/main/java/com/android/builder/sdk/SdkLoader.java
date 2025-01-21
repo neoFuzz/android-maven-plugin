@@ -61,7 +61,7 @@ public interface SdkLoader {
     /**
      * Returns the location of artifact repositories built-in the SDK.
      *
-     * @return a non null list of repository folders.
+     * @return a non-null list of repository folders.
      */
     @NonNull
     ImmutableList<File> getRepositories();

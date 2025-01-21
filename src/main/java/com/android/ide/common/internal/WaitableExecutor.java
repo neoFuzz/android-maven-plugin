@@ -15,6 +15,7 @@
  */
 package com.android.ide.common.internal;
 
+import com.android.annotations.NonNull;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
@@ -50,7 +51,7 @@ public class WaitableExecutor<T> {
         }
 
         mExecutorService = Executors.newFixedThreadPool(nThreads);
-        mCompletionService = new ExecutorCompletionService<T>(mExecutorService);
+        mCompletionService = new ExecutorCompletionService<>(mExecutorService);
     }
 
     /**
@@ -58,7 +59,7 @@ public class WaitableExecutor<T> {
      */
     public WaitableExecutor() {
         mExecutorService = null;
-        mCompletionService = new ExecutorCompletionService<T>(ExecutorSingleton.getExecutor());
+        mCompletionService = new ExecutorCompletionService<>(ExecutorSingleton.getExecutor());
     }
 
     /**
@@ -101,10 +102,10 @@ public class WaitableExecutor<T> {
                 cancelAllTasks();
             }
 
-            // get the original exception adn throw that one.
+            // get the original exception and throw that one.
             Throwable cause = e.getCause();
-            if (cause instanceof LoggedErrorException) {
-                throw (LoggedErrorException) cause;
+            if (cause instanceof LoggedErrorException lee) {
+                throw lee;
             } else {
                 throw new RuntimeException(cause);
             }
@@ -148,7 +149,7 @@ public class WaitableExecutor<T> {
                         // if the task was cancelled we probably don't care about its result.
                     } else {
                         // there was an error.
-                        results.add(new TaskResult<T>(cause));
+                        results.add(new TaskResult<>(cause));
                     }
                 }
             }
@@ -171,17 +172,34 @@ public class WaitableExecutor<T> {
     }
 
     public static final class TaskResult<T> {
-        public T value;
-        public Throwable exception;
+        private T value;
+        private Throwable exception;
 
         TaskResult(Throwable cause) {
-            exception = cause;
+            setException(cause);
         }
 
+        @NonNull
         static <T> TaskResult<T> withValue(T value) {
-            TaskResult<T> result = new TaskResult<T>(null);
-            result.value = value;
+            TaskResult<T> result = new TaskResult<>(null);
+            result.setValue(value);
             return result;
+        }
+
+        public T getValue() {
+            return value;
+        }
+
+        public void setValue(T value) {
+            this.value = value;
+        }
+
+        public Throwable getException() {
+            return exception;
+        }
+
+        public void setException(Throwable exception) {
+            this.exception = exception;
         }
     }
 }

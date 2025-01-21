@@ -93,13 +93,9 @@ public final class DensityQualifier extends EnumBasedResourceQualifier {
 
     @Override
     public boolean isMatchFor(ResourceQualifier qualifier) {
-        if (qualifier instanceof DensityQualifier) {
-            // as long as there's a density qualifier, it's always a match.
-            // The best match will be found later.
-            return true;
-        }
-
-        return false;
+        // as long as there's a density qualifier, it's always a match.
+        // The best match will be found later.
+        return qualifier instanceof DensityQualifier;
     }
 
     @Override
@@ -121,8 +117,18 @@ public final class DensityQualifier extends EnumBasedResourceQualifier {
             // in all case we're going to prefer the higher dpi.
             // if reference is high, we want highest dpi.
             // if reference is medium, we'll prefer to scale down high dpi, than scale up low dpi
-            // if reference if low, we'll prefer to scale down high than medium (2:1 over 4:3)
+            // if reference is low, we'll prefer to scale down high than medium (2:1 over 4:3)
             return mValue.getDpiValue() > compareQ.mValue.getDpiValue();
         }
+    }
+
+    @Override
+    public boolean equals(Object qualifier) {
+        return qualifier instanceof DensityQualifier;
+    }
+
+    @Override
+    public int hashCode() {
+        return mValue.hashCode();
     }
 }

@@ -36,7 +36,7 @@ public class FileValidity<S extends DataSet> {
         return sourceFile;
     }
 
-    public static enum FileStatus {
+    public enum FileStatus {
         VALID_FILE,
         IGNORED_FILE,
         UNKNOWN_FILE

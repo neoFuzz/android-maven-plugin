@@ -20,16 +20,14 @@ import com.android.SdkConstants;
 import com.android.annotations.NonNull;
 import com.android.annotations.VisibleForTesting;
 import com.android.utils.XmlUtils;
-import com.google.common.base.Optional;
+
+import java.util.*;
+
 import com.google.common.base.Preconditions;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
 
 import static com.android.manifmerger.Actions.ActionType;
 
@@ -46,6 +44,9 @@ import static com.android.manifmerger.Actions.ActionType;
  * Most of the output from this validation should be warnings.
  */
 public class PostValidator {
+    private PostValidator() {
+        // no instantiation.
+    }
 
     /**
      * Post validation of the merged document. This will essentially check that all merging
@@ -129,11 +130,11 @@ public class PostValidator {
         NodeList childNodes = element.getChildNodes();
         for (int i = 0; i < childNodes.getLength(); i++) {
             Node childNode = childNodes.item(i);
-            if (childNode instanceof Element) {
-                if (elementUsesNamespace((Element) childNode, namespaceName)) {
-                    return true;
-                }
+            if (childNode instanceof Element el &&
+                    elementUsesNamespace(el, namespaceName)) {
+                return true;
             }
+
         }
         return false;
     }
@@ -205,7 +206,7 @@ public class PostValidator {
                 }
             }
 
-            // move the activity-alias element if neither it or its comments immediately follow the
+            // move the activity-alias element if neither it nor its comments immediately follow the
             // target activity.
             if (!activityAlias.getXml().equals(nextSibling)
                     && !(!comments.isEmpty() && comments.get(0).equals(nextSibling))) {
@@ -276,7 +277,7 @@ public class PostValidator {
     }
 
     /**
-     * Validate an xml element and recursively its children elements, ensuring that all merging
+     * Validate an XML element and recursively its children elements, ensuring that all merging
      * instructions were applied.
      *
      * @param xmlElement    xml element to validate.
@@ -290,36 +291,31 @@ public class PostValidator {
             @NonNull MergingReport.Builder mergingReport) {
 
         NodeOperationType operationType = xmlElement.getOperationType();
-        switch (operationType) {
-            case REPLACE:
-                // we should find at least one rejected twin.
-                if (!isNodeOperationPresent(xmlElement, actions, ActionType.REJECTED)) {
-                    xmlElement.addMessage(mergingReport, MergingReport.Record.Severity.WARNING,
-                            String.format(
-                                    "%1$s was tagged at %2$s:%3$d to replace another declaration "
-                                            + "but no other declaration present",
-                                    xmlElement.getId(),
-                                    xmlElement.getDocument().getSourceFile().print(true),
-                                    xmlElement.getPosition().getStartLine() + 1
-                            ));
-                }
-                break;
-            case REMOVE:
-            case REMOVE_ALL:
-                // we should find at least one rejected twin.
-                if (!isNodeOperationPresent(xmlElement, actions, ActionType.REJECTED)) {
-                    xmlElement.addMessage(mergingReport, MergingReport.Record.Severity.WARNING,
-                            String.format(
-                                    "%1$s was tagged at %2$s:%3$d to remove other declarations "
-                                            + "but no other declaration present",
-                                    xmlElement.getId(),
-                                    xmlElement.getDocument().getSourceFile().print(true),
-                                    xmlElement.getPosition().getStartLine() + 1
-                            ));
-                }
-                break;
-        }
         validateAttributes(xmlElement, actions, mergingReport);
+        if (operationType == NodeOperationType.REPLACE) {// we should find at least one rejected twin.
+            if (!isNodeOperationPresent(xmlElement, actions, ActionType.REJECTED)) {
+                xmlElement.addMessage(mergingReport, MergingReport.Record.Severity.WARNING,
+                        String.format(
+                                "%1$s was tagged at %2$s:%3$d to replace another declaration "
+                                        + "but no other declaration present",
+                                xmlElement.getId(),
+                                xmlElement.getDocument().getSourceFile().print(true),
+                                xmlElement.getPosition().getStartLine() + 1
+                        ));
+            }
+        } else if ((operationType == NodeOperationType.REMOVE || operationType == NodeOperationType.REMOVE_ALL) &&
+                !isNodeOperationPresent(xmlElement, actions, ActionType.REJECTED)) {
+                // we should find at least one rejected twin.
+                xmlElement.addMessage(mergingReport, MergingReport.Record.Severity.WARNING,
+                        String.format(
+                                "%1$s was tagged at %2$s:%3$d to remove other declarations "
+                                        + "but no other declaration present",
+                                xmlElement.getId(),
+                                xmlElement.getDocument().getSourceFile().print(true),
+                                xmlElement.getPosition().getStartLine() + 1
+                        ));
+            }
+
         validateAndroidAttributes(xmlElement, mergingReport);
         for (XmlElement child : xmlElement.getMergeableElements()) {
             validate(child, actions, mergingReport);
@@ -339,36 +335,33 @@ public class PostValidator {
                 = xmlElement.getAttributeOperations();
         for (Map.Entry<XmlNode.NodeName, AttributeOperationType> attributeOperation :
                 attributeOperations) {
-            switch (attributeOperation.getValue()) {
-                case REMOVE:
-                    if (!isAttributeOperationPresent(
+            if (Objects.requireNonNull(attributeOperation.getValue()) == AttributeOperationType.REMOVE) {
+                if (!isAttributeOperationPresent(
+                        xmlElement, attributeOperation, actions, ActionType.REJECTED)) {
+                    xmlElement.addMessage(mergingReport, MergingReport.Record.Severity.WARNING,
+                            String.format(
+                                    "%1$s@%2$s was tagged at %3$s:%4$d to remove other"
+                                            + " declarations but no other declaration present",
+                                    xmlElement.getId(),
+                                    attributeOperation.getKey(),
+                                    xmlElement.getDocument().getSourceFile().print(true),
+                                    xmlElement.getPosition().getStartLine() + 1
+                            ));
+                }
+            } else if (attributeOperation.getValue() == AttributeOperationType.REPLACE &&
+                    !isAttributeOperationPresent(
                             xmlElement, attributeOperation, actions, ActionType.REJECTED)) {
-                        xmlElement.addMessage(mergingReport, MergingReport.Record.Severity.WARNING,
-                                String.format(
-                                        "%1$s@%2$s was tagged at %3$s:%4$d to remove other"
-                                                + " declarations but no other declaration present",
-                                        xmlElement.getId(),
-                                        attributeOperation.getKey(),
-                                        xmlElement.getDocument().getSourceFile().print(true),
-                                        xmlElement.getPosition().getStartLine() + 1
-                                ));
-                    }
-                    break;
-                case REPLACE:
-                    if (!isAttributeOperationPresent(
-                            xmlElement, attributeOperation, actions, ActionType.REJECTED)) {
-                        xmlElement.addMessage(mergingReport, MergingReport.Record.Severity.WARNING,
-                                String.format(
-                                        "%1$s@%2$s was tagged at %3$s:%4$d to replace other"
-                                                + " declarations but no other declaration present",
-                                        xmlElement.getId(),
-                                        attributeOperation.getKey(),
-                                        xmlElement.getDocument().getSourceFile().print(true),
-                                        xmlElement.getPosition().getStartLine() + 1
-                                ));
-                    }
-                    break;
+                xmlElement.addMessage(mergingReport, MergingReport.Record.Severity.WARNING,
+                        String.format(
+                                "%1$s@%2$s was tagged at %3$s:%4$d to replace other"
+                                        + " declarations but no other declaration present",
+                                xmlElement.getId(),
+                                attributeOperation.getKey(),
+                                xmlElement.getDocument().getSourceFile().print(true),
+                                xmlElement.getPosition().getStartLine() + 1
+                        ));
             }
+
         }
 
     }

@@ -17,6 +17,7 @@
 package com.github.cardforge.maven.plugins.android.phase09package;
 
 import com.android.SdkConstants;
+import com.android.annotations.NonNull;
 import com.github.cardforge.maven.plugins.android.AbstractAndroidMojo;
 import com.github.cardforge.maven.plugins.android.CommandExecutor;
 import com.github.cardforge.maven.plugins.android.ExecutionException;
@@ -70,6 +71,8 @@ public class AarMojo extends AbstractAndroidMojo {
      * The name of the top level folder in the AAR where JAR libraries are found.
      */
     public static final String LIBRARIES_FOLDER = "libs";
+    public static final String FILE = " file.";
+    public static final String IOEXCEPTION_WHILE_CREATING = "IOException while creating .";
 
     /**
      * <p>Classifier to add to the artifact generated. If given, the artifact will be an attachment instead.</p>
@@ -78,7 +81,7 @@ public class AarMojo extends AbstractAndroidMojo {
     private String classifier;
 
     /**
-     * Specifies the application makefile to use for the build (if other than the default Application.mk).
+     * Specifies the application makefile to use for the build (if other than the default {@code Application.mk}).
      */
     @Parameter
     @PullParameter
@@ -127,7 +130,7 @@ public class AarMojo extends AbstractAndroidMojo {
 
     /**
      * Set to {@code false} to automatically include all dependency JARs in the generated AAR. These are placed in
-     * a directory called |code libs} in the generated aar. The set of JARs to include can be restricted using the
+     * a directory called {@code libs} in the generated aar. The set of JARs to include can be restricted using the
      * {@code artifactSet} and {@code artifactTypeSet} parameters. If {@code skipDependencies} is {@code true}
      * (default), only those JARs explicitly selected by the {@code artifactSet} and {@code artifactTypeSet} parameters
      * will be included.
@@ -176,11 +179,11 @@ public class AarMojo extends AbstractAndroidMojo {
     @Parameter(property = "artifactSet")
     private IncludeExcludeSet artifactSet;
 
-    private List<String> sourceFolders = new ArrayList<String>();
+    private List<String> sourceFolders = new ArrayList<>();
 
     /**
-     * @throws MojoExecutionException
-     * @throws MojoFailureException
+     * @throws MojoExecutionException if an error occurs during the execution of the Mojo
+     * @throws MojoFailureException if an error occurs during the execution of the Mojo
      */
     public void execute() throws MojoExecutionException, MojoFailureException {
         String out = targetDirectory.getPath();
@@ -208,7 +211,7 @@ public class AarMojo extends AbstractAndroidMojo {
      * Creates an appropriate aar/classes.jar that does not include R
      *
      * @return File which is the AAR classes jar.
-     * @throws MojoExecutionException
+     * @throws MojoExecutionException if an error occurs while creating the classes.jar file
      */
     protected File createAarClassesJar() throws MojoExecutionException {
         final File obfuscatedJarFile = new File(obfuscatedJar);
@@ -228,13 +231,16 @@ public class AarMojo extends AbstractAndroidMojo {
             attachJar(classesJar);
             return classesJar;
         } catch (ArchiverException e) {
-            throw new MojoExecutionException("ArchiverException while creating ." + classesJar + " file.", e);
+            throw new MojoExecutionException("ArchiverException while creating ." + classesJar + FILE, e);
         } catch (IOException e) {
-            throw new MojoExecutionException("IOException while creating ." + classesJar + " file.", e);
+            throw new MojoExecutionException(IOEXCEPTION_WHILE_CREATING + classesJar + FILE, e);
         }
 
     }
 
+    /**
+     * @param jarFile The JAR file to attach to the project.
+     */
     private void attachJar(File jarFile) {
         if (attachJar) {
             projectHelper.attachArtifact(project, "jar", project.getArtifact().getClassifier(), jarFile);
@@ -243,7 +249,7 @@ public class AarMojo extends AbstractAndroidMojo {
 
     /**
      * @return AAR file.
-     * @throws MojoExecutionException
+     * @throws MojoExecutionException if an error occurs while creating the AAR file
      */
     protected File createAarLibraryFile(File classesJar) throws MojoExecutionException {
         final File aarLibrary = new File(targetDirectory,
@@ -318,14 +324,19 @@ public class AarMojo extends AbstractAndroidMojo {
 
             zipArchiver.createArchive();
         } catch (ArchiverException e) {
-            throw new MojoExecutionException("ArchiverException while creating ." + AAR + " file.", e);
+            throw new MojoExecutionException("ArchiverException while creating ." + AAR + FILE, e);
         } catch (IOException e) {
-            throw new MojoExecutionException("IOException while creating ." + AAR + " file.", e);
+            throw new MojoExecutionException(IOEXCEPTION_WHILE_CREATING + AAR + FILE, e);
         }
 
         return aarLibrary;
     }
 
+    /**
+     * @param zipArchiver ZipArchiver to add files to.
+     * @throws MojoExecutionException if an error occurs while adding the R.txt file to the archive
+     * @throws IOException if an error occurs while creating the R.txt file
+     */
     private void addR(ZipArchiver zipArchiver) throws MojoExecutionException, IOException {
         final File rFile = new File(targetDirectory, "R.txt");
         if (!rFile.exists()) {
@@ -338,6 +349,10 @@ public class AarMojo extends AbstractAndroidMojo {
         getLog().debug("Packaging R.txt in AAR");
     }
 
+    /**
+     * @param zipArchiver ZipArchiver to add files to.
+     * @throws MojoExecutionException if an error occurs while adding native libraries to the archive
+     */
     private void addNativeLibraries(final ZipArchiver zipArchiver) throws MojoExecutionException {
         try {
             if (nativeLibrariesDirectory.exists()) {
@@ -362,7 +377,7 @@ public class AarMojo extends AbstractAndroidMojo {
                 }
             }
         } catch (ArchiverException e) {
-            throw new MojoExecutionException("IOException while creating ." + AAR + " file.", e);
+            throw new MojoExecutionException(IOEXCEPTION_WHILE_CREATING + AAR + FILE, e);
         }
         // TODO: Next is to check for any:
         // TODO: - compiled in (as part of this build) libs
@@ -371,6 +386,10 @@ public class AarMojo extends AbstractAndroidMojo {
         // TODO:        - But where is that directory configured?
     }
 
+    /**
+     * @param zipArchiver ZipArchiver to add files to.
+     * @throws MojoExecutionException if an error occurs while adding JAR libraries to the archive
+     */
     private void addLibraries(final ZipArchiver zipArchiver) throws MojoExecutionException {
         for (Artifact artifact : filterArtifacts(getRelevantCompileArtifacts(), skipDependencies,
                 artifactTypeSet.getIncludes(), artifactTypeSet.getExcludes(), artifactSet.getIncludes(),
@@ -421,13 +440,9 @@ public class AarMojo extends AbstractAndroidMojo {
      * @param directory    The directory to scan for .so files
      * @param architecture The prefix for where in the jar the .so files will go.
      */
-    protected void addSharedLibraries(ZipArchiver zipArchiver, File directory, String architecture) {
+    protected void addSharedLibraries(ZipArchiver zipArchiver, @NonNull File directory, String architecture) {
         getLog().debug("Searching for shared libraries in " + directory);
-        File[] libFiles = directory.listFiles(new FilenameFilter() {
-            public boolean accept(final File dir, final String name) {
-                return name.startsWith("lib") && name.endsWith(".so");
-            }
-        });
+        File[] libFiles = directory.listFiles((dir, name) -> name.startsWith("lib") && name.endsWith(".so"));
 
         if (libFiles != null) {
             for (File libFile : libFiles) {
@@ -441,12 +456,12 @@ public class AarMojo extends AbstractAndroidMojo {
     /**
      * Generates an intermediate apk file (actually .ap_) containing the resources and assets.
      *
-     * @throws MojoExecutionException
+     * @throws MojoExecutionException if an error occurs while generating the intermediate apk file
      */
     private void generateIntermediateApk() throws MojoExecutionException {
         // Have to generate the AAR against the dependent resources or build will fail if any local resources
         // directly reference any of the dependent resources. NB this does NOT include the dep resources in the AAR.
-        List<File> dependenciesResDirectories = new ArrayList<File>();
+        List<File> dependenciesResDirectories = new ArrayList<>();
         for (Artifact libraryArtifact : getTransitiveDependencyArtifacts(APKLIB, AAR)) {
             final File apkLibResDir = getUnpackedLibResourceFolder(libraryArtifact);
             if (apkLibResDir.exists()) {

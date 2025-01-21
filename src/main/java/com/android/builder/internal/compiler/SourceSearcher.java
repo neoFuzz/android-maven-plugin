@@ -25,7 +25,6 @@ import com.android.ide.common.process.ProcessException;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
-import java.util.concurrent.Callable;
 
 /**
  * Class to search for source files (by extension) in a set of source folders.
@@ -45,7 +44,7 @@ public class SourceSearcher {
 
     public void setUseExecutor(boolean useExecutor) {
         if (useExecutor) {
-            mExecutor = new WaitableExecutor<Void>();
+            mExecutor = new WaitableExecutor<>();
         } else {
             mExecutor = null;
         }
@@ -73,12 +72,9 @@ public class SourceSearcher {
             // get the extension of the file.
             if (checkExtension(file)) {
                 if (mExecutor != null) {
-                    mExecutor.execute(new Callable<Void>() {
-                        @Override
-                        public Void call() throws Exception {
-                            processor.processFile(rootFolder, file);
-                            return null;
-                        }
+                    mExecutor.execute(() -> {
+                        processor.processFile(rootFolder, file);
+                        return null;
                     });
                 } else {
                     processor.processFile(rootFolder, file);

@@ -12,18 +12,31 @@ public class UsesSdk {
     private String maxSdkVersion;
     private String targetSdkVersion;
 
+    /**
+     * @return the minSdkVersion
+     */
     public String getMinSdkVersion() {
         return minSdkVersion;
     }
 
+    /**
+     * @return the maxSdkVersion
+     */
     public String getMaxSdkVersion() {
         return maxSdkVersion;
     }
 
+    /**
+     * @return the targetSdkVersion
+     */
     public String getTargetSdkVersion() {
         return targetSdkVersion;
     }
 
+    /**
+     * @param o the object to compare with
+     * @return true if the objects are equal, false otherwise
+     */
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -54,6 +67,9 @@ public class UsesSdk {
         return true;
     }
 
+    /**
+     * @return the hash code of the object
+     */
     @Override
     public int hashCode() {
         int result = minSdkVersion != null ? minSdkVersion.hashCode() : 0;
@@ -62,6 +78,9 @@ public class UsesSdk {
         return result;
     }
 
+    /**
+     * @return the string representation of the object
+     */
     @Override
     public String toString() {
         return minSdkVersion + " : " + maxSdkVersion + " : " + targetSdkVersion;

@@ -20,7 +20,6 @@ import com.android.annotations.NonNull;
 import com.android.annotations.Nullable;
 import com.android.annotations.VisibleForTesting;
 import com.android.utils.XmlUtils;
-import com.google.common.base.Charsets;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Lists;
@@ -38,6 +37,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 /**
@@ -64,7 +64,7 @@ abstract class DataMerger<I extends DataItem<F>, F extends DataFile<I>, S extend
      */
     private final List<S> mDataSets = Lists.newArrayList();
 
-    public DataMerger() {
+    protected DataMerger() {
         mFactory = DocumentBuilderFactory.newInstance();
         mFactory.setNamespaceAware(true);
         mFactory.setValidating(false);
@@ -94,7 +94,6 @@ abstract class DataMerger<I extends DataItem<F>, F extends DataFile<I>, S extend
      * @param resourceSet the ResourceSet to add.
      */
     public void addDataSet(S resourceSet) {
-        // TODO figure out if we allow partial overlay through a per-resource flag.
         mDataSets.add(resourceSet);
     }
 
@@ -143,6 +142,11 @@ abstract class DataMerger<I extends DataItem<F>, F extends DataFile<I>, S extend
     @NonNull
     @Override
     public ListMultimap<String, I> getDataMap() {
+        return getMultimap();
+    }
+
+    @NonNull
+    private ListMultimap<String, I> getMultimap() {
         // put all the sets in a multimap. The result is that for each key,
         // there is a sorted list of items from all the layers, including removed ones.
         ListMultimap<String, I> fullItemMultimap = ArrayListMultimap.create();
@@ -153,7 +157,6 @@ abstract class DataMerger<I extends DataItem<F>, F extends DataFile<I>, S extend
                 fullItemMultimap.putAll(entry.getKey(), entry.getValue());
             }
         }
-
         return fullItemMultimap;
     }
 
@@ -288,7 +291,7 @@ abstract class DataMerger<I extends DataItem<F>, F extends DataFile<I>, S extend
 
         if (doCleanUp) {
             // reset all states. We can't just reset the toWrite and previouslyWritten objects
-            // since overlayed items might have been touched as well.
+            // since overlay items might have been touched as well.
             // Should also clean (remove) objects that are removed.
             postMergeCleanUp();
         }
@@ -329,19 +332,22 @@ abstract class DataMerger<I extends DataItem<F>, F extends DataFile<I>, S extend
 
             String content = XmlUtils.toXml(document);
 
-            try {
-                createDir(blobRootFolder);
-            } catch (IOException ioe) {
-                throw new MergingException(ioe).setFile(blobRootFolder);
-            }
+            createDir(blobRootFolder);
+
             File file = new File(blobRootFolder, FN_MERGER_XML);
-            try {
-                Files.write(content, file, Charsets.UTF_8);
-            } catch (IOException ioe) {
-                throw new MergingException(ioe).setFile(file);
-            }
+            writeContentFile(content, file);
         } catch (ParserConfigurationException e) {
             throw new MergingException(e);
+        } catch (IOException ioe) {
+            throw new MergingException(ioe).setFile(blobRootFolder);
+        }
+    }
+
+    private static void writeContentFile(String content, File file) throws MergingException {
+        try {
+            Files.write(content, file, StandardCharsets.UTF_8);
+        } catch (IOException ioe) {
+            throw new MergingException(ioe).setFile(file);
         }
     }
 
@@ -462,16 +468,7 @@ abstract class DataMerger<I extends DataItem<F>, F extends DataFile<I>, S extend
      * @see DataItem#isWritten()
      */
     private void setPostBlobLoadStateToWritten() {
-        ListMultimap<String, I> itemMap = ArrayListMultimap.create();
-
-        // put all the sets into list per keys. The order is important as the lower sets are
-        // overridden by the higher sets.
-        for (S dataSet : mDataSets) {
-            ListMultimap<String, I> map = dataSet.getDataMap();
-            for (Map.Entry<String, Collection<I>> entry : map.asMap().entrySet()) {
-                itemMap.putAll(entry.getKey(), entry.getValue());
-            }
-        }
+        ListMultimap<String, I> itemMap = getMultimap();
 
         // the items that represent the current state is the last item in the list for each key.
         for (String key : itemMap.keySet()) {
@@ -494,16 +491,7 @@ abstract class DataMerger<I extends DataItem<F>, F extends DataFile<I>, S extend
      * @see DataItem#isTouched()
      */
     private void setPostBlobLoadStateToTouched() {
-        ListMultimap<String, I> itemMap = ArrayListMultimap.create();
-
-        // put all the sets into list per keys. The order is important as the lower sets are
-        // overridden by the higher sets.
-        for (S dataSet : mDataSets) {
-            ListMultimap<String, I> map = dataSet.getDataMap();
-            for (Map.Entry<String, Collection<I>> entry : map.asMap().entrySet()) {
-                itemMap.putAll(entry.getKey(), entry.getValue());
-            }
-        }
+        ListMultimap<String, I> itemMap = getMultimap();
 
         // the items that represent the current state is the last item in the list for each key.
         for (String key : itemMap.keySet()) {
@@ -560,7 +548,7 @@ abstract class DataMerger<I extends DataItem<F>, F extends DataFile<I>, S extend
      * @param dataSets the resource sets.
      * @return true if the update can be performed. false if a full merge should be done.
      */
-    public boolean checkValidUpdate(List<S> dataSets) {
+    public boolean checkValidUpdate(@NonNull List<S> dataSets) {
         if (dataSets.size() != mDataSets.size()) {
             return false;
         }
@@ -668,7 +656,7 @@ abstract class DataMerger<I extends DataItem<F>, F extends DataFile<I>, S extend
         return fileValidity;
     }
 
-    protected synchronized void createDir(File folder) throws IOException {
+    protected synchronized void createDir(@NonNull File folder) throws IOException {
         if (!folder.isDirectory() && !folder.mkdirs()) {
             throw new IOException("Failed to create directory: " + folder);
         }

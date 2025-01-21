@@ -23,7 +23,9 @@ import com.android.ide.common.blame.SourceFile;
 import com.android.ide.common.blame.SourceFilePosition;
 import com.android.ide.common.blame.SourcePosition;
 import com.google.common.base.Joiner;
-import com.google.common.base.Optional;
+
+import java.util.Optional;
+
 import com.google.common.base.Preconditions;
 import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableSet;
@@ -34,7 +36,7 @@ import org.w3c.dom.Attr;
  * <p>
  * Basically a facade object on {@link Attr} objects with some added features like automatic
  * namespace handling, manifest merger friendly identifiers and smart replacement of shortened
- * full qualified class names using manifest node's package setting from the the owning Android's
+ * full qualified class names using manifest node's package setting from the owning Android's
  * document.
  */
 public class XmlAttribute extends XmlNode {
@@ -247,10 +249,12 @@ public class XmlAttribute extends XmlNode {
                     report.getActionRecorder().getAttributeCreationRecord(higherPriority);
             String message =
                     String.format(
-                            "Attribute %1$s value=(%2$s) from %3$s\n"
-                                    + "\tis also present at %4$s value=(%5$s).\n"
-                                    + "\tThe merger automatically chose %2$s. "
-                                    + "Verify that this is what you want and adjust if necessary.",
+                            """
+                                    Attribute %1$s value=(%2$s) from %3$s
+                                    \tis also present at %4$s value=(%5$s).
+                                    \tThe merger automatically chose %2$s.
+                                    Verify that this is what you want and adjust if necessary.
+                                    """,
                             higherPriority.getId(),
                             higherPriority.getValue(),
                             attributeRecord != null
@@ -296,7 +300,7 @@ public class XmlAttribute extends XmlNode {
     }
 
     /**
-     * Merge this attribute value (on a lower priority element) with a implicit default value
+     * Merge this attribute value (on a lower priority element) with an implicit default value
      * (implicitly declared on the implicitNode).
      *
      * @param mergingReport report to log errors and actions.
@@ -393,9 +397,10 @@ public class XmlAttribute extends XmlNode {
         String error;
         if (getOwnerElement().getType().getMergeType() == MergeType.MERGE_CHILDREN_ONLY) {
             error = String.format(
-                    "Attribute %1$s value=(%2$s) from %3$s\n"
-                            + "\tis also present at %4$s value=(%5$s).\n"
-                            + "\tAttributes of <%6$s> elements are not merged.",
+                    """
+                            Attribute %1$s value=(%2$s) from %3$s
+                            \tis also present at %4$s value=(%5$s).
+                            \tAttributes of <%6$s> elements are not merged.""",
                     higherPriority.getId(),
                     higherPriority.getValue(),
                     attributeRecord != null
@@ -406,10 +411,11 @@ public class XmlAttribute extends XmlNode {
                     getOwnerElement().getType().toXmlName());
         } else {
             error = String.format(
-                    "Attribute %1$s value=(%2$s) from %3$s\n"
-                            + "\tis also present at %4$s value=(%5$s).\n"
-                            + "\tSuggestion: add 'tools:replace=\"%6$s\"' to <%7$s> element "
-                            + "at %8$s to override.",
+                    """
+                            Attribute %1$s value=(%2$s) from %3$s
+                            \tis also present at %4$s value=(%5$s).
+                            \tSuggestion: add 'tools:replace="%6$s"' to <%7$s> element \
+                            at %8$s to override.""",
                     higherPriority.getId(),
                     higherPriority.getValue(),
                     attributeRecord != null

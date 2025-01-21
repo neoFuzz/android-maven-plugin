@@ -1,6 +1,6 @@
 package com.github.cardforge.maven.plugins.android.common;
 
-import org.apache.commons.io.IOUtils;
+import com.android.annotations.NonNull;
 import org.codehaus.plexus.util.IOUtil;
 
 import java.io.*;
@@ -16,40 +16,34 @@ import java.util.jar.JarFile;
 public class JarHelper {
 
     /**
-     * Unjars the specified jar file into the the specified directory
+     * Un-jars the specified jar file into the specified directory
      *
-     * @param jarFile
-     * @param outputDirectory
-     * @param unjarListener
-     * @throws IOException
+     * @param jarFile         The jar file to un-jar
+     * @param outputDirectory The directory into which to un-jar the jar file
+     * @param unjarListener   The listener to determine which entries to include
+     * @throws IOException Thrown if an error occurs while un-jarring the jar file
      */
-    public static void unjar(JarFile jarFile, File outputDirectory, UnjarListener unjarListener) throws IOException {
-        for (Enumeration en = jarFile.entries(); en.hasMoreElements(); ) {
-            JarEntry entry = (JarEntry) en.nextElement();
+    public static void unjar(@NonNull JarFile jarFile, File outputDirectory, UnjarListener unjarListener) throws IOException {
+        for (Enumeration<JarEntry> en = jarFile.entries(); en.hasMoreElements(); ) {
+            JarEntry entry = en.nextElement();
             File entryFile = new File(outputDirectory, entry.getName());
             if (!entryFile.toPath().normalize().startsWith(outputDirectory.toPath().normalize())) {
                 throw new IOException("Bad zip entry");
             }
             if (unjarListener.include(entry)) {
                 // Create the output directory if need be
-                if (!entryFile.getParentFile().exists()) {
-                    if (!entryFile.getParentFile().mkdirs()) {
+                if (!entryFile.getParentFile().exists() &&
+                        !entryFile.getParentFile().mkdirs()) {
                         throw new IOException("Error creating output directory: " + entryFile.getParentFile());
                     }
-                }
+
 
                 // If the entry is an actual file, unzip that too
                 if (!entry.isDirectory()) {
-                    final InputStream in = jarFile.getInputStream(entry);
-                    try {
-                        final OutputStream out = new FileOutputStream(entryFile);
-                        try {
+                    try (final InputStream in = jarFile.getInputStream(entry)) {
+                        try (final OutputStream out = new FileOutputStream(entryFile)) {
                             IOUtil.copy(in, out);
-                        } finally {
-                            IOUtils.closeQuietly(out);
                         }
-                    } finally {
-                        IOUtils.closeQuietly(in);
                     }
                 }
             }

@@ -23,12 +23,12 @@ import java.io.File;
 /**
  * Represents a file in an asset folder.
  */
-class AssetFile extends DataFile<AssetItem> {
+public class AssetFile extends DataFile<AssetItem> {
 
     /**
      * Creates a resource file with a single resource item.
      * <p>
-     * The source file is set on the item with {@link AssetItem#setSource(DataFile)}
+     * The source file is set on the item with {@link AssetItem#setSource}
      *
      * @param file the File
      * @param item the resource item

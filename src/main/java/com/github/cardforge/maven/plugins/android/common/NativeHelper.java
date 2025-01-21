@@ -1,5 +1,7 @@
 package com.github.cardforge.maven.plugins.android.common;
 
+import com.android.annotations.NonNull;
+import com.android.annotations.Nullable;
 import com.github.cardforge.maven.plugins.android.AbstractAndroidMojo;
 import com.github.cardforge.maven.plugins.android.AndroidNdk;
 import com.google.common.io.PatternFilenameFilter;
@@ -19,18 +21,18 @@ import java.io.FileNotFoundException;
 import java.util.*;
 
 import static com.github.cardforge.maven.plugins.android.common.AndroidExtension.AAR;
-import static com.github.cardforge.maven.plugins.android.common.AndroidExtension.APKLIB;
 
 /**
  * @author Johan Lindquist
  */
 public class NativeHelper {
 
-    public static final int NDK_REQUIRED_VERSION = 7;
+    public static final String FOR_NATIVE_ARTIFACTS = " for native artifacts";
+    public static final String INC_ATT_ART = "Including attached artifact: ";
 
-    private MavenProject project;
-    private DependencyGraphBuilder dependencyGraphBuilder;
-    private Log log;
+    private final MavenProject project;
+    private final DependencyGraphBuilder dependencyGraphBuilder;
+    private final Log log;
 
     public NativeHelper(MavenProject project, DependencyGraphBuilder dependencyGraphBuilder, Log log) {
         this.project = project;
@@ -38,11 +40,10 @@ public class NativeHelper {
         this.log = log;
     }
 
-    public static String[] getAppAbi(File applicationMakefile) {
-        Scanner scanner = null;
-        try {
-            if (applicationMakefile != null && applicationMakefile.exists()) {
-                scanner = new Scanner(applicationMakefile);
+    @Nullable
+    public static String[] getAppAbi(@NonNull File applicationMakefile) {
+        try (Scanner scanner = new Scanner(applicationMakefile)) {
+            if (applicationMakefile.exists()) {
                 while (scanner.hasNextLine()) {
                     String line = scanner.nextLine().trim();
                     if (line.startsWith("APP_ABI")) {
@@ -52,10 +53,6 @@ public class NativeHelper {
             }
         } catch (FileNotFoundException e) {
             // do nothing
-        } finally {
-            if (scanner != null) {
-                scanner.close();
-            }
         }
         return null;
     }
@@ -66,10 +63,10 @@ public class NativeHelper {
      * architecture is embedded in the classifier, 'armeabi' will be returned.
      *
      * @param artifact            The artifact to retrieve the classifier from.
-     * @param defaultArchitecture The architecture to return if can't be resolved from the classifier
-     * @return The retrieved architecture, or <code>defaulArchitecture</code> if not resolveable
+     * @param defaultArchitecture The architecture to return if it can't be resolved from the classifier
+     * @return The retrieved architecture, or <code>defaultArchitecture</code> if not resolvable
      */
-    public static String extractArchitectureFromArtifact(Artifact artifact, final String defaultArchitecture) {
+    public static String extractArchitectureFromArtifact(@NonNull Artifact artifact, final String defaultArchitecture) {
         String classifier = artifact.getClassifier();
         if (classifier != null) {
             //
@@ -98,18 +95,17 @@ public class NativeHelper {
      * It retrieves the list from the following places:
      * <ul>
      *     <li>ndkArchitecture parameter</li>
-     *     <li>projects Application.mk - currently only a single architecture is supported by this method</li>
+     *     <li>projects {@code Application.mk} - currently only a single architecture is supported by this method</li>
      * </ul>
      *
      * @param ndkArchitectures    Space separated list of architectures.  This may be from configuration or otherwise
      * @param applicationMakefile The makefile (Application.mk) to retrieve the list from.
      * @param basedir             Directory the build is running from (to resolve files)
-     * @return List of architectures to be supported by build.
-     * @throws MojoExecutionException
+     * @return The list of architectures to be supported by build.
      */
+    @NonNull
     public static String[] getNdkArchitectures(final String ndkArchitectures, final String applicationMakefile,
-                                               final File basedir)
-            throws MojoExecutionException {
+                                               final File basedir) {
         // if there is a specified ndk architecture, return it
         if (ndkArchitectures != null) {
             return ndkArchitectures.split(" ");
@@ -145,7 +141,7 @@ public class NativeHelper {
      * @param artifact        Artifact to check the classifier match for
      * @return True if the architecture matches, otherwise false
      */
-    public static boolean artifactHasHardwareArchitecture(Artifact artifact, String ndkArchitecture,
+    public static boolean artifactHasHardwareArchitecture(@NonNull Artifact artifact, String ndkArchitecture,
                                                           String defaultArchitecture) {
         return Const.ArtifactType.NATIVE_SYMBOL_OBJECT.equals(artifact.getType())
                 && ndkArchitecture.equals(extractArchitectureFromArtifact(artifact, defaultArchitecture));
@@ -155,8 +151,8 @@ public class NativeHelper {
             AbstractAndroidMojo mojo, File unpackDirectory, boolean sharedLibraries)
             throws MojoExecutionException {
         log.debug("Finding native dependencies. UnpackFolder=" + unpackDirectory + " shared=" + sharedLibraries);
-        final Set<Artifact> filteredArtifacts = new LinkedHashSet<Artifact>();
-        final Set<Artifact> allArtifacts = new LinkedHashSet<Artifact>();
+        final Set<Artifact> filteredArtifacts = new LinkedHashSet<>();
+        final Set<Artifact> allArtifacts = new LinkedHashSet<>();
 
         // Add all dependent artifacts declared in the pom file
         // Note: The result of project.getDependencyArtifacts() can be an UnmodifiableSet so we
@@ -175,49 +171,44 @@ public class NativeHelper {
             // as part of a previous build step (NDK mojo)
             if (isNativeLibrary && artifact.getScope() == null) {
                 // Including attached artifact
-                log.debug("Including attached artifact: " + artifact + ". Artifact scope is not set.");
+                log.debug(INC_ATT_ART + artifact + ". Artifact scope is not set.");
                 filteredArtifacts.add(artifact);
             } else {
                 if (isNativeLibrary && (
                         Artifact.SCOPE_COMPILE.equals(artifact.getScope()) || Artifact.SCOPE_RUNTIME
                                 .equals(artifact.getScope()))) {
-                    log.debug("Including attached artifact: " + artifact + ". Artifact scope is Compile or Runtime.");
+                    log.debug(INC_ATT_ART + artifact + ". Artifact scope is Compile or Runtime.");
                     filteredArtifacts.add(artifact);
                 } else {
                     final String type = artifact.getType();
 
-                    if (APKLIB.equals(type) || AAR.equals(type)) {
+                    if (AAR.equals(type)) {
                         // Check if the artifact contains a libs folder - if so, include it in the list
                         final File libsFolder;
                         if (mojo != null) {
                             libsFolder = mojo.getUnpackedLibNativesFolder(artifact);
                         } else {
-                            // This is used from NativeHelperTest since we have no AbstractAndroidMojo there
                             libsFolder = new File(
-                                    AbstractAndroidMojo.getLibraryUnpackDirectory(unpackDirectory, artifact),
+                                    new File(unpackDirectory.getAbsolutePath(), artifact.getArtifactId()),
                                     AAR.equals(type) ? "jni" : "libs");
                         }
 
-                        if (!libsFolder.exists()) {
-                            log.debug("Skipping " + libsFolder.getAbsolutePath() + " for native artifacts");
+                        if (!libsFolder.exists() || !libsFolder.isDirectory()) {
+                            log.debug("Skipping " + libsFolder.getAbsolutePath() + FOR_NATIVE_ARTIFACTS);
                             continue;
                         }
 
-                        if (!libsFolder.isDirectory()) {
-                            continue;
-                        }
-
-                        log.debug("Checking " + libsFolder.getAbsolutePath() + " for native artifacts");
+                        log.debug("Checking " + libsFolder.getAbsolutePath() + FOR_NATIVE_ARTIFACTS);
                         // make sure we ignore libs folders that only contain JARs
                         // The regular expression filters out all file paths ending with '.jar' or '.JAR',
                         // so all native libs remain
                         if (libsFolder.list(new PatternFilenameFilter("^.*(?<!(?i)\\.jar)$")).length > 0) {
-                            log.debug("Including attached artifact: " + artifact + ". Artifact is "
+                            log.debug(INC_ATT_ART + artifact + ". Artifact is "
                                     + artifact.getType());
                             filteredArtifacts.add(artifact);
                         }
                     } else if (!"jar".equals(type)) {
-                        log.debug("Not checking " + type + " for native artifacts");
+                        log.debug("Not checking " + type + FOR_NATIVE_ARTIFACTS);
                     }
                 }
             }
@@ -237,9 +228,10 @@ public class NativeHelper {
         );
     }
 
-    private Set<Artifact> processTransitiveDependencies(List<Dependency> dependencies, boolean sharedLibraries)
+    @NonNull
+    private Set<Artifact> processTransitiveDependencies(@NonNull List<Dependency> dependencies, boolean sharedLibraries)
             throws MojoExecutionException {
-        final Set<Artifact> transitiveArtifacts = new LinkedHashSet<Artifact>();
+        final Set<Artifact> transitiveArtifacts = new LinkedHashSet<>();
         for (Dependency dependency : dependencies) {
             if (!Artifact.SCOPE_PROVIDED.equals(dependency.getScope()) && !dependency.isOptional()) {
                 final Set<Artifact> transArtifactsFor = processTransitiveDependencies(dependency, sharedLibraries);
@@ -252,27 +244,23 @@ public class NativeHelper {
 
     }
 
+    @NonNull
     private Set<Artifact> processTransitiveDependencies(Dependency dependency, boolean sharedLibraries)
             throws MojoExecutionException {
         try {
-            final Set<Artifact> artifacts = new LinkedHashSet<Artifact>();
+            final Set<Artifact> artifacts = new LinkedHashSet<>();
 
-            final List<String> exclusionPatterns = new ArrayList<String>();
+            final List<String> exclusionPatterns = new ArrayList<>();
             if (dependency.getExclusions() != null && !dependency.getExclusions().isEmpty()) {
                 for (final Exclusion exclusion : dependency.getExclusions()) {
                     exclusionPatterns.add(exclusion.getGroupId() + ":" + exclusion.getArtifactId());
                 }
             }
-            final ArtifactFilter optionalFilter = new ArtifactFilter() {
-                @Override
-                public boolean include(Artifact artifact) {
-                    return !artifact.isOptional();
-                }
-            };
+            final ArtifactFilter optionalFilter = artifact -> !artifact.isOptional();
 
             final AndArtifactFilter filter = new AndArtifactFilter();
             filter.add(new ExcludesArtifactFilter(exclusionPatterns));
-            filter.add(new OrArtifactFilter(Arrays.<ArtifactFilter>asList(new ScopeArtifactFilter("compile"),
+            filter.add(new OrArtifactFilter(Arrays.asList(new ScopeArtifactFilter("compile"),
                     new ScopeArtifactFilter("runtime"),
                     new ScopeArtifactFilter("test"))));
             filter.add(optionalFilter);

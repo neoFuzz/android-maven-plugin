@@ -42,7 +42,7 @@ public interface IPkgDescExtra extends IPkgDesc {
      * @return A non-null, possibly empty, for old paths previously used for the same extra.
      */
     @NonNull
-    public String[] getOldPaths();
+    String[] getOldPaths();
 
     /**
      * Returns the display name of the Extra.
@@ -50,6 +50,6 @@ public interface IPkgDescExtra extends IPkgDesc {
      * @return A non-null name for the Extra, used for display purposes.
      */
     @NonNull
-    public String getNameDisplay();
+    String getNameDisplay();
 
 }

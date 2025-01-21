@@ -1,4 +1,4 @@
-/*******************************************************************************
+/* ******************************************************************************
  * Copyright (c) 2008, 2011 Sonatype Inc. and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -11,8 +11,8 @@
 package com.github.cardforge.maven.plugins.android.common;
 
 import com.android.SdkConstants;
+import com.android.annotations.NonNull;
 import com.github.cardforge.maven.plugins.android.phase09package.AarMojo;
-import com.github.cardforge.maven.plugins.android.phase09package.ApklibMojo;
 import com.google.common.io.PatternFilenameFilter;
 import org.apache.commons.io.FileUtils;
 import org.apache.maven.artifact.Artifact;
@@ -102,7 +102,7 @@ public final class UnpackedLibHelper {
         // Move native libraries from libs to jni folder for legacy AARs.
         // This ensures backward compatibility with older AARs where libs are in "libs" folder.
         final File jniFolder = new File(aarDirectory, AarMojo.NATIVE_LIBRARIES_FOLDER);
-        final File libsFolder = new File(aarDirectory, ApklibMojo.NATIVE_LIBRARIES_FOLDER);
+        final File libsFolder = new File(aarDirectory, "libs");
         if (!jniFolder.exists() && libsFolder.isDirectory() && libsFolder.exists()) {
             String[] natives = libsFolder.list(new PatternFilenameFilter("^.*(?<!(?i)\\.jar)$"));
             if (natives.length > 0) {
@@ -119,16 +119,17 @@ public final class UnpackedLibHelper {
         }
     }
 
+    @NonNull
     public File getArtifactToFile(Artifact artifact) throws MojoExecutionException {
-        final File artifactFile = artifactResolverHelper.resolveArtifactToFile(artifact);
-        return artifactFile;
+        return artifactResolverHelper.resolveArtifactToFile(artifact);
     }
 
     public File getUnpackedLibsFolder() {
         return unpackedLibsDirectory;
     }
 
-    public File getUnpackedLibFolder(Artifact artifact) {
+    @NonNull
+    public File getUnpackedLibFolder(@NonNull Artifact artifact) {
         return new File(unpackedLibsDirectory.getAbsolutePath(),
                 getShortenedGroupId(artifact.getGroupId())
                         + "_"
@@ -138,18 +139,22 @@ public final class UnpackedLibHelper {
         );
     }
 
+    @NonNull
     public File getUnpackedClassesJar(Artifact artifact) {
         return new File(getUnpackedLibFolder(artifact), SdkConstants.FN_CLASSES_JAR);
     }
 
+    @NonNull
     public File getUnpackedApkLibSourceFolder(Artifact artifact) {
         return new File(getUnpackedLibFolder(artifact), "src");
     }
 
+    @NonNull
     public File getUnpackedLibResourceFolder(Artifact artifact) {
         return new File(getUnpackedLibFolder(artifact), "res");
     }
 
+    @NonNull
     public File getUnpackedLibAssetsFolder(Artifact artifact) {
         return new File(getUnpackedLibFolder(artifact), "assets");
     }
@@ -159,15 +164,17 @@ public final class UnpackedLibHelper {
      * @return Folder where the unpacked native libraries are located.
      * @see <a href="http://tools.android.com/tech-docs/new-build-system/aar-format">AAR Format Documentation</a>
      */
-    public File getUnpackedLibNativesFolder(Artifact artifact) {
+    @NonNull
+    public File getUnpackedLibNativesFolder(@NonNull Artifact artifact) {
         if (AAR.equals(artifact.getType())) {
             return new File(getUnpackedLibFolder(artifact), AarMojo.NATIVE_LIBRARIES_FOLDER);
         } else {
-            return new File(getUnpackedLibFolder(artifact), ApklibMojo.NATIVE_LIBRARIES_FOLDER);
+            return new File(getUnpackedLibFolder(artifact), "libs");
         }
     }
 
-    public File getJarFileForApk(Artifact artifact) {
+    @NonNull
+    public File getJarFileForApk(@NonNull Artifact artifact) {
         final String fileName = artifact.getFile().getName();
         final String modifiedFileName = fileName.substring(0, fileName.lastIndexOf(".")) + ".jar";
         return new File(artifact.getFile().getParentFile(), modifiedFileName);
@@ -178,7 +185,8 @@ public final class UnpackedLibHelper {
      * @return A shortened (and potentially non-unique) version of the groupId, that consists of the first letter
      * of each part of the groupId. Eg oam for org.apache.maven
      */
-    private String getShortenedGroupId(String groupId) {
+    @NonNull
+    private String getShortenedGroupId(@NonNull String groupId) {
         final String[] parts = groupId.split("\\.");
         final StringBuilder sb = new StringBuilder();
         for (final String part : parts) {
@@ -190,7 +198,7 @@ public final class UnpackedLibHelper {
     /**
      * @return True if this project constructs an APK as opposed to an AAR or APKLIB.
      */
-    public boolean isAPKBuild(MavenProject project) {
+    public boolean isAPKBuild(@NonNull MavenProject project) {
         return APK.equals(project.getPackaging());
     }
 }

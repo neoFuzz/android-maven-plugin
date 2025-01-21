@@ -1,15 +1,16 @@
 package com.github.cardforge.maven.plugins.android.common;
 
+import com.android.annotations.NonNull;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.logging.Log;
 import org.codehaus.plexus.archiver.ArchiverException;
 import org.codehaus.plexus.archiver.UnArchiver;
 import org.codehaus.plexus.archiver.zip.ZipUnArchiver;
-import org.codehaus.plexus.components.io.fileselectors.FileInfo;
+
 import org.codehaus.plexus.components.io.fileselectors.FileSelector;
 
 import java.io.File;
-import java.io.IOException;
+
 
 /**
  * Extract an archive to a given location.
@@ -21,17 +22,12 @@ public final class ZipExtractor {
         this.log = log;
     }
 
-    public void extract(File zipFile, File targetFolder, final String suffixToExclude) throws MojoExecutionException {
+    public void extract(File zipFile, @NonNull File targetFolder, final String suffixToExclude) throws MojoExecutionException {
         final UnArchiver unArchiver = new ZipUnArchiver(zipFile);
 
         targetFolder.mkdirs();
 
-        final FileSelector exclusionFilter = new FileSelector() {
-            @Override
-            public boolean isSelected(FileInfo fileInfo) throws IOException {
-                return !fileInfo.getName().endsWith(suffixToExclude);
-            }
-        };
+        final FileSelector exclusionFilter = fileInfo -> !fileInfo.getName().endsWith(suffixToExclude);
 
         unArchiver.setDestDirectory(targetFolder);
         unArchiver.setFileSelectors(new FileSelector[]{exclusionFilter});

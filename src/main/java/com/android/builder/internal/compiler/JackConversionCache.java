@@ -23,11 +23,9 @@ import com.android.ide.common.process.JavaProcessExecutor;
 import com.android.ide.common.process.ProcessException;
 import com.android.ide.common.process.ProcessOutputHandler;
 import com.android.sdklib.BuildToolInfo;
-import com.android.sdklib.repository.FullRevision;
 import com.android.utils.ILogger;
 import com.android.utils.Pair;
 import com.google.common.io.Files;
-import org.w3c.dom.NamedNodeMap;
 
 import java.io.File;
 import java.io.IOException;
@@ -43,7 +41,7 @@ import java.util.List;
  * Because different project could use different build-tools, both the library to be converted
  * and the version of the build tools are used as keys in the cache.
  * <p>
- * The API is fairly simple, just call {@link #convertLibrary(File, File, DexOptions, BuildToolInfo, boolean, JavaProcessExecutor, ProcessOutputHandler)}
+ * The API is fairly simple, just call {@link #convertLibrary(File, File, DexOptions, BuildToolInfo, boolean, JavaProcessExecutor, ProcessOutputHandler, ILogger)}
  * <p>
  * The call will be blocking until the conversion happened, either through actually running Jill or
  * through copying the output of a previous Jill run.
@@ -62,13 +60,7 @@ public class JackConversionCache extends PreProcessCache<PreProcessCache.Key> {
     @NonNull
     @Override
     protected KeyFactory<Key> getKeyFactory() {
-        return new KeyFactory<Key>() {
-            @Override
-            public Key of(@NonNull File sourceFile, @NonNull FullRevision revision,
-                          @NonNull NamedNodeMap attrMap) {
-                return Key.of(sourceFile, revision);
-            }
-        };
+        return (sourceFile, revision, attrMap) -> Key.of(sourceFile, revision);
     }
 
     /**
@@ -81,7 +73,7 @@ public class JackConversionCache extends PreProcessCache<PreProcessCache.Key> {
      * @param buildToolInfo   the build tools info
      * @param verbose         verbose flag
      * @param processExecutor the java process executor.
-     * @throws ProcessException
+     * @throws ProcessException failed to run Jill
      */
     public void convertLibrary(
             @NonNull File inputFile,
@@ -100,9 +92,9 @@ public class JackConversionCache extends PreProcessCache<PreProcessCache.Key> {
         Item item = pair.getFirst();
 
         // if this is a new item
-        if (pair.getSecond()) {
+        if (Boolean.TRUE.equals(pair.getSecond())) {
             try {
-                // haven't process this file yet so do it and record it.
+                // haven't processed this file yet so do it and record it.
                 List<File> files = AndroidBuilder.convertLibaryToJackUsingApis(
                         inputFile,
                         outFile,

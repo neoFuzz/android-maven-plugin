@@ -21,6 +21,7 @@ import com.android.annotations.concurrency.Immutable;
 import com.android.builder.model.ClassField;
 import com.google.common.collect.ImmutableSet;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Set;
 
@@ -29,7 +30,7 @@ import java.util.Set;
  */
 @Immutable
 public final class ClassFieldImpl implements ClassField, Serializable {
-
+    @Serial
     private static final long serialVersionUID = 1L;
 
     @NonNull
@@ -44,7 +45,7 @@ public final class ClassFieldImpl implements ClassField, Serializable {
     private final String documentation;
 
     public ClassFieldImpl(@NonNull String type, @NonNull String name, @NonNull String value) {
-        this(type, name, value, ImmutableSet.<String>of(), "");
+        this(type, name, value, ImmutableSet.of(), "");
     }
 
     public ClassFieldImpl(@NonNull String type, @NonNull String name, @NonNull String value,
@@ -58,11 +59,6 @@ public final class ClassFieldImpl implements ClassField, Serializable {
         this.value = value;
         this.annotations = ImmutableSet.copyOf(annotations);
         this.documentation = documentation;
-    }
-
-    public ClassFieldImpl(@NonNull ClassField classField) {
-        this(classField.getType(), classField.getName(), classField.getValue(),
-                classField.getAnnotations(), classField.getDocumentation());
     }
 
     @Override
@@ -106,9 +102,7 @@ public final class ClassFieldImpl implements ClassField, Serializable {
         if (!type.equals(that.type)) return false;
         if (!value.equals(that.value)) return false;
         if (!annotations.equals(that.annotations)) return false;
-        if (!documentation.equals(that.documentation)) return false;
-
-        return true;
+        return documentation.equals(that.documentation);
     }
 
     @Override

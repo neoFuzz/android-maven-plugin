@@ -75,12 +75,10 @@ public class ScreenSizeQualifier extends EnumBasedResourceQualifier {
     @Override
     public boolean isMatchFor(ResourceQualifier qualifier) {
         // This is a match only if the screen size is smaller than the qualifier's screen size.
-        if (qualifier instanceof ScreenSizeQualifier) {
-            int qualifierIndex = ScreenSize.getIndex(((ScreenSizeQualifier) qualifier).mValue);
+        if (qualifier instanceof ScreenSizeQualifier ssq) {
+            int qualifierIndex = ScreenSize.getIndex(ssq.mValue);
             int index = ScreenSize.getIndex(mValue);
-            if (index <= qualifierIndex) {
-                return true;
-            }
+            return index <= qualifierIndex;
         }
         return false;
     }
@@ -98,5 +96,16 @@ public class ScreenSizeQualifier extends EnumBasedResourceQualifier {
         // Return true if this size is larger than reference size. Since isMatchFor() is called
         // before, it is guaranteed that the size will not be larger than the reference.
         return thisIndex > compareIndex;
+    }
+
+    @Override
+    public int hashCode() {
+        return mValue.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object qualifier) {
+        return qualifier instanceof ScreenSizeQualifier s &&
+                s.mValue == mValue;
     }
 }

@@ -47,6 +47,12 @@ public class LocalAddonSysImgPkgInfo extends LocalPkgInfo {
                                    @NonNull String abi,
                                    @NonNull MajorRevision revision) {
         super(localSdk, localDir, sourceProps);
+        if (addonVendor == null) {
+            addonVendor = new IdDisplay("Unknown Vendor", "Unknown Vendor");
+        }
+        if (addonName == null) {
+            addonName = new IdDisplay("Unknown Addon", "Unknown Addon");
+        }
         mDesc = PkgDesc.Builder.newAddonSysImg(version, addonVendor, addonName, abi, revision)
                 .create();
     }

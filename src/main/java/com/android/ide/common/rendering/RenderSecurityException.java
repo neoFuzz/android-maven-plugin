@@ -57,6 +57,7 @@ public class RenderSecurityException extends SecurityException {
         return new RenderSecurityException(message);
     }
 
+    @NonNull
     private static String computeLabel(@NonNull String resource, @Nullable String context) {
         StringBuilder sb = new StringBuilder(40);
         sb.append(resource);

@@ -68,7 +68,7 @@ public class TestManifestGenerator {
     }
 
     public void generate() throws IOException {
-        Map<String, String> map = new HashMap<String, String>();
+        Map<String, String> map = new HashMap<>();
         map.put(PH_PACKAGE, mPackageName);
         map.put(PH_MIN_SDK_VERSION, mMinSdkVersion != null ? mMinSdkVersion : "1");
         map.put(PH_TARGET_SDK_VERSION, mTargetSdkVersion != null ? mTargetSdkVersion : map.get(PH_MIN_SDK_VERSION));

@@ -1,5 +1,6 @@
 package com.github.cardforge.maven.plugins.android.standalonemojos;
 
+import com.android.annotations.NonNull;
 import com.github.cardforge.maven.plugins.android.AbstractAndroidMojo;
 import com.github.cardforge.maven.plugins.android.common.AndroidExtension;
 import com.github.cardforge.maven.plugins.android.common.XmlHelper;
@@ -42,7 +43,7 @@ import java.util.Properties;
  * @deprecated Use manifest-merger v2 mojo instead
  * {@link ManifestMergerMojo}
  */
-@Deprecated(since = "4.8", forRemoval = false)
+@Deprecated(since = "4.8")
 @Mojo(name = "manifest-update", defaultPhase = LifecyclePhase.PROCESS_RESOURCES)
 public class ManifestUpdateMojo extends AbstractAndroidMojo {
     // basic attributes
@@ -85,6 +86,9 @@ public class ManifestUpdateMojo extends AbstractAndroidMojo {
     private static final String ELEM_COMPATIBLE_SCREENS = "compatible-screens";
     private static final String ELEM_SCREEN = "screen";
     private static final String ELEM_USES_SDK = "uses-sdk";
+    public static final String SETTING = "Setting ";
+    public static final String MANIFEST_VERSION_CODE = "android.manifest.versionCode";
+
     /**
      * Update the <code>android:versionName</code> with the specified parameter. If left empty it
      * will use the version number of the project. Exposed via the project property
@@ -96,14 +100,15 @@ public class ManifestUpdateMojo extends AbstractAndroidMojo {
      * Update the <code>android:versionCode</code> attribute with the specified parameter. Exposed via
      * the project property <code>android.manifest.versionCode</code>.
      */
-    @Parameter(property = "android.manifest.versionCode")
+    @Parameter(property = MANIFEST_VERSION_CODE)
     protected Integer manifestVersionCode;
     /**
      * Update the <code>android:versionCode</code> attribute automatically from the project version
-     * e.g 3.2.1 will become version code 3002001. As described in this blog post
-     * http://www.simpligility.com/2010/11/release-version-management-for-your-android-application/
+     * e.g 3.2.1 will become version code 3002001. As described in this
+     * <a href="http://www.simpligility.com/2010/11/release-version-management-for-your-android-application/">blog post
+     * </a>
      * but done without using resource filtering. The value is exposed via the project property
-     * property <code>android.manifest.versionCodeUpdateFromVersion</code> and the resulting value
+     * <code>android.manifest.versionCodeUpdateFromVersion</code> and the resulting value
      * as <code>android.manifest.versionCode</code>.
      * For the purpose of generating the versionCode, if a version element is missing it is presumed to be 0.
      * The maximum values for the version increment and version minor values are 999,
@@ -125,7 +130,7 @@ public class ManifestUpdateMojo extends AbstractAndroidMojo {
     @Parameter(property = "android.manifest.debuggable")
     protected Boolean manifestDebuggable;
     /**
-     * For a given provider (named by <code>android:name</code> update the <code>android:authorities</code>
+     * For a given provider (named by <code>android:name</code> update the <code>android:authorities</code>)
      * attribute for the provider. Exposed via the project property <code>android.manifest.providerAuthorities</code>.
      */
     @Parameter(property = "android.manifest.providerAuthorities")
@@ -244,8 +249,8 @@ public class ManifestUpdateMojo extends AbstractAndroidMojo {
     private UsesSdk parsedUsesSdk;
 
     /**
-     * @throws MojoExecutionException
-     * @throws MojoFailureException
+     * @throws MojoExecutionException the mojo execution exception
+     * @throws MojoFailureException   the mojo failure exception
      */
     public void execute() throws MojoExecutionException, MojoFailureException {
         if (!AndroidExtension.isAndroidPackaging(project.getPackaging())) {
@@ -388,14 +393,13 @@ public class ManifestUpdateMojo extends AbstractAndroidMojo {
     private Document readManifest(File manifestFile) throws IOException, ParserConfigurationException, SAXException {
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         DocumentBuilder db = dbf.newDocumentBuilder();
-        Document doc = db.parse(manifestFile);
-        return doc;
+        return db.parse(manifestFile);
     }
 
     /**
      * Write manifest using JAXP transformer
      */
-    private void writeManifest(File manifestFile, Document doc) throws IOException, TransformerException {
+    private void writeManifest(@NonNull File manifestFile, Document doc) throws IOException, TransformerException {
         TransformerFactory xfactory = TransformerFactory.newInstance();
         Transformer xformer = xfactory.newTransformer();
         xformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
@@ -421,13 +425,13 @@ public class ManifestUpdateMojo extends AbstractAndroidMojo {
     }
 
     /**
-     * @param manifestFile
-     * @throws IOException
-     * @throws ParserConfigurationException
-     * @throws SAXException
-     * @throws TransformerException
-     * @throws MojoFailureException
-     * @throws MojoExecutionException
+     * @param manifestFile the manifest file to update
+     * @throws IOException                  the io exception
+     * @throws ParserConfigurationException the parser configuration exception
+     * @throws SAXException                 the SAX exception
+     * @throws TransformerException         the transformer exception
+     * @throws MojoFailureException         the mojo failure exception
+     * @throws MojoExecutionException       the mojo execution exception
      */
     public void updateManifest(File manifestFile)
             throws IOException, ParserConfigurationException, SAXException, TransformerException,
@@ -436,12 +440,12 @@ public class ManifestUpdateMojo extends AbstractAndroidMojo {
         Element manifestElement = doc.getDocumentElement();
         boolean dirty = false;
 
-        if (StringUtils.isEmpty(parsedVersionName)) {  // default to ${project.version}
+        if (StringUtils.isEmpty(parsedVersionName)) {  // default to ${project.version} property
             parsedVersionName = project.getVersion();
         }
         Attr versionNameAttrib = manifestElement.getAttributeNode(ATTR_VERSION_NAME);
         if (versionNameAttrib == null || !StringUtils.equals(parsedVersionName, versionNameAttrib.getValue())) {
-            getLog().info("Setting " + ATTR_VERSION_NAME + " to " + parsedVersionName);
+            getLog().info(SETTING + ATTR_VERSION_NAME + " to " + parsedVersionName);
             manifestElement.setAttribute(ATTR_VERSION_NAME, parsedVersionName);
             dirty = true;
         }
@@ -457,7 +461,7 @@ public class ManifestUpdateMojo extends AbstractAndroidMojo {
             performVersioCodeAutoIncrement(manifestElement);
             dirty = true;
         }
-        if (parsedVersionCodeUpdateFromVersion) {
+        if (Boolean.TRUE.equals(parsedVersionCodeUpdateFromVersion)) {
             performVersionCodeUpdateFromVersion(manifestElement);
             dirty = true;
         }
@@ -468,11 +472,11 @@ public class ManifestUpdateMojo extends AbstractAndroidMojo {
                 currentVersionCode = NumberUtils.toInt(versionCodeAttr.getValue(), 0);
             }
             if (currentVersionCode != parsedVersionCode) {
-                getLog().info("Setting " + ATTR_VERSION_CODE + " to " + parsedVersionCode);
+                getLog().info(SETTING + ATTR_VERSION_CODE + " to " + parsedVersionCode);
                 manifestElement.setAttribute(ATTR_VERSION_CODE, String.valueOf(parsedVersionCode));
                 dirty = true;
             }
-            project.getProperties().setProperty("android.manifest.versionCode", String.valueOf(parsedVersionCode));
+            project.getProperties().setProperty(MANIFEST_VERSION_CODE, String.valueOf(parsedVersionCode));
         }
         if (!StringUtils.isEmpty(parsedApplicationIcon)) {
             dirty = updateApplicationAttribute(manifestElement, ATTR_APPLICATION_ICON, parsedApplicationIcon, dirty);
@@ -499,7 +503,7 @@ public class ManifestUpdateMojo extends AbstractAndroidMojo {
 
             if (sharedUserIdAttrib == null || !StringUtils
                     .equals(parsedSharedUserId, sharedUserIdAttrib.getValue())) {
-                getLog().info("Setting " + ATTR_SHARED_USER_ID + " to " + parsedSharedUserId);
+                getLog().info(SETTING + ATTR_SHARED_USER_ID + " to " + parsedSharedUserId);
                 manifestElement.setAttribute(ATTR_SHARED_USER_ID, parsedSharedUserId);
                 dirty = true;
             }
@@ -517,7 +521,7 @@ public class ManifestUpdateMojo extends AbstractAndroidMojo {
                     Attr debuggableAttrib = element.getAttributeNode(ATTR_DEBUGGABLE);
                     if (debuggableAttrib == null || parsedDebuggable != BooleanUtils
                             .toBoolean(debuggableAttrib.getValue())) {
-                        getLog().info("Setting " + ATTR_DEBUGGABLE + " to " + parsedDebuggable);
+                        getLog().info(SETTING + ATTR_DEBUGGABLE + " to " + parsedDebuggable);
                         element.setAttribute(ATTR_DEBUGGABLE, String.valueOf(parsedDebuggable));
                         dirty = true;
                     }
@@ -533,7 +537,7 @@ public class ManifestUpdateMojo extends AbstractAndroidMojo {
         }
 
         if (parsedCompatibleScreens != null) {
-            getLog().info("Setting " + ELEM_COMPATIBLE_SCREENS);
+            getLog().info(SETTING + ELEM_COMPATIBLE_SCREENS);
             updateCompatibleScreens(doc, manifestElement);
             dirty = true;
         }
@@ -572,7 +576,7 @@ public class ManifestUpdateMojo extends AbstractAndroidMojo {
         return dirty;
     }
 
-    private boolean updateApplicationAttribute(Element manifestElement,
+    private boolean updateApplicationAttribute(@NonNull Element manifestElement,
                                                String attribute, String value, boolean dirty) {
         NodeList appElements =
                 manifestElement.getElementsByTagName(ELEM_APPLICATION);
@@ -587,7 +591,7 @@ public class ManifestUpdateMojo extends AbstractAndroidMojo {
                 Attr labelAttrib = element.getAttributeNode(attribute);
                 if (labelAttrib == null
                         || !value.equals(labelAttrib.getValue())) {
-                    getLog().info("Setting " + attribute + " to " + value);
+                    getLog().info(SETTING + attribute + " to " + value);
                     element.setAttribute(attribute, String.valueOf(value));
                     dirty = true;
                 }
@@ -611,7 +615,7 @@ public class ManifestUpdateMojo extends AbstractAndroidMojo {
         }
     }
 
-    private void performVersioCodeAutoIncrement(Element manifestElement) {
+    private void performVersioCodeAutoIncrement(@NonNull Element manifestElement) {
         Attr versionCode = manifestElement.getAttributeNode(ATTR_VERSION_CODE);
         int currentVersionCode = 0;
         if (versionCode != null) {
@@ -619,7 +623,7 @@ public class ManifestUpdateMojo extends AbstractAndroidMojo {
         }
         currentVersionCode++;
         manifestElement.setAttribute(ATTR_VERSION_CODE, String.valueOf(currentVersionCode));
-        project.getProperties().setProperty("android.manifest.versionCode", String.valueOf(currentVersionCode));
+        project.getProperties().setProperty(MANIFEST_VERSION_CODE, String.valueOf(currentVersionCode));
     }
 
     /**
@@ -629,17 +633,18 @@ public class ManifestUpdateMojo extends AbstractAndroidMojo {
      * version components.  In an effort to preseve uniqueness two digits
      * are allowed for both the minor and incremental versions.
      *
-     * @throws MojoExecutionException
+     * @throws MojoExecutionException the mojo execution exception
      */
-    private void performVersionCodeUpdateFromVersion(Element manifestElement) throws MojoExecutionException {
+    private void performVersionCodeUpdateFromVersion(@NonNull Element manifestElement) throws MojoExecutionException {
         String verString = project.getVersion();
         getLog().debug("Generating versionCode for " + verString);
         String verCode = generateVersionCodeFromVersionName(verString);
-        getLog().info("Setting " + ATTR_VERSION_CODE + " to " + verCode);
+        getLog().info(SETTING + ATTR_VERSION_CODE + " to " + verCode);
         manifestElement.setAttribute(ATTR_VERSION_CODE, verCode);
-        project.getProperties().setProperty("android.manifest.versionCode", String.valueOf(verCode));
+        project.getProperties().setProperty(MANIFEST_VERSION_CODE, verCode);
     }
 
+    @NonNull
     private String generateVersionCodeFromVersionName(String versionName) throws MojoExecutionException {
         // use the new version generator with default settings
         VersionGenerator gen = new VersionGenerator();
@@ -652,7 +657,7 @@ public class ManifestUpdateMojo extends AbstractAndroidMojo {
         Element supportsScreensElem = XmlHelper.getOrCreateElement(doc, manifestElement,
                 ELEM_SUPPORTS_SCREENS);
 
-        getLog().info("Setting " + ELEM_SUPPORTS_SCREENS);
+        getLog().info(SETTING + ELEM_SUPPORTS_SCREENS);
 
         if (parsedSupportsScreens.getAnyDensity() != null) {
             supportsScreensElem.setAttribute(ATTR_ANY_DENSITY, parsedSupportsScreens.getAnyDensity());
@@ -723,7 +728,7 @@ public class ManifestUpdateMojo extends AbstractAndroidMojo {
         // read those screen elements that were already defined in the Manifest
         NodeList manifestScreenElems = compatibleScreensElem.getElementsByTagName(ELEM_SCREEN);
         int numManifestScreens = manifestScreenElems.getLength();
-        ArrayList<CompatibleScreen> manifestScreens = new ArrayList<CompatibleScreen>(numManifestScreens);
+        ArrayList<CompatibleScreen> manifestScreens = new ArrayList<>(numManifestScreens);
         for (int i = 0; i < numManifestScreens; i++) {
             Element screenElem = (Element) manifestScreenElems.item(i);
 
@@ -744,7 +749,7 @@ public class ManifestUpdateMojo extends AbstractAndroidMojo {
 
         // merge those screens defined in the POM, overriding any matching screens
         // already defined in the Manifest
-        HashSet<CompatibleScreen> mergedScreens = new HashSet<CompatibleScreen>();
+        HashSet<CompatibleScreen> mergedScreens = new HashSet<>();
         mergedScreens.addAll(manifestScreens);
         mergedScreens.addAll(parsedCompatibleScreens);
 
@@ -758,7 +763,7 @@ public class ManifestUpdateMojo extends AbstractAndroidMojo {
         }
     }
 
-    private boolean updateProviderAuthorities(Element manifestElement) {
+    private boolean updateProviderAuthorities(@NonNull Element manifestElement) {
         boolean dirty = false;
         NodeList appElems = manifestElement.getElementsByTagName(ELEM_APPLICATION);
 
@@ -801,7 +806,7 @@ public class ManifestUpdateMojo extends AbstractAndroidMojo {
         return false;
     }
 
-    private void performProviderUpdate(Element providerElem, String newAuthorities) {
+    private void performProviderUpdate(@NonNull Element providerElem, String newAuthorities) {
         Attr providerAuthorities = providerElem.getAttributeNode(ATTR_AUTHORITIES);
         providerAuthorities.setValue(newAuthorities);
     }

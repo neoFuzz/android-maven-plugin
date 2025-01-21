@@ -26,8 +26,7 @@ public class CompatibleScreen {
 
     @Override
     public boolean equals(Object obj) {
-        if (obj instanceof CompatibleScreen) {
-            CompatibleScreen that = (CompatibleScreen) obj;
+        if (obj instanceof CompatibleScreen that) {
             return this.screenDensity.equals(that.screenDensity) && this.screenSize.equals(that.screenSize);
         }
         return false;

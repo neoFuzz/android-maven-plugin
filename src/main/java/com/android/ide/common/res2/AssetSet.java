@@ -87,10 +87,10 @@ public class AssetSet extends DataSet<AssetItem, AssetFile> {
         readFiles(sourceFolder, sourceFolder, logger);
     }
 
-    private void readFiles(File sourceFolder, File folder, ILogger logger)
+    private void readFiles(File sourceFolder, @NonNull File folder, ILogger logger)
             throws MergingException {
         File[] files = folder.listFiles();
-        if (files != null && files.length > 0) {
+        if (files != null) {
             for (File file : files) {
                 if (!isIgnored(file)) {
                     if (file.isFile()) {

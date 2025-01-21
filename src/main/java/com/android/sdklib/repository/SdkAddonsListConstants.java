@@ -17,6 +17,8 @@
 package com.android.sdklib.repository;
 
 
+import com.android.annotations.NonNull;
+
 import java.io.InputStream;
 
 /**
@@ -87,6 +89,10 @@ public class SdkAddonsListConstants {
      */
     public static final String NS_URI = getSchemaUri(NS_LATEST_VERSION);
 
+    private SdkAddonsListConstants() {
+        // Not instantiable
+    }
+
     /**
      * Returns a stream to the requested sdk-addon XML Schema.
      *
@@ -104,10 +110,12 @@ public class SdkAddonsListConstants {
      *
      * @param version Between 1 and {@link #NS_LATEST_VERSION} included.
      */
+    @NonNull
     public static String getSchemaUri(int version) {
         return String.format(NS_BASE + "%d", version);                      //$NON-NLS-1$
     }
 
+    @NonNull
     public static String getDefaultName(int version) {
         return String.format("addons_list-%1$d.xml", version);              //$NON-NLS-1$
     }

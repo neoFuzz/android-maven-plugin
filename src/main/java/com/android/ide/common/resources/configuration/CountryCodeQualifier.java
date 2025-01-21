@@ -16,6 +16,9 @@
 
 package com.android.ide.common.resources.configuration;
 
+import com.android.annotations.NonNull;
+import com.android.annotations.Nullable;
+
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -46,6 +49,7 @@ public final class CountryCodeQualifier extends ResourceQualifier {
      * @param segment the folder segment from which to create a qualifier.
      * @return a new {@link CountryCodeQualifier} object or <code>null</code>
      */
+    @Nullable
     public static CountryCodeQualifier getQualifier(String segment) {
         Matcher m = sCountryCodePattern.matcher(segment);
         if (m.matches()) {
@@ -59,8 +63,7 @@ public final class CountryCodeQualifier extends ResourceQualifier {
                 return null;
             }
 
-            CountryCodeQualifier qualifier = new CountryCodeQualifier(code);
-            return qualifier;
+            return new CountryCodeQualifier(code);
         }
 
         return null;
@@ -72,8 +75,9 @@ public final class CountryCodeQualifier extends ResourceQualifier {
      *
      * @param code the value of the qualifier, as returned by {@link #getCode()}.
      */
+    @NonNull
     public static String getFolderSegment(int code) {
-        if (code != DEFAULT_CODE && code >= 100 && code <= 999) { // code is 3 digit.) {
+        if (code >= 100 && code <= 999) { // code is 3 digit.
             return String.format("mcc%1$d", code); //$NON-NLS-1$
         }
 
@@ -90,6 +94,7 @@ public final class CountryCodeQualifier extends ResourceQualifier {
     }
 
     @Override
+    @NonNull
     public String getShortName() {
         return "Country Code";
     }
@@ -122,8 +127,8 @@ public final class CountryCodeQualifier extends ResourceQualifier {
 
     @Override
     public boolean equals(Object qualifier) {
-        if (qualifier instanceof CountryCodeQualifier) {
-            return mCode == ((CountryCodeQualifier) qualifier).mCode;
+        if (qualifier instanceof CountryCodeQualifier q) {
+            return mCode == q.mCode;
         }
 
         return false;
@@ -138,11 +143,13 @@ public final class CountryCodeQualifier extends ResourceQualifier {
      * Returns the string used to represent this qualifier in the folder name.
      */
     @Override
+    @NonNull
     public String getFolderSegment() {
         return getFolderSegment(mCode);
     }
 
     @Override
+    @NonNull
     public String getShortDisplayValue() {
         if (mCode != DEFAULT_CODE) {
             return String.format("MCC %1$d", mCode);
@@ -152,6 +159,7 @@ public final class CountryCodeQualifier extends ResourceQualifier {
     }
 
     @Override
+    @NonNull
     public String getLongDisplayValue() {
         return getShortDisplayValue();
     }

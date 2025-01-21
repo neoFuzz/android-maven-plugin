@@ -111,12 +111,13 @@ public class DependencyData {
                     case OUTPUT:
                         data.addOutputFile(line);
                         break;
-                    case MAIN:
-                        data.setMainFile(line);
-                        nextMode = ParseMode.SECONDARY;
-                        break;
                     case SECONDARY:
                         data.addSecondaryFile(line);
+                        break;
+                    case MAIN:
+                    default:
+                        data.setMainFile(line);
+                        nextMode = ParseMode.SECONDARY;
                         break;
                 }
             }

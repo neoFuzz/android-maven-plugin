@@ -1,4 +1,4 @@
-/*******************************************************************************
+/* ******************************************************************************
  * Copyright (c) 2008, 2011 Sonatype Inc. and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -10,6 +10,7 @@
  *******************************************************************************/
 package com.github.cardforge.maven.plugins.android.common;
 
+import com.android.annotations.NonNull;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.ArtifactResolutionRequest;
@@ -31,6 +32,7 @@ public final class ArtifactResolverHelper {
     public static final List<String> EXCLUDE_NON_PACKAGED_SCOPES = Arrays.asList(
             Artifact.SCOPE_PROVIDED, Artifact.SCOPE_IMPORT
     );
+    public static final String NOT_RESOLVE_ARTIFACT = "Could not resolve artifact ";
 
     private final ArtifactResolver artifactResolver;
     private final Logger log;
@@ -40,9 +42,16 @@ public final class ArtifactResolverHelper {
      * Creates an ArtifactResolver that has no remote repositories to resolve against.
      */
     public ArtifactResolverHelper(ArtifactResolver artifactResolver, Logger log) {
-        this(artifactResolver, log, Collections.<ArtifactRepository>emptyList());
+        this(artifactResolver, log, Collections.emptyList());
     }
 
+    /**
+     * Creates an ArtifactResolver that has the specified remote repositories to resolve against.
+     *
+     * @param artifactResolver           the artifact resolver to use
+     * @param log                        the logger to use
+     * @param remoteArtifactRepositories the remote repositories to resolve against
+     */
     public ArtifactResolverHelper(ArtifactResolver artifactResolver, Logger log,
                                   final List<ArtifactRepository> remoteArtifactRepositories) {
         this.artifactResolver = artifactResolver;
@@ -60,6 +69,7 @@ public final class ArtifactResolverHelper {
      * This excludes artifacts of the {@code EXCLUDED_DEPENDENCY_SCOPES} scopes.
      * And this should maintain dependency order to comply with library project resource precedence.
      */
+    @NonNull
     public Set<Artifact> getFilteredArtifacts(Iterable<Artifact> allArtifacts, String... types) {
         return getFilteredArtifacts(EXCLUDE_NON_PACKAGED_SCOPES, allArtifacts, types);
     }
@@ -74,17 +84,14 @@ public final class ArtifactResolverHelper {
      * @return a {@code List} of all project dependencies. Never {@code null}.
      * This should maintain dependency order to comply with library project resource precedence.
      */
+    @NonNull
     public Set<Artifact> getFilteredArtifacts(List<String> filteredScopes,
-                                              Iterable<Artifact> allArtifacts, String... types) {
+                                              @NonNull Iterable<Artifact> allArtifacts, String... types) {
         final List<String> acceptTypeList = Arrays.asList(types);
         boolean acceptAllArtifacts = acceptTypeList.isEmpty();
-        final Set<Artifact> results = new LinkedHashSet<Artifact>();
+        final Set<Artifact> results = new LinkedHashSet<>();
         for (Artifact artifact : allArtifacts) {
-            if (artifact == null) {
-                continue;
-            }
-
-            if (filteredScopes.contains(artifact.getScope())) {
+            if (artifact == null || filteredScopes.contains(artifact.getScope())) {
                 continue;
             }
 
@@ -102,19 +109,28 @@ public final class ArtifactResolverHelper {
      * @return a {@link java.io.File} to the resolved artifact, never <code>null</code>.
      * @throws org.apache.maven.plugin.MojoExecutionException if the artifact could not be resolved.
      */
+    @NonNull
     public File resolveArtifactToFile(Artifact artifact) throws MojoExecutionException {
         final Artifact resolvedArtifact = resolveArtifact(artifact);
         final File jar = resolvedArtifact.getFile();
         if (jar == null) {
-            throw new MojoExecutionException("Could not resolve artifact " + artifact.getId()
+            throw new MojoExecutionException(NOT_RESOLVE_ARTIFACT + artifact.getId()
                     + ". Please install it with \"mvn install:install-file ...\" or deploy it to a repository "
                     + "with \"mvn deploy:deploy-file ...\"");
         }
         return jar;
     }
 
-    public Set<Artifact> resolveArtifacts(Collection<Artifact> artifacts) throws MojoExecutionException {
-        final Set<Artifact> resolvedArtifacts = new LinkedHashSet<Artifact>();
+    /**
+     * Resolves a collection of artifacts to a collection of resolved artifacts.
+     *
+     * @param artifacts Artifacts to resolve
+     * @return Resolved artifacts
+     * @throws MojoExecutionException if an artifact could not be resolved
+     */
+    @NonNull
+    public Set<Artifact> resolveArtifacts(@NonNull Collection<Artifact> artifacts) throws MojoExecutionException {
+        final Set<Artifact> resolvedArtifacts = new LinkedHashSet<>();
         for (final Artifact artifact : artifacts) {
             resolvedArtifacts.add(resolveArtifact(artifact));
         }
@@ -136,14 +152,14 @@ public final class ArtifactResolverHelper {
         final ArtifactResolutionResult resolutionResult = this.artifactResolver.resolve(artifactResolutionRequest);
 
         log.debug("Resolving : " + artifact);
-        if (resolutionResult.getArtifacts().size() == 0) {
-            throw new MojoExecutionException("Could not resolve artifact " + artifact
+        if (resolutionResult.getArtifacts().isEmpty()) {
+            throw new MojoExecutionException(NOT_RESOLVE_ARTIFACT + artifact
                     + ". Please install it with \"mvn install:install-file ...\" or deploy it to a repository "
                     + "with \"mvn deploy:deploy-file ...\"");
         }
         if (resolutionResult.getArtifacts().size() > 1) {
             log.debug("Resolved artifacts : " + resolutionResult.getArtifacts());
-            throw new MojoExecutionException("Could not resolve artifact " + artifact
+            throw new MojoExecutionException(NOT_RESOLVE_ARTIFACT + artifact
                     + " to single target. Found the following possible options : " + resolutionResult.getArtifacts());
         }
 

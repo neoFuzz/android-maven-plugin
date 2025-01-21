@@ -16,6 +16,9 @@
 
 package com.android.ide.common.resources.configuration;
 
+import com.android.annotations.NonNull;
+import com.android.annotations.Nullable;
+
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -29,7 +32,7 @@ public final class ScreenWidthQualifier extends ResourceQualifier {
      */
     static final int DEFAULT_SIZE = -1;
     private static final Pattern sParsePattern = Pattern.compile("^w(\\d+)dp$"); //$NON-NLS-1$
-    private static final String sPrintPattern = "w%1$ddp"; //$NON-NLS-1$
+    private static final String S_PRINT_PATTERN = "w%1$ddp"; //$NON-NLS-1$
     private int mValue = DEFAULT_SIZE;
 
     public ScreenWidthQualifier() {
@@ -40,6 +43,7 @@ public final class ScreenWidthQualifier extends ResourceQualifier {
         mValue = value;
     }
 
+    @Nullable
     public static ScreenWidthQualifier getQualifier(String value) {
         try {
             int dp = Integer.parseInt(value);
@@ -49,6 +53,7 @@ public final class ScreenWidthQualifier extends ResourceQualifier {
             return qualifier;
 
         } catch (NumberFormatException e) {
+            // ignored
         }
 
         return null;
@@ -102,8 +107,8 @@ public final class ScreenWidthQualifier extends ResourceQualifier {
     @Override
     public boolean isMatchFor(ResourceQualifier qualifier) {
         // this is the match only of the current dp value is lower or equal to the
-        if (qualifier instanceof ScreenWidthQualifier) {
-            return mValue <= ((ScreenWidthQualifier) qualifier).mValue;
+        if (qualifier instanceof ScreenWidthQualifier s) {
+            return mValue <= s.mValue;
         }
 
         return false;
@@ -126,17 +131,19 @@ public final class ScreenWidthQualifier extends ResourceQualifier {
             return true;
         } else {
             // get the qualifier that has the width that is the closest to the reference, but not
-            // above. (which is guaranteed when this is called as isMatchFor is called first.
+            // above. which is guaranteed when this is called as isMatchFor is called first.
             return mValue > compareQ.mValue;
         }
     }
 
     @Override
+    @NonNull
     public String getFolderSegment() {
-        return String.format(sPrintPattern, mValue);
+        return String.format(S_PRINT_PATTERN, mValue);
     }
 
     @Override
+    @NonNull
     public String getShortDisplayValue() {
         if (isValid()) {
             return getFolderSegment();
@@ -147,11 +154,7 @@ public final class ScreenWidthQualifier extends ResourceQualifier {
 
     @Override
     public String getLongDisplayValue() {
-        if (isValid()) {
-            return getFolderSegment();
-        }
-
-        return ""; //$NON-NLS-1$
+        return getShortName();
     }
 
     @Override
@@ -171,9 +174,6 @@ public final class ScreenWidthQualifier extends ResourceQualifier {
             return false;
         }
         ScreenWidthQualifier other = (ScreenWidthQualifier) obj;
-        if (mValue != other.mValue) {
-            return false;
-        }
-        return true;
+        return mValue == other.mValue;
     }
 }

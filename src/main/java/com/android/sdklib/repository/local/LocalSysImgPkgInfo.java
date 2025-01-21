@@ -77,7 +77,7 @@ public class LocalSysImgPkgInfo extends LocalPkgInfo {
      * This is typically used when there's no tag-display attribute.
      *
      * @param tagId A non-null tag id to sanitize for display.
-     * @return The tag id with all non-alphanum symbols replaced by spaces and trimmed.
+     * @return The tag id with all non-alphanumeric symbols replaced by spaces and trimmed.
      */
     @NonNull
     public static String tagIdToDisplay(@NonNull String tagId) {
@@ -103,6 +103,5 @@ public class LocalSysImgPkgInfo extends LocalPkgInfo {
         return mDesc;
     }
 
-    // TODO create package on demand if needed. This might not be needed
-    // since typically system-images are retrieved via IAndroidTarget.
+    // TODO create package on demand if needed. This might not be needed since typically system-images are retrieved via IAndroidTarget.
 }

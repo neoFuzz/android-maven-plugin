@@ -1,5 +1,7 @@
 package com.github.cardforge.maven.plugins.android.common;
 
+import com.android.annotations.NonNull;
+
 /**
  * FileNameHelper can make a valid filename.
  *
@@ -8,10 +10,15 @@ package com.github.cardforge.maven.plugins.android.common;
 public class FileNameHelper {
     //    { '/', '\n', '\r', '\t', '\0', '\f', '`', '?', '*', '\\', '<', '>', '|', '\"', ':' };
     private static final String ILLEGAL_CHARACTERS_REGEX = "[/\\n\\r\\t\\\0\\f`\\?\\*\\\\<>\\|\":]";
-    private static final String SEPERATOR = "_";
+    private static final String SEPARATOR = "_";
 
-    public static String fixFileName(String fileName) {
-        return fileName.replaceAll(ILLEGAL_CHARACTERS_REGEX, SEPERATOR);
+    private FileNameHelper() {
+        // no instances
+    }
+
+    @NonNull
+    public static String fixFileName(@NonNull String fileName) {
+        return fileName.replaceAll(ILLEGAL_CHARACTERS_REGEX, SEPARATOR);
     }
 
 }

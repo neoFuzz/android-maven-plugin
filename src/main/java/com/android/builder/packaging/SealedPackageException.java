@@ -16,10 +16,13 @@
 
 package com.android.builder.packaging;
 
+import java.io.Serial;
+
 /**
  * An exception thrown when trying to add files to a sealed APK.
  */
 public final class SealedPackageException extends Exception {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     public SealedPackageException(String format, Object... args) {

@@ -98,7 +98,7 @@ public class AidlProcessor implements SourceSearcher.SourceFileProcessor {
         DependencyData data = mDependencyFileProcessor.processFile(depFile);
 
         if (mParcelableOutputDir != null && data != null && data.getOutputFiles().isEmpty()) {
-            // looks like a parcelable. Store it in the 2ndary output of the DependencyData object.
+            // looks like a parcelable. Store it in the secondary output of the DependencyData object.
 
             String relative = FileOp.makeRelative(sourceFolder, sourceFile);
 

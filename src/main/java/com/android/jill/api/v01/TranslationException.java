@@ -17,26 +17,41 @@
 package com.android.jill.api.v01;
 
 import javax.annotation.Nonnull;
+import java.io.Serial;
 
 /**
  * A fatal problem that caused Jill to abort the translation. The problem should already have
  * reported, so it is safe to ignore its message.
  */
 public class TranslationException extends Exception {
+    @Serial
     private static final long serialVersionUID = 1L;
 
+    /**
+     * Constructs a new {@link TranslationException} with no detail message.
+     */
     public TranslationException() {
         super();
     }
 
+    /**
+     * @param message the detail message. The detail message is saved for later retrieval by the
+     */
     public TranslationException(@Nonnull String message) {
         super(message);
     }
 
+    /**
+     * @param message the detail message. The detail message is saved for later retrieval by the
+     * @param cause the cause (which is saved for later retrieval by the {@link #getCause()} method).
+     */
     public TranslationException(@Nonnull String message, @Nonnull Throwable cause) {
         super(message, cause);
     }
 
+    /**
+     * @param cause the cause (which is saved for later retrieval by the {@link #getCause()} method).
+     */
     public TranslationException(@Nonnull Throwable cause) {
         super(cause);
     }

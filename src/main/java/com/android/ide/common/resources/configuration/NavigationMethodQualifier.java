@@ -71,4 +71,18 @@ public final class NavigationMethodQualifier extends EnumBasedResourceQualifier 
 
         return false;
     }
+
+    @Override
+    public boolean equals(Object qualifier) {
+        if (qualifier instanceof NavigationMethodQualifier q) {
+            return mValue == q.mValue;
+        }
+
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return mValue.hashCode();
+    }
 }

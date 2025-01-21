@@ -24,7 +24,7 @@ import com.android.sdklib.repository.FullRevision;
 import com.android.utils.ILogger;
 import com.google.common.base.Joiner;
 import com.google.common.base.MoreObjects;
-import com.google.common.base.Optional;
+import java.util.Optional;
 import com.google.common.collect.ImmutableList;
 
 import java.io.File;
@@ -50,13 +50,13 @@ public enum BuildToolsServiceLoader {
      * Jack service description.
      */
     public static final Service<JackProvider> JACK =
-            new Service<JackProvider>(ImmutableList.of("jack.jar"), JackProvider.class);
+            new Service<>(ImmutableList.of("jack.jar"), JackProvider.class);
     /**
      * Jill service description.
      */
     public static final Service<JillProvider> JILL =
-            new Service<JillProvider>(ImmutableList.of("jill.jar"), JillProvider.class);
-    private final List<LoadedBuildTool> loadedBuildTools = new ArrayList<LoadedBuildTool>();
+            new Service<>(ImmutableList.of("jill.jar"), JillProvider.class);
+    private final List<LoadedBuildTool> loadedBuildTools = new ArrayList<>();
 
     /**
      * Load a built-tools version specific {@link ServiceLoader} helper.
@@ -88,7 +88,7 @@ public enum BuildToolsServiceLoader {
                 return Optional.of(loadedBuildTool);
             }
         }
-        return Optional.absent();
+        return Optional.empty();
     }
 
     /**
@@ -107,7 +107,7 @@ public enum BuildToolsServiceLoader {
 
     /**
      * Abstract notion of what a service is. A service must be declared in one of the classpath
-     * provided jar files. The service declaration must conforms to {@link ServiceLoader} contract.
+     * provided jar files. The service declaration must conform to a {@link ServiceLoader} contract.
      *
      * @param <T> the type of service.
      */
@@ -145,7 +145,7 @@ public enum BuildToolsServiceLoader {
 
         private final BuildToolInfo buildToolInfo;
         private final List<LoadedServiceLoader> loadedServicesLoaders =
-                new ArrayList<LoadedServiceLoader>();
+                new ArrayList<>();
 
         private BuildToolServiceLoader(BuildToolInfo buildToolInfo) {
             this.buildToolInfo = buildToolInfo;
@@ -159,11 +159,9 @@ public enum BuildToolsServiceLoader {
          * @param serviceType the requested service type encapsulation.
          * @param <T>         the type of service
          * @return a {@link ServiceLoader} instance for the T service type.
-         * @throws ClassNotFoundException
          */
         @NonNull
-        public synchronized <T> ServiceLoader<T> getServiceLoader(Service<T> serviceType)
-                throws ClassNotFoundException {
+        public synchronized <T> ServiceLoader<T> getServiceLoader(@NonNull Service<T> serviceType) {
 
             Optional<ServiceLoader<T>> serviceLoaderOptional =
                     getLoadedServiceLoader(serviceType.getServiceClass());
@@ -187,7 +185,7 @@ public enum BuildToolsServiceLoader {
             }
             ClassLoader cl = new URLClassLoader(urls, serviceType.getServiceClass().getClassLoader());
             ServiceLoader<T> serviceLoader = ServiceLoader.load(serviceType.getServiceClass(), cl);
-            loadedServicesLoaders.add(new LoadedServiceLoader<T>(
+            loadedServicesLoaders.add(new LoadedServiceLoader<>(
                     serviceType.getServiceClass(), serviceLoader));
             return serviceLoader;
         }
@@ -200,12 +198,11 @@ public enum BuildToolsServiceLoader {
          * @param serviceType the requested service type encapsulation.
          * @param <T>         the requested service class type.
          * @return the instance of T or null of none exist in this context.
-         * @throws ClassNotFoundException
          */
         @NonNull
         public synchronized <T> Optional<T> getSingleService(
-                ILogger logger,
-                Service<T> serviceType) throws ClassNotFoundException {
+                @NonNull ILogger logger,
+                Service<T> serviceType) {
             logger.verbose("Looking for %1$s", serviceType);
             ServiceLoader<T> serviceLoader = getServiceLoader(serviceType);
             logger.verbose("Got a serviceLoader %1$d",
@@ -219,7 +216,7 @@ public enum BuildToolsServiceLoader {
                 return Optional.of(service);
             } else {
                 logger.info("Cannot find service implementation %1$s" + serviceType);
-                return Optional.absent();
+                return Optional.empty();
             }
         }
 
@@ -231,7 +228,7 @@ public enum BuildToolsServiceLoader {
                     return Optional.of((ServiceLoader<T>) loadedServiceLoader.serviceLoader);
                 }
             }
-            return Optional.absent();
+            return Optional.empty();
         }
 
         /**

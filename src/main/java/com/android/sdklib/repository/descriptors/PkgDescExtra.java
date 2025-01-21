@@ -23,6 +23,8 @@ import com.android.sdklib.repository.FullRevision;
 import com.android.sdklib.repository.License;
 import com.android.sdklib.repository.MajorRevision;
 
+import java.util.Objects;
+
 /**
  * Implementation detail of {@link IPkgDescExtra} for extra packages.
  */
@@ -69,21 +71,21 @@ public final class PkgDescExtra extends PkgDesc implements IPkgDescExtra {
 
     /**
      * Helper method that converts the old_paths property string into the
-     * an old paths array.
+     * old paths array.
      *
      * @param oldPathsProperty A possibly-null old_path property string.
      * @return A list of old paths split by their separator. Can be empty but not null.
      */
     @NonNull
     public static String[] convertOldPaths(@Nullable String oldPathsProperty) {
-        if (oldPathsProperty == null || oldPathsProperty.length() == 0) {
+        if (oldPathsProperty == null || oldPathsProperty.isEmpty()) {
             return new String[0];
         }
         return oldPathsProperty.split(";");  //$NON-NLS-1$
     }
 
     /**
-     * Helper to computhe whether the extra path of both {@link IPkgDescExtra}s
+     * Helper to compute whether the extra path of both {@link IPkgDescExtra}s
      * are compatible with each other, which means they are either equal or are
      * matched between existing path and the potential old paths list.
      * <p/>
@@ -101,8 +103,9 @@ public final class PkgDescExtra extends PkgDesc implements IPkgDescExtra {
         int lenEpOldPaths = epOldPaths.length;
         for (int indexEp = -1; indexEp < lenEpOldPaths; indexEp++) {
             if (sameVendorAndPath(
-                    lhs.getVendor().getId(), lhs.getPath(),
-                    rhs.getVendor().getId(), indexEp < 0 ? rhs.getPath() : epOldPaths[indexEp])) {
+                    Objects.requireNonNull(lhs.getVendor()).getId(), lhs.getPath(),
+                    Objects.requireNonNull(rhs.getVendor()).getId(), indexEp < 0 ?
+                            rhs.getPath() : epOldPaths[indexEp])) {
                 return true;
             }
         }
@@ -129,35 +132,25 @@ public final class PkgDescExtra extends PkgDesc implements IPkgDescExtra {
         // in either the current or the remote package.
         //
         // The vendor test below needs to account for an old installed package
-        // (e.g. with an install path of vendor-name) that has then been updated
+        // (e.g. with an installation path of vendor-name) that has then been updated
         // in-place and thus when reloaded contains the vendor name in both the
         // path and the vendor attributes.
-        if (otherPath != null && thisPath != null && thisVendor != null) {
-            if (otherPath.equals(thisVendor + '-' + thisPath) &&
-                    (otherVendor == null ||
-                            otherVendor.length() == 0 ||
-                            otherVendor.equals(thisVendor))) {
+        if (otherPath != null && thisPath != null && thisVendor != null &&
+                otherPath.equals(thisVendor + '-' + thisPath) &&
+                    (otherVendor == null || otherVendor.isEmpty() || otherVendor.equals(thisVendor))) {
                 return true;
             }
-        }
-        if (thisPath != null && otherPath != null && otherVendor != null) {
-            if (thisPath.equals(otherVendor + '-' + otherPath) &&
-                    (thisVendor == null ||
-                            thisVendor.length() == 0 ||
-                            thisVendor.equals(otherVendor))) {
+
+        if (thisPath != null && otherPath != null && otherVendor != null &&
+                thisPath.equals(otherVendor + '-' + otherPath) &&
+                    (thisVendor == null || thisVendor.isEmpty() || thisVendor.equals(otherVendor))) {
                 return true;
             }
-        }
 
 
-        if (thisPath != null && thisPath.equals(otherPath)) {
-            if ((thisVendor == null && otherVendor == null) ||
-                    (thisVendor != null && thisVendor.equals(otherVendor))) {
-                return true;
-            }
-        }
-
-        return false;
+        return thisPath != null && thisPath.equals(otherPath) &&
+                ((thisVendor == null && otherVendor == null) ||
+                        (thisVendor != null && thisVendor.equals(otherVendor)));
     }
 
     @NonNull

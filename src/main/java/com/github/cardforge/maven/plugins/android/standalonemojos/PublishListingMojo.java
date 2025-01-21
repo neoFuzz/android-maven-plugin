@@ -1,5 +1,7 @@
 package com.github.cardforge.maven.plugins.android.standalonemojos;
 
+import com.android.annotations.NonNull;
+import com.android.annotations.Nullable;
 import com.github.cardforge.maven.plugins.android.AbstractPublisherMojo;
 import com.github.cardforge.maven.plugins.android.common.AndroidPublisherHelper;
 import com.google.api.client.http.AbstractInputStreamContent;
@@ -15,11 +17,13 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * @author Joris de Groot
  * @author Benoit Billington
  */
+@SuppressWarnings("unused") // used in Maven goal
 @Mojo(name = "publish-listing", requiresProject = false)
 public class PublishListingMojo extends AbstractPublisherMojo {
 
@@ -55,11 +59,11 @@ public class PublishListingMojo extends AbstractPublisherMojo {
     private boolean uploadImages;
 
     /**
-     * @throws org.apache.maven.plugin.MojoExecutionException
-     * @throws org.apache.maven.plugin.MojoFailureException
+     * @throws org.apache.maven.plugin.MojoExecutionException If execution error occurs
+     * @throws org.apache.maven.plugin.MojoFailureException   If failure error occurs
      */
     public void execute() throws MojoExecutionException, MojoFailureException {
-        if (packageName == null || packageName.equals("")) {
+        if (packageName == null || packageName.isEmpty()) {
             packageName = extractPackageNameFromAndroidManifest(androidManifestFile);
         }
 
@@ -140,18 +144,20 @@ public class PublishListingMojo extends AbstractPublisherMojo {
         }
     }
 
+    @NonNull
     private List<AbstractInputStreamContent> getImageListAsStream(File listingDir, String graphicPath) {
         File graphicDir = new File(listingDir, graphicPath);
-        List<AbstractInputStreamContent> images = new ArrayList<AbstractInputStreamContent>();
+        List<AbstractInputStreamContent> images = new ArrayList<>();
         if (graphicDir.exists()) {
             File[] imageFiles = graphicDir.listFiles();
-            for (File imageFile : imageFiles) {
+            for (File imageFile : Objects.requireNonNull(imageFiles)) {
                 images.add(new FileContent(AndroidPublisherHelper.MIME_TYPE_IMAGE, imageFile));
             }
         }
         return images;
     }
 
+    @Nullable
     private AbstractInputStreamContent getImageAsStream(File listingDir, String graphicPath)
             throws MojoFailureException {
         File graphicDir = new File(listingDir, graphicPath);
@@ -194,7 +200,7 @@ public class PublishListingMojo extends AbstractPublisherMojo {
     private void uploadScreenShots(File dir, String locale, String imageType)
             throws MojoFailureException, MojoExecutionException {
         List<AbstractInputStreamContent> contentGraphicList = getImageListAsStream(dir, imageType);
-        if (contentGraphicList == null || contentGraphicList.isEmpty()) {
+        if (contentGraphicList.isEmpty()) {
             getLog().warn("There are no images in " + dir.getAbsolutePath() + "/" + imageType);
             return;
         }

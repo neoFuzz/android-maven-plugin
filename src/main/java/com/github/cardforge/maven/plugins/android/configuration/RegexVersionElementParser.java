@@ -14,8 +14,11 @@ import static java.lang.String.format;
  */
 public class RegexVersionElementParser implements VersionElementParser {
 
-    private Pattern namingPattern;
+    private final Pattern namingPattern;
 
+    /**
+     * @param pattern the pattern to use for parsing version elements
+     */
     public RegexVersionElementParser(String pattern) {
         namingPattern = Pattern.compile(pattern);
     }
@@ -35,7 +38,7 @@ public class RegexVersionElementParser implements VersionElementParser {
         for (int i = 0; i < elementCount; i++) {
             // Capturing groups start at index 1
             try {
-                result[i] = Integer.valueOf(matcher.group(i + 1));
+                result[i] = Integer.parseInt(matcher.group(i + 1));
             } catch (NumberFormatException ignored) {
                 // Either the group is not present, or cannot be cast to integer.
                 result[i] = 0;

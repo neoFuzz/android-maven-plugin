@@ -12,7 +12,15 @@ import java.lang.reflect.Field;
  * @author Pappy STĂNESCU - pappy.stanescu@gmail.com
  */
 public final class ConfigHelper {
+    private ConfigHelper() {
+        // nothing
+    }
 
+    /**
+     * @param mojo          The mojo to copy values to.
+     * @param confFieldName The name of the configuration field to copy values from.
+     * @throws MojoExecutionException If an error occurs while copying values.
+     */
     public static void copyValues(AbstractMojo mojo, String confFieldName) throws MojoExecutionException {
         try {
             final Class<? extends AbstractMojo> mojoClass = mojo.getClass();
@@ -37,10 +45,8 @@ public final class ConfigHelper {
 
                 final Class<?> cls = value.getClass();
 
-                if ((cls == String.class) && (((String) value).length() == 0)) {
-                    continue;
-                }
-                if (cls.isArray() && (Array.getLength(value) == 0)) {
+                if ((cls == String.class) && (((String) value).isEmpty()) ||
+                        (cls.isArray() && (Array.getLength(value) == 0))) {
                     continue;
                 }
 
@@ -64,10 +70,9 @@ public final class ConfigHelper {
 
                     mojoField.setAccessible(true);
                     mojoField.set(mojo, value);
-                } catch (final NoSuchFieldException e) {
+                } catch (NoSuchFieldException | IllegalArgumentException e) {
                     // swallow
-                } catch (final IllegalArgumentException e) {
-                    // probably not a deprecated parameter, see Proguard configuration;
+                    // probably not a deprecated parameter, see Proguard configuration
                 }
             }
         } catch (final Exception e) {

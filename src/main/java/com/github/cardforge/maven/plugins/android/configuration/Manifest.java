@@ -8,78 +8,73 @@ import java.util.Properties;
 
 /**
  * Configuration for the manifest update. This class is only the definition of the parameters that are shadowed in
- * {@link ManifestUpdateMojo} and used there.
+ * {@link } and used there.
  *
  * @author Manfred Moser - manfred@simpligility.com
  * @deprecated Use ManifestMerger {@link ManifestMerger} in
- * combination
- * with {@link ManifestMergerMojo}
+ * combination with {@link com.github.cardforge.maven.plugins.android.standalonemojos.ManifestUpdateMojo}
  */
-@Deprecated(since = "4.8", forRemoval = false)
+@Deprecated(since = "4.8")
 public class Manifest {
     /**
-     * Mirror of {@link ManifestUpdateMojo#manifestVersionName}.
+     * Mirror of {@link com.github.cardforge.maven.plugins.android.standalonemojos.ManifestUpdateMojo#manifestVersionName}.
      */
     protected String versionName;
 
     /**
-     * Mirror of {@link ManifestUpdateMojo#manifestVersionCode}.
+     * Mirror of {@link com.github.cardforge.maven.plugins.android.standalonemojos.ManifestUpdateMojo#manifestVersionCode}.
      */
     protected Integer versionCode;
     /**
-     * Mirror of {@link ManifestUpdateMojo
+     * Mirror of {@link com.github.cardforge.maven.plugins.android.standalonemojos.ManifestUpdateMojo
      * #manifestVersionCodeUpdateFromVersion}.
      */
     protected Boolean versionCodeUpdateFromVersion;
     /**
-     * Mirror of {@link com.github.cardforge.standalonemojos
-     * .ManifestUpdateMojo#manifestApplicationIcon}.
+     * Mirror of {@link com.github.cardforge.maven.plugins.android.standalonemojos.ManifestUpdateMojo#manifestApplicationIcon}.
      */
     protected String applicationIcon;
     /**
-     * Mirror of {@link com.github.cardforge.standalonemojos
-     * .ManifestUpdateMojo#manifestApplicationLabel}.
+     * Mirror of {@link com.github.cardforge.maven.plugins.android.standalonemojos.ManifestUpdateMojo#manifestApplicationLabel}.
      */
     protected String applicationLabel;
     /**
-     * Mirror of {@link com.github.cardforge.standalonemojos
-     * .ManifestUpdateMojo#manifestApplicationTheme}.
+     * Mirror of {@link com.github.cardforge.maven.plugins.android.standalonemojos.ManifestUpdateMojo#manifestApplicationTheme}.
      */
     protected String applicationTheme;
     /**
-     * Mirror of {@link ManifestUpdateMojo#manifestSharedUserId}.
+     * Mirror of {@link com.github.cardforge.maven.plugins.android.standalonemojos.ManifestUpdateMojo#manifestSharedUserId}.
      */
     protected String sharedUserId;
     /**
-     * Mirror of {@link ManifestUpdateMojo#manifestDebuggable}.
+     * Mirror of {@link com.github.cardforge.maven.plugins.android.standalonemojos.ManifestUpdateMojo#manifestDebuggable}.
      */
     protected Boolean debuggable;
     /**
      * Mirror of
-     * {@link ManifestUpdateMojo#manifestSupportsScreens}
+     * {@link com.github.cardforge.maven.plugins.android.standalonemojos.ManifestUpdateMojo#manifestSupportsScreens}
      * .
      */
     protected SupportsScreens supportsScreens;
     /**
      * Mirror of
-     * {@link ManifestUpdateMojo#manifestCompatibleScreens}
+     * {@link com.github.cardforge.maven.plugins.android.standalonemojos.ManifestUpdateMojo#manifestCompatibleScreens}
      * .
      */
     protected List<CompatibleScreen> compatibleScreens;
     /**
      * Mirror of
-     * {@link ManifestUpdateMojo#manifestProviderAuthorities}
+     * {@link com.github.cardforge.maven.plugins.android.standalonemojos.ManifestUpdateMojo#manifestProviderAuthorities}
      * .
      */
     protected Properties providerAuthorities;
     /**
      * Mirror of
-     * {@link ManifestUpdateMojo#manifestUsesSdk}
+     * {@link com.github.cardforge.maven.plugins.android.standalonemojos.ManifestUpdateMojo#manifestUsesSdk}
      */
     protected UsesSdk usesSdk;
     /**
-     * Mirror of {@link ManifestUpdateMojo
-     * #manifestVersionCodeAutoIncrement}.
+     * Mirror of {@link com.github.cardforge.maven.plugins.android.standalonemojos.ManifestUpdateMojo#manifestVersionCodeAutoIncrement}.
      */
     private Boolean versionCodeAutoIncrement;
 

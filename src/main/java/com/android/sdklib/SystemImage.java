@@ -35,7 +35,10 @@ import java.util.Locale;
 public class SystemImage implements ISystemImage {
     public static final IdDisplay DEFAULT_TAG = new IdDisplay("default",    //$NON-NLS-1$
             "Default");   //$NON-NLS-1$
-    @Deprecated
+    /**
+     * @deprecated Use {@link #getLocation()} instead.
+     */
+    @Deprecated(since = "24.3.3")
     private final LocationType mLocationtype;
     private final IdDisplay mTag;
     private final IdDisplay mAddonVendor;
@@ -229,6 +232,7 @@ public class SystemImage implements ISystemImage {
      */
     @NonNull
     @Override
+    @Deprecated(since = "24.3.3")
     public LocationType getLocationType() {
         return mLocationtype;
     }
@@ -272,7 +276,7 @@ public class SystemImage implements ISystemImage {
      * Sort by tag & ABI name only. This is what matters from a user point of view.
      */
     @Override
-    public int compareTo(ISystemImage other) {
+    public int compareTo(@NonNull ISystemImage other) {
         int t = this.getTag().compareTo(other.getTag());
         if (t != 0) {
             return t;
@@ -306,10 +310,9 @@ public class SystemImage implements ISystemImage {
 
     @Override
     public boolean equals(Object o) {
-        if (!(o instanceof SystemImage)) {
+        if (!(o instanceof SystemImage other)) {
             return false;
         }
-        SystemImage other = (SystemImage) o;
         return mTag.equals(other.mTag) && mAbiType.equals(other.getAbiType()) && Objects.equal(mAddonVendor, other.mAddonVendor)
                 && mLocation.equals(other.mLocation) && Arrays.equals(mSkins, other.mSkins);
     }

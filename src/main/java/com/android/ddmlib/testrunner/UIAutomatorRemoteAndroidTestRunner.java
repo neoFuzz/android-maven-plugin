@@ -1,5 +1,6 @@
 package com.android.ddmlib.testrunner;
 
+import com.android.annotations.NonNull;
 import com.android.ddmlib.*;
 import org.apache.commons.lang3.StringUtils;
 
@@ -17,14 +18,14 @@ public class UIAutomatorRemoteAndroidTestRunner {
     private static final String CLASS_ARG_NAME = "class";
     private static final String DEBUG_ARG_NAME = "debug";
     private final String jarFile;
-    private IDevice mRemoteDevice;
-    // default to no timeout
-    private int mMaxTimeToOutputResponse = 0;
-    private String mRunName = null;
+    private final IDevice mRemoteDevice;
     /**
      * map of name-value instrumentation argument pairs
      */
-    private List<Entry<String, String>> mArgList;
+    private final List<Entry<String, String>> mArgList;
+    // default to no timeout
+    private int mMaxTimeToOutputResponse = 0;
+    private String mRunName = null;
     private InstrumentationResultParser mParser;
     private boolean noHup;
     private Object dumpFilePath;
@@ -32,14 +33,13 @@ public class UIAutomatorRemoteAndroidTestRunner {
     public UIAutomatorRemoteAndroidTestRunner(String jarFile, IDevice remoteDevice) {
         this.jarFile = jarFile;
         mRemoteDevice = remoteDevice;
-        mArgList = new ArrayList<Entry<String, String>>();
+        mArgList = new ArrayList<>();
     }
 
     /**
      * {@inheritDoc}
      */
-
-    public void setTestClassOrMethods(String[] testClassOrMethods) {
+    public void setTestClassOrMethods(@NonNull String[] testClassOrMethods) {
         for (String testClassOrMethod : testClassOrMethods) {
             addInstrumentationArg(CLASS_ARG_NAME, testClassOrMethod);
         }
@@ -52,20 +52,15 @@ public class UIAutomatorRemoteAndroidTestRunner {
         if (name == null || value == null) {
             throw new IllegalArgumentException("name or value arguments cannot be null");
         }
-        mArgList.add(new AbstractMap.SimpleImmutableEntry<String, String>(name, value));
+        mArgList.add(new AbstractMap.SimpleImmutableEntry<>(name, value));
     }
 
     /**
      * {@inheritDoc}
      */
-
     public void addBooleanArg(String name, boolean value) {
         addInstrumentationArg(name, Boolean.toString(value));
     }
-
-    /**
-     * {@inheritDoc}
-     */
 
     /**
      * {@inheritDoc}
@@ -75,9 +70,17 @@ public class UIAutomatorRemoteAndroidTestRunner {
         addBooleanArg(DEBUG_ARG_NAME, debug);
     }
 
+    /**
+     * {@inheritDoc}
+     */
+
     public void setNoHup(boolean noHup) {
         this.noHup = noHup;
     }
+
+    /**
+     * {@inheritDoc}
+     */
 
     public void setDumpFilePath(String dumpFilePath) {
         this.dumpFilePath = dumpFilePath;
@@ -86,7 +89,6 @@ public class UIAutomatorRemoteAndroidTestRunner {
     /**
      * {@inheritDoc}
      */
-
     public void setMaxtimeToOutputResponse(int maxTimeToOutputResponse) {
         mMaxTimeToOutputResponse = maxTimeToOutputResponse;
     }
@@ -120,7 +122,7 @@ public class UIAutomatorRemoteAndroidTestRunner {
         try {
             mRemoteDevice.executeShellCommand(runCaseCommandStr, mParser, mMaxTimeToOutputResponse);
         } catch (IOException e) {
-            Log.w(LOG_TAG, String.format("IOException %1$s when running tests %2$s on %3$s", e.toString(), jarFile,
+            Log.w(LOG_TAG, String.format("IOException %1$s when running tests %2$s on %3$s", e, jarFile,
                     mRemoteDevice.getSerialNumber()));
             // rely on parser to communicate results to listeners
             mParser.handleTestRunFailed(e.toString());
@@ -128,7 +130,7 @@ public class UIAutomatorRemoteAndroidTestRunner {
         } catch (ShellCommandUnresponsiveException e) {
             Log.w(LOG_TAG,
                     String.format("ShellCommandUnresponsiveException %1$s when running tests %2$s on %3$s",
-                            e.toString(), jarFile, mRemoteDevice.getSerialNumber()));
+                            e, jarFile, mRemoteDevice.getSerialNumber()));
             mParser.handleTestRunFailed(String.format("Failed to receive adb shell test output within %1$d ms. "
                             + "Test may have timed out, or adb connection to device became unresponsive",
                     mMaxTimeToOutputResponse));
@@ -141,7 +143,7 @@ public class UIAutomatorRemoteAndroidTestRunner {
             throw e;
         } catch (AdbCommandRejectedException e) {
             Log.w(LOG_TAG, String.format("AdbCommandRejectedException %1$s when running tests %2$s on %3$s",
-                    e.toString(), jarFile, mRemoteDevice.getSerialNumber()));
+                    e, jarFile, mRemoteDevice.getSerialNumber()));
             mParser.handleTestRunFailed(e.toString());
             throw e;
         }
@@ -160,6 +162,7 @@ public class UIAutomatorRemoteAndroidTestRunner {
      * Returns the full instrumentation command line syntax for the provided instrumentation arguments. Returns an empty
      * string if no arguments were specified.
      */
+    @NonNull
     private String buildArgsCommand() {
         StringBuilder commandBuilder = new StringBuilder();
         for (Entry<String, String> argPair : mArgList) {
@@ -180,8 +183,8 @@ public class UIAutomatorRemoteAndroidTestRunner {
     /**
      * Adds instrumentation arguments from userProperties from keys with the propertiesKeyPrefix prefix.
      *
-     * @param userProperties
-     * @param propertiesKeyPrefix
+     * @param userProperties      the properties to load the arguments from
+     * @param propertiesKeyPrefix the prefix of the properties to load
      */
     public void setUserProperties(Properties userProperties, String propertiesKeyPrefix) {
         if (userProperties == null) {
@@ -207,7 +210,7 @@ public class UIAutomatorRemoteAndroidTestRunner {
 
                 // Verify so the key isn't blank after substring
                 if (StringUtils.isNotBlank(name)) {
-                    //Now its safe to add the parameter
+                    //Now it's safe to add the parameter
                     addInstrumentationArg(name, value);
                 }
             }

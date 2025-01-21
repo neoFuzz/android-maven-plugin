@@ -15,7 +15,7 @@
  */
 package com.android.sdklib.internal.build;
 
-import com.android.SdkConstants;
+import com.android.annotations.NonNull;
 import com.android.sdklib.internal.build.SignedJarBuilder.IZipEntryFilter.ZipAbortException;
 import org.bouncycastle.asn1.cms.CMSObjectIdentifiers;
 import org.bouncycastle.cert.jcajce.JcaCertStore;
@@ -29,6 +29,7 @@ import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 import org.bouncycastle.operator.jcajce.JcaDigestCalculatorProviderBuilder;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.security.*;
 import java.security.cert.X509Certificate;
 import java.util.Base64;
@@ -43,17 +44,17 @@ import java.util.zip.ZipInputStream;
  *
  * @deprecated Use Android-Builder instead
  */
-@Deprecated
+@Deprecated(since = "26.1.0")
 public class SignedJarBuilder {
     private static final String DIGEST_ALGORITHM = "SHA1";
     private static final String DIGEST_ATTR = "SHA1-Digest";
     private static final String DIGEST_MANIFEST_ATTR = "SHA1-Digest-Manifest";
     private JarOutputStream mOutputJar;
-    private PrivateKey mKey;
-    private X509Certificate mCertificate;
+    private final PrivateKey mKey;
+    private final X509Certificate mCertificate;
     private Manifest mManifest;
     private MessageDigest mMessageDigest;
-    private byte[] mBuffer = new byte[4096];
+    private final byte[] mBuffer = new byte[4096];
 
     /**
      * Creates a {@link SignedJarBuilder} with a given output stream, and signing information.
@@ -64,8 +65,8 @@ public class SignedJarBuilder {
      * @param key         the {@link PrivateKey} used to sign the archive, or <code>null</code>.
      * @param certificate the {@link X509Certificate} used to sign the archive, or
      *                    <code>null</code>.
-     * @throws IOException
-     * @throws NoSuchAlgorithmException
+     * @throws IOException if an I/O error occurs.
+     * @throws NoSuchAlgorithmException if the algorithm used for the signature is not available.
      */
     public SignedJarBuilder(OutputStream out, PrivateKey key, X509Certificate certificate)
             throws IOException, NoSuchAlgorithmException {
@@ -87,20 +88,17 @@ public class SignedJarBuilder {
      *
      * @param inputFile the {@link File} to write.
      * @param jarPath   the filepath inside the archive.
-     * @throws IOException
+     * @throws IOException if an I/O error occurs.
      */
-    public void writeFile(File inputFile, String jarPath) throws IOException {
+    public void writeFile(@NonNull File inputFile, String jarPath) throws IOException {
         // Get an input stream on the file.
-        FileInputStream fis = new FileInputStream(inputFile);
-        try {
+        try (FileInputStream fis = new FileInputStream(inputFile)) {
             // create the zip entry
             JarEntry entry = new JarEntry(jarPath);
             entry.setTime(inputFile.lastModified());
             writeEntry(fis, entry);
-        } finally {
-            // close the file stream used to read the file
-            fis.close();
         }
+        // Finally, close the file stream used to read the file
     }
 
     /**
@@ -110,14 +108,13 @@ public class SignedJarBuilder {
      *
      * @param input  the {@link InputStream} for the Jar/Zip to copy.
      * @param filter the filter or <code>null</code>
-     * @throws IOException
+     * @throws IOException if an I/O error occurs.
      * @throws ZipAbortException if the {@link IZipEntryFilter} filter indicated that the write
-     *                           must be aborted.
+     *                           operation must be aborted.
      */
     public void writeZip(InputStream input, IZipEntryFilter filter)
             throws IOException, ZipAbortException {
-        ZipInputStream zis = new ZipInputStream(input);
-        try {
+        try (ZipInputStream zis = new ZipInputStream(input)) {
             // loop on the entries of the intermediary package and put them in the final package.
             ZipEntry entry;
             while ((entry = zis.getNextEntry()) != null) {
@@ -127,12 +124,12 @@ public class SignedJarBuilder {
                     continue;
                 }
                 // if we have a filter, we check the entry against it
-                if (filter != null && filter.checkEntry(name) == false) {
+                if (filter != null && !filter.checkEntry(name)) {
                     continue;
                 }
                 JarEntry newEntry;
                 // Preserve the STORED method of the input entry.
-                if (entry.getMethod() == JarEntry.STORED) {
+                if (entry.getMethod() == ZipEntry.STORED) {
                     newEntry = new JarEntry(entry);
                 } else {
                     // Create a new entry so that the compressed len is recomputed.
@@ -141,16 +138,14 @@ public class SignedJarBuilder {
                 writeEntry(zis, newEntry);
                 zis.closeEntry();
             }
-        } finally {
-            zis.close();
         }
     }
 
     /**
      * Closes the Jar archive by creating the manifest, and signing the archive.
      *
-     * @throws IOException
-     * @throws GeneralSecurityException
+     * @throws IOException            if an I/O error occurs.
+     * @throws GeneralSecurityException if a security error occurs.
      */
     public void close() throws IOException, GeneralSecurityException {
         if (mManifest != null) {
@@ -165,9 +160,9 @@ public class SignedJarBuilder {
             writeSignatureFile(out);
             // CERT.*
             mOutputJar.putNextEntry(new JarEntry("META-INF/CERT." + mKey.getAlgorithm()));
-            writeSignatureBlock(signature, mCertificate, mKey,out);
+            writeSignatureBlock(signature, mCertificate, mKey, out);
             // close out at the end because it can also close mOutputJar.
-            // (there's some timing issue here I think, because it's worked before with out
+            // (there's some timing issue here I think, because it's worked before without
             // being closed after writing CERT.SF).
             out.close();
         }
@@ -194,9 +189,9 @@ public class SignedJarBuilder {
      *
      * @param input The input stream from where to write the entry content.
      * @param entry the entry to write in the jar.
-     * @throws IOException
+     * @throws IOException if an I/O error occurs.
      */
-    private void writeEntry(InputStream input, JarEntry entry) throws IOException {
+    private void writeEntry(@NonNull InputStream input, JarEntry entry) throws IOException {
         // add the entry to the jar archive
         mOutputJar.putNextEntry(entry);
         // read the content of the entry from the input stream, and write it into the archive.
@@ -233,7 +228,7 @@ public class SignedJarBuilder {
         MessageDigest md = MessageDigest.getInstance(DIGEST_ALGORITHM);
         PrintStream print = new PrintStream(
                 new DigestOutputStream(new ByteArrayOutputStream(), md),
-                true, SdkConstants.UTF_8);
+                true, StandardCharsets.UTF_8);
         // Digest of the entire manifest
         mManifest.write(print);
         print.flush();
@@ -241,12 +236,7 @@ public class SignedJarBuilder {
         Map<String, Attributes> entries = mManifest.getEntries();
         for (Map.Entry<String, Attributes> entry : entries.entrySet()) {
             // Digest of the manifest stanza for this entry.
-            print.print("Name: " + entry.getKey() + "\r\n");
-            for (Map.Entry<Object, Object> att : entry.getValue().entrySet()) {
-                print.print(att.getKey() + ": " + att.getValue() + "\r\n");
-            }
-            print.print("\r\n");
-            print.flush();
+            com.android.builder.signing.SignedJarBuilder.digestManifest(print, entry);
             Attributes sfAttr = new Attributes();
             sfAttr.putValue(DIGEST_ATTR, Base64.getEncoder().encodeToString(md.digest()));
             sf.getEntries().put(entry.getKey(), sfAttr);
@@ -333,6 +323,7 @@ public class SignedJarBuilder {
          * {@link IZipEntryFilter#checkEntry(String)}.
          */
         class ZipAbortException extends Exception {
+            @Serial
             private static final long serialVersionUID = 1L;
 
             public ZipAbortException() {
@@ -357,7 +348,7 @@ public class SignedJarBuilder {
      * Write to another stream and also feed it to the Signature object.
      */
     private static class SignatureOutputStream extends FilterOutputStream {
-        private Signature mSignature;
+        private final Signature mSignature;
         private int mCount = 0;
 
         public SignatureOutputStream(OutputStream out, Signature sig) {
@@ -377,7 +368,7 @@ public class SignedJarBuilder {
         }
 
         @Override
-        public void write(byte[] b, int off, int len) throws IOException {
+        public void write(@NonNull byte[] b, int off, int len) throws IOException {
             try {
                 mSignature.update(b, off, len);
             } catch (SignatureException e) {

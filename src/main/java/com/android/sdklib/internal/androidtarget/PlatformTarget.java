@@ -176,17 +176,17 @@ public final class PlatformTarget implements IAndroidTarget {
 
     @Override
     public String getFullName() {
-        return mName;
+        return getName();
     }
 
     @Override
     public String getClasspathName() {
-        return mName;
+        return getName();
     }
 
     @Override
     public String getShortClasspathName() {
-        return mName;
+        return getName();
     }
 
     /*
@@ -313,9 +313,9 @@ public final class PlatformTarget implements IAndroidTarget {
     }
 
     /**
+     * <p>
      * Currently always return a fixed list with "android.test.runner" in it.
      * <p/>
-     * TODO change the fixed library list to be build-dependent later.
      * {@inheritDoc}
      */
     @Override
@@ -325,7 +325,7 @@ public final class PlatformTarget implements IAndroidTarget {
     }
 
     /**
-     * The platform has no USB Vendor Id: always return {@link IAndroidTarget#NO_USB_ID}.
+     * The platform has no {@code USB Vendor Id:} always return {@link IAndroidTarget#NO_USB_ID}.
      * {@inheritDoc}
      */
     @Override
@@ -364,9 +364,7 @@ public final class PlatformTarget implements IAndroidTarget {
 
     @Override
     public boolean equals(Object obj) {
-        if (obj instanceof PlatformTarget) {
-            PlatformTarget platform = (PlatformTarget) obj;
-
+        if (obj instanceof PlatformTarget platform) {
             return mVersion.equals(platform.getVersion());
         }
 
@@ -380,7 +378,7 @@ public final class PlatformTarget implements IAndroidTarget {
      * @see java.lang.Comparable#compareTo(java.lang.Object)
      */
     @Override
-    public int compareTo(IAndroidTarget target) {
+    public int compareTo(@NonNull IAndroidTarget target) {
         // quick check.
         if (this == target) {
             return 0;
@@ -389,12 +387,12 @@ public final class PlatformTarget implements IAndroidTarget {
         int versionDiff = mVersion.compareTo(target.getVersion());
 
         // only if the version are the same do we care about add-ons.
-        if (versionDiff == 0) {
+        if (versionDiff == 0 &&
+                !target.isPlatform()) {
             // platforms go before add-ons.
-            if (target.isPlatform() == false) {
-                return -1;
-            }
+            return -1;
         }
+
 
         return versionDiff;
     }
@@ -429,7 +427,7 @@ public final class PlatformTarget implements IAndroidTarget {
                 return Integer.decode(value);
             }
         } catch (NumberFormatException e) {
-            // ignore, return default value;
+            // ignore, return default value
         }
 
         return defaultValue;

@@ -63,25 +63,21 @@ import java.util.*;
  * <th>Query parameter</th>
  * <th>Getter</th>
  * </tr>
- *
  * <tr>
  * <td>Tools</td>
  * <td>Unique instance</td>
  * <td>{@code getPkgInfo(PkgType.PKG_TOOLS)} => {@link LocalPkgInfo}</td>
  * </tr>
- *
  * <tr>
  * <td>Platform-Tools</td>
  * <td>Unique instance</td>
  * <td>{@code getPkgInfo(PkgType.PKG_PLATFORM_TOOLS)} => {@link LocalPkgInfo}</td>
  * </tr>
- *
  * <tr>
  * <td>Docs</td>
  * <td>Unique instance</td>
  * <td>{@code getPkgInfo(PkgType.PKG_DOCS)} => {@link LocalPkgInfo}</td>
  * </tr>
- *
  * <tr>
  * <td>Build-Tools</td>
  * <td>{@link FullRevision}</td>
@@ -90,7 +86,6 @@ import java.util.*;
  *     or {@code getPkgInfo(PkgType.PKG_BUILD_TOOLS, FullRevision)} => {@link LocalPkgInfo}, <br/>
  *     or {@code getPkgsInfos(PkgType.PKG_BUILD_TOOLS)} => {@link LocalPkgInfo}[]</td>
  * </tr>
- *
  * <tr>
  * <td>Extras</td>
  * <td>String vendor/path</td>
@@ -98,21 +93,18 @@ import java.util.*;
  *     or {@code getPkgInfo(PkgType.PKG_EXTRAS, String)} => {@link LocalPkgInfo}, <br/>
  *     or {@code getPkgsInfos(PkgType.PKG_EXTRAS)} => {@link LocalPkgInfo}[]</td>
  * </tr>
- *
  * <tr>
  * <td>Sources</td>
  * <td>{@link AndroidVersion}</td>
  * <td>{@code getPkgInfo(PkgType.PKG_SOURCES, AndroidVersion)} => {@link LocalPkgInfo}, <br/>
  *     or {@code getPkgsInfos(PkgType.PKG_SOURCES)} => {@link LocalPkgInfo}[]</td>
  * </tr>
- *
  * <tr>
  * <td>Samples</td>
  * <td>{@link AndroidVersion}</td>
  * <td>{@code getPkgInfo(PkgType.PKG_SAMPLES, AndroidVersion)} => {@link LocalPkgInfo}, <br/>
  *     or {@code getPkgsInfos(PkgType.PKG_SAMPLES)} => {@link LocalPkgInfo}[]</td>
  * </tr>
- *
  * <tr>
  * <td>Platforms</td>
  * <td>{@link AndroidVersion}</td>
@@ -121,7 +113,6 @@ import java.util.*;
  *     or {@code getPkgsInfos(PkgType.PKG_PLATFORMS)} => {@link LocalPkgInfo}[], <br/>
  *     or {@code getTargetFromHashString(String)} => {@link IAndroidTarget}</td>
  * </tr>
- *
  * <tr>
  * <td>Add-ons</td>
  * <td>{@link AndroidVersion} x String vendor/path</td>
@@ -129,13 +120,11 @@ import java.util.*;
  *     or {@code getPkgsInfos(PkgType.PKG_ADDONS)}    => {@link LocalPkgInfo}[], <br/>
  *     or {@code getTargetFromHashString(String)} => {@link IAndroidTarget}</td>
  * </tr>
- *
  * <tr>
  * <td>System images</td>
  * <td>{@link AndroidVersion} x {@link String} ABI</td>
  * <td>{@code getPkgsInfos(PkgType.PKG_SYS_IMAGES)} => {@link LocalPkgInfo}[]</td>
  * </tr>
- *
  * </table>
  * <p>
  * Apps/libraries that use it are encouraged to keep an existing instance around
@@ -166,6 +155,7 @@ import java.util.*;
  *
  * @version 2 of the {@code SdkManager} class, essentially.
  */
+@SuppressWarnings("deprecation")
 public class LocalSdk {
 
     /**
@@ -186,7 +176,7 @@ public class LocalSdk {
      * Cache of targets from local sdk. See {@link #getTargets()}.
      */
     @GuardedBy(value = "mLocalPackages")
-    private final List<IAndroidTarget> mCachedTargets = new ArrayList<IAndroidTarget>();
+    private final List<IAndroidTarget> mCachedTargets = new ArrayList<>();
     /**
      * Location of the SDK. Maybe null. Can be changed.
      */
@@ -249,7 +239,8 @@ public class LocalSdk {
      * @param sdkRoot The location of the SDK root folder.
      */
     public void setLocation(@NonNull File sdkRoot) {
-        assert sdkRoot != null;
+        // noinspection ConstantConditions
+        assert sdkRoot != null; // NOSONAR - not sure what to do
         mSdkRoot = sdkRoot;
         clearLocalPkg(PkgType.PKG_ALL);
     }
@@ -259,8 +250,9 @@ public class LocalSdk {
      * The getLocation() API replaces this function.
      *
      * @return The location of the SDK. Null if not initialized yet.
+     * @deprecated Use {@link #getLocation()} instead.
      */
-    @Deprecated
+    @Deprecated(since = "v22")
     @Nullable
     public String getPath() {
         return mSdkRoot != null ? mSdkRoot.getPath() : null;
@@ -346,17 +338,14 @@ public class LocalSdk {
      */
     @Nullable
     public LocalPkgInfo getPkgInfo(@NonNull PkgType filter, @NonNull AndroidVersion version) {
-        assert filter == PkgType.PKG_PLATFORM ||
-                filter == PkgType.PKG_SAMPLE ||
-                filter == PkgType.PKG_SOURCE;
-
-        for (LocalPkgInfo pkg : getPkgsInfos(filter)) {
-            IPkgDesc d = pkg.getDesc();
-            if (d.hasAndroidVersion() && d.getAndroidVersion().equals(version)) {
-                return pkg;
+        if (filter == PkgType.PKG_PLATFORM || filter == PkgType.PKG_SAMPLE || filter == PkgType.PKG_SOURCE) {
+            for (LocalPkgInfo pkg : getPkgsInfos(filter)) {
+                IPkgDesc d = pkg.getDesc();
+                if (d.hasAndroidVersion() && Objects.equals(d.getAndroidVersion(), version)) {
+                    return pkg;
+                }
             }
         }
-
         return null;
     }
 
@@ -374,14 +363,13 @@ public class LocalSdk {
     @Nullable
     public LocalPkgInfo getPkgInfo(@NonNull PkgType filter, @NonNull FullRevision revision) {
 
-        assert filter == PkgType.PKG_BUILD_TOOLS;
-
-        for (LocalPkgInfo pkg : getPkgsInfos(filter)) {
-            IPkgDesc d = pkg.getDesc();
-            if (d.hasFullRevision() && d.getFullRevision().equals(revision)) {
-                return pkg;
+        if (filter == PkgType.PKG_BUILD_TOOLS)
+            for (LocalPkgInfo pkg : getPkgsInfos(filter)) {
+                IPkgDesc d = pkg.getDesc();
+                if (d.hasFullRevision() && d.getFullRevision().equals(revision)) {
+                    return pkg;
+                }
             }
-        }
         return null;
     }
 
@@ -398,15 +386,13 @@ public class LocalSdk {
     @Nullable
     public LocalPkgInfo getPkgInfo(@NonNull PkgType filter, @NonNull String path) {
 
-        assert filter == PkgType.PKG_ADDON ||
-                filter == PkgType.PKG_PLATFORM;
-
-        for (LocalPkgInfo pkg : getPkgsInfos(filter)) {
-            IPkgDesc d = pkg.getDesc();
-            if (d.hasPath() && path.equals(d.getPath())) {
-                return pkg;
+        if (filter == PkgType.PKG_ADDON || filter == PkgType.PKG_PLATFORM)
+            for (LocalPkgInfo pkg : getPkgsInfos(filter)) {
+                IPkgDesc d = pkg.getDesc();
+                if (d.hasPath() && path.equals(d.getPath())) {
+                    return pkg;
+                }
             }
-        }
         return null;
     }
 
@@ -425,14 +411,12 @@ public class LocalSdk {
     public LocalPkgInfo getPkgInfo(@NonNull PkgType filter,
                                    @NonNull String vendor,
                                    @NonNull String path) {
-
-        assert filter == PkgType.PKG_EXTRA ||
-                filter == PkgType.PKG_ADDON;
-
-        for (LocalPkgInfo pkg : getPkgsInfos(filter)) {
-            IPkgDesc d = pkg.getDesc();
-            if (d.hasVendor() && vendor.equals(d.getVendor().getId())) {
-                if (d.hasPath() && path.equals(d.getPath())) {
+        if (filter == PkgType.PKG_EXTRA || filter == PkgType.PKG_ADDON) {
+            for (LocalPkgInfo pkg : getPkgsInfos(filter)) {
+                IPkgDesc d = pkg.getDesc();
+                boolean vendorMatches = d.hasVendor() && vendor.equals(d.getVendor().getId());
+                boolean pathMatches = d.hasPath() && path.equals(d.getPath());
+                if (vendorMatches && pathMatches) {
                     return pkg;
                 }
             }
@@ -463,11 +447,6 @@ public class LocalSdk {
      */
     @Nullable
     public LocalPkgInfo getPkgInfo(@NonNull PkgType filter) {
-
-        assert filter == PkgType.PKG_TOOLS ||
-                filter == PkgType.PKG_PLATFORM_TOOLS ||
-                filter == PkgType.PKG_DOC;
-
         if (filter != PkgType.PKG_TOOLS &&
                 filter != PkgType.PKG_PLATFORM_TOOLS &&
                 filter != PkgType.PKG_DOC) {
@@ -478,7 +457,7 @@ public class LocalSdk {
         synchronized (mLocalPackages) {
             Collection<LocalPkgInfo> existing = mLocalPackages.get(filter);
             assert existing.size() <= 1;
-            if (existing.size() > 0) {
+            if (!existing.isEmpty()) {
                 return existing.iterator().next();
             }
 
@@ -605,13 +584,10 @@ public class LocalSdk {
                                 scanExtras(subDir, existing);
                                 break;
 
-                            case PKG_TOOLS:
-                            case PKG_PLATFORM_TOOLS:
-                            case PKG_DOC:
+                            case PKG_TOOLS, PKG_PLATFORM_TOOLS, PKG_DOC:
                                 break;
                             default:
-                                throw new IllegalArgumentException(
-                                        "Unsupported pkg type " + filter.toString());
+                                throw new IllegalArgumentException("Unsupported pkg type " + filter);
                         }
                         mVisitedDirs.put(filter, new LocalDirInfo(mFileOp, subDir));
                         list.addAll(existing);
@@ -636,14 +612,14 @@ public class LocalSdk {
     @Nullable
     public BuildToolInfo getBuildTool(@Nullable FullRevision revision) {
         LocalPkgInfo pkg = getPkgInfo(PkgType.PKG_BUILD_TOOLS, revision);
-        if (pkg instanceof LocalBuildToolPkgInfo) {
-            return ((LocalBuildToolPkgInfo) pkg).getBuildToolInfo();
+        if (pkg instanceof LocalBuildToolPkgInfo p) {
+            return p.getBuildToolInfo();
         }
         return null;
     }
 
     /**
-     * Returns the highest build-tool revision known, or null if there are are no build-tools.
+     * Returns the highest build-tool revision known, or null if there are no build-tools.
      * <p/>
      * If no specific build-tool package is installed but the platform-tools is lower than 17,
      * then this creates and returns a "legacy" built-tool package using platform-tools.
@@ -658,9 +634,9 @@ public class LocalSdk {
             return mLegacyBuildTools;
         }
 
-        LocalPkgInfo[] pkgs = getPkgsInfos(PkgType.PKG_BUILD_TOOLS);
+        LocalPkgInfo[] pkgInfos = getPkgsInfos(PkgType.PKG_BUILD_TOOLS);
 
-        if (pkgs.length == 0) {
+        if (pkgInfos.length == 0) {
             LocalPkgInfo ptPkg = getPkgInfo(PkgType.PKG_PLATFORM_TOOLS);
             if (ptPkg instanceof LocalPlatformToolPkgInfo &&
                     ptPkg.getDesc().getFullRevision().compareTo(new FullRevision(17)) < 0) {
@@ -671,15 +647,13 @@ public class LocalSdk {
             return null;
         }
 
-        assert pkgs.length > 0;
-
         // Note: the pkgs come from a TreeMultimap so they should already be sorted.
         // Just in case, sort them again.
-        Arrays.sort(pkgs);
+        Arrays.sort(pkgInfos);
 
         // LocalBuildToolPkgInfo's comparator sorts on its FullRevision so we just
         // need to take the latest element.
-        LocalPkgInfo pkg = pkgs[pkgs.length - 1];
+        LocalPkgInfo pkg = pkgInfos[pkgInfos.length - 1];
         if (pkg instanceof LocalBuildToolPkgInfo) {
             return ((LocalBuildToolPkgInfo) pkg).getBuildToolInfo();
         }
@@ -713,7 +687,7 @@ public class LocalSdk {
     /**
      * Returns the targets (platforms & addons) that are available in the SDK.
      * The target list is created on demand the first time then cached.
-     * It will not refreshed unless {@link #clearLocalPkg} is called to clear platforms
+     * It will not be refreshed unless {@link #clearLocalPkg} is called to clear platforms
      * and/or add-ons.
      * <p/>
      * The array can be empty but not null.
@@ -722,15 +696,12 @@ public class LocalSdk {
     public IAndroidTarget[] getTargets() {
         synchronized (mLocalPackages) {
             if (mReloadTargets) {
-                LocalPkgInfo[] pkgsInfos = getPkgsInfos(EnumSet.of(PkgType.PKG_PLATFORM,
+                LocalPkgInfo[] pkgInfos = getPkgsInfos(EnumSet.of(PkgType.PKG_PLATFORM,
                         PkgType.PKG_ADDON));
-                int n = pkgsInfos.length;
                 mCachedTargets.clear();
-                for (int i = 0; i < n; i++) {
-                    LocalPkgInfo info = pkgsInfos[i];
-                    assert info instanceof LocalPlatformPkgInfo;
-                    if (info instanceof LocalPlatformPkgInfo) {
-                        IAndroidTarget target = ((LocalPlatformPkgInfo) info).getAndroidTarget();
+                for (LocalPkgInfo info : pkgInfos) {
+                    if (info instanceof LocalPlatformPkgInfo localPlatformPkgInfo) {
+                        IAndroidTarget target = localPlatformPkgInfo.getAndroidTarget();
                         if (target != null) {
                             mCachedTargets.add(target);
                         }
@@ -766,6 +737,7 @@ public class LocalSdk {
      * Try to find a tools package at the given location.
      * Returns null if not found.
      */
+    @Nullable
     private LocalToolPkgInfo scanTools(File toolFolder) {
         // Can we find some properties?
         Properties props = parseProperties(new File(toolFolder, SdkConstants.FN_SOURCE_PROP));
@@ -812,6 +784,7 @@ public class LocalSdk {
      * Try to find a platform-tools package at the given location.
      * Returns null if not found.
      */
+    @Nullable
     private LocalPlatformToolPkgInfo scanPlatformTools(File ptFolder) {
         // Can we find some properties?
         Properties props = parseProperties(new File(ptFolder, SdkConstants.FN_SOURCE_PROP));
@@ -820,14 +793,14 @@ public class LocalSdk {
             return null;
         }
 
-        LocalPlatformToolPkgInfo info = new LocalPlatformToolPkgInfo(this, ptFolder, props, rev);
-        return info;
+        return new LocalPlatformToolPkgInfo(this, ptFolder, props, rev);
     }
 
     /**
      * Try to find a docs package at the given location.
      * Returns null if not found.
      */
+    @Nullable
     private LocalDocPkgInfo scanDoc(File docFolder) {
         // Can we find some properties?
         Properties props = parseProperties(new File(docFolder, SdkConstants.FN_SOURCE_PROP));
@@ -837,8 +810,8 @@ public class LocalSdk {
         }
 
         try {
-            AndroidVersion vers = new AndroidVersion(props);
-            LocalDocPkgInfo info = new LocalDocPkgInfo(this, docFolder, props, vers, rev);
+            AndroidVersion androidVersion = new AndroidVersion(props);
+            LocalDocPkgInfo info = new LocalDocPkgInfo(this, docFolder, props, androidVersion, rev);
 
             // To start with, a doc folder should have an "index.html" to be acceptable.
             // We don't actually check the content of the file.
@@ -915,14 +888,14 @@ public class LocalSdk {
             }
 
             try {
-                AndroidVersion vers = new AndroidVersion(props);
+                AndroidVersion androidVersion = new AndroidVersion(props);
 
                 LocalPlatformPkgInfo pkgInfo =
-                        new LocalPlatformPkgInfo(this, platformDir, props, vers, rev, minToolsRev);
+                        new LocalPlatformPkgInfo(this, platformDir, props, androidVersion, rev, minToolsRev);
                 outCollection.add(pkgInfo);
 
             } catch (AndroidVersionException e) {
-                continue; // skip invalid or missing android version.
+                // skip invalid or missing android version.
             }
         }
     }
@@ -940,46 +913,50 @@ public class LocalSdk {
             }
 
             try {
-                AndroidVersion vers = new AndroidVersion(props);
-
-                // Starting with addon-4.xsd, we have vendor-id and name-id available
-                // in the add-on source properties so we'll use that directly.
-
-                String nameId = props.getProperty(PkgProps.ADDON_NAME_ID);
-                String nameDisp = props.getProperty(PkgProps.ADDON_NAME_DISPLAY);
-                String vendorId = props.getProperty(PkgProps.ADDON_VENDOR_ID);
-                String vendorDisp = props.getProperty(PkgProps.ADDON_VENDOR_DISPLAY);
-
-                if (nameId == null) {
-                    // Support earlier add-ons that only had a name display attribute
-                    nameDisp = props.getProperty(PkgProps.ADDON_NAME, "Unknown");
-                    nameId = LocalAddonPkgInfo.sanitizeDisplayToNameId(nameDisp);
-                }
-
-                if (nameId != null && nameDisp == null) {
-                    nameDisp = LocalExtraPkgInfo.getPrettyName(null, nameId);
-                }
-
-                if (vendorId != null && vendorDisp == null) {
-                    vendorDisp = LocalExtraPkgInfo.getPrettyName(null, nameId);
-                }
-
-                if (vendorId == null) {
-                    // Support earlier add-ons that only had a vendor display attribute
-                    vendorDisp = props.getProperty(PkgProps.ADDON_VENDOR, "Unknown");
-                    vendorId = LocalAddonPkgInfo.sanitizeDisplayToNameId(vendorDisp);
-                }
-
-                LocalAddonPkgInfo pkgInfo = new LocalAddonPkgInfo(
-                        this, addonDir, props, vers, rev,
-                        new IdDisplay(vendorId, vendorDisp),
-                        new IdDisplay(nameId, nameDisp));
-                outCollection.add(pkgInfo);
-
+                checkAddon4(outCollection, addonDir, props, rev);
             } catch (AndroidVersionException e) {
-                continue; // skip invalid or missing android version.
+                // skip invalid or missing android version.
             }
         }
+    }
+
+    private void checkAddon4(Collection<LocalPkgInfo> outCollection, File addonDir,
+                             Properties props, MajorRevision rev) throws AndroidVersionException {
+        AndroidVersion androidVersion = new AndroidVersion(props);
+
+        // Starting with addon-4.xsd, we have vendor-id and name-id available
+        // in the add-on source properties so we'll use that directly.
+
+        String nameId = props.getProperty(PkgProps.ADDON_NAME_ID);
+        String nameDisp = props.getProperty(PkgProps.ADDON_NAME_DISPLAY);
+        String vendorId = props.getProperty(PkgProps.ADDON_VENDOR_ID);
+        String vendorDisp = props.getProperty(PkgProps.ADDON_VENDOR_DISPLAY);
+
+        if (nameId == null) {
+            // Support earlier add-ons that only had a name display attribute
+            nameDisp = props.getProperty(PkgProps.ADDON_NAME, "Unknown");
+            nameId = LocalAddonPkgInfo.sanitizeDisplayToNameId(nameDisp);
+        }
+
+        if (nameId != null && nameDisp == null) {
+            nameDisp = LocalExtraPkgInfo.getPrettyName(null, nameId);
+        }
+
+        if (vendorId != null && vendorDisp == null) {
+            vendorDisp = LocalExtraPkgInfo.getPrettyName(null, nameId);
+        }
+
+        if (vendorId == null) {
+            // Support earlier add-ons that only had a vendor display attribute
+            vendorDisp = props.getProperty(PkgProps.ADDON_VENDOR, "Unknown");
+            vendorId = LocalAddonPkgInfo.sanitizeDisplayToNameId(vendorDisp);
+        }
+
+        LocalAddonPkgInfo pkgInfo = new LocalAddonPkgInfo(
+                this, addonDir, props, androidVersion, rev,
+                new IdDisplay(vendorId, vendorDisp),
+                new IdDisplay(nameId, nameDisp));
+        outCollection.add(pkgInfo);
     }
 
     private void scanSysImages(
@@ -1020,11 +997,10 @@ public class LocalSdk {
                         }
 
                         File prop2 = new File(dir2, SdkConstants.FN_SOURCE_PROP);
-                        if (mFileOp.isFile(prop2)) {
-                            if (!propFiles.contains(prop2)) {
-                                propFiles.add(prop2);
-                            }
+                        if (mFileOp.isFile(prop2) && !propFiles.contains(prop2)) {
+                            propFiles.add(prop2);
                         }
+
                     }
                 }
             }
@@ -1038,7 +1014,7 @@ public class LocalSdk {
             }
 
             try {
-                AndroidVersion vers = new AndroidVersion(props);
+                AndroidVersion androidVersion = new AndroidVersion(props);
 
                 IdDisplay tag = LocalSysImgPkgInfo.extractTagFromProps(props);
                 String vendorId = props.getProperty(PkgProps.ADDON_VENDOR_ID, null);
@@ -1046,7 +1022,7 @@ public class LocalSdk {
 
                 if (vendorId == null && !scanAddons) {
                     LocalSysImgPkgInfo pkgInfo =
-                            new LocalSysImgPkgInfo(this, abiDir, props, vers, tag, abiDir.getName(), rev);
+                            new LocalSysImgPkgInfo(this, abiDir, props, androidVersion, tag, abiDir.getName(), rev);
                     outCollection.add(pkgInfo);
 
                 } else if (vendorId != null && scanAddons) {
@@ -1055,12 +1031,12 @@ public class LocalSdk {
 
                     LocalAddonSysImgPkgInfo pkgInfo =
                             new LocalAddonSysImgPkgInfo(
-                                    this, abiDir, props, vers, vendor, tag, abiDir.getName(), rev);
+                                    this, abiDir, props, androidVersion, vendor, tag, abiDir.getName(), rev);
                     outCollection.add(pkgInfo);
                 }
 
             } catch (AndroidVersionException e) {
-                continue; // skip invalid or missing android version.
+                // skip invalid or missing android version.
             }
         }
     }
@@ -1084,13 +1060,13 @@ public class LocalSdk {
             }
 
             try {
-                AndroidVersion vers = new AndroidVersion(props);
+                AndroidVersion androidVersion = new AndroidVersion(props);
 
                 LocalSamplePkgInfo pkgInfo =
-                        new LocalSamplePkgInfo(this, platformDir, props, vers, rev, minToolsRev);
+                        new LocalSamplePkgInfo(this, platformDir, props, androidVersion, rev, minToolsRev);
                 outCollection.add(pkgInfo);
             } catch (AndroidVersionException e) {
-                continue; // skip invalid or missing android version.
+                // skip invalid or missing android version.
             }
         }
     }
@@ -1109,13 +1085,13 @@ public class LocalSdk {
             }
 
             try {
-                AndroidVersion vers = new AndroidVersion(props);
+                AndroidVersion androidVersion = new AndroidVersion(props);
 
                 LocalSourcePkgInfo pkgInfo =
-                        new LocalSourcePkgInfo(this, platformDir, props, vers, rev);
+                        new LocalSourcePkgInfo(this, platformDir, props, androidVersion, rev);
                 outCollection.add(pkgInfo);
             } catch (AndroidVersionException e) {
-                continue; // skip invalid or missing android version.
+                // skip invalid or missing android version.
             }
         }
     }
@@ -1167,6 +1143,7 @@ public class LocalSdk {
      * Parses the given file as properties file if it exists.
      * Returns null if the file does not exist, cannot be parsed or has no properties.
      */
+    @Nullable
     private Properties parseProperties(File propsFile) {
         InputStream fis = null;
         try {
@@ -1177,7 +1154,7 @@ public class LocalSdk {
                 props.load(fis);
 
                 // To be valid, there must be at least one property in it.
-                if (props.size() > 0) {
+                if (!props.isEmpty()) {
                     return props;
                 }
             }
@@ -1188,6 +1165,7 @@ public class LocalSdk {
                 try {
                     fis.close();
                 } catch (IOException e) {
+                    // Ignore
                 }
             }
         }

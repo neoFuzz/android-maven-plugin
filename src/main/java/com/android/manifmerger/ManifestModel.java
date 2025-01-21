@@ -21,7 +21,6 @@ import com.android.annotations.NonNull;
 import com.android.annotations.Nullable;
 import com.android.annotations.concurrency.Immutable;
 import com.android.utils.SdkUtils;
-import com.android.xml.AndroidManifest;
 import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
@@ -46,6 +45,9 @@ import static com.android.manifmerger.AttributeModel.SeparatedValuesValidator;
  */
 @Immutable
 class ManifestModel {
+    public static final String ATTRIBUTE_REQUIRED = "required";
+    public static final String ATTRIBUTE_GLESVERSION = "glEsVersion";
+    public static final String ATTRIBUTE_PACKAGE = "package";
 
     /**
      * Subclass of {@link com.android.manifmerger.ManifestModel.AttributeBasedNodeKeyResolver} that
@@ -54,6 +56,7 @@ class ManifestModel {
     private static final NodeKeyResolver DEFAULT_NAME_ATTRIBUTE_RESOLVER =
             new AttributeBasedNodeKeyResolver(ANDROID_URI, SdkConstants.ATTR_NAME);
     private static final NoKeyNodeResolver DEFAULT_NO_KEY_NODE_RESOLVER = new NoKeyNodeResolver();
+
     /**
      * A {@link com.android.manifmerger.ManifestModel.NodeKeyResolver} capable of extracting the
      * element key first in an "android:name" attribute and if not value found there, in the
@@ -64,7 +67,7 @@ class ManifestModel {
         private final NodeKeyResolver nameAttrResolver = DEFAULT_NAME_ATTRIBUTE_RESOLVER;
         private final NodeKeyResolver glEsVersionResolver =
                 new AttributeBasedNodeKeyResolver(ANDROID_URI,
-                        AndroidManifest.ATTRIBUTE_GLESVERSION);
+                        ATTRIBUTE_GLESVERSION);
 
         @Nullable
         @Override
@@ -78,7 +81,7 @@ class ManifestModel {
         @NonNull
         @Override
         public ImmutableList<String> getKeyAttributesNames() {
-            return ImmutableList.of(SdkConstants.ATTR_NAME, AndroidManifest.ATTRIBUTE_GLESVERSION);
+            return ImmutableList.of(SdkConstants.ATTR_NAME, ATTRIBUTE_GLESVERSION);
         }
     };
     /**
@@ -91,13 +94,13 @@ class ManifestModel {
      */
     @Nullable
     private static final NodeKeyResolver INTENT_FILTER_KEY_RESOLVER = new NodeKeyResolver() {
-        @Nullable
         @Override
+        @NonNull
         public String getKey(@NonNull Element element) {
             @NonNull OrphanXmlElement xmlElement = new OrphanXmlElement(element);
             assert (xmlElement.getType() == NodeTypes.INTENT_FILTER);
             // concatenate all actions and categories attribute names.
-            @NonNull List<String> allSubElementKeys = new ArrayList<String>();
+            @NonNull List<String> allSubElementKeys = new ArrayList<>();
             NodeList childNodes = element.getChildNodes();
             for (int i = 0; i < childNodes.getLength(); i++) {
                 Node child = childNodes.item(i);
@@ -128,23 +131,23 @@ class ManifestModel {
 
     /**
      * Definitions of the support node types in the Android Manifest file.
-     * {@link <a href=http://developer.android.com/guide/topics/manifest/manifest-intro.html/>}
+     * <a href="http://developer.android.com/guide/topics/manifest/manifest-intro.html/">Link</a>
      * for more details about the xml format.
      * <p>
-     * There is no DTD or schema associated with the file type so this is best effort in providing
+     * There is no DTD or schema associated with the file type so this is the best effort in providing
      * some metadata on the elements of the Android's xml file.
      * <p>
      * Each xml element is defined as an enum value and for each node, extra metadata is added
      * <ul>
-     *     <li>{@link com.android.manifmerger.MergeType} to identify how the merging engine
+     *     <li>{@link MergeType} to identify how the merging engine
      *     should process this element.</li>
-     *     <li>{@link com.android.manifmerger.ManifestModel.NodeKeyResolver} to resolve the
+     *     <li>{@link NodeKeyResolver} to resolve the
      *     element's key. Elements can have an attribute like "android:name", others can use
      *     a sub-element, and finally some do not have a key and are meant to be unique.</li>
      *     <li>List of attributes models with special behaviors :
      *     <ul>
      *         <li>Smart substitution of class names to fully qualified class names using the
-     *         document's package declaration. The list's size can be 0..n</li>
+     *         document's package declaration. The list's size can be {@code 0..n}</li>
      *         <li>Implicit default value when no defined on the xml element.</li>
      *         <li>{@link AttributeModel.Validator} to validate attribute value against.</li>
      *     </ul>
@@ -157,7 +160,7 @@ class ManifestModel {
      * If you find yourself needing to extend the model to support future requirements, do it here
      * and modify the engine to make proper decision based on the added metadata.
      */
-    enum NodeTypes {
+    public enum NodeTypes {
 
         /**
          * Action (contained in intent-filter)
@@ -427,11 +430,11 @@ class ManifestModel {
          * Uses-feature Xml documentation</a>}
          */
         USES_FEATURE(MergeType.MERGE, NAME_AND_GLESVERSION_KEY_RESOLVER,
-                AttributeModel.newModel(AndroidManifest.ATTRIBUTE_REQUIRED)
+                AttributeModel.newModel(ATTRIBUTE_REQUIRED)
                         .setDefaultValue(SdkConstants.VALUE_TRUE)
                         .setOnReadValidator(BOOLEAN_VALIDATOR)
                         .setMergingPolicy(AttributeModel.OR_MERGING_POLICY),
-                AttributeModel.newModel(AndroidManifest.ATTRIBUTE_GLESVERSION)
+                AttributeModel.newModel(ATTRIBUTE_GLESVERSION)
                         .setDefaultValue("0x00010000")
                         .setOnReadValidator(new Hexadecimal32BitsWithMinimumValue(0x00010000))),
 
@@ -443,7 +446,7 @@ class ManifestModel {
          * Use-library Xml documentation</a>}
          */
         USES_LIBRARY(MergeType.MERGE, DEFAULT_NAME_ATTRIBUTE_RESOLVER,
-                AttributeModel.newModel(AndroidManifest.ATTRIBUTE_REQUIRED)
+                AttributeModel.newModel("required")
                         .setDefaultValue(SdkConstants.VALUE_TRUE)
                         .setOnReadValidator(BOOLEAN_VALIDATOR)
                         .setMergingPolicy(AttributeModel.OR_MERGING_POLICY)),
@@ -508,7 +511,7 @@ class ManifestModel {
             this.mMergeType = Preconditions.checkNotNull(mergeType);
             this.mNodeKeyResolver = Preconditions.checkNotNull(nodeKeyResolver);
             @NonNull ImmutableList.Builder<AttributeModel> attributeModels =
-                    new ImmutableList.Builder<AttributeModel>();
+                    new ImmutableList.Builder<>();
             if (attributeModelBuilders != null) {
                 for (AttributeModel.Builder attributeModelBuilder : attributeModelBuilders) {
                     attributeModels.add(attributeModelBuilder.build());
@@ -519,15 +522,15 @@ class ManifestModel {
         }
 
         /**
-         * Returns the {@link NodeTypes} instance from an xml element name (without namespace
-         * decoration). For instance, an xml element
+         * Returns the {@link NodeTypes} instance from an XML element name (without namespace
+         * decoration). For instance, an XML element
          * <pre>
          *     {@code
          *     <activity android:name="foo">
          *         ...
          *     </activity>}
          * </pre>
-         * has a xml simple name of "activity" which will resolve to {@link NodeTypes#ACTIVITY} value.
+         * has an XML simple name of "activity" which will resolve to {@link NodeTypes#ACTIVITY} value.
          * <p>
          * Note : a runtime exception will be generated if no mapping from the simple name to a
          * {@link com.android.manifmerger.ManifestModel.NodeTypes} exists.
@@ -543,7 +546,7 @@ class ManifestModel {
             } catch (IllegalArgumentException e) {
                 // if this element name is not a known tag, we categorize it as 'custom' which will
                 // be simply merged. It will prevent us from catching simple spelling mistakes but
-                // extensibility is a must have feature.
+                // extensibility is a must-have feature.
                 return NodeTypes.CUSTOM;
             }
         }
@@ -553,6 +556,7 @@ class ManifestModel {
             return mNodeKeyResolver;
         }
 
+        @NonNull
         ImmutableList<AttributeModel> getAttributeModels() {
             return mAttributeModels.asList();
         }
@@ -571,6 +575,7 @@ class ManifestModel {
         /**
          * Returns the Xml name for this node type
          */
+        @NonNull
         String toXmlName() {
             return SdkUtils.constantNameToXmlName(this.name());
         }
@@ -589,7 +594,7 @@ class ManifestModel {
     }
 
     /**
-     * Interface responsible for providing a key extraction capability from a xml element.
+     * Interface responsible for providing a key extraction capability from an XML element.
      * Some elements store their keys as an attribute, some as a sub-element attribute, some don't
      * have any key.
      */
@@ -645,7 +650,7 @@ class ManifestModel {
         private final String mAttributeName;
 
         /**
-         * Build a new instance capable of resolving an xml element key from the passed attribute
+         * Build a new instance capable of resolving an XML element key from the passed attribute
          * namespace and local name.
          *
          * @param namespaceUri  optional namespace for the attribute name.

@@ -32,7 +32,16 @@ import java.util.regex.Pattern;
  */
 public class GradleCoordinate {
     public static final String PREVIEW_ID = "rc";
+    public static final int PLUS_REV_VALUE = -1;
 
+    /**
+     * Comparator which compares Gradle versions - and treats a + version as higher
+     * than a specific number. This is typically useful when seeing if a dependency
+     * is met, e.g. if you require version 0.7.3, comparing it with 0.7.+ would consider
+     * 0.7.+ higher and therefore satisfying the version requirement.
+     */
+    public static final Comparator<GradleCoordinate> COMPARE_PLUS_HIGHER =
+            new GradleCoordinateComparator(1);
     /**
      * Maven coordinates take the following form: groupId:artifactId:packaging:classifier:version
      * where
@@ -45,46 +54,13 @@ public class GradleCoordinate {
      * We only care about coordinates of the following form: groupId:artifactId:revision
      * where revision is a series of '.' separated numbers optionally terminated by a '+' character.
      */
-    public static final PlusComponent PLUS_REV = new PlusComponent();
-    public static final int PLUS_REV_VALUE = -1;
-    /**
-     * Comparator which compares Gradle versions - and treats a + version as lower
-     * than a specific number in the same place. This is typically useful when trying
-     * to for example order coordinates by "most specific".
-     */
-    public static final Comparator<GradleCoordinate> COMPARE_PLUS_LOWER =
-            new GradleCoordinateComparator(-1);
-    /**
-     * Comparator which compares Gradle versions - and treats a + version as higher
-     * than a specific number. This is typically useful when seeing if a dependency
-     * is met, e.g. if you require version 0.7.3, comparing it with 0.7.+ would consider
-     * 0.7.+ higher and therefore satisfying the version requirement.
-     */
-    public static final Comparator<GradleCoordinate> COMPARE_PLUS_HIGHER =
-            new GradleCoordinateComparator(1);
-    private static final String NONE = "NONE";
+    static final PlusComponent PLUS_REV = new PlusComponent();
     private static final Pattern MAVEN_PATTERN =
             Pattern.compile("([\\w\\d\\.-]+):([\\w\\d\\.-]+):([^:@]+)(@[\\w-]+)?");
     private final String mGroupId;
     private final String mArtifactId;
     private final ArtifactType mArtifactType;
-    private final List<RevisionComponent> mRevisions = new ArrayList<RevisionComponent>(3);
-
-    /**
-     * Constructor
-     */
-    public GradleCoordinate(@NonNull String groupId, @NonNull String artifactId,
-                            @NonNull RevisionComponent... revisions) {
-        this(groupId, artifactId, Arrays.asList(revisions), null);
-    }
-
-    /**
-     * Constructor
-     */
-    public GradleCoordinate(@NonNull String groupId, @NonNull String artifactId,
-                            @NonNull int... revisions) {
-        this(groupId, artifactId, createComponents(revisions), null);
-    }
+    private final List<RevisionComponent> mRevisions = new ArrayList<>(3);
 
     /**
      * Constructor
@@ -98,18 +74,6 @@ public class GradleCoordinate {
         mArtifactType = type;
     }
 
-    private static List<RevisionComponent> createComponents(int[] revisions) {
-        List<RevisionComponent> result = new ArrayList<RevisionComponent>(revisions.length);
-        for (int revision : revisions) {
-            if (revision == PLUS_REV_VALUE) {
-                result.add(PLUS_REV);
-            } else {
-                result.add(new NumberComponent(revision));
-            }
-        }
-        return result;
-    }
-
     /**
      * Create a GradleCoordinate from a string of the form groupId:artifactId:MajorRevision.MinorRevision.(MicroRevision|+)
      *
@@ -118,10 +82,6 @@ public class GradleCoordinate {
      */
     @Nullable
     public static GradleCoordinate parseCoordinateString(@NonNull String coordinateString) {
-        if (coordinateString == null) {
-            return null;
-        }
-
         Matcher matcher = MAVEN_PATTERN.matcher(coordinateString);
         if (!matcher.matches()) {
             return null;
@@ -143,19 +103,16 @@ public class GradleCoordinate {
         return new GradleCoordinate(groupId, artifactId, revisions, type);
     }
 
-    public static GradleCoordinate parseVersionOnly(@NonNull String revision) {
-        return new GradleCoordinate(NONE, NONE, parseRevisionNumber(revision), null);
-    }
-
-    public static List<RevisionComponent> parseRevisionNumber(String revision) {
-        List<RevisionComponent> components = new ArrayList<RevisionComponent>();
+    @NonNull
+    public static List<RevisionComponent> parseRevisionNumber(@NonNull String revision) {
+        List<RevisionComponent> components = new ArrayList<>();
         StringBuilder buffer = new StringBuilder();
         for (int i = 0; i < revision.length(); i++) {
             char c = revision.charAt(i);
             if (c == '.') {
                 flushBuffer(components, buffer, true);
             } else if (c == '+') {
-                if (buffer.length() > 0) {
+                if (!buffer.isEmpty()) {
                     flushBuffer(components, buffer, true);
                 }
                 components.add(PLUS_REV);
@@ -172,16 +129,33 @@ public class GradleCoordinate {
                 buffer.append(c);
             }
         }
-        if (buffer.length() > 0 || components.isEmpty()) {
+        if (!buffer.isEmpty() || components.isEmpty()) {
             flushBuffer(components, buffer, true);
         }
         return components;
     }
 
-    private static void flushBuffer(List<RevisionComponent> components, StringBuilder buffer,
+    private static void flushBuffer(@NonNull List<RevisionComponent> components, StringBuilder buffer,
                                     boolean closeList) {
+        RevisionComponent newComponent = getRevisionComponent(buffer);
+        buffer.setLength(0);
+        if (!components.isEmpty() &&
+                components.get(components.size() - 1) instanceof ListComponent component &&
+                !component.mClosed) {
+            component.add(newComponent);
+            if (closeList) {
+                component.mClosed = true;
+            }
+            return;
+        }
+
+        components.add(newComponent);
+    }
+
+    @NonNull
+    private static RevisionComponent getRevisionComponent(@NonNull StringBuilder buffer) {
         RevisionComponent newComponent;
-        if (buffer.length() == 0) {
+        if (buffer.isEmpty()) {
             newComponent = new NumberComponent(0);
         } else {
             String string = buffer.toString();
@@ -196,26 +170,14 @@ public class GradleCoordinate {
                 newComponent = new StringComponent(string);
             }
         }
-        buffer.setLength(0);
-        if (!components.isEmpty() &&
-                components.get(components.size() - 1) instanceof ListComponent) {
-            ListComponent component = (ListComponent) components.get(components.size() - 1);
-            if (!component.mClosed) {
-                component.add(newComponent);
-                if (closeList) {
-                    component.mClosed = true;
-                }
-                return;
-            }
-        }
-        components.add(newComponent);
+        return newComponent;
     }
 
     @Override
     public String toString() {
         String s = String.format(Locale.US, "%s:%s:%s", mGroupId, mArtifactId, getFullRevision());
         if (mArtifactType != null) {
-            s += "@" + mArtifactType.toString();
+            s += "@" + mArtifactType;
         }
         return s;
     }
@@ -244,14 +206,10 @@ public class GradleCoordinate {
         return mArtifactType;
     }
 
-    public boolean acceptsGreaterRevisions() {
-        return mRevisions.get(mRevisions.size() - 1) == PLUS_REV;
-    }
-
     public String getFullRevision() {
         StringBuilder revision = new StringBuilder();
         for (RevisionComponent component : mRevisions) {
-            if (revision.length() > 0) {
+            if (!revision.isEmpty()) {
                 revision.append('.');
             }
             revision.append(component.toString());
@@ -262,30 +220,6 @@ public class GradleCoordinate {
 
     public boolean isPreview() {
         return !mRevisions.isEmpty() && mRevisions.get(mRevisions.size() - 1).isPreview();
-    }
-
-    /**
-     * Returns the major version (X in X.2.3), which can be {@link #PLUS_REV}, or Integer.MIN_VALUE
-     * if it is not available
-     */
-    public int getMajorVersion() {
-        return mRevisions.isEmpty() ? Integer.MIN_VALUE : mRevisions.get(0).asInteger();
-    }
-
-    /**
-     * Returns the minor version (X in 1.X.3), which can be {@link #PLUS_REV}, or Integer.MIN_VALUE
-     * if it is not available
-     */
-    public int getMinorVersion() {
-        return mRevisions.size() < 2 ? Integer.MIN_VALUE : mRevisions.get(1).asInteger();
-    }
-
-    /**
-     * Returns the major version (X in 1.2.X), which can be {@link #PLUS_REV}, or Integer.MIN_VALUE
-     * if it is not available
-     */
-    public int getMicroVersion() {
-        return mRevisions.size() < 3 ? Integer.MIN_VALUE : mRevisions.get(2).asInteger();
     }
 
     /**
@@ -322,11 +256,7 @@ public class GradleCoordinate {
         if ((mArtifactType == null) != (that.mArtifactType == null)) {
             return false;
         }
-        if (mArtifactType != null && !mArtifactType.equals(that.mArtifactType)) {
-            return false;
-        }
-
-        return true;
+        return mArtifactType == null || mArtifactType.equals(that.mArtifactType);
     }
 
     @Override
@@ -414,7 +344,7 @@ public class GradleCoordinate {
 
         @Override
         public boolean equals(Object o) {
-            return o instanceof NumberComponent && ((NumberComponent) o).mNumber == mNumber;
+            return o instanceof NumberComponent nc && nc.mNumber == mNumber;
         }
 
         @Override
@@ -423,9 +353,9 @@ public class GradleCoordinate {
         }
 
         @Override
-        public int compareTo(RevisionComponent o) {
-            if (o instanceof NumberComponent) {
-                return mNumber - ((NumberComponent) o).mNumber;
+        public int compareTo(@NonNull RevisionComponent o) {
+            if (o instanceof NumberComponent nc) {
+                return mNumber - nc.mNumber;
             }
             if (o instanceof StringComponent) {
                 return 1;
@@ -456,8 +386,13 @@ public class GradleCoordinate {
 
         @Override
         public boolean equals(Object o) {
-            return o instanceof PaddedNumberComponent
-                    && ((PaddedNumberComponent) o).mString.equals(mString);
+            return o instanceof PaddedNumberComponent pnc &&
+                    pnc.mString.equals(mString);
+        }
+
+        @Override
+        public int hashCode() {
+            return mString.hashCode();
         }
     }
 
@@ -485,7 +420,7 @@ public class GradleCoordinate {
 
         @Override
         public boolean equals(Object o) {
-            return o instanceof StringComponent && ((StringComponent) o).mString.equals(mString);
+            return o instanceof StringComponent sc && sc.mString.equals(mString);
         }
 
         @Override
@@ -494,12 +429,12 @@ public class GradleCoordinate {
         }
 
         @Override
-        public int compareTo(RevisionComponent o) {
+        public int compareTo(@NonNull RevisionComponent o) {
             if (o instanceof NumberComponent) {
                 return -1;
             }
-            if (o instanceof StringComponent) {
-                return mString.compareTo(((StringComponent) o).mString);
+            if (o instanceof StringComponent sc) {
+                return mString.compareTo(sc.mString);
             }
             if (o instanceof ListComponent) {
                 return -1;  // 1-sp < 1-1
@@ -508,7 +443,7 @@ public class GradleCoordinate {
         }
     }
 
-    private static class PlusComponent extends RevisionComponent {
+    static class PlusComponent extends RevisionComponent {
         @Override
         public String toString() {
             return "+";
@@ -525,7 +460,7 @@ public class GradleCoordinate {
         }
 
         @Override
-        public int compareTo(RevisionComponent o) {
+        public int compareTo(@NonNull RevisionComponent o) {
             throw new UnsupportedOperationException(
                     "Please use a specific comparator that knows how to handle +");
         }
@@ -535,10 +470,11 @@ public class GradleCoordinate {
      * A list of components separated by dashes.
      */
     public static class ListComponent extends RevisionComponent {
-        private final List<RevisionComponent> mItems = new ArrayList<RevisionComponent>();
+        private final List<RevisionComponent> mItems = new ArrayList<>();
         private boolean mClosed = false;
 
-        public static ListComponent of(RevisionComponent... components) {
+        @NonNull
+        public static ListComponent of(@NonNull RevisionComponent... components) {
             ListComponent result = new ListComponent();
             for (RevisionComponent component : components) {
                 result.add(component);
@@ -561,15 +497,14 @@ public class GradleCoordinate {
         }
 
         @Override
-        public int compareTo(RevisionComponent o) {
+        public int compareTo(@NonNull RevisionComponent o) {
             if (o instanceof NumberComponent) {
                 return -1;  // 1-1 < 1.0.x
             }
             if (o instanceof StringComponent) {
                 return 1;  // 1-1 > 1-sp
             }
-            if (o instanceof ListComponent) {
-                ListComponent rhs = (ListComponent) o;
+            if (o instanceof ListComponent rhs) {
                 for (int i = 0; i < mItems.size() && i < rhs.mItems.size(); i++) {
                     int rc = mItems.get(i).compareTo(rhs.mItems.get(i));
                     if (rc != 0) return rc;
@@ -581,7 +516,7 @@ public class GradleCoordinate {
 
         @Override
         public boolean equals(Object o) {
-            return o instanceof ListComponent && ((ListComponent) o).mItems.equals(mItems);
+            return o instanceof ListComponent lc && lc.mItems.equals(mItems);
         }
 
         @Override
@@ -602,6 +537,16 @@ public class GradleCoordinate {
             mPlusResult = plusResult;
         }
 
+        /**
+         * Compares two Gradle coordinates. The comparison is based on the groupId, artifactId
+         * and revision number. The revision number is compared component by component, with
+         * the last component being a special case: if it is a plus component, it is considered
+         * higher than any specific number.
+         *
+         * @param a the first object to be compared.
+         * @param b the second object to be compared.
+         * @return a negative integer, zero, or a positive integer as the first argument is less than, equal to, or greater than the second.
+         */
         @Override
         public int compare(@NonNull GradleCoordinate a, @NonNull GradleCoordinate b) {
             // Make sure we're comparing apples to apples. If not, compare artifactIds
@@ -613,18 +558,10 @@ public class GradleCoordinate {
             int sizeB = b.mRevisions.size();
             int common = Math.min(sizeA, sizeB);
             for (int i = 0; i < common; ++i) {
-                RevisionComponent revision1 = a.mRevisions.get(i);
-                if (revision1 instanceof PlusComponent) return mPlusResult;
-                RevisionComponent revision2 = b.mRevisions.get(i);
-                if (revision2 instanceof PlusComponent) return -mPlusResult;
-                int delta = revision1.compareTo(revision2);
-                if (delta != 0) {
-                    return delta;
-                }
+                Integer mPlusResult1 = getInteger(a, b, i);
+                if (mPlusResult1 != null) return mPlusResult1;
             }
-            if (sizeA == sizeB) {
-                return 0;
-            } else {
+            if (sizeA != sizeB) {
                 // Treat X.0 and X.0.0 as equal
                 List<RevisionComponent> revisionList;
                 int returnValueIfNonZero;
@@ -642,17 +579,37 @@ public class GradleCoordinate {
                     returnValueIfNonZero = 1;
                 }
                 for (int i = from; i < to; ++i) {
-                    RevisionComponent revision = revisionList.get(i);
-                    if (revision instanceof NumberComponent) {
-                        if (revision.asInteger() != 0) {
-                            return returnValueIfNonZero;
-                        }
-                    } else {
-                        return returnValueIfNonZero;
-                    }
+                    Integer returnValueIfNonZero1 = getInteger2(revisionList, i, returnValueIfNonZero);
+                    if (returnValueIfNonZero1 != null) return returnValueIfNonZero1;
                 }
-                return 0;
             }
+            return 0;
+        }
+
+        @Nullable
+        private Integer getInteger2(@NonNull List<RevisionComponent> revisionList, int i, int returnValueIfNonZero) {
+            RevisionComponent revision = revisionList.get(i);
+            if (revision instanceof NumberComponent) {
+                if (revision.asInteger() != 0) {
+                    return returnValueIfNonZero;
+                }
+            } else {
+                return returnValueIfNonZero;
+            }
+            return null;
+        }
+
+        @Nullable
+        private Integer getInteger(@NonNull GradleCoordinate a, @NonNull GradleCoordinate b, int i) {
+            RevisionComponent revision1 = a.mRevisions.get(i);
+            if (revision1 instanceof PlusComponent) return mPlusResult;
+            RevisionComponent revision2 = b.mRevisions.get(i);
+            if (revision2 instanceof PlusComponent) return -mPlusResult;
+            int delta = revision1.compareTo(revision2);
+            if (delta != 0) {
+                return delta;
+            }
+            return null;
         }
     }
 }

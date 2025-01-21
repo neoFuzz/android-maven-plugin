@@ -37,6 +37,9 @@ import static com.android.SdkConstants.*;
  * Miscellaneous utilities used by the Android SDK tools
  */
 public class SdkUtils {
+    private SdkUtils() {
+        // empty
+    }
     /**
      * Prefix in comments which mark the source locations for merge results
      */
@@ -62,8 +65,7 @@ public class SdkUtils {
     }
 
     /**
-     * Returns true if the given sequence ends with the given suffix (case
-     * sensitive).
+     * Returns true if the given sequence ends with the given suffix (case-     * sensitive).
      *
      * @param sequence the character sequence to be checked
      * @param suffix   the suffix to look for
@@ -74,8 +76,7 @@ public class SdkUtils {
     }
 
     /**
-     * Returns true if the given sequence ends at the given offset with the given suffix (case
-     * sensitive)
+     * Returns true if the given sequence ends at the given offset with the given suffix (case-     * sensitive)
      *
      * @param sequence  the character sequence to be checked
      * @param endOffset the offset at which the sequence is considered to end
@@ -127,6 +128,7 @@ public class SdkUtils {
      * @param string the string to be cleaned up
      * @return the string, without whitespace
      */
+    @NonNull
     public static String stripWhitespace(@NonNull String string) {
         StringBuilder sb = new StringBuilder(string.length());
         for (int i = 0, n = string.length(); i < n; i++) {
@@ -221,7 +223,7 @@ public class SdkUtils {
             } else {
                 lineWidth -= hangingIndent.length();
             }
-            sb.append(text.substring(index, lineEnd));
+            sb.append(text, index, lineEnd);
             sb.append('\n');
             index = next;
         }
@@ -345,6 +347,7 @@ public class SdkUtils {
      * @return the corresponding URL
      * @throws MalformedURLException in very unexpected cases
      */
+    @NonNull
     public static URL fileToUrl(@NonNull File file) throws MalformedURLException {
         return file.toURI().toURL();
     }
@@ -357,10 +360,11 @@ public class SdkUtils {
      * @param file           the file to create a path comment for
      * @param includePadding whether to include padding. The final comment recognized by
      *                       error recognizers expect padding between the {@code <!--} and
-     *                       the start marker (From:); you can disable padding if the caller
+     *                       the start marker {@code (From:);} you can disable padding if the caller
      *                       already is in a context where the padding has been added.
      * @return the corresponding XML contents of the string
      */
+    @NonNull
     public static String createPathComment(@NonNull File file, boolean includePadding)
             throws MalformedURLException {
         String url = fileToUrlString(file);
@@ -420,6 +424,7 @@ public class SdkUtils {
      * @param xmlName the hyphen separated lower case xml name.
      * @return the equivalent constant name.
      */
+    @NonNull
     public static String xmlNameToConstantName(String xmlName) {
         return CaseFormat.LOWER_HYPHEN.to(CaseFormat.UPPER_UNDERSCORE, xmlName);
     }
@@ -430,6 +435,7 @@ public class SdkUtils {
      * @param camelCaseName the camel case name.
      * @return the equivalent constant name.
      */
+    @NonNull
     public static String camelCaseToConstantName(String camelCaseName) {
         return CaseFormat.LOWER_CAMEL.to(CaseFormat.UPPER_UNDERSCORE, camelCaseName);
     }
@@ -440,6 +446,7 @@ public class SdkUtils {
      * @param constantName the constant name.
      * @return the equivalent camel case name.
      */
+    @NonNull
     public static String constantNameToCamelCase(String constantName) {
         return CaseFormat.UPPER_UNDERSCORE.to(CaseFormat.LOWER_CAMEL, constantName);
     }
@@ -450,6 +457,7 @@ public class SdkUtils {
      * @param constantName the constant name.
      * @return the equivalent XML name.
      */
+    @NonNull
     public static String constantNameToXmlName(String constantName) {
         return CaseFormat.UPPER_UNDERSCORE.to(CaseFormat.LOWER_HYPHEN, constantName);
     }
@@ -475,7 +483,7 @@ public class SdkUtils {
 
     /**
      * Returns true if the given file path points to an image file recognized by
-     * Android. See http://developer.android.com/guide/appendix/media-formats.html
+     * Android. See <a href="http://developer.android.com/guide/appendix/media-formats.html">...</a>
      * for details.
      *
      * @param path the filename to be tested

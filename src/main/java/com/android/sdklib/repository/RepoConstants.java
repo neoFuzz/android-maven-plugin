@@ -23,7 +23,6 @@ import java.io.InputStream;
  * Public constants common to the sdk-repository and sdk-addon XML Schemas.
  */
 public class RepoConstants {
-
     /**
      * The license definition.
      */
@@ -60,17 +59,18 @@ public class RepoConstants {
      * The optional project-files provided by extra packages.
      */
     public static final String NODE_PROJECT_FILES = "project-files";            //$NON-NLS-1$
-
     /**
      * A system-image package.
      */
     public static final String NODE_SYSTEM_IMAGE = "system-image";           //$NON-NLS-1$
-
-    /* An included-ABI element for a system-image package. */
+    /**
+     * An included-ABI element for a system-image package.
+     */
     public static final String NODE_ABI_INCLUDED = "included-abi";           //$NON-NLS-1$
-    /* An ABI element for a system-image package. */
+    /**
+     * An ABI element for a system-image package.
+     */
     public static final String NODE_ABI = "abi";                    //$NON-NLS-1$
-
     /**
      * The optional minimal tools revision required by platform & extra packages.
      */
@@ -83,7 +83,6 @@ public class RepoConstants {
      * The optional minimal API level required by extra packages.
      */
     public static final String NODE_MIN_API_LEVEL = "min-api-level";            //$NON-NLS-1$
-
     /**
      * The version, a string, for platform packages.
      */
@@ -126,7 +125,6 @@ public class RepoConstants {
      * The optional string used to display a package in a list view.
      */
     public static final String NODE_LIST_DISPLAY = "list-display";              //$NON-NLS-1$
-
     /**
      * A layoutlib package.
      */
@@ -135,7 +133,6 @@ public class RepoConstants {
      * The API integer for a layoutlib element.
      */
     public static final String NODE_API = "api";                       //$NON-NLS-1$
-
     /**
      * The libs container, optional for an add-on.
      */
@@ -144,26 +141,22 @@ public class RepoConstants {
      * A lib element in a libs container.
      */
     public static final String NODE_LIB = "lib";                          //$NON-NLS-1$
-
     /**
      * The path segment, a string, for extra packages.
      */
     public static final String NODE_PATH = "path";                         //$NON-NLS-1$
-
     /**
      * The old_path segments, a string, for extra packages.
      */
     public static final String NODE_OLD_PATHS = "old-paths";                    //$NON-NLS-1$
-
     /**
      * The archives container, for all packages.
      */
     public static final String NODE_ARCHIVES = "archives";                      //$NON-NLS-1$
     /**
-     * An archive element, for the archives container.
+     * An archive element, for the archives' container.
      */
     public static final String NODE_ARCHIVE = "archive";                       //$NON-NLS-1$
-
     /**
      * An archive size, an int > 0.
      */
@@ -176,12 +169,13 @@ public class RepoConstants {
      * A download archive URL, either absolute or relative to the repository xml.
      */
     public static final String NODE_URL = "url";                           //$NON-NLS-1$
-
     /**
      * Optional element to indicate an archive is only suitable for the specified OS. <br/>
      * Values: windows | macosx | linux.
+     * <p>
+     * This replaces {@link #LEGACY_ATTR_OS}
+     * </p>
      *
-     * @replaces {@link #LEGACY_ATTR_OS}
      * @since repo-10, addon-7 and sys-img-3.
      */
     public static final String NODE_HOST_OS = "host-os";                   //$NON-NLS-1$
@@ -195,8 +189,10 @@ public class RepoConstants {
     /**
      * Optional element to indicate an archive is only suitable for the specified JVM bit size.<br/>
      * Values: 32 | 64.
+     * <p>
+     * This replaces {@link #LEGACY_ATTR_ARCH}
+     * </p>
      *
-     * @replaces {@link #LEGACY_ATTR_ARCH}
      * @since repo-10, addon-7 and sys-img-3.
      */
     public static final String NODE_JVM_BITS = "jvm-bits";                 //$NON-NLS-1$
@@ -208,8 +204,6 @@ public class RepoConstants {
      * @since repo-10, addon-7 and sys-img-3.
      */
     public static final String NODE_MIN_JVM_VERSION = "min-jvm-version";        //$NON-NLS-1$
-
-
     /**
      * An archive checksum type, mandatory.
      */
@@ -224,7 +218,6 @@ public class RepoConstants {
      * Use {@link #NODE_JVM_BITS} instead in repo-10, addon-7 and sys-img-3.
      */
     public static final String LEGACY_ATTR_ARCH = "arch";                              //$NON-NLS-1$
-
     /**
      * A license definition ID.
      */
@@ -233,29 +226,29 @@ public class RepoConstants {
      * A license reference.
      */
     public static final String ATTR_REF = "ref";                                //$NON-NLS-1$
-
-
     /**
-     * Type of a sha1 checksum.
+     * Type of sha1 checksum.
      */
     public static final String SHA1_TYPE = "sha1";                              //$NON-NLS-1$
-
     /**
      * Length of a string representing a SHA1 checksum; always 40 characters long.
      */
     public static final int SHA1_CHECKSUM_LEN = 40;
-
     /**
      * Temporary folder used to hold downloads and extract archives during installation.
      * This folder will be located in the SDK.
      */
     public static final String FD_TEMP = "temp";     //$NON-NLS-1$
 
+    RepoConstants() {
+        // Not instantiable
+    }
+
     /**
      * Returns a stream to the requested XML Schema.
      * This is an internal helper. Users of the library should call
-     * {@link SdkRepoConstants#getXsdStream(String, int)} or
-     * {@link SdkAddonConstants#getXsdStream(String, int)}.
+     * {@code SdkRepoConstants#getXsdStream(String, int)} or
+     * {@code SdkAddonConstants#getXsdStream(String, int)}.
      *
      * @param rootElement The root of the filename of the XML schema.
      *                    This is by convention the same as the root element declared by the schema.

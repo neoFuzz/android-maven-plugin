@@ -101,11 +101,17 @@ public final class UiModeQualifier extends EnumBasedResourceQualifier {
         } else if (mValue == referenceQualifier.mValue) {
             // got new exact value, this is the best!
             return true;
-        } else if (mValue == UiMode.NORMAL) {
-            // else "normal" can be a match in case there's no exact match
-            return true;
-        }
+        } else return mValue == UiMode.NORMAL; // else "normal" can be a match in case there's no exact match
+    }
 
-        return false;
+    @Override
+    public int hashCode() {
+        return mValue.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object qualifier) {
+        return qualifier instanceof UiModeQualifier q &&
+                q.mValue == mValue;
     }
 }

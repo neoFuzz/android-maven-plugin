@@ -23,8 +23,8 @@ import com.android.annotations.NonNull;
  */
 public class DuplicateDataException extends MergingException {
 
-    private DataItem mOne;
-    private DataItem mTwo;
+    private final transient DataItem mOne;
+    private final transient DataItem mTwo;
 
     DuplicateDataException(@NonNull DataItem one, @NonNull DataItem two) {
         super(String.format("Duplicate resources: %1s:%2s, %3s:%4s",

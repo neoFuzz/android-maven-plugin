@@ -25,7 +25,7 @@ import java.io.File;
  * <p>
  * This includes the name and source file as a {@link AssetFile}.
  */
-class AssetItem extends DataItem<AssetFile> {
+public class AssetItem extends DataItem<AssetFile> {
 
     /**
      * Constructs the object with a name
@@ -38,6 +38,7 @@ class AssetItem extends DataItem<AssetFile> {
         super(name);
     }
 
+    @NonNull
     static AssetItem create(@NonNull File sourceFolder, @NonNull File file) {
         // compute the relative path
         StringBuilder sb = new StringBuilder();
@@ -47,7 +48,7 @@ class AssetItem extends DataItem<AssetFile> {
         return new AssetItem(sb.toString());
     }
 
-    private static void computePath(StringBuilder sb, File current, File stop) {
+    private static void computePath(StringBuilder sb, @NonNull File current, File stop) {
         if (current.equals(stop)) {
             return;
         }

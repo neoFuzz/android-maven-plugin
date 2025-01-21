@@ -16,6 +16,8 @@
 
 package com.android.ide.common.resources;
 
+import com.android.annotations.NonNull;
+import com.android.annotations.Nullable;
 import com.android.ide.common.rendering.api.DensityBasedResourceValue;
 import com.android.ide.common.rendering.api.ResourceValue;
 import com.android.ide.common.resources.ValueResourceParser.IValueResourceRepository;
@@ -36,7 +38,7 @@ public final class IdGeneratingResourceFile extends ResourceFile
         implements IValueResourceRepository {
 
     private final Map<String, ResourceValue> mIdResources =
-            new HashMap<String, ResourceValue>();
+            new HashMap<>();
 
     private final Collection<ResourceType> mResourceTypeList;
 
@@ -73,7 +75,7 @@ public final class IdGeneratingResourceFile extends ResourceFile
     @Override
     protected void update(ScanningContext context) {
         // Copy the previous list of ID names
-        Set<String> oldIdNames = new HashSet<String>(mIdResources.keySet());
+        Set<String> oldIdNames = new HashSet<>(mIdResources.keySet());
 
         // reset current content.
         mIdResources.clear();
@@ -88,14 +90,14 @@ public final class IdGeneratingResourceFile extends ResourceFile
 
         // We only need to update the repository if our IDs have changed
         Set<String> keySet = mIdResources.keySet();
-        assert keySet != oldIdNames;
-        if (oldIdNames.equals(keySet) == false) {
+        assert !keySet.equals(oldIdNames);
+        if (!oldIdNames.equals(keySet)) {
             updateResourceItems(context);
         }
     }
 
     @Override
-    protected void dispose(ScanningContext context) {
+    protected void dispose(@NonNull ScanningContext context) {
         ResourceRepository repository = getRepository();
 
         // Remove declarations from this file from the repository
@@ -116,6 +118,7 @@ public final class IdGeneratingResourceFile extends ResourceFile
     }
 
     @Override
+    @Nullable
     public ResourceValue getValue(ResourceType type, String name) {
         // Check to see if they're asking for one of the right types:
         if (type != mFileType && type != ResourceType.ID) {
@@ -143,9 +146,7 @@ public final class IdGeneratingResourceFile extends ResourceFile
         try {
             IAbstractFile file = getFile();
             return parser.parse(mFileType, file.getOsLocation(), file.getContents());
-        } catch (IOException e) {
-            // Pass
-        } catch (StreamException e) {
+        } catch (IOException | StreamException e) {
             // Pass
         }
 
@@ -183,7 +184,8 @@ public final class IdGeneratingResourceFile extends ResourceFile
      * @param folder the folder this file is under
      * @return a resource value associated with this layout
      */
-    private ResourceValue getFileValue(IAbstractFile file, ResourceFolder folder) {
+    @NonNull
+    private ResourceValue getFileValue(IAbstractFile file, @NonNull ResourceFolder folder) {
         // test if there's a density qualifier associated with the resource
         DensityQualifier qualifier = folder.getConfiguration().getDensityQualifier();
 
@@ -205,7 +207,7 @@ public final class IdGeneratingResourceFile extends ResourceFile
     /**
      * Returns the name of this resource.
      */
-    private String getFileName(ResourceType type) {
+    private String getFileName(ResourceType ignored) { // NOSONAR
         // get the name from the filename.
         String name = getFile().getName();
 

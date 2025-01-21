@@ -15,12 +15,15 @@
  */
 package com.github.cardforge.maven.plugins.android;
 
+import java.io.Serial;
+
 /**
  *
  */
 public class ExecutionException extends Exception {
 
-    static final long serialVersionUID = -7843278034782074384L;
+    @Serial
+    private static final long serialVersionUID = -7843278034782074384L;
 
     /**
      * Constructs an <code>ExecutionException</code>  with no exception message.

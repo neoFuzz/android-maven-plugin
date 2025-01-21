@@ -19,7 +19,7 @@ package com.android.sdklib.repository;
 import com.android.annotations.NonNull;
 
 /**
- * A {@link FullRevision} which distinguishes between x and x.0, x.0.0, x.y.0, etc; it basically
+ * A {@link FullRevision} which distinguishes between x and x.0, x.0.0, x.y.0, etc.; it basically
  * keeps track of the precision of the revision string.
  * <p>
  * This is vital when referencing Gradle artifact numbers,
@@ -71,7 +71,7 @@ public class PreciseRevision extends FullRevision {
 
     /**
      * Returns the version in a fixed format major.minor.micro
-     * with an optional "rc preview#". For example it would
+     * with an optional "rc preview#". For example, it would
      * return "18.0.0", "18.1.0" or "18.1.2 rc5".
      */
     @Override
@@ -130,10 +130,9 @@ public class PreciseRevision extends FullRevision {
     public boolean equals(Object rhs) {
         boolean equals = super.equals(rhs);
         if (equals) {
-            if (!(rhs instanceof PreciseRevision)) {
+            if (!(rhs instanceof PreciseRevision other)) {
                 return false;
             }
-            PreciseRevision other = (PreciseRevision) rhs;
             return mPrecision == other.mPrecision;
         }
         return false;

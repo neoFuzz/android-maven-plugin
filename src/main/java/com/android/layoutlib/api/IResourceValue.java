@@ -23,13 +23,8 @@ import com.android.ide.common.rendering.api.ResourceValue;
  *
  * @deprecated use {@link ResourceValue}.
  */
-@Deprecated
+@Deprecated(since = "4.7")
 public interface IResourceValue {
-
-    /**
-     * Returns the type of the resource. For instance "drawable", "color", etc...
-     */
-    String getType();
 
     /**
      * Returns the name of the resource, as defined in the XML.

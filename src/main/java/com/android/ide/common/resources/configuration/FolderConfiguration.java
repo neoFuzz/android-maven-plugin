@@ -73,7 +73,7 @@ public final class FolderConfiguration implements Comparable<FolderConfiguration
      *
      * @param folderSegments The segments of the folder name. The first segments should contain
      *                       the name of the folder
-     * @return a FolderConfiguration object, or null if the folder name isn't valid..
+     * @return a FolderConfiguration object, or null if the folder name isn't valid.
      */
     @Nullable
     public static FolderConfiguration getConfig(@NonNull String[] folderSegments) {
@@ -92,7 +92,7 @@ public final class FolderConfiguration implements Comparable<FolderConfiguration
      *
      * @param folderSegments The segments of the folder name. The first segments should contain
      *                       the name of the folder
-     * @return a FolderConfiguration object, or null if the folder name isn't valid..
+     * @return a FolderConfiguration object, or null if the folder name isn't valid.
      * @see FolderConfiguration#getConfig(String[])
      */
     @Nullable
@@ -111,7 +111,7 @@ public final class FolderConfiguration implements Comparable<FolderConfiguration
      * Creates a {@link FolderConfiguration} matching the qualifiers.
      *
      * @param qualifiers the qualifiers.
-     * @return a FolderConfiguration object, or null if the folder name isn't valid..
+     * @return a FolderConfiguration object, or null if the folder name isn't valid.
      */
     @Nullable
     public static FolderConfiguration getConfigFromQualifiers(
@@ -123,7 +123,7 @@ public final class FolderConfiguration implements Comparable<FolderConfiguration
      * Creates a {@link FolderConfiguration} matching the qualifiers.
      *
      * @param qualifiers An iterator on the qualifiers.
-     * @return a FolderConfiguration object, or null if the folder name isn't valid..
+     * @return a FolderConfiguration object, or null if the folder name isn't valid.
      */
     @Nullable
     public static FolderConfiguration getConfigFromQualifiers(
@@ -167,7 +167,7 @@ public final class FolderConfiguration implements Comparable<FolderConfiguration
      * Creates a {@link FolderConfiguration} matching the given folder name.
      *
      * @param folderName the folder name
-     * @return a FolderConfiguration object, or null if the folder name isn't valid..
+     * @return a FolderConfiguration object, or null if the folder name isn't valid.
      */
     @Nullable
     public static FolderConfiguration getConfigForFolder(@NonNull String folderName) {
@@ -216,9 +216,7 @@ public final class FolderConfiguration implements Comparable<FolderConfiguration
      * <p/>This makes qualifiers at all indices <code>null</code>.
      */
     public void reset() {
-        for (int i = 0; i < INDEX_COUNT; i++) {
-            mQualifiers[i] = null;
-        }
+        Arrays.fill(mQualifiers, null);
     }
 
     /**
@@ -268,11 +266,7 @@ public final class FolderConfiguration implements Comparable<FolderConfiguration
      * @return true if the Region qualifier is valid.
      */
     public boolean checkRegion() {
-        if (mQualifiers[INDEX_LANGUAGE] == null && mQualifiers[INDEX_REGION] != null) {
-            return false;
-        }
-
-        return true;
+        return mQualifiers[INDEX_LANGUAGE] != null || mQualifiers[INDEX_REGION] == null;
     }
 
     /**
@@ -619,8 +613,8 @@ public final class FolderConfiguration implements Comparable<FolderConfiguration
             }
 
             // compute the dp. round them up since we want -w480dp to match a 480.5dp screen
-            int dp1 = (int) Math.ceil(size1 * Density.DEFAULT_DENSITY / density.getDpiValue());
-            int dp2 = (int) Math.ceil(size2 * Density.DEFAULT_DENSITY / density.getDpiValue());
+            int dp1 = (int) Math.ceil((double) (size1 * Density.DEFAULT_DENSITY) / density.getDpiValue());
+            int dp2 = (int) Math.ceil((double) (size2 * Density.DEFAULT_DENSITY) / density.getDpiValue());
 
             setSmallestScreenWidthQualifier(new SmallestScreenWidthQualifier(dp2));
 
@@ -650,8 +644,7 @@ public final class FolderConfiguration implements Comparable<FolderConfiguration
             return true;
         }
 
-        if (obj instanceof FolderConfiguration) {
-            FolderConfiguration fc = (FolderConfiguration) obj;
+        if (obj instanceof FolderConfiguration fc) {
             for (int i = 0; i < INDEX_COUNT; i++) {
                 ResourceQualifier qualifier = mQualifiers[i];
                 ResourceQualifier fcQualifier = fc.mQualifiers[i];
@@ -866,7 +859,7 @@ public final class FolderConfiguration implements Comparable<FolderConfiguration
      * @param configurables the list of {@link Configurable} to choose from.
      * @return an item from the given list of {@link Configurable} or null.
      * <p>
-     * See http://d.android.com/guide/topics/resources/resources-i18n.html#best-match
+     * See <a href="http://d.android.com/guide/topics/resources/resources-i18n.html#best-match">this</a>
      */
     @Nullable
     public Configurable findMatchingConfigurable(@Nullable List<? extends Configurable> configurables) {
@@ -901,7 +894,7 @@ public final class FolderConfiguration implements Comparable<FolderConfiguration
         // exactly match the device.
 
         // 1: eliminate resources that contradict
-        ArrayList<Configurable> matchingConfigurables = new ArrayList<Configurable>();
+        ArrayList<Configurable> matchingConfigurables = new ArrayList<>();
         for (Configurable res : configurables) {
             final FolderConfiguration configuration = res.getConfiguration();
             if (configuration != null && configuration.isMatchFor(this)) {
@@ -922,7 +915,7 @@ public final class FolderConfiguration implements Comparable<FolderConfiguration
 
             // The reference value, to find the best match.
             // Note that this qualifier could be null. In which case any qualifier found in the
-            // possible match, will all be considered best match.
+            // possible match, will all be considered the best match.
             ResourceQualifier referenceQualifier = getQualifier(q);
 
             // If referenceQualifier is null, we don't eliminate resources based on it.
@@ -938,9 +931,9 @@ public final class FolderConfiguration implements Comparable<FolderConfiguration
                     // set the flag.
                     found = true;
 
-                    // Now check for a best match. If the reference qualifier is null ,
+                    // Now check for the best match. If the reference qualifier is null ,
                     // any qualifier is a "best" match (we don't need to record all of them.
-                    // Instead the non compatible ones are removed below)
+                    // Instead, the non-compatible ones are removed below)
                     if (qualifier.isBetterMatchThan(bestMatch, referenceQualifier)) {
                         bestMatch = qualifier;
                     }
@@ -957,7 +950,7 @@ public final class FolderConfiguration implements Comparable<FolderConfiguration
                     ResourceQualifier qualifier = configurable.getConfiguration().getQualifier(q);
 
                     if (qualifier == null) {
-                        // this resources has no qualifier of this type: rejected.
+                        // these resources have no qualifier of this type: rejected.
                         matchingConfigurables.remove(configurable);
                     } else if (bestMatch != null && !bestMatch.equals(qualifier)) {
                         // there's a reference qualifier and there is a better match for it than
@@ -1017,7 +1010,7 @@ public final class FolderConfiguration implements Comparable<FolderConfiguration
      * Returns the index of the first non null {@link ResourceQualifier} starting at index
      * <var>startIndex</var>
      *
-     * @param startIndex
+     * @param startIndex the index to start the search from.
      * @return -1 if no qualifier was found.
      */
     public int getHighestPriorityQualifier(int startIndex) {

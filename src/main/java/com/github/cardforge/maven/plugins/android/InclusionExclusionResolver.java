@@ -15,15 +15,10 @@ import static com.google.common.collect.FluentIterable.from;
 public class InclusionExclusionResolver {
 
     private static final Splitter COLON_SPLITTER = Splitter.on(':');
-    private static final Function<String, String> TRIMMER = new Function<String, String>() {
+    private static final Function<String, String> TRIMMER = value -> value.trim();
+    private static final Predicate<String> MUST_NOT_BE_BLANK = new Predicate<>() {
         @Override
-        public String apply(String value) {
-            return value.trim();
-        }
-    };
-    private static final Predicate<String> MUST_NOT_BE_BLANK = new Predicate<String>() {
-        @Override
-        public boolean apply(String value) {
+        public boolean apply(@NonNull String value) {
             return !value.trim().isEmpty();
         }
 
@@ -47,8 +42,10 @@ public class InclusionExclusionResolver {
      * @param excludeArtifactQualifiers Artifact qualifiers to be always excluded even if {@code skipDependencies} is
      *                                  {@code true}
      */
+    @NonNull
     public static Collection<Artifact> filterArtifacts(@NonNull Iterable<Artifact> artifacts,
-                                                       final boolean skipDependencies, @Nullable final Collection<String> includeArtifactTypes,
+                                                       final boolean skipDependencies,
+                                                       @Nullable final Collection<String> includeArtifactTypes,
                                                        @Nullable final Collection<String> excludeArtifactTypes,
                                                        @Nullable final Collection<String> includeArtifactQualifiers,
                                                        @Nullable final Collection<String> excludeArtifactQualifiers) {
@@ -57,7 +54,7 @@ public class InclusionExclusionResolver {
         final boolean hasIncludeQualifier = includeArtifactQualifiers != null;
         final boolean hasExcludeQualifier = excludeArtifactQualifiers != null;
         return from(artifacts)
-                .filter(new Predicate<Artifact>() {
+                .filter(new Predicate<>() {
                     @Override
                     public boolean apply(Artifact artifact) {
                         final boolean includedByType = hasIncludeTypes
@@ -73,9 +70,7 @@ public class InclusionExclusionResolver {
                                     || includedByQualifier
                                     || includedByType && !excludedByQualifier;
                         } else {
-                            return includedByQualifier
-                                    || includedByType && hasExcludeQualifier && !excludedByQualifier
-                                    || includedByType;
+                            return includedByQualifier || includedByType;
                         }
                     }
 
@@ -90,7 +85,7 @@ public class InclusionExclusionResolver {
     private static boolean match(final Artifact artifact, Iterable<String> artifactQualifiers) {
         return from(artifactQualifiers)
                 .filter(MUST_NOT_BE_BLANK)
-                .anyMatch(new Predicate<String>() {
+                .anyMatch(new Predicate<>() {
                     @Override
                     public boolean apply(String artifactQualifier) {
                         return match(artifact, artifactQualifier);

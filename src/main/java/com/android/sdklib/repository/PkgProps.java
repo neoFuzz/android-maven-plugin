@@ -26,6 +26,9 @@ package com.android.sdklib.repository;
  * of our build process depend on them.
  */
 public class PkgProps {
+    private PkgProps() {
+        // Not instantiable
+    }
 
     // Base Package
     public static final String PKG_REVISION = "Pkg.Revision";           //$NON-NLS-1$

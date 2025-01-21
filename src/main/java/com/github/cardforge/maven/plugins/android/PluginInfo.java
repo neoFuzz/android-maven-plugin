@@ -1,5 +1,7 @@
 package com.github.cardforge.maven.plugins.android;
 
+import com.android.annotations.NonNull;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
@@ -13,7 +15,6 @@ import java.util.Properties;
  * @author Manfred Moser
  */
 public class PluginInfo {
-
     private static final String COLON = ":";
     private static Properties prop;
     private static String groupId;
@@ -22,6 +23,10 @@ public class PluginInfo {
 
     static {
         loadProperties();
+    }
+
+    private PluginInfo() {
+        // no instances
     }
 
     private static void loadProperties() {
@@ -45,6 +50,7 @@ public class PluginInfo {
      *
      * @return GAV string
      */
+    @NonNull
     public static String getGAV() {
         StringBuilder builder = new StringBuilder()
                 .append(groupId)
@@ -67,6 +73,7 @@ public class PluginInfo {
         return version;
     }
 
+    @NonNull
     public static String getQualifiedGoal(String goal) {
         StringBuilder builder = new StringBuilder()
                 .append(groupId)

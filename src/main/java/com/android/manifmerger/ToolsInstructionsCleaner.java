@@ -20,7 +20,9 @@ import com.android.SdkConstants;
 import com.android.annotations.NonNull;
 import com.android.annotations.concurrency.Immutable;
 import com.android.utils.ILogger;
-import com.google.common.base.Optional;
+
+import java.util.Optional;
+
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import org.w3c.dom.*;
@@ -34,7 +36,7 @@ import static com.android.manifmerger.MergingReport.Result.ERROR;
  * Removes all "tools:" statements from the resulting xml.
  * <p>
  * All attributes belonging to the {@link com.android.SdkConstants#ANDROID_URI} namespace will be
- * removed. If an element contained a "tools:node=\"remove\"" attribute, the element will be
+ * removed. If an element contained a {@code tools:node="remove"} attribute, the element will be
  * deleted. And elements that are themselves in the tools namespace will also be removed.
  */
 @Immutable
@@ -61,7 +63,7 @@ public class ToolsInstructionsCleaner {
         Preconditions.checkNotNull(logger);
         MergingReport.Result result =
                 cleanToolsReferences(mergeType, document.getDocumentElement(), logger);
-        return result == MergingReport.Result.SUCCESS ? Optional.of(document) : Optional.absent();
+        return result == MergingReport.Result.SUCCESS ? Optional.of(document) : Optional.empty();
     }
 
     @NonNull
@@ -80,7 +82,7 @@ public class ToolsInstructionsCleaner {
         if (namedNodeMap != null) {
             // make a copy of the original list of attributes as we will remove some during this
             // process.
-            List<Node> attributes = new ArrayList<Node>();
+            List<Node> attributes = new ArrayList<>();
             for (int i = 0; i < namedNodeMap.getLength(); i++) {
                 attributes.add(namedNodeMap.item(i));
             }
@@ -88,8 +90,8 @@ public class ToolsInstructionsCleaner {
                 if (SdkConstants.TOOLS_URI.equals(attribute.getNamespaceURI())) {
                     // we need to special case when the element contained tools:node="remove"
                     // since it also needs to be deleted unless it had a selector.
-                    // if this is tools:node="removeAll", we always delete the element whether or
-                    // not there is a tools:selector.
+                    // if this is tools:node="removeAll", we always delete the element whether
+                    //  there is a tools:selector.
                     boolean hasSelector = namedNodeMap.getNamedItemNS(
                             SdkConstants.TOOLS_URI, "selector") != null;
                     if (attribute.getLocalName().equals(NodeOperationType.NODE_LOCAL_NAME)

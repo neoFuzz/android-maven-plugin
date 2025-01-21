@@ -52,7 +52,7 @@ public final class NightModeQualifier extends EnumBasedResourceQualifier {
 
     @Override
     public String getShortName() {
-        return "Night Mode";
+        return NAME;
     }
 
     @Override
@@ -70,5 +70,16 @@ public final class NightModeQualifier extends EnumBasedResourceQualifier {
         }
 
         return false;
+    }
+
+    @Override
+    public boolean equals(Object qualifier) {
+        return qualifier instanceof NightModeQualifier nm &&
+                nm.mValue == mValue;
+    }
+
+    @Override
+    public int hashCode() {
+        return mValue.hashCode();
     }
 }

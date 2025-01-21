@@ -28,7 +28,6 @@ import com.android.sdklib.BuildToolInfo;
 import com.android.sdklib.IAndroidTarget;
 import com.android.utils.ILogger;
 import com.google.common.base.Joiner;
-import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableList;
 
@@ -45,6 +44,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public class AaptPackageProcessBuilder extends ProcessEnvBuilder<AaptPackageProcessBuilder> {
 
+    public static final String COMMA_SEP = "\",\"";
     @NonNull
     private final File mManifestFile;
     @NonNull
@@ -94,14 +94,10 @@ public class AaptPackageProcessBuilder extends ProcessEnvBuilder<AaptPackageProc
         return collection == null || collection.isEmpty();
     }
 
+    @NonNull
     private static Collection<String> getDensityResConfigs(Collection<String> resourceConfigs) {
-        return Collections2.filter(new ArrayList<String>(resourceConfigs),
-                new Predicate<String>() {
-                    @Override
-                    public boolean apply(@Nullable String input) {
-                        return Density.getEnum(input) != null;
-                    }
-                });
+        return Collections2.filter(new ArrayList<>(resourceConfigs),
+                input -> Density.getEnum(input) != null);
     }
 
     @NonNull
@@ -163,7 +159,7 @@ public class AaptPackageProcessBuilder extends ProcessEnvBuilder<AaptPackageProc
 
     @NonNull
     public List<? extends SymbolFileProvider> getLibraries() {
-        return mLibraries == null ? ImmutableList.<SymbolFileProvider>of() : mLibraries;
+        return mLibraries == null ? ImmutableList.of() : mLibraries;
     }
 
     /**
@@ -346,19 +342,19 @@ public class AaptPackageProcessBuilder extends ProcessEnvBuilder<AaptPackageProc
             builder.addArgs("--debug-mode");
         }
 
-        if (mType != VariantType.ANDROID_TEST) {
-            if (mPackageForR != null) {
+        if (mType != VariantType.ANDROID_TEST &&
+                mPackageForR != null) {
                 builder.addArgs("--custom-package", mPackageForR);
                 logger.verbose("Custom package for R class: '%s'", mPackageForR);
             }
-        }
+
 
         if (mPseudoLocalesEnabled) {
             if (buildToolInfo.getRevision().getMajor() >= 21) {
                 builder.addArgs("--pseudo-localize");
             } else {
                 throw new RuntimeException(
-                        "Pseudolocalization is only available since Build Tools version 21.0.0,"
+                        "Pseudo-localization is only available since Build Tools version 21.0.0,"
                                 + " please upgrade or turn it off.");
             }
         }
@@ -398,7 +394,7 @@ public class AaptPackageProcessBuilder extends ProcessEnvBuilder<AaptPackageProc
             builder.addArgs(additionalParameters);
         }
 
-        List<String> resourceConfigs = new ArrayList<String>();
+        List<String> resourceConfigs = new ArrayList<>();
         if (!isNullOrEmpty(mResourceConfigs)) {
             resourceConfigs.addAll(mResourceConfigs);
         }
@@ -444,7 +440,7 @@ public class AaptPackageProcessBuilder extends ProcessEnvBuilder<AaptPackageProc
                             "When using splits in tools 21 and above, resConfigs should not contain "
                                     + "any densities. Right now, it contains \"%1$s\"\n"
                                     + "Suggestion: remove these from resConfigs from build.gradle",
-                            Joiner.on("\",\"").join(densityResConfig)));
+                            Joiner.on(COMMA_SEP).join(densityResConfig)));
                 }
             }
             builder.addArgs("--preferred-density", mPreferredDensity);
@@ -465,47 +461,52 @@ public class AaptPackageProcessBuilder extends ProcessEnvBuilder<AaptPackageProc
         return builder.createProcess();
     }
 
-    private void checkResConfigsVersusSplitSettings(ILogger logger) {
+    private void checkResConfigsVersusSplitSettings(ILogger ignored) {
         if (isNullOrEmpty(mResourceConfigs) || isNullOrEmpty(mSplits)) {
             return;
         }
 
         // only consider the Density related resConfig settings.
         Collection<String> resConfigs = getDensityResConfigs(mResourceConfigs);
-        List<String> splits = new ArrayList<String>(mSplits);
+        List<String> splits = new ArrayList<>(mSplits);
         splits.removeAll(resConfigs);
         if (!splits.isEmpty()) {
             // some splits are required, yet the resConfigs do not contain the split density value
             // which mean that the resulting split file would be empty, flag this as an error.
             throw new RuntimeException(String.format(
-                    "Splits for densities \"%1$s\" were configured, yet the resConfigs settings does"
-                            + " not include such splits. The resulting split APKs would be empty.\n"
-                            + "Suggestion : exclude those splits in your build.gradle : \n"
-                            + "splits {\n"
-                            + "     density {\n"
-                            + "         enable true\n"
-                            + "         exclude \"%2$s\"\n"
-                            + "     }\n"
-                            + "}\n"
-                            + "OR add them to the resConfigs list.",
+                    """
+                            Splits for densities "%1$s" were configured, yet the resConfigs settings does\
+                             not include such splits. The resulting split APKs would be empty.
+                            Suggestion : exclude those splits in your build.gradle :\s
+                            splits {
+                                 density {
+                                     enable true
+                                     exclude "%2$s"
+                                 }
+                            }
+                            OR add them to the resConfigs list.
+                            """,
                     Joiner.on(",").join(splits),
-                    Joiner.on("\",\"").join(splits)));
+                    Joiner.on(COMMA_SEP).join(splits)));
         }
         resConfigs.removeAll(mSplits);
         if (!resConfigs.isEmpty()) {
             // there are densities present in the resConfig but not in splits, which mean that those
             // densities will be packaged in the main APK
             throw new RuntimeException(String.format(
-                    "Inconsistent density configuration, with \"%1$s\" present on "
-                            + "resConfig settings, while only \"%2$s\" densities are requested "
-                            + "in splits APK density settings.\n"
-                            + "Suggestion : remove extra densities from the resConfig : \n"
-                            + "defaultConfig {\n"
-                            + "     resConfigs \"%2$s\"\n"
-                            + "}\n"
-                            + "OR remove such densities from the split's exclude list.\n",
+                    """
+                            Inconsistent density configuration, with "%1$s" present on \
+                            resConfig settings, while only "%2$s" densities are requested \
+                            in splits APK density settings.
+                            Suggestion : remove extra densities from the resConfig :\s
+                            defaultConfig {
+                                 resConfigs "%2$s"
+                            }
+                            OR remove such densities from the split's exclude list.
+                            """
+                    ,
                     Joiner.on(",").join(resConfigs),
-                    Joiner.on("\",\"").join(mSplits)));
+                    Joiner.on(COMMA_SEP).join(mSplits)));
         }
     }
 }

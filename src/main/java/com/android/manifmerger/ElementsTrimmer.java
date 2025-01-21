@@ -18,7 +18,7 @@ package com.android.manifmerger;
 
 import com.android.SdkConstants;
 import com.android.annotations.NonNull;
-import com.android.xml.AndroidManifest;
+import com.android.annotations.Nullable;
 import org.w3c.dom.Attr;
 
 import java.util.Map;
@@ -26,6 +26,8 @@ import java.util.NavigableMap;
 import java.util.TreeMap;
 
 import static com.android.SdkConstants.ANDROID_URI;
+import static com.android.manifmerger.ManifestModel.ATTRIBUTE_GLESVERSION;
+import static com.android.manifmerger.ManifestModel.ATTRIBUTE_REQUIRED;
 
 /**
  * Trims the document from unwanted, repeated elements.
@@ -59,7 +61,7 @@ public class ElementsTrimmer {
             @NonNull MergingReport.Builder mergingReport) {
 
         // I sort the glEsVersion declaration by value.
-        NavigableMap<Integer, XmlElement> glEsVersionDeclarations = new TreeMap<Integer, XmlElement>();
+        NavigableMap<Integer, XmlElement> glEsVersionDeclarations = new TreeMap<>();
 
         for (XmlElement childElement : xmlDocument.getRootNode().getMergeableElements()) {
             if (childElement.getType().equals(ManifestModel.NodeTypes.USES_FEATURE)) {
@@ -83,7 +85,7 @@ public class ElementsTrimmer {
             boolean removeElement;
 
             Attr requiredAttribute = glEsVersionDeclaration.getValue().getXml().getAttributeNodeNS(
-                    ANDROID_URI, AndroidManifest.ATTRIBUTE_REQUIRED);
+                    ANDROID_URI, ATTRIBUTE_REQUIRED);
 
             boolean isRequired = requiredAttribute == null ||
                     Boolean.parseBoolean(requiredAttribute.getValue());
@@ -115,10 +117,10 @@ public class ElementsTrimmer {
                 if (glEsVersionDeclaration.getValue().getXml().getAttributeNodeNS(ANDROID_URI,
                         SdkConstants.ATTR_NAME) != null) {
                     glEsVersionDeclaration.getValue().getXml().removeAttributeNS(ANDROID_URI,
-                            AndroidManifest.ATTRIBUTE_GLESVERSION);
+                            ATTRIBUTE_GLESVERSION);
                     mergingReport.getActionRecorder().recordAttributeAction(
                             glEsVersionDeclaration.getValue().getAttribute(XmlNode.fromXmlName(
-                                    "android:" + AndroidManifest.ATTRIBUTE_GLESVERSION)).get(),
+                                    "android:" + ATTRIBUTE_GLESVERSION)).get(),
                             Actions.ActionType.REJECTED,
                             null /* attributeOperationType */);
                 } else {
@@ -135,15 +137,17 @@ public class ElementsTrimmer {
 
     }
 
+    @Nullable
     private static Integer getGlEsVersion(@NonNull XmlElement xmlElement) {
         Attr glEsVersion = xmlElement.getXml()
-                .getAttributeNodeNS(ANDROID_URI, AndroidManifest.ATTRIBUTE_GLESVERSION);
+                .getAttributeNodeNS(ANDROID_URI, ATTRIBUTE_GLESVERSION);
         if (glEsVersion == null) {
             return null;
         }
         return getHexValue(glEsVersion);
     }
 
+    @NonNull
     private static Integer getHexValue(@NonNull Attr attribute) {
         return Integer.decode(attribute.getValue());
     }

@@ -28,20 +28,6 @@ public class TextResourceValue extends ResourceValue {
         super(type, name, isFramework);
     }
 
-    public TextResourceValue(ResourceType type, String name, String textValue, String rawXmlValue,
-                             boolean isFramework) {
-        super(type, name, textValue, isFramework);
-        mRawXmlValue = rawXmlValue;
-    }
-
-    @Override
-    public String getRawXmlValue() {
-        if (mRawXmlValue != null) {
-            return mRawXmlValue;
-        }
-        return super.getValue();
-    }
-
     public void setRawXmlValue(String value) {
         mRawXmlValue = value;
     }
@@ -65,10 +51,7 @@ public class TextResourceValue extends ResourceValue {
         TextResourceValue other = (TextResourceValue) obj;
         if (mRawXmlValue == null) {
             //noinspection VariableNotUsedInsideIf
-            if (other.mRawXmlValue != null)
-                return false;
-        } else if (!mRawXmlValue.equals(other.mRawXmlValue))
-            return false;
-        return true;
+            return other.mRawXmlValue == null;
+        } else return mRawXmlValue.equals(other.mRawXmlValue);
     }
 }

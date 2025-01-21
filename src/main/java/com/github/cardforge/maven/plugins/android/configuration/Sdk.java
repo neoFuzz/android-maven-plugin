@@ -49,14 +49,23 @@ public class Sdk {
     @Parameter(property = "android.sdk.buildTools")
     private String buildTools;
 
+    /**
+     * @return the path to the Android SDK
+     */
     public File getPath() {
         return path;
     }
 
+    /**
+     * @return the chosen platform version
+     */
     public String getPlatform() {
         return platform;
     }
 
+    /**
+     * @return the chosen Build-Tools version
+     */
     public String getBuildTools() {
         return buildTools;
     }

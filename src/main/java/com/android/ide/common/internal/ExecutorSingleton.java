@@ -16,6 +16,8 @@
 
 package com.android.ide.common.internal;
 
+import com.android.annotations.NonNull;
+
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -23,6 +25,9 @@ import java.util.concurrent.Executors;
  * Singleton executor service.
  */
 public class ExecutorSingleton {
+    private ExecutorSingleton() {
+        // no instance
+    }
 
     private static ExecutorService sExecutorService = create();
 
@@ -49,6 +54,7 @@ public class ExecutorSingleton {
         }
     }
 
+    @NonNull
     private static ExecutorService create() {
         return Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
     }

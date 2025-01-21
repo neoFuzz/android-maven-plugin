@@ -1,5 +1,6 @@
 package com.github.cardforge.maven.plugins.android.configuration;
 
+import com.android.annotations.NonNull;
 import org.apache.maven.plugin.MojoExecutionException;
 
 import static java.lang.String.format;
@@ -24,7 +25,13 @@ public class VersionGenerator {
         this(versionDigits, "");
     }
 
-    public VersionGenerator(String versionDigits, String versionNamingPattern) {
+    /**
+     * Constructor for VersionGenerator.
+     *
+     * @param versionDigits        the version digits
+     * @param versionNamingPattern the version naming pattern
+     */
+    public VersionGenerator(@NonNull String versionDigits, String versionNamingPattern) {
         final String[] digits = versionDigits.split("[,;]");
 
         this.elementsCount = digits.length;
@@ -33,7 +40,7 @@ public class VersionGenerator {
         int total = 0;
 
         for (int k = 0; k < this.elementsCount; k++) {
-            int value = Integer.valueOf(digits[k].trim());
+            int value = Integer.parseInt(digits[k].trim());
 
             total += value;
 
@@ -53,6 +60,13 @@ public class VersionGenerator {
         }
     }
 
+    /**
+     * Generates a version code from the given version name.
+     *
+     * @param versionName the version name to parse
+     * @return the version code
+     * @throws MojoExecutionException if the version name is invalid
+     */
     public int generate(String versionName) throws MojoExecutionException {
         final int[] versionElements = elementParser.parseVersionElements(versionName);
 

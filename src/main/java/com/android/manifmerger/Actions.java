@@ -25,7 +25,7 @@ import com.android.ide.common.blame.SourceFile;
 import com.android.ide.common.blame.SourceFilePosition;
 import com.android.utils.ILogger;
 import com.google.common.base.MoreObjects;
-import com.google.common.base.Optional;
+import java.util.Optional;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -68,7 +68,6 @@ public class Actions {
         return getGsonParser().fromJson(xml, Actions.class);
     }
 
-    @SuppressWarnings("SpellCheckingInspection")
     @NonNull
     private static Gson getGsonParser() {
         GsonBuilder gsonBuilder = new GsonBuilder();
@@ -118,7 +117,7 @@ public class Actions {
     public ImmutableList<NodeRecord> getNodeRecords(XmlNode.NodeKey key) {
         return mRecords.containsKey(key)
                 ? mRecords.get(key).getNodeRecords()
-                : ImmutableList.<NodeRecord>of();
+                : ImmutableList.of();
     }
 
     /**
@@ -150,7 +149,7 @@ public class Actions {
     }
 
     /**
-     * Initial dump of the merging tool actions, need to be refined and spec'ed out properly.
+     * Initial dump of the merging tool actions, need to be refined and spec'd out properly.
      *
      * @param logger logger to log to at INFO level.
      */
@@ -162,12 +161,13 @@ public class Actions {
      * Dump merging tool actions to a text file.
      *
      * @param fileWriter the file to write all actions into.
-     * @throws IOException
+     * @throws IOException if the file cannot be written.
      */
     void log(@NonNull FileWriter fileWriter) throws IOException {
         fileWriter.append(getLogs());
     }
 
+    @NonNull
     private String getLogs() {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append(HEADER);
@@ -191,8 +191,7 @@ public class Actions {
     }
 
     @NonNull
-    public String persist() throws IOException {
-        //noinspection SpellCheckingInspection
+    public String persist() {
         GsonBuilder gson = new GsonBuilder().setPrettyPrinting();
         gson.enableComplexMapKeySerialization();
         MessageJsonSerializer.registerTypeAdapters(gson);
@@ -210,7 +209,7 @@ public class Actions {
                 inMemory,
                 xmlDocument.prettyPrint(),
                 XmlDocument.Type.MAIN,
-                Optional.<String>absent() /* mainManifestPackageName */);
+                Optional.empty() /* mainManifestPackageName */);
 
         ImmutableMultimap.Builder<Integer, Record> mappingBuilder = ImmutableMultimap.builder();
         for (XmlElement xmlElement : loadedWithLineNumbers.getRootNode().getMergeableElements()) {
@@ -257,7 +256,7 @@ public class Actions {
             if (resultingSourceMapping.containsKey(count)) {
                 for (Record record : resultingSourceMapping.get(count)) {
                     actualMappings.append(count + 1).append("-->")
-                            .append(record.getActionLocation().toString())
+                            .append(record.getActionLocation())
                             .append("\n");
                 }
             }
@@ -267,7 +266,7 @@ public class Actions {
     }
 
     /**
-     * Defines all possible actions taken from the merging tool for an xml element or attribute.
+     * Defines all possible actions taken from the merging tool for an XML element or attribute.
      */
     public enum ActionType {
         /**
@@ -287,7 +286,7 @@ public class Actions {
          */
         REJECTED,
         /**
-         * The implied element was added was added when importing a library that expected the
+         * The implied element was added when importing a library that expected the
          * element to be present by default while targeted SDK requires its declaration.
          */
         IMPLIED,
@@ -349,7 +348,7 @@ public class Actions {
     }
 
     /**
-     * Defines a merging tool action for an xml element.
+     * Defines a merging tool action for an XML element.
      */
     public static class NodeRecord extends Record {
 
@@ -368,14 +367,14 @@ public class Actions {
         @NonNull
         @Override
         public String toString() {
-            return "Id=" + mTargetId.toString() + " actionType=" + getActionType()
+            return "Id=" + mTargetId + " actionType=" + getActionType()
                     + " location=" + getActionLocation()
                     + " opType=" + mNodeOperationType;
         }
     }
 
     /**
-     * Defines a merging tool action for an xml attribute
+     * Defines a merging tool action for an XML attribute
      */
     public static class AttributeRecord extends Record {
 
@@ -423,8 +422,7 @@ public class Actions {
     }
 
     /**
-     * Internal structure on how {@link com.android.manifmerger.Actions.Record}s are kept for an
-     * xml element.
+     * Internal structure on how {@link com.android.manifmerger.Actions.Record}s are kept for an XML element.
      * <p>
      * Each xml element should have an associated DecisionTreeRecord which keeps a list of
      * {@link com.android.manifmerger.Actions.NodeRecord} for all the node actions related
@@ -461,7 +459,7 @@ public class Actions {
         ImmutableList<AttributeRecord> getAttributeRecords(XmlNode.NodeName attributeName) {
             List<AttributeRecord> attributeRecords = mAttributeRecords.get(attributeName);
             return attributeRecords == null
-                    ? ImmutableList.<AttributeRecord>of()
+                    ? ImmutableList.of()
                     : ImmutableList.copyOf(attributeRecords);
         }
     }

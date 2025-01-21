@@ -45,7 +45,7 @@ import java.io.IOException;
  *
  * @author Stéphane Nicolas - snicolas@octo.com
  * @see <a href="http://developer.android.com/tools/help/monkey.html">Monkey docs by Google</a>
- * @see <a href="http://stackoverflow.com/q/3968064/693752">Stack Over Flow thread for parsing monkey output.</a>
+ * @see <a href="http://stackoverflow.com/q/3968064/693752">Stack Overflow thread for parsing monkey output.</a>
  */
 @SuppressWarnings("unused")
 @Mojo(name = "monkey")
@@ -78,7 +78,7 @@ public class MonkeyMojo extends AbstractAndroidMojo {
 
     /**
      * The configuration for the ui automator goal. As soon as a lint goal is invoked the command will be executed
-     * unless the skip parameter is set. A minimal configuration that will run lint and produce a XML report in
+     * unless the skip parameter is set. A minimal configuration that will run lint and produce an XML report in
      * ${project.build.directory}/lint/lint-results.xml is
      *
      * <pre>
@@ -306,7 +306,7 @@ public class MonkeyMojo extends AbstractAndroidMojo {
     private Boolean parsedIgnoreCrashes;
 
     /**
-     * Normally, the Monkey will stop when the application experiences any type of timeout error such as a
+     * Normally, the Monkey will stop when the application experiences any type of timeout error such as an
      * "Application Not Responding" dialog. If you specify this option, the Monkey will continue to send events to the
      * system, until the count is completed.
      * <p>
@@ -392,18 +392,18 @@ public class MonkeyMojo extends AbstractAndroidMojo {
     }
 
     /**
-     * Whether or not tests are enabled.
+     * Whether tests are enabled.
      *
-     * @return a boolean indicating whether or not tests are enabled.
+     * @return a boolean indicating whether tests are enabled.
      */
     protected boolean isEnableIntegrationTest() {
         return !parsedSkip && !mavenTestSkip && !mavenSkipTests;
     }
 
     /**
-     * Whether or not test failures should be ignored.
+     * Whether test failures should be ignored.
      *
-     * @return a boolean indicating whether or not test failures should be ignored.
+     * @return a boolean indicating whether test failures should be ignored.
      */
     protected boolean isIgnoreTestFailures() {
         return mavenIgnoreTestFailure || mavenTestFailureIgnore;
@@ -412,7 +412,7 @@ public class MonkeyMojo extends AbstractAndroidMojo {
     /**
      * Actually plays tests.
      *
-     * @throws MojoExecutionException if exercising app threw an exception and isIgnoreTestFailures is false..
+     * @throws MojoExecutionException if exercising app threw an exception and isIgnoreTestFailures is false
      * @throws MojoFailureException   if exercising app failed and isIgnoreTestFailures is false.
      */
     protected void exerciseApp() throws MojoExecutionException, MojoFailureException {

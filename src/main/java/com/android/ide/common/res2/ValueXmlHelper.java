@@ -16,6 +16,7 @@
 
 package com.android.ide.common.res2;
 
+import com.android.annotations.NonNull;
 import com.android.annotations.Nullable;
 import com.android.annotations.VisibleForTesting;
 
@@ -25,11 +26,14 @@ import static com.android.SdkConstants.*;
  * Helper class to help with XML values resource file.
  */
 public class ValueXmlHelper {
+    private ValueXmlHelper() {
+        // don't instantiate
+    }
 
     /**
      * Replaces escapes in an XML resource string with the actual characters,
-     * performing unicode substitutions (replacing any {@code \\uNNNN} references in the
-     * given string with the corresponding unicode characters), etc.
+     * performing Unicode substitutions (replacing any {@code \\uNNNN} references in the
+     * given string with the corresponding Unicode characters), etc.
      *
      * @param s              the string to unescape
      * @param escapeEntities XML entities
@@ -174,7 +178,7 @@ public class ValueXmlHelper {
                 prevSpace = false;
                 char next = s.charAt(i + 1);
                 // Unicode escapes
-                if (next == 'u' && i < n - 5) { // case sensitive
+                if (next == 'u' && i < n - 5) { // case-sensitive
                     String hex = s.substring(i + 2, i + 6);
                     try {
                         int unicodeValue = Integer.parseInt(hex, 16);
@@ -247,7 +251,7 @@ public class ValueXmlHelper {
                     boolean isSpace = Character.isWhitespace(c);
                     if (isSpace) {
                         if (!prevSpace) {
-                            sb.append(' '); // replace newlines etc with a plain space
+                            sb.append(' '); // replace newlines etc. with a plain space
                         }
                     } else {
                         sb.append(c);
@@ -298,9 +302,9 @@ public class ValueXmlHelper {
     /**
      * Escape a string value to be placed in a string resource file such that it complies with
      * the escaping rules described here:
-     * http://developer.android.com/guide/topics/resources/string-resource.html
+     * <a href="http://developer.android.com/guide/topics/resources/string-resource.html">here</a>
      * More examples of the escaping rules can be found here:
-     * http://androidcookbook.com/Recipe.seam?recipeId=2219&recipeFrom=ViewTOC
+     * <a href="http://androidcookbook.com/Recipe.seam?recipeId=2219&recipeFrom=ViewTOC">here</a
      * This method assumes that the String is not escaped already.
      * <p>
      * Rules:
@@ -315,6 +319,7 @@ public class ValueXmlHelper {
      * @param s the string to be escaped
      * @return the escaped string as it would appear in the XML text in a values file
      */
+    @NonNull
     public static String escapeResourceString(String s) {
         return escapeResourceString(s, true);
     }
@@ -322,9 +327,9 @@ public class ValueXmlHelper {
     /**
      * Escape a string value to be placed in a string resource file such that it complies with
      * the escaping rules described here:
-     * http://developer.android.com/guide/topics/resources/string-resource.html
+     * <a href="http://developer.android.com/guide/topics/resources/string-resource.html">here</a>
      * More examples of the escaping rules can be found here:
-     * http://androidcookbook.com/Recipe.seam?recipeId=2219&recipeFrom=ViewTOC
+     * <a href="http://androidcookbook.com/Recipe.seam?recipeId=2219&recipeFrom=ViewTOC">here</a>
      * This method assumes that the String is not escaped already.
      * <p>
      * Rules:
@@ -344,7 +349,8 @@ public class ValueXmlHelper {
      *                  entity to itself be escaped.
      * @return the escaped string as it would appear in the XML text in a values file
      */
-    public static String escapeResourceString(String s, boolean escapeXml) {
+    @NonNull
+    public static String escapeResourceString(@NonNull String s, boolean escapeXml) {
         int n = s.length();
         if (n == 0) {
             return "";
@@ -368,8 +374,7 @@ public class ValueXmlHelper {
                     }
                     sb.append(c);
                     break;
-                case '"':
-                case '\\':
+                case '"', '\\':
                     sb.append('\\');
                     sb.append(c);
                     break;

@@ -30,7 +30,7 @@ import java.io.File;
  * - jumbo mode
  */
 @Immutable
-class DexKey extends PreProcessCache.Key {
+public class DexKey extends PreProcessCache.Key {
     private final boolean mJumboMode;
 
     private DexKey(@NonNull File sourceFile, @NonNull FullRevision buildToolsRevision,
@@ -39,6 +39,7 @@ class DexKey extends PreProcessCache.Key {
         mJumboMode = jumboMode;
     }
 
+    @NonNull
     static DexKey of(@NonNull File sourceFile, @NonNull FullRevision buildToolsRevision,
                      boolean jumboMode) {
         return new DexKey(sourceFile, buildToolsRevision, jumboMode);
@@ -53,20 +54,14 @@ class DexKey extends PreProcessCache.Key {
         if (this == o) {
             return true;
         }
-        if (!(o instanceof DexKey)) {
+        if (!(o instanceof DexKey dexKey)) {
             return false;
         }
         if (!super.equals(o)) {
             return false;
         }
 
-        DexKey dexKey = (DexKey) o;
-
-        if (mJumboMode != dexKey.mJumboMode) {
-            return false;
-        }
-
-        return true;
+        return mJumboMode == dexKey.mJumboMode;
     }
 
     @Override

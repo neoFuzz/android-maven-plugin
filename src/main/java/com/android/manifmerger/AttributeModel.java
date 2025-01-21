@@ -61,7 +61,6 @@ class AttributeModel {
             return true;
         }
 
-        @Nullable
         @Override
         public String merge(@NonNull String higherPriority, @NonNull String lowerPriority) {
             return Boolean.toString(BooleanValidator.isTrue(higherPriority) ||
@@ -79,7 +78,6 @@ class AttributeModel {
             return true;
         }
 
-        @Nullable
         @Override
         public String merge(@NonNull String higherPriority, @NonNull String lowerPriority) {
             return higherPriority;

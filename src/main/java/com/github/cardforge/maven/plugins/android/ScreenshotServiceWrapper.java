@@ -1,5 +1,6 @@
 package com.github.cardforge.maven.plugins.android;
 
+import com.android.annotations.NonNull;
 import com.android.ddmlib.IDevice;
 import com.github.rtyley.android.screenshot.paparazzo.OnDemandScreenshotService;
 import com.github.rtyley.android.screenshot.paparazzo.processors.AnimatedGifCreator;
@@ -27,7 +28,14 @@ public class ScreenshotServiceWrapper implements DeviceCallback {
     private final Log log;
     private final File screenshotParentDir;
 
-    public ScreenshotServiceWrapper(DeviceCallback delegate, MavenProject project, Log log) {
+    /**
+     * Constructor for ScreenshotServiceWrapper.
+     *
+     * @param delegate the delegate.
+     * @param project  the project.
+     * @param log      the logger to use.
+     */
+    public ScreenshotServiceWrapper(DeviceCallback delegate, @NonNull MavenProject project, Log log) {
         this.delegate = delegate;
         this.log = log;
         screenshotParentDir = new File(project.getBuild().getDirectory(), "screenshots");
@@ -35,6 +43,13 @@ public class ScreenshotServiceWrapper implements DeviceCallback {
     }
 
 
+    /**
+     * Do actions with device.
+     *
+     * @param device the device
+     * @throws MojoExecutionException in case of error1
+     * @throws MojoFailureException   in case of error2
+     */
     @Override
     public void doWithDevice(final IDevice device) throws MojoExecutionException, MojoFailureException {
         String deviceName = getDescriptiveName(device);
@@ -55,6 +70,11 @@ public class ScreenshotServiceWrapper implements DeviceCallback {
         screenshotService.finish();
     }
 
+    /**
+     * Create a directory if it does not exist.
+     *
+     * @param dir the directory to create
+     */
     private void create(File dir) {
         try {
             forceMkdir(dir);

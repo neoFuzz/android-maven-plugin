@@ -30,26 +30,44 @@ public class HeaderFilesDirective {
     @Parameter
     private String[] excludes;
 
+    /**
+     * @return Base directory from where to include/exclude files from.
+     */
     public String getDirectory() {
         return directory;
     }
 
+    /**
+     * @param directory Base directory from where to include/exclude files from.
+     */
     public void setDirectory(String directory) {
         this.directory = directory;
     }
 
+    /**
+     * @return An array with a list of files to exclude
+     */
     public String[] getExcludes() {
         return excludes;
     }
 
+    /**
+     * @param excludes An array with a list of files to exclude
+     */
     public void setExcludes(String[] excludes) {
         this.excludes = excludes;
     }
 
+    /**
+     * @return An array with a list of files to include
+     */
     public String[] getIncludes() {
         return includes;
     }
 
+    /**
+     * @param includes An array with a list of files to include
+     */
     public void setIncludes(String[] includes) {
         this.includes = includes;
     }

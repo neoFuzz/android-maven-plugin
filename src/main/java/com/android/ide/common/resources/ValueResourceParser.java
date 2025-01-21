@@ -27,8 +27,6 @@ import org.xml.sax.helpers.DefaultHandler;
  * SAX handler to parse value resource files.
  */
 public final class ValueResourceParser extends DefaultHandler {
-
-    // TODO: reuse definitions from somewhere else.
     private static final String NODE_RESOURCES = "resources";
     private static final String NODE_ITEM = "item";
     private static final String ATTR_NAME = "name";
@@ -39,13 +37,13 @@ public final class ValueResourceParser extends DefaultHandler {
     private static final String DEFAULT_NS_PREFIX = "android:";
     private static final int DEFAULT_NS_PREFIX_LEN = DEFAULT_NS_PREFIX.length();
     private final boolean mIsFramework;
+    private final IValueResourceRepository mRepository;
     private boolean inResources = false;
     private int mDepth = 0;
     private ResourceValue mCurrentValue = null;
     private StyleResourceValue mCurrentStyle = null;
     private DeclareStyleableResourceValue mCurrentDeclareStyleable = null;
     private AttrResourceValue mCurrentAttr;
-    private IValueResourceRepository mRepository;
 
     public ValueResourceParser(IValueResourceRepository repository, boolean isFramework) {
         mRepository = repository;
@@ -83,11 +81,11 @@ public final class ValueResourceParser extends DefaultHandler {
             throws SAXException {
         try {
             mDepth++;
-            if (inResources == false && mDepth == 1) {
+            if (!inResources && mDepth == 1) {
                 if (qName.equals(NODE_RESOURCES)) {
                     inResources = true;
                 }
-            } else if (mDepth == 2 && inResources == true) {
+            } else if (mDepth == 2 && inResources) {
                 ResourceType type = getType(qName, attributes);
 
                 if (type != null) {
@@ -189,8 +187,7 @@ public final class ValueResourceParser extends DefaultHandler {
             typeValue = qName;
         }
 
-        ResourceType type = ResourceType.getEnum(typeValue);
-        return type;
+        return ResourceType.getEnum(typeValue);
     }
 
     @Override

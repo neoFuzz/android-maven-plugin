@@ -25,7 +25,6 @@ import com.android.ddmlib.*;
 import com.android.utils.ILogger;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
-import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.IOException;
@@ -69,7 +68,7 @@ public class ConnectedDevice extends DeviceConnector {
     }
 
     @Override
-    public void disconnect(int timeout, ILogger logger) throws TimeoutException {
+    public void disconnect(int timeout, ILogger logger) {
         // nothing to do here
     }
 
@@ -123,8 +122,9 @@ public class ConnectedDevice extends DeviceConnector {
     }
 
     @Override
-    public void executeShellCommand(String command, IShellOutputReceiver receiver, long maxTimeout, long maxTimeToOutputResponse, TimeUnit maxTimeUnits) throws TimeoutException, AdbCommandRejectedException, ShellCommandUnresponsiveException, IOException {
-
+    public void executeShellCommand(String command, IShellOutputReceiver receiver, long maxTimeout,
+                                    long maxTimeToOutputResponse, TimeUnit maxTimeUnits) {
+        // empty
     }
 
     @NonNull
@@ -138,11 +138,7 @@ public class ConnectedDevice extends DeviceConnector {
         try {
             iDevice.pullFile(remote, local);
 
-        } catch (TimeoutException e) {
-            throw new IOException(String.format("Failed to pull %s from device", remote), e);
-        } catch (AdbCommandRejectedException e) {
-            throw new IOException(String.format("Failed to pull %s from device", remote), e);
-        } catch (SyncException e) {
+        } catch (TimeoutException | AdbCommandRejectedException | SyncException e) {
             throw new IOException(String.format("Failed to pull %s from device", remote), e);
         }
     }
@@ -158,9 +154,9 @@ public class ConnectedDevice extends DeviceConnector {
         String sdkVersion = iDevice.getProperty(IDevice.PROP_BUILD_API_LEVEL);
         if (sdkVersion != null) {
             try {
-                return Integer.valueOf(sdkVersion);
-            } catch (NumberFormatException e) {
-
+                return Integer.parseInt(sdkVersion);
+            } catch (NumberFormatException ignored) {
+                // nothing
             }
         }
 
@@ -219,7 +215,7 @@ public class ConnectedDevice extends DeviceConnector {
 
     @Override
     public Set<String> getLanguageSplits() throws TimeoutException, AdbCommandRejectedException, ShellCommandUnresponsiveException, IOException {
-        return new Set<String>() {
+        return new Set<>() {
             @Override
             public int size() {
                 return 0;
@@ -235,21 +231,21 @@ public class ConnectedDevice extends DeviceConnector {
                 return false;
             }
 
-            @NotNull
+            @NonNull
             @Override
             public Iterator<String> iterator() {
                 return null;
             }
 
-            @NotNull
+            @NonNull
             @Override
             public Object[] toArray() {
                 return new Object[0];
             }
 
-            @NotNull
+            @NonNull
             @Override
-            public <T> T[] toArray(@NotNull T[] a) {
+            public <T> T[] toArray(@NonNull T[] a) {
                 return null;
             }
 
@@ -264,28 +260,28 @@ public class ConnectedDevice extends DeviceConnector {
             }
 
             @Override
-            public boolean containsAll(@NotNull Collection<?> c) {
+            public boolean containsAll(@NonNull Collection<?> c) {
                 return false;
             }
 
             @Override
-            public boolean addAll(@NotNull Collection<? extends String> c) {
+            public boolean addAll(@NonNull Collection<? extends String> c) {
                 return false;
             }
 
             @Override
-            public boolean retainAll(@NotNull Collection<?> c) {
+            public boolean retainAll(@NonNull Collection<?> c) {
                 return false;
             }
 
             @Override
-            public boolean removeAll(@NotNull Collection<?> c) {
+            public boolean removeAll(@NonNull Collection<?> c) {
                 return false;
             }
 
             @Override
             public void clear() {
-
+                // nothing
             }
         };
     }

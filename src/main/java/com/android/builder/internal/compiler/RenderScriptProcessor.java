@@ -110,10 +110,12 @@ public class RenderScriptProcessor {
         }
     }
 
+    @NonNull
     public static File getSupportJar(String buildToolsFolder) {
         return new File(buildToolsFolder, "renderscript/lib/" + FN_RENDERSCRIPT_V8_JAR);
     }
 
+    @NonNull
     public static File getSupportNativeLibFolder(String buildToolsFolder) {
         File rs = new File(buildToolsFolder, "renderscript");
         File lib = new File(rs, "lib");
@@ -177,7 +179,7 @@ public class RenderScriptProcessor {
         builder.addEnvironments(env);
 
         // Due to a device side bug, let's not enable this at this time.
-//        if (mDebugBuild) {
+//        if (mDebugBuild) { // NOSONAR : reason provided
 //            command.add("-g");
 //        }
 

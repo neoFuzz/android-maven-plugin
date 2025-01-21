@@ -42,7 +42,6 @@ public interface JillProvider {
      * @param cls the {@link JillConfig} API interface
      * @return <code>true</true> if the config is supported
      */
-    @Nonnull
     <T extends JillConfig> boolean isConfigSupported(@Nonnull Class<T> cls);
 
     /**
@@ -139,6 +138,6 @@ public interface JillProvider {
         /**
          * A production and stable sub-release.
          */
-        RELEASE;
+        RELEASE
     }
 }

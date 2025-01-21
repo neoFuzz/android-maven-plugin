@@ -22,13 +22,13 @@ import com.android.annotations.Nullable;
 import com.android.resources.ResourceFolderType;
 import com.android.utils.SdkUtils;
 import com.android.utils.XmlUtils;
-import com.google.common.base.Charsets;
 import com.google.common.collect.Lists;
 import com.google.common.io.Files;
 import org.w3c.dom.*;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -53,6 +53,10 @@ public class XmlPrettyPrinter {
      */
     private final XmlFormatPreferences mPrefs;
     /**
+     * Line separator to use
+     */
+    private final String mLineSeparator;
+    /**
      * Start node to start formatting at
      */
     private Node mStartNode;
@@ -74,10 +78,6 @@ public class XmlPrettyPrinter {
      */
     private String mIndentString;
     /**
-     * Line separator to use
-     */
-    private String mLineSeparator;
-    /**
      * If true, we're only formatting an open tag
      */
     private boolean mOpenTagOnly;
@@ -96,7 +96,7 @@ public class XmlPrettyPrinter {
      * @param prefs         the preferences to format with
      * @param style         the style to format with
      * @param lineSeparator the line separator to use, such as "\n" (can be null, in which
-     *                      case the system default is looked up via the line.separator property)
+     *                      case the system default is looked up via the {@code line.separator} property)
      */
     public XmlPrettyPrinter(XmlFormatPreferences prefs, XmlFormatStyle style,
                             String lineSeparator) {
@@ -106,59 +106,6 @@ public class XmlPrettyPrinter {
             lineSeparator = System.lineSeparator();
         }
         mLineSeparator = lineSeparator;
-    }
-
-    /**
-     * Pretty-prints the given XML document, which must be well-formed. If it is not,
-     * the original unformatted XML document is returned
-     *
-     * @param xml           the XML content to format
-     * @param prefs         the preferences to format with
-     * @param style         the style to format with
-     * @param lineSeparator the line separator to use, such as "\n" (can be null, in which
-     *                      case the system default is looked up via the line.separator property)
-     * @return the formatted document (or if a parsing error occurred, returns the
-     * unformatted document)
-     */
-    @NonNull
-    public static String prettyPrint(
-            @NonNull String xml,
-            @NonNull XmlFormatPreferences prefs,
-            @NonNull XmlFormatStyle style,
-            @Nullable String lineSeparator) {
-        Document document = XmlUtils.parseDocumentSilently(xml, true);
-        if (document != null) {
-            XmlPrettyPrinter printer = new XmlPrettyPrinter(prefs, style, lineSeparator);
-            printer.setEndWithNewline(xml.endsWith(printer.getLineSeparator()));
-            StringBuilder sb = new StringBuilder(3 * xml.length() / 2);
-            printer.prettyPrint(-1, document, null, null, sb, false /*openTagOnly*/);
-            return sb.toString();
-        } else {
-            // Parser error: just return the unformatted content
-            return xml;
-        }
-    }
-
-    /**
-     * Pretty prints the given node
-     *
-     * @param node          the node, usually a document, to be printed
-     * @param prefs         the formatting preferences
-     * @param style         the formatting style to use
-     * @param lineSeparator the line separator to use, or null to use the
-     *                      default
-     * @return a formatted string
-     * @deprecated Use {@link #prettyPrint(org.w3c.dom.Node, XmlFormatPreferences,
-     * XmlFormatStyle, String, boolean)} instead
-     */
-    @NonNull
-    @Deprecated
-    public static String prettyPrint(
-            @NonNull Node node,
-            @NonNull XmlFormatPreferences prefs,
-            @NonNull XmlFormatStyle style,
-            @Nullable String lineSeparator) {
-        return prettyPrint(node, prefs, style, lineSeparator, false);
     }
 
     /**
@@ -198,7 +145,7 @@ public class XmlPrettyPrinter {
      * @deprecated Use {@link #prettyPrint(org.w3c.dom.Node, boolean)} instead
      */
     @NonNull
-    @Deprecated
+    @Deprecated(since = "3.2.0", forRemoval = true)
     public static String prettyPrint(@NonNull Node node) {
         return prettyPrint(node, false);
     }
@@ -230,7 +177,7 @@ public class XmlPrettyPrinter {
     /**
      * Command line driver
      */
-    public static void main(String[] args) {
+    public static void main(@NonNull String[] args) {
         if (args.length == 0) {
             printUsage();
         }
@@ -272,7 +219,7 @@ public class XmlPrettyPrinter {
         System.exit(0);
     }
 
-    private static void formatFile(@NonNull XmlFormatPreferences prefs, File file,
+    private static void formatFile(@NonNull XmlFormatPreferences prefs, @NonNull File file,
                                    boolean stdout) {
         if (file.isDirectory()) {
             File[] files = file.listFiles();
@@ -299,7 +246,7 @@ public class XmlPrettyPrinter {
             }
 
             try {
-                String xml = Files.toString(file, Charsets.UTF_8);
+                String xml = Files.toString(file, StandardCharsets.UTF_8);
                 Document document = XmlUtils.parseDocumentSilently(xml, true);
                 if (document == null) {
                     System.err.println("Could not parse " + file);
@@ -319,7 +266,7 @@ public class XmlPrettyPrinter {
                 if (stdout) {
                     System.out.println(formatted);
                 } else {
-                    Files.write(formatted, file, Charsets.UTF_8);
+                    Files.write(formatted, file, StandardCharsets.UTF_8);
                 }
             } catch (IOException e) {
                 System.err.println("Could not read " + file);
@@ -423,11 +370,11 @@ public class XmlPrettyPrinter {
         }
     }
 
-    private void visitBeforeChildren(int depth, Node node) {
+    private void visitBeforeChildren(int depth, @NonNull Node node) {
         short type = node.getNodeType();
         switch (type) {
-            case Node.DOCUMENT_NODE:
-            case Node.DOCUMENT_FRAGMENT_NODE:
+            case Node.DOCUMENT_NODE,
+                 Node.DOCUMENT_FRAGMENT_NODE:
                 // Nothing to do
                 break;
 
@@ -462,16 +409,16 @@ public class XmlPrettyPrinter {
                 printDocType(node);
                 break;
 
-            case Node.ENTITY_REFERENCE_NODE:
-            case Node.ENTITY_NODE:
-            case Node.NOTATION_NODE:
+            case Node.ENTITY_REFERENCE_NODE,
+                 Node.ENTITY_NODE,
+                 Node.NOTATION_NODE:
                 break;
             default:
                 assert false : type;
         }
     }
 
-    private void visitAfterChildren(int depth, Node node) {
+    private void visitAfterChildren(int depth, @NonNull Node node) {
         short type = node.getNodeType();
         switch (type) {
             case Node.ATTRIBUTE_NODE:
@@ -481,10 +428,12 @@ public class XmlPrettyPrinter {
                 printCloseElementTag(depth, node);
                 break;
             }
+            default:
+                // Nothing to do
         }
     }
 
-    private void printProcessingInstruction(Node node) {
+    private void printProcessingInstruction(@NonNull Node node) {
         mOut.append("<?xml "); //$NON-NLS-1$
         mOut.append(node.getNodeValue().trim());
         mOut.append('?').append('>').append(mLineSeparator);
@@ -504,7 +453,7 @@ public class XmlPrettyPrinter {
         }
     }
 
-    private void printCharacterData(Node node) {
+    private void printCharacterData(@NonNull Node node) {
         String nodeValue = node.getNodeValue();
         boolean separateLine = nodeValue.indexOf('\n') != -1;
         if (separateLine && !endsWithLineSeparator()) {
@@ -518,7 +467,7 @@ public class XmlPrettyPrinter {
         }
     }
 
-    private void printText(Node node) {
+    private void printText(@NonNull Node node) {
         boolean escape = true;
         String text = node.getNodeValue();
 
@@ -536,8 +485,6 @@ public class XmlPrettyPrinter {
         // so look for actual text content and extract that part out
         String trimmed = text.trim();
         if (!trimmed.isEmpty()) {
-            // TODO: Reformat the contents if it is too wide?
-
             // Note that we append the actual text content, NOT the trimmed content,
             // since the whitespace may be significant, e.g.
             // <string name="toast_sync_error">Sync error: <xliff:g id="error">%1$s</xliff:g>...
@@ -620,21 +567,18 @@ public class XmlPrettyPrinter {
         }
     }
 
-    private void printComment(int depth, Node node) {
+    private void printComment(int depth, @NonNull Node node) {
         String comment = node.getNodeValue();
         boolean multiLine = comment.indexOf('\n') != -1;
         String trimmed = comment.trim();
 
         // See if this is an "end-of-the-line" comment, e.g. it is not a multi-line
-        // comment and it appears on the same line as an opening or closing element tag;
-        // if so, continue to place it as a suffix comment
+        // comment, and it appears on the same line as an opening or closing element tag.
+        // If so, continue to place it as a suffix comment
         boolean isSuffixComment = false;
         if (!multiLine) {
             Node previous = node.getPreviousSibling();
-            isSuffixComment = true;
-            if (previous == null && node.getParentNode().getNodeType() == Node.DOCUMENT_NODE) {
-                isSuffixComment = false;
-            }
+            isSuffixComment = previous != null || node.getParentNode().getNodeType() != Node.DOCUMENT_NODE;
             while (previous != null) {
                 short type = previous.getNodeType();
                 if (type == Node.COMMENT_NODE) {
@@ -666,7 +610,7 @@ public class XmlPrettyPrinter {
         if (!mPrefs.removeEmptyLines && !isSuffixComment) {
             Node curr = node.getPreviousSibling();
             if (curr == null) {
-                if (mOut.length() > 0 && !endsWithLineSeparator()) {
+                if (!mOut.isEmpty() && !endsWithLineSeparator()) {
                     mOut.append(mLineSeparator);
                 }
             } else if (curr.getNodeType() == Node.TEXT_NODE) {
@@ -696,8 +640,6 @@ public class XmlPrettyPrinter {
             }
         }
 
-
-        // TODO: Reformat the comment text?
         if (!multiLine) {
             if (!isSuffixComment) {
                 indent(depth);
@@ -823,7 +765,7 @@ public class XmlPrettyPrinter {
                             for (int j = 0; j < line.length(); j++) {
                                 char c = line.charAt(j);
                                 if (!Character.isWhitespace(c)) {
-                                    // Only set minIndent if there's text content on the line;
+                                    // Only set minIndent if there's text content on the line,
                                     // blank lines can exist in the comment without affecting
                                     // the overall minimum indentation boundary.
                                     if (indent < minIndent) {
@@ -851,9 +793,7 @@ public class XmlPrettyPrinter {
                             }
                         }
 
-                        for (int i = 0; i < indentation; i++) {
-                            mOut.append(' ');
-                        }
+                        mOut.append(" ".repeat(Math.max(0, indentation)));
 
                         if (indentation < 0) {
                             boolean prefixIsSpace = true;
@@ -941,7 +881,7 @@ public class XmlPrettyPrinter {
         int attributeCount = attributes.getLength();
         if (attributeCount > 0) {
             // Sort the attributes
-            List<Attr> attributeList = new ArrayList<Attr>();
+            List<Attr> attributeList = new ArrayList<>();
             for (int i = 0; i < attributeCount; i++) {
                 attributeList.add((Attr) attributes.item(i));
             }
@@ -1053,7 +993,7 @@ public class XmlPrettyPrinter {
         // newline would have been added above it), or if we are not in a formatting
         // style where
         if (mStyle == XmlFormatStyle.LAYOUT) {
-            // In layouts we always separate elements
+            // In layouts, we always separate elements
             return true;
         }
 
@@ -1062,17 +1002,16 @@ public class XmlPrettyPrinter {
             Node curr = element.getPreviousSibling();
 
             // <style> elements are traditionally separated unless it follows a comment
-            if (TAG_STYLE.equals(element.getTagName())) {
-                if (curr == null
-                        || curr.getNodeType() == Node.ELEMENT_NODE
-                        || (curr.getNodeType() == Node.TEXT_NODE
-                        && curr.getNodeValue().trim().isEmpty()
-                        && (curr.getPreviousSibling() == null
-                        || curr.getPreviousSibling().getNodeType()
-                        == Node.ELEMENT_NODE))) {
-                    return true;
-                }
+            if (TAG_STYLE.equals(element.getTagName()) && (curr == null
+                    || curr.getNodeType() == Node.ELEMENT_NODE
+                    || (curr.getNodeType() == Node.TEXT_NODE
+                    && curr.getNodeValue().trim().isEmpty()
+                    && (curr.getPreviousSibling() == null
+                    || curr.getPreviousSibling().getNodeType()
+                    == Node.ELEMENT_NODE)))) {
+                return true;
             }
+
 
             // In all other styles, we separate elements if they have a different tag than
             // the previous one (but we don't insert a newline inside tags)
@@ -1097,12 +1036,8 @@ public class XmlPrettyPrinter {
                 }
                 curr = curr.getPreviousSibling();
             }
-            if (curr == null && depth <= 1) {
-                // Insert new line inside tag if it's the first element inside the root tag
-                return true;
-            }
-
-            return false;
+            // Insert new line inside tag if it's the first element inside the root tag
+            return curr == null && depth <= 1;
         }
 
         return false;
@@ -1113,12 +1048,8 @@ public class XmlPrettyPrinter {
             return false;
         }
 
-        if (element.getParentNode().getNodeType() == Node.ELEMENT_NODE
-                && keepElementAsSingleLine(depth - 1, (Element) element.getParentNode())) {
-            return false;
-        }
-
-        return true;
+        return element.getParentNode().getNodeType() != Node.ELEMENT_NODE
+                || !keepElementAsSingleLine(depth - 1, (Element) element.getParentNode());
     }
 
     private boolean indentBeforeElementClose(Element element, int depth) {
@@ -1204,14 +1135,12 @@ public class XmlPrettyPrinter {
     }
 
     /**
-     * TODO: Explain why we need to do per-tag decisions on whether to keep them on the
-     * same line or not. Show that we can't just do it by depth, or by file type.
-     * (style versus plurals example)
+     * Returns true if the given element is a single line tag.
      *
      * @param element the element whose tag we want to check
      * @return true if the element is a single line tag
      */
-    private boolean isSingleLineTag(Element element) {
+    private boolean isSingleLineTag(@NonNull Element element) {
         String tag = element.getTagName();
 
         return (tag.equals(TAG_ITEM) && mStyle == XmlFormatStyle.RESOURCE)
@@ -1256,16 +1185,12 @@ public class XmlPrettyPrinter {
      * @return true if this element should be an empty tag
      */
     @SuppressWarnings("MethodMayBeStatic") // Intentionally instance method so it can be overridden
-    protected boolean isEmptyTag(Element element) {
+    protected boolean isEmptyTag(@NonNull Element element) {
         if (element.getFirstChild() != null) {
             return false;
         }
 
         String tag = element.getTagName();
-        if (TAG_STRING.equals(tag)) {
-            return false;
-        }
-
-        return true;
+        return !TAG_STRING.equals(tag);
     }
 }

@@ -17,6 +17,10 @@ public class MetaInf {
 
     private List<String> excludes;
 
+    /**
+     * @param obj The reference object with which to compare.
+     * @return <code>true</code> if this object is the same as the obj argument;
+     */
     @Override
     public boolean equals(Object obj) {
         if (this == obj) {
@@ -40,38 +44,45 @@ public class MetaInf {
         }
 
         if (this.excludes == null) {
-            if (that.excludes != null) {
-                return false;
-            }
-        } else if (!this.excludes.equals(that.excludes)) {
-            return false;
-        }
-
-        return true;
+            return that.excludes == null;
+        } else return this.excludes.equals(that.excludes);
     }
 
+    /**
+     * @param excludes An array with a list of files to exclude
+     * @return <code>MetaInf</code>
+     */
     public MetaInf exclude(String... excludes) {
         getExcludes().addAll(Arrays.asList(excludes));
 
         return this;
     }
 
+    /**
+     * @return An array with a list of files to exclude
+     */
     public List<String> getExcludes() {
         if (this.excludes == null) {
-            this.excludes = new ArrayList<String>();
+            this.excludes = new ArrayList<>();
         }
 
         return this.excludes;
     }
 
+    /**
+     * @return An array with a list of files to include
+     */
     public List<String> getIncludes() {
         if (this.includes == null) {
-            this.includes = new ArrayList<String>();
+            this.includes = new ArrayList<>();
         }
 
         return this.includes;
     }
 
+    /**
+     * @return <code>int</code> with the hash code of this object
+     */
     @Override
     public int hashCode() {
         final int prime = 31;
@@ -81,12 +92,20 @@ public class MetaInf {
         return result;
     }
 
+    /**
+     * @param includes An array with a list of files to include
+     * @return <code>MetaInf</code>
+     */
     public MetaInf include(String... includes) {
         getIncludes().addAll(Arrays.asList(includes));
 
         return this;
     }
 
+    /**
+     * @param name The name of the file to check
+     * @return <code>true</code> if the file is included or excluded
+     */
     public boolean isIncluded(String name) {
         boolean included = this.includes == null;
 

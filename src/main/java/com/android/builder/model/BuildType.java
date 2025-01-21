@@ -45,14 +45,14 @@ public interface BuildType extends BaseConfig {
     boolean isDebuggable();
 
     /**
-     * Returns whether the build type is configured to be build with support for code coverage.
+     * Returns whether the build type is configured to be built with support for code coverage.
      *
      * @return true if code coverage is enabled.
      */
     boolean isTestCoverageEnabled();
 
     /**
-     * Returns whether the build type is configured to be build with support for pseudolocales.
+     * Returns whether the build type is configured to be built with support for pseudo-locales.
      *
      * @return true if code coverage is enabled.
      */

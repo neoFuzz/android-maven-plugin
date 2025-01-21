@@ -29,7 +29,7 @@ import org.w3c.dom.Element;
 import static com.android.manifmerger.ManifestModel.NodeTypes;
 
 /**
- * An xml element that does not belong to a {@link com.android.manifmerger.XmlDocument}
+ * An XML element that does not belong to a {@link com.android.manifmerger.XmlDocument}
  */
 public class OrphanXmlElement extends XmlNode {
 
@@ -44,7 +44,7 @@ public class OrphanXmlElement extends XmlNode {
         mXml = Preconditions.checkNotNull(xml);
         NodeTypes nodeType;
         String elementName = mXml.getNodeName();
-        // this is bit more complicated than it should be. Look first if there is a namespace
+        // this is a bit more complicated than it should be. Look first if there is a namespace
         // prefix in the name, most elements don't. If they do, however, strip it off if it is the
         // android prefix, but if it's custom namespace prefix, classify the node as CUSTOM.
         int indexOfColon = elementName.indexOf(':');
@@ -81,7 +81,7 @@ public class OrphanXmlElement extends XmlNode {
     public NodeKey getId() {
         return new NodeKey(Strings.isNullOrEmpty(getKey())
                 ? getName().toString()
-                : getName().toString() + "#" + getKey());
+                : getName() + "#" + getKey());
     }
 
     @NonNull

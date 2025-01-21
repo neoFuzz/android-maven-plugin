@@ -29,14 +29,14 @@ public interface MergeConsumer<I extends DataItem> {
     /**
      * Called before the merge starts.
      *
-     * @throws ConsumerException
+     * @throws ConsumerException if the consumer cannot start the merge.
      */
     void start(@NonNull DocumentBuilderFactory factory) throws ConsumerException;
 
     /**
      * Called after the merge ends.
      *
-     * @throws ConsumerException
+     * @throws ConsumerException if the consumer cannot finish the merge.
      */
     void end() throws ConsumerException;
 
@@ -45,18 +45,18 @@ public interface MergeConsumer<I extends DataItem> {
      * indicate whether the item actually changed.
      *
      * @param item the new item.
-     * @throws ConsumerException
+     * @throws ConsumerException if the item cannot be added.
      */
     void addItem(@NonNull I item) throws ConsumerException;
 
     /**
      * Removes an item. Optionally pass the item that will replace this one.
-     * This methods does not do the replacement. The replaced item is just there
+     * This method does not do the replacement. The replaced item is just there
      * in case the removal can be optimized when it's a replacement vs. a removal.
      *
      * @param removedItem the removed item.
      * @param replacedBy  the optional item that replaces the removed item.
-     * @throws ConsumerException
+     * @throws ConsumerException if the item cannot be removed.
      */
     void removeItem(@NonNull I removedItem, @Nullable I replacedBy) throws ConsumerException;
 
@@ -66,7 +66,7 @@ public interface MergeConsumer<I extends DataItem> {
      * An exception thrown during by the consumer. It always contains the original exception
      * as its cause.
      */
-    public static class ConsumerException extends MergingException {
+    class ConsumerException extends MergingException {
         public ConsumerException(Throwable cause) {
             super(cause);
         }

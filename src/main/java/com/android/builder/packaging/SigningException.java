@@ -16,10 +16,13 @@
 
 package com.android.builder.packaging;
 
+import java.io.Serial;
+
 /**
  * An exception thrown when signing fails.
  */
 public final class SigningException extends Exception {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     public SigningException(String format, Object... args) {

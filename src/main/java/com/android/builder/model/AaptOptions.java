@@ -50,7 +50,7 @@ public interface AaptOptions {
     List<String> getAdditionalParameters();
 
     /**
-     * Returns the resource namespacing strategy for this sub-project
+     * Returns the resource namespacing strategy for this subproject
      */
     @NonNull
     Namespacing getNamespacing();

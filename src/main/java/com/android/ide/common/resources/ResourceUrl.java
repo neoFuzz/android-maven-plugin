@@ -71,11 +71,13 @@ public class ResourceUrl {
      * @param framework whether it's a framework resource
      * @param create    if it's an id resource, whether it's of the form {@code @+id}
      */
+    @NonNull
     public static ResourceUrl create(@NonNull ResourceType type, @NonNull String name,
                                      boolean framework, boolean create) {
         return new ResourceUrl(type, name, framework, create);
     }
 
+    @NonNull
     public static ResourceUrl create(@NonNull ResourceValue value) {
         return create(value.getResourceType(), value.getName(), value.isFramework(), false);
     }
@@ -196,7 +198,6 @@ public class ResourceUrl {
         return sb.toString();
     }
 
-    @SuppressWarnings("RedundantIfStatement")
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -217,11 +218,7 @@ public class ResourceUrl {
         if (!name.equals(that.name)) {
             return false;
         }
-        if (type != that.type) {
-            return false;
-        }
-
-        return true;
+        return type == that.type;
     }
 
     @Override

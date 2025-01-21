@@ -17,6 +17,7 @@
 package com.android.builder.internal;
 
 import com.android.SdkConstants;
+import com.android.annotations.NonNull;
 import com.android.builder.internal.SymbolLoader.SymbolEntry;
 import com.google.common.base.Charsets;
 import com.google.common.base.Splitter;
@@ -52,6 +53,7 @@ public class SymbolWriter {
         mSymbols.add(symbols);
     }
 
+    @NonNull
     private Table<String, String, SymbolEntry> getAllSymbols() {
         Table<String, String, SymbolEntry> symbols = HashBasedTable.create();
 

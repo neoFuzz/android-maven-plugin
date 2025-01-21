@@ -34,11 +34,12 @@ import org.apache.maven.plugins.annotations.Mojo;
  * @author hugo.josefson@jayway.com
  * @author Manfred Moser - manfred@simpligility.com
  */
+@SuppressWarnings("unused") // used in Maven goals
 @Mojo(name = "undeploy")
 public class UndeployMojo extends AbstractAndroidMojo {
     /**
-     * @throws MojoExecutionException
-     * @throws MojoFailureException
+     * @throws MojoExecutionException if the execution fails
+     * @throws MojoFailureException   if the apk file does not exist
      */
     public void execute() throws MojoExecutionException, MojoFailureException {
         String packageToUndeploy;

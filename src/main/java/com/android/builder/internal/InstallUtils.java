@@ -23,6 +23,9 @@ import com.android.sdklib.SdkVersionInfo;
 import com.android.utils.ILogger;
 
 public class InstallUtils {
+    private InstallUtils() {
+        // hidden constructor
+    }
 
     /**
      * Checks whether a device is compatible with a given app minSdkVersion value.

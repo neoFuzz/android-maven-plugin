@@ -16,6 +16,7 @@
  */
 package com.github.cardforge.maven.plugins.android.phase08preparepackage;
 
+import com.android.annotations.NonNull;
 import com.github.cardforge.maven.plugins.android.AbstractAndroidMojo;
 import com.github.cardforge.maven.plugins.android.CommandExecutor;
 import com.github.cardforge.maven.plugins.android.ExecutionException;
@@ -49,6 +50,31 @@ import static com.github.cardforge.maven.plugins.android.common.AndroidExtension
 
 /**
  * Converts compiled Java classes to the Android dex format.
+ * <p>
+ * Configuration for the dex command execution. It can be configured in the plugin configuration like so
+ *
+ * <pre>
+ * &lt;dexCompiler&gt;dex&lt;/dexCompiler&gt;
+ * &lt;dex&gt;
+ *   &lt;jvmArguments&gt;
+ *     &lt;jvmArgument&gt;-Xms256m&lt;/jvmArgument&gt;
+ *     &lt;jvmArgument&gt;-Xmx512m&lt;/jvmArgument&gt;
+ *   &lt;/jvmArguments&gt;
+ *   &lt;coreLibrary&gt;true|false&lt;/coreLibrary&gt;
+ *   &lt;noLocals&gt;true|false&lt;/noLocals&gt;
+ *   &lt;forceJumbo&gt;true|false&lt;/forceJumbo&gt;
+ *   &lt;optimize&gt;true|false&lt;/optimize&gt;
+ *   &lt;preDex&gt;true|false&lt;/preDex&gt;
+ *   &lt;preDexLibLocation&gt;path to predexed libraries, defaults to target/dexedLibs&lt;/preDexLibLocation&gt;
+ *   &lt;incremental&gt;true|false&lt;/incremental&gt;
+ *   &lt;multiDex&gt;true|false&lt;/multiDex&gt;
+ *   &lt;generateMainDexList&gt;true|false&lt;/generateMainDexList&gt;
+ *   &lt;mainDexList&gt;path to class list file&lt;/mainDexList&gt;
+ *   &lt;minimalMainDex&gt;true|false&lt;/minimalMainDex&gt;
+ * &lt;/dex&gt;
+ * </pre>
+ * <p>
+ * or via properties dex.* or command line parameters android.dex.*
  *
  * @author hugo.josefson@jayway.com
  */
@@ -58,34 +84,6 @@ import static com.github.cardforge.maven.plugins.android.common.AndroidExtension
         requiresDependencyResolution = ResolutionScope.COMPILE
 )
 public class DexMojo extends AbstractAndroidMojo {
-
-    /**
-     * Configuration for the dex command execution. It can be configured in the plugin configuration like so
-     *
-     * <pre>
-     * &lt;dexCompiler&gt;dex&lt;/dexCompiler&gt;
-     * &lt;dex&gt;
-     *   &lt;jvmArguments&gt;
-     *     &lt;jvmArgument&gt;-Xms256m&lt;/jvmArgument&gt;
-     *     &lt;jvmArgument&gt;-Xmx512m&lt;/jvmArgument&gt;
-     *   &lt;/jvmArguments&gt;
-     *   &lt;coreLibrary&gt;true|false&lt;/coreLibrary&gt;
-     *   &lt;noLocals&gt;true|false&lt;/noLocals&gt;
-     *   &lt;forceJumbo&gt;true|false&lt;/forceJumbo&gt;
-     *   &lt;optimize&gt;true|false&lt;/optimize&gt;
-     *   &lt;preDex&gt;true|false&lt;/preDex&gt;
-     *   &lt;preDexLibLocation&gt;path to predexed libraries, defaults to target/dexedLibs&lt;/preDexLibLocation&gt;
-     *   &lt;incremental&gt;true|false&lt;/incremental&gt;
-     *   &lt;multiDex&gt;true|false&lt;/multiDex&gt;
-     *   &lt;generateMainDexList&gt;true|false&lt;/generateMainDexList&gt;
-     *   &lt;mainDexList&gt;path to class list file&lt;/mainDexList&gt;
-     *   &lt;minimalMainDex&gt;true|false&lt;/minimalMainDex&gt;
-     * &lt;/dex&gt;
-     * </pre>
-     *
-     * or via properties dex.* or command line parameters android.dex.*
-     */
-
     /**
      * The dex compiler to use. Allowed values are 'dex' (default) and 'd8'.
      */
@@ -254,6 +252,7 @@ public class DexMojo extends AbstractAndroidMojo {
      *
      * @return the full path to the current java executable.
      */
+    @NonNull
     private static File getJavaExecutable() {
         final String javaHome = System.getProperty("java.home");
         final String slash = File.separator;
@@ -261,8 +260,20 @@ public class DexMojo extends AbstractAndroidMojo {
     }
 
     /**
-     * @throws MojoExecutionException
-     * @throws MojoFailureException
+     * Executes the Mojo goal by performing the following tasks:
+     * <ul>
+     *     <li>Parses the configuration settings.</li>
+     *     <li>If the selected DEX compiler is not DEX, skips execution with a log message.</li>
+     *     <li>If APK generation is enabled, calls {@link #runDex} to run the DEX compiler.</li>
+     *     <li>If the attachment of JAR is enabled, attaches the generated JAR file to the Maven project.</li>
+     *     <li>If attaching sources is enabled, creates and attaches an APK sources file.</li>
+     * </ul>
+     * <p>
+     * This method is typically invoked during the execution of a Maven build to handle APK compilation and artifact attachment tasks.
+     * </p>
+     *
+     * @throws MojoExecutionException If there is an error executing the Mojo.
+     * @throws MojoFailureException   If the Mojo fails due to a configuration or other critical issue.
      */
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
@@ -313,12 +324,21 @@ public class DexMojo extends AbstractAndroidMojo {
     }
 
     /**
-     * Gets the input files for dex. This is a combination of directories and jar files.
+     * Retrieves the set of input files to be processed by the dex tool.
+     * <p>
+     * This method determines the appropriate input files based on whether ProGuard obfuscation has been applied.
+     * If an obfuscated JAR file exists, it is added to the input set. Otherwise, the original project output
+     * directory and its dependencies are used.
+     * <p>
+     * The method also filters out certain artifact types such as native dependencies and handles APK and AAR
+     * dependencies appropriately.
      *
-     * @return
+     * @return A set of {@link File} objects representing the input files for the dex tool.
+     * @throws MojoExecutionException if an error occurs while determining the input files.
      */
+    @NonNull
     private Set<File> getDexInputFiles() throws MojoExecutionException {
-        Set<File> inputs = new HashSet<File>();
+        Set<File> inputs = new HashSet<>();
 
         if (obfuscatedJar != null && obfuscatedJar.exists()) {
             // proguard has been run, use this jar
@@ -345,7 +365,7 @@ public class DexMojo extends AbstractAndroidMojo {
                     // We need to dex the APK classes including the APK R.
                     // But we don't want to add a second instance of the embedded Rs for any of the APK's dependencies
                     // as they will already have been generated to target/classes. The R values from the APK will be
-                    // the correct ones, so best solution is to extract the APK classes (including all Rs) to
+                    // the correct ones, so the best solution is to extract the APK classes (including all Rs) to
                     // target/classes overwriting any generated Rs and let dex pick up the values from there.
                     getLog().debug("Extracting APK classes to target/classes : " + artifact.getArtifactId());
                     final File apkClassesJar = getUnpackedLibHelper().getJarFileForApk(artifact);
@@ -362,12 +382,17 @@ public class DexMojo extends AbstractAndroidMojo {
         return inputs;
     }
 
+    /**
+     * Parses the configuration settings for the DEX compilation process.
+     * This method sets various configuration options based on the provided configuration
+     * and default values.
+     */
     private void parseConfiguration() {
         // config in pom found
         if (dex != null) {
             // the if statements make sure that properties/command line
             // parameter overrides configuration
-            // and that the dafaults apply in all cases;
+            // and that the dafaults apply in all cases
             if (dex.getJvmArguments() == null) {
                 parsedJvmArguments = dexJvmArguments;
             } else {
@@ -453,8 +478,17 @@ public class DexMojo extends AbstractAndroidMojo {
         }
     }
 
-    private Set<File> preDex(CommandExecutor executor, Set<File> inputFiles) throws MojoExecutionException {
-        Set<File> filtered = new HashSet<File>();
+    /**
+     * Pre-dexes the input files if pre-dexing is enabled.
+     *
+     * @param executor   The command executor to use for executing the pre-dexing process.
+     * @param inputFiles The set of input files to be pre-dexed.
+     * @return The set of pre-dexed files.
+     * @throws MojoExecutionException If an error occurs during the pre-dexing process.
+     */
+    @NonNull
+    private Set<File> preDex(CommandExecutor executor, @NonNull Set<File> inputFiles) throws MojoExecutionException {
+        Set<File> filtered = new HashSet<>();
         getLog().info("Pre dex-ing libraries for faster dex-ing of the final application.");
 
         for (File inputFile : inputFiles) {
@@ -478,12 +512,23 @@ public class DexMojo extends AbstractAndroidMojo {
         return filtered;
     }
 
-    private File predexJarPath(File inputFile) {
+    /**
+     * @param inputFile The input file to create the pre-dexed JAR file for.
+     * @return The pre-dexed JAR file.
+     */
+    @NonNull
+    private File predexJarPath(@NonNull File inputFile) {
         final File predexLibsDirectory = new File(parsedPreDexLibLocation.trim());
         predexLibsDirectory.mkdirs();
         return new File(predexLibsDirectory, inputFile.getName());
     }
 
+    /**
+     * @return The commands returned are in the form of a list that can be passed to
+     * {@link CommandExecutor#executeCommand(Runnable)}.
+     * @throws MojoExecutionException if an error occurs while creating the commands.
+     */
+    @NonNull
     private List<String> dexDefaultCommands() throws MojoExecutionException {
         List<String> commands = jarDefaultCommands();
         commands.add(getAndroidSdk().getDxJarPath());
@@ -491,14 +536,24 @@ public class DexMojo extends AbstractAndroidMojo {
         return commands;
     }
 
+    /**
+     * @return The commands returned are in the form of a list that can be passed to
+     * {@link CommandExecutor#executeCommand}.
+     */
+    @NonNull
     private List<String> jarDefaultCommands() {
         List<String> commands = javaDefaultCommands();
         commands.add("-jar");
         return commands;
     }
 
+    /**
+     * @return The commands returned are in the form of a list that can be passed to
+     * {@link CommandExecutor#executeCommand}.
+     */
+    @NonNull
     private List<String> javaDefaultCommands() {
-        List<String> commands = new ArrayList<String>();
+        List<String> commands = new ArrayList<>();
         if (parsedJvmArguments != null) {
             for (String jvmArgument : parsedJvmArguments) {
                 // preserve backward compatibility allowing argument with or
@@ -515,6 +570,13 @@ public class DexMojo extends AbstractAndroidMojo {
         return commands;
     }
 
+    /**
+     * Runs the dexing process on the input files.
+     *
+     * @param executor   The command executor to use for executing the dexing process.
+     * @param outputFile The output file to write the dexed classes to.
+     * @throws MojoExecutionException if an error occurs during the dexing process.
+     */
     private void runDex(CommandExecutor executor, File outputFile)
             throws MojoExecutionException {
         final List<String> commands = dexDefaultCommands();
@@ -559,9 +621,15 @@ public class DexMojo extends AbstractAndroidMojo {
         executeJava(commands, executor);
     }
 
-    private String executeJava(final List<String> commands, CommandExecutor executor) throws MojoExecutionException {
+    /**
+     * @param commands The commands to execute.
+     * @param executor The command executor to use for executing the commands.
+     * @return The output of the executed commands.
+     * @throws MojoExecutionException if an error occurs during the execution of the commands.
+     */
+    private String executeJava(@NonNull final List<String> commands, @NonNull CommandExecutor executor) throws MojoExecutionException {
         final String javaExecutable = getJavaExecutable().getAbsolutePath();
-        getLog().debug(javaExecutable + " " + commands.toString());
+        getLog().debug(javaExecutable + " " + commands);
         try {
             executor.setCaptureStdOut(true);
             executor.executeCommand(javaExecutable, commands, project.getBasedir(), false);
@@ -571,6 +639,12 @@ public class DexMojo extends AbstractAndroidMojo {
         }
     }
 
+    /**
+     * @param executor The command executor to use for executing the commands.
+     * @return The main dex classes jar file.
+     * @throws MojoExecutionException if an error occurs during the generation of the main dex classes jar.
+     */
+    @NonNull
     private File generateMainDexClassesJar(CommandExecutor executor) throws MojoExecutionException {
         List<String> commands = jarDefaultCommands();
         commands.add(getAndroidSdk().getProguardJarPath());
@@ -603,6 +677,12 @@ public class DexMojo extends AbstractAndroidMojo {
         return mainDexClassesJar;
     }
 
+    /**
+     * @param executor The command executor to use for executing the commands.
+     * @return The main dex classes list file.
+     * @throws MojoExecutionException if an error occurs during the generation of the main dex classes list.
+     */
+    @NonNull
     private File generateMainDexClassesList(CommandExecutor executor) throws MojoExecutionException {
         File mainDexClassesJar = generateMainDexClassesJar(executor);
         List<String> commands = javaDefaultCommands();
@@ -631,8 +711,10 @@ public class DexMojo extends AbstractAndroidMojo {
     }
 
     /**
-     * @return
-     * @throws MojoExecutionException
+     * Create the {@code .apksource} file for the project.
+     *
+     * @return the {@link File} for the .apksource file to attach to the project.
+     * @throws MojoExecutionException if an error occurs while creating the .apksource file.
      */
     protected File createApkSourcesFile() throws MojoExecutionException {
         final File apksources = new File(targetDirectory, finalName
@@ -675,7 +757,7 @@ public class DexMojo extends AbstractAndroidMojo {
     /**
      * Adds a directory to a {@link JarArchiver} with a directory prefix.
      *
-     * @param jarArchiver
+     * @param jarArchiver The {@link JarArchiver} to add the directory to.
      * @param directory   The directory to add.
      * @param prefix      An optional prefix for where in the Jar file the directory's contents should go.
      */
@@ -689,10 +771,12 @@ public class DexMojo extends AbstractAndroidMojo {
     }
 
     /**
-     * @param jarArchiver
-     * @param javaResources
+     * Adds a list of Java resources to a {@link JarArchiver}.
+     *
+     * @param jarArchiver   The {@link JarArchiver} to add the resources to.
+     * @param javaResources The list of Java resources to add.
      */
-    protected void addJavaResources(JarArchiver jarArchiver, List<Resource> javaResources) {
+    protected void addJavaResources(@NonNull JarArchiver jarArchiver, @NonNull List<Resource> javaResources) {
         for (Resource javaResource : javaResources) {
             addJavaResource(jarArchiver, javaResource);
         }
@@ -701,7 +785,7 @@ public class DexMojo extends AbstractAndroidMojo {
     /**
      * Adds a Java Resources directory (typically "src/main/resources") to a {@link JarArchiver}.
      *
-     * @param jarArchiver
+     * @param jarArchiver  The {@link JarArchiver} to add the resources to.
      * @param javaResource The Java resource to add.
      */
     protected void addJavaResource(JarArchiver jarArchiver, Resource javaResource) {

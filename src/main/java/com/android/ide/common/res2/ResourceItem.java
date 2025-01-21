@@ -62,7 +62,7 @@ public class ResourceItem extends DataItem<ResourceFile>
     }
 
     @Nullable
-    private static String getAttributeValue(NamedNodeMap attributes, String attributeName) {
+    private static String getAttributeValue(@NonNull NamedNodeMap attributes, String attributeName) {
         Attr attribute = (Attr) attributes.getNamedItem(attributeName);
         if (attribute != null) {
             return attribute.getValue();
@@ -135,12 +135,10 @@ public class ResourceItem extends DataItem<ResourceFile>
                     }
                     break;
                 }
-                case Node.TEXT_NODE:
+                case Node.TEXT_NODE, Node.CDATA_SECTION_NODE:
                     sb.append(child.getNodeValue());
                     break;
-                case Node.CDATA_SECTION_NODE:
-                    sb.append(child.getNodeValue());
-                    break;
+                default:
             }
         }
 
@@ -189,12 +187,10 @@ public class ResourceItem extends DataItem<ResourceFile>
 
                     break;
                 }
-                case Node.TEXT_NODE:
+                case Node.TEXT_NODE, Node.CDATA_SECTION_NODE:
                     sb.append(child.getNodeValue());
                     break;
-                case Node.CDATA_SECTION_NODE:
-                    sb.append(child.getNodeValue());
-                    break;
+                default:
             }
         }
 
@@ -226,7 +222,7 @@ public class ResourceItem extends DataItem<ResourceFile>
      *
      * @param from the resource to copy the value from.
      */
-    void setValue(ResourceItem from) {
+    void setValue(@NonNull ResourceItem from) {
         mValue = from.mValue;
         setTouched();
     }
@@ -250,7 +246,7 @@ public class ResourceItem extends DataItem<ResourceFile>
     public String getQualifiers() {
         ResourceFile resourceFile = getSource();
         if (resourceFile == null) {
-            throw new RuntimeException("Cannot call getQualifier on " + toString());
+            throw new RuntimeException("Cannot call getQualifier on " + this);
         }
 
         return resourceFile.getQualifiers();
@@ -260,7 +256,7 @@ public class ResourceItem extends DataItem<ResourceFile>
     public DataFile.FileType getSourceType() {
         ResourceFile resourceFile = getSource();
         if (resourceFile == null) {
-            throw new RuntimeException("Cannot call getSourceType on " + toString());
+            throw new RuntimeException("Cannot call getSourceType on " + this);
         }
 
         return resourceFile.getType();
@@ -332,7 +328,7 @@ public class ResourceItem extends DataItem<ResourceFile>
     @Nullable
     private Density getFolderDensity() {
         String qualifiers = getQualifiers();
-        if (!qualifiers.isEmpty() && qualifiers.contains("dpi")) {
+        if (qualifiers.contains("dpi")) {
             Iterable<String> segments = Splitter.on('-').split(qualifiers);
             FolderConfiguration config = FolderConfiguration.getConfigFromQualifiers(segments);
             if (config != null) {
@@ -435,7 +431,6 @@ public class ResourceItem extends DataItem<ResourceFile>
                 }
                 break;
             case DECLARE_STYLEABLE:
-                //noinspection deprecation
                 value = parseDeclareStyleable(new DeclareStyleableResourceValue(type, name,
                         isFrameworks));
                 break;
@@ -543,7 +538,6 @@ public class ResourceItem extends DataItem<ResourceFile>
         return value;
     }
 
-    @SuppressWarnings("deprecation") // support for deprecated (but supported) API
     @NonNull
     private ResourceValue parseDeclareStyleable(
             @NonNull DeclareStyleableResourceValue declareStyleable) {
@@ -635,6 +629,4 @@ public class ResourceItem extends DataItem<ResourceFile>
     Node getAdoptedNode(Document document) {
         return NodeUtils.adoptNode(document, mValue);
     }
-
-
 }

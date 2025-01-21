@@ -52,7 +52,7 @@ import java.util.Map;
  * Writing/Loading the blob is not done through this class directly, but instead through the
  * {@link DataMerger} which contains DataSet objects.
  */
-abstract class DataSet<I extends DataItem<F>, F extends DataFile<I>> implements SourceSet, DataMap<I> {
+public abstract class DataSet<I extends DataItem<F>, F extends DataFile<I>> implements SourceSet, DataMap<I> {
 
     static final String NODE_SOURCE = "source";
     static final String NODE_FILE = "file";
@@ -403,7 +403,7 @@ abstract class DataSet<I extends DataItem<F>, F extends DataFile<I>> implements 
      * @param dataSetNode the node to read from.
      * @return a new DataSet object or null.
      */
-    DataSet<I, F> createFromXml(Node dataSetNode) {
+    DataSet<I, F> createFromXml(@NonNull Node dataSetNode) {
         // get the config name
         Attr configNameAttr = (Attr) dataSetNode.getAttributes().getNamedItem(ATTR_CONFIG);
         if (configNameAttr == null) {
@@ -490,7 +490,7 @@ abstract class DataSet<I extends DataItem<F>, F extends DataFile<I>> implements 
      * @return true if the set was properly updated, false otherwise
      * @throws MergingException if something goes wrong
      */
-    public boolean updateWith(File sourceFolder, File changedFile, FileStatus fileStatus,
+    public boolean updateWith(File sourceFolder, File changedFile, @NonNull FileStatus fileStatus,
                               ILogger logger)
             throws MergingException {
         switch (fileStatus) {

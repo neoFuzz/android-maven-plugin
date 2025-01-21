@@ -13,6 +13,8 @@
  */
 package com.github.cardforge.maven.plugins.android;
 
+import com.android.annotations.NonNull;
+import com.android.annotations.Nullable;
 import org.apache.commons.lang3.SystemUtils;
 import org.apache.maven.plugin.MojoExecutionException;
 
@@ -34,8 +36,11 @@ public class AndroidNdk {
             + "alternative, you may add the parameter to commandline: -Dandroid.ndk.path=... or set environment "
             + "variable ANDROID_ND_HOME.";
 
-    public static final String[] NDK_ARCHITECTURES = {"armeabi", "armeabi-v7a", "arm64-v8a", "mips", "mips64",
-            "x86", "x86_64"};
+    public static final String ARMEABI = "armeabi";
+    public static final String MIPS_64 = "mips64";
+    public static final String X_86_64 = "x86_64";
+    public static final String[] NDK_ARCHITECTURES = {ARMEABI, "armeabi-v7a", "arm64-v8a", "mips", MIPS_64,
+            "x86", X_86_64};
 
     /**
      * Arm toolchain implementations.
@@ -92,8 +97,9 @@ public class AndroidNdk {
         }
     }
 
+    @Nullable
     private File findStripper(String toolchain) {
-        List<String> osDirectories = new ArrayList<String>();
+        List<String> osDirectories = new ArrayList<>();
         String extension = "";
 
         if (SystemUtils.IS_OS_LINUX) {
@@ -113,11 +119,11 @@ public class AndroidNdk {
             fileName = "arm-linux-androideabi-strip" + extension;
         } else if (toolchain.startsWith("aarch64")) {
             fileName = "aarch64-linux-android-strip" + extension;
-        } else if (toolchain.startsWith("x86_64")) {
+        } else if (toolchain.startsWith(X_86_64)) {
             fileName = "x86_64-linux-android-strip" + extension;
         } else if (toolchain.startsWith("x86")) {
             fileName = "i686-linux-android-strip" + extension;
-        } else if (toolchain.startsWith("mips64")) {
+        } else if (toolchain.startsWith(MIPS_64)) {
             fileName = "mips64el-linux-android-strip" + extension;
         } else if (toolchain.startsWith("mips")) {
             fileName = "mipsel-linux-android-strip" + extension;
@@ -150,7 +156,8 @@ public class AndroidNdk {
         return stripper;
     }
 
-    private String resolveNdkToolchain(String[] toolchains) {
+    @Nullable
+    private String resolveNdkToolchain(@NonNull String[] toolchains) {
         for (String toolchain : toolchains) {
             File f = findStripper(toolchain);
             if (f != null && f.exists()) {
@@ -167,20 +174,20 @@ public class AndroidNdk {
      * @return String
      * @throws MojoExecutionException When no toolchain is found
      */
-    public String getToolchain(File file) throws MojoExecutionException {
+    public String getToolchain(@NonNull File file) throws MojoExecutionException {
         String resolvedNdkToolchain = null;
 
         // try to resolve the toolchain now
         String ndkArchitecture = file.getParentFile().getName();
-        if (ndkArchitecture.startsWith("armeabi")) {
+        if (ndkArchitecture.startsWith(ARMEABI)) {
             resolvedNdkToolchain = resolveNdkToolchain(ARM_TOOLCHAIN);
         } else if (ndkArchitecture.startsWith("arm64")) {
             resolvedNdkToolchain = resolveNdkToolchain(ARM64_TOOLCHAIN);
-        } else if (ndkArchitecture.startsWith("x86_64")) {
+        } else if (ndkArchitecture.startsWith(X_86_64)) {
             resolvedNdkToolchain = resolveNdkToolchain(X86_64_TOOLCHAIN);
         } else if (ndkArchitecture.startsWith("x86")) {
             resolvedNdkToolchain = resolveNdkToolchain(X86_TOOLCHAIN);
-        } else if (ndkArchitecture.startsWith("mips64")) {
+        } else if (ndkArchitecture.startsWith(MIPS_64)) {
             resolvedNdkToolchain = resolveNdkToolchain(MIPS64_TOOLCHAIN);
         } else if (ndkArchitecture.startsWith("mips")) {
             resolvedNdkToolchain = resolveNdkToolchain(MIPS_TOOLCHAIN);
@@ -207,23 +214,23 @@ public class AndroidNdk {
         }
     }
 
-    public File getGdbServer(String ndkArchitecture) throws MojoExecutionException {
+    public File getGdbServer(@NonNull String ndkArchitecture) throws MojoExecutionException {
         // create a list of possible gdb server parent folder locations
-        List<String> gdbServerLocations = new ArrayList<String>();
-        if (ndkArchitecture.startsWith("armeabi")) {
+        List<String> gdbServerLocations = new ArrayList<>();
+        if (ndkArchitecture.startsWith(ARMEABI)) {
             gdbServerLocations.add("android-arm");
             gdbServerLocations.add("android-armeabi");
             gdbServerLocations.addAll(Arrays.asList(ARM_TOOLCHAIN));
         } else if (ndkArchitecture.startsWith("arm64")) {
             gdbServerLocations.add("android-arm64");
             gdbServerLocations.addAll(Arrays.asList(ARM64_TOOLCHAIN));
-        } else if (ndkArchitecture.startsWith("x86_64")) {
+        } else if (ndkArchitecture.startsWith(X_86_64)) {
             gdbServerLocations.add("android-x86_64");
             gdbServerLocations.addAll(Arrays.asList(X86_64_TOOLCHAIN));
         } else if (ndkArchitecture.startsWith("x86")) {
             gdbServerLocations.add("android-x86");
             gdbServerLocations.addAll(Arrays.asList(X86_TOOLCHAIN));
-        } else if (ndkArchitecture.startsWith("mips64")) {
+        } else if (ndkArchitecture.startsWith(MIPS_64)) {
             gdbServerLocations.add("android-mips64");
             gdbServerLocations.addAll(Arrays.asList(MIPS64_TOOLCHAIN));
         } else if (ndkArchitecture.startsWith("mips")) {

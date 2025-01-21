@@ -16,6 +16,7 @@
 package com.github.cardforge.maven.plugins.android;
 
 import com.android.SdkConstants;
+import com.android.annotations.NonNull;
 import com.android.annotations.Nullable;
 import com.android.repository.Revision;
 import com.android.repository.api.LocalPackage;
@@ -26,6 +27,8 @@ import com.android.sdklib.IAndroidTarget;
 import com.android.sdklib.repository.AndroidSdkHandler;
 import com.android.sdklib.repository.targets.AndroidTargetManager;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -42,7 +45,7 @@ import java.util.function.Predicate;
 public class AndroidSdk {
     public static final String CANNOT_FIND_S = "Cannot find ";
     /**
-     * the default API level for the SDK used as a fall back if none is supplied,
+     * the default API level for the SDK used as a fallback if none is supplied,
      * should ideally point to the latest available version
      */
     private static final String DEFAULT_ANDROID_API_LEVEL = "26";
@@ -63,6 +66,7 @@ public class AndroidSdk {
             + "configuration parameter <sdk><path>...</path></sdk> in the plugin <configuration/>. As an alternative,"
             + " you may add the parameter to commandline: -Dandroid.sdk.path=... or set environment variable "
             + AbstractAndroidMojo.ENV_ANDROID_HOME + ".";
+    private static final Logger log = LoggerFactory.getLogger(AndroidSdk.class);
     private final File sdkPath;
     private final IAndroidTarget androidTarget;
     private final String buildToolsVersion;
@@ -80,6 +84,7 @@ public class AndroidSdk {
         this.sdkPath = sdkPath;
         this.buildToolsVersion = buildToolsVersion;
         this.progressIndicator = new ProgressIndicatorImpl();
+        String path = "";
 
         if (sdkPath != null) {
             sdkManager = AndroidSdkHandler.getInstance(sdkPath);
@@ -89,6 +94,7 @@ public class AndroidSdk {
             if (sdkManager == null) {
                 throw invalidSdkException(sdkPath, apiLevel);
             }
+            path = sdkPath.getPath();
         }
 
         /*
@@ -99,17 +105,16 @@ public class AndroidSdk {
          *  tools without having your code break when new versions are released. For information about the deprecated
          *  SDK Tools package, see the SDK Tools release notes. TODO: Android SDK Command-Line Tools
          */
-        //loadSDKToolsMajorVersion();
+        //loadSDKToolsMajorVersion(); // noinspection CommentedOutCode
 
         if (apiLevel == null) {
             apiLevel = DEFAULT_ANDROID_API_LEVEL;
         }
-        System.out.println("API: " + apiLevel + " | SDK Path: " + sdkPath.getPath() + " | Buildtools: "
-                + buildToolsVersion);
+        log.info("API: {} | SDK Path: {} | Buildtools: {}", apiLevel, path, buildToolsVersion);
 
         androidTarget = findPlatformByApiLevel(apiLevel);
         if (androidTarget == null) {
-            throw invalidSdkException(sdkPath, apiLevel);
+            throw invalidSdkException(new File(path), apiLevel);
         }
     }
 
@@ -121,14 +126,15 @@ public class AndroidSdk {
         }
     }
 
-    private InvalidSdkException invalidSdkException(File sdkPath, String platformOrApiLevel) {
+    private InvalidSdkException invalidSdkException(@NonNull File sdkPath, String platformOrApiLevel) {
         throw new InvalidSdkException("Invalid SDK: Platform/API level " + platformOrApiLevel
                 + " not available. This command should give you all you need:\n" + sdkPath.getAbsolutePath()
                 + File.separator + "tools" + File.separator + "android update sdk --no-ui --obsolete --force");
     }
 
+    @Nullable
     private IAndroidTarget findPlatformByApiLevel(String apiLevel) {
-        // try find by api level first
+        // try to find by api level first
         AndroidVersion version;
         try {
             version = new AndroidVersion(apiLevel);
@@ -240,9 +246,9 @@ public class AndroidSdk {
     }
 
     /**
-     * Get the path for mainDexClasses.rules
+     * Get the path for {@code mainDexClasses.rules}
      *
-     * @return the path to the mainDexClasses.rules
+     * @return the path to the {@code mainDexClasses.rules}
      */
     public String getMainDexClassesRulesPath() {
         File mainDexClassesRules = new File(getBuildToolInfo().getLocation(),
@@ -320,7 +326,7 @@ public class AndroidSdk {
     }
 
     /**
-     * Get the path to the tools directory.
+     * Get the path to the tools' directory.
      *
      * @return the path to the tools directory
      */
@@ -332,9 +338,10 @@ public class AndroidSdk {
         return getBuildToolInfo().getPath(pathId);
     }
 
+    @NonNull
     private BuildToolInfo getBuildToolInfo() {
         //First we use the build tools specified in the pom file
-        if (buildToolsVersion != null && !buildToolsVersion.equals("")) {
+        if (buildToolsVersion != null && !buildToolsVersion.isEmpty()) {
             BuildToolInfo buildToolInfo = sdkManager.getBuildToolInfo(Revision.parseRevision(buildToolsVersion),
                     progressIndicator);
             if (buildToolInfo != null) {
@@ -371,10 +378,12 @@ public class AndroidSdk {
         return latestBuildToolInfo;
     }
 
+    @NonNull
     private String getPathForPlatformTool(String tool) {
         return new File(platformToolsPath, tool).getAbsolutePath();
     }
 
+    @NonNull
     private String getPathForTool(String tool) {
         return new File(toolsPath, tool).getAbsolutePath();
     }
@@ -410,7 +419,7 @@ public class AndroidSdk {
      * Resolves the android.jar from this SDK.
      *
      * @return a <code>File</code> pointing to the android.jar file.
-     * @throws org.apache.maven.plugin.MojoExecutionException if the file can not be resolved.
+     * @throws MojoExecutionException if the file can not be resolved.
      */
     public File getAndroidJar() throws MojoExecutionException {
         final String androidJarPath = androidTarget.getPath(IAndroidTarget.ANDROID_JAR);
@@ -424,7 +433,7 @@ public class AndroidSdk {
      * Resolves the path for this SDK.
      *
      * @return a <code>File</code> pointing to the SDk Directory.
-     * @throws org.apache.maven.plugin.MojoExecutionException if the file can not be resolved.
+     * @throws MojoExecutionException if the file can not be resolved.
      */
     public File getSdkPath() throws MojoExecutionException {
         if (sdkPath.exists()) {

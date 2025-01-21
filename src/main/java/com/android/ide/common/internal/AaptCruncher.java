@@ -47,7 +47,7 @@ public class AaptCruncher implements PngCruncher {
      *
      * @param from the file to crunch
      * @param to   the output file
-     * @throws PngException
+     * @throws PngException if the crunching failed.
      */
     @Override
     public void crunchPng(@NonNull File from, @NonNull File to) throws PngException {
@@ -55,10 +55,7 @@ public class AaptCruncher implements PngCruncher {
         try {
             ProcessInfo processInfo = new ProcessInfoBuilder()
                     .setExecutable(mAaptLocation)
-                    .addArgs("s",
-                            "-i",
-                            from.getAbsolutePath(),
-                            "-o",
+                    .addArgs("s", "-i", from.getAbsolutePath(), "-o",
                             to.getAbsolutePath()).createProcess();
 
             ProcessResult result = mProcessExecutor.execute(processInfo, mProcessOutputHandler);

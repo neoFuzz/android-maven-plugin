@@ -29,7 +29,10 @@ import com.android.sdklib.SdkVersionInfo;
 import com.android.utils.Pair;
 import com.android.utils.PositionXmlParser;
 import com.android.utils.XmlUtils;
-import com.google.common.base.Optional;
+
+import java.util.Objects;
+import java.util.Optional;
+
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
@@ -40,6 +43,7 @@ import org.w3c.dom.NodeList;
 
 import java.util.concurrent.atomic.AtomicReference;
 
+import static com.android.manifmerger.ManifestModel.ATTRIBUTE_PACKAGE;
 import static com.android.manifmerger.ManifestModel.NodeTypes.USES_PERMISSION;
 import static com.android.manifmerger.ManifestModel.NodeTypes.USES_SDK;
 import static com.android.manifmerger.PlaceholderHandler.KeyBasedValueResolver;
@@ -58,7 +62,7 @@ public class XmlDocument {
     private final Element mRootElement;
     // this is initialized lazily to avoid un-necessary early parsing.
     @NonNull
-    private final AtomicReference<XmlElement> mRootNode = new AtomicReference<XmlElement>(null);
+    private final AtomicReference<XmlElement> mRootNode = new AtomicReference<>(null);
     @NonNull
     private final SourceFile mSourceFile;
     @NonNull
@@ -144,7 +148,7 @@ public class XmlDocument {
      * @param lowerPriorityDocument the lower priority document to merge in.
      * @param mergingReportBuilder  the merging report to record errors and actions.
      * @return a new merged {@link com.android.manifmerger.XmlDocument} or
-     * {@link Optional#absent()} if there were errors during the merging activities.
+     * {@link Optional#empty()} if there were errors during the merging activities.
      */
     @NonNull
     public Optional<XmlDocument> merge(
@@ -161,7 +165,7 @@ public class XmlDocument {
      * @param mergingReportBuilder   the merging report to record errors and actions.
      * @param addImplicitPermissions whether to perform implicit permission addition.
      * @return a new merged {@link com.android.manifmerger.XmlDocument} or
-     * {@link Optional#absent()} if there were errors during the merging activities.
+     * {@link Optional#empty()} if there were errors during the merging activities.
      */
     @NonNull
     public Optional<XmlDocument> merge(
@@ -178,16 +182,16 @@ public class XmlDocument {
 
         addImplicitElements(lowerPriorityDocument, mergingReportBuilder, addImplicitPermissions);
 
-        // force re-parsing as new nodes may have appeared.
+        // force reparsing as new nodes may have appeared.
         return mergingReportBuilder.hasErrors()
-                ? Optional.<XmlDocument>absent()
+                ? Optional.empty()
                 : Optional.of(reparse());
     }
 
     /**
-     * Forces a re-parsing of the document
+     * Forces a reparsing of the document
      *
-     * @return a new {@link com.android.manifmerger.XmlDocument} with up to date information.
+     * @return a new {@link com.android.manifmerger.XmlDocument} with up-to-date information.
      */
     @NonNull
     public XmlDocument reparse() {
@@ -224,7 +228,7 @@ public class XmlDocument {
      *
      * @param other the other document to compare against.
      * @return a {@link String} describing the differences between the two XML elements or
-     * {@link Optional#absent()} if they are equals.
+     * {@link Optional#empty()} if they are equals.
      */
     @SuppressWarnings("CovariantCompareTo")
     public Optional<String> compareTo(@NonNull XmlDocument other) {
@@ -266,7 +270,7 @@ public class XmlDocument {
      * @return the package name to do partial class names resolution.
      */
     public String getPackageName() {
-        return mMainManifestPackageName.or(mRootElement.getAttribute("package"));
+        return mMainManifestPackageName.orElse(mRootElement.getAttribute(ATTRIBUTE_PACKAGE));
     }
 
     /**
@@ -285,7 +289,7 @@ public class XmlDocument {
      * @return the package name to use for attribute expansion.
      */
     public String getPackageNameForAttributeExpansion() {
-        String aPackage = mRootElement.getAttribute("package");
+        String aPackage = mRootElement.getAttribute(ATTRIBUTE_PACKAGE);
         if (aPackage != null) {
             return aPackage;
         }
@@ -297,11 +301,11 @@ public class XmlDocument {
 
     public Optional<XmlAttribute> getPackage() {
         Optional<XmlAttribute> packageAttribute =
-                getRootNode().getAttribute(XmlNode.fromXmlName("package"));
+                getRootNode().getAttribute(XmlNode.fromXmlName(ATTRIBUTE_PACKAGE));
         return packageAttribute.isPresent()
                 ? packageAttribute
                 : getRootNode().getAttribute(XmlNode.fromNSName(
-                SdkConstants.ANDROID_URI, "android", "package"));
+                SdkConstants.ANDROID_URI, "android", ATTRIBUTE_PACKAGE));
     }
 
     public Document getXml() {
@@ -369,10 +373,7 @@ public class XmlDocument {
         // check for system properties.
         String injectedTargetVersion = mSystemPropertyResolver
                 .getValue(ManifestSystemProperty.TARGET_SDK_VERSION);
-        if (injectedTargetVersion != null) {
-            return injectedTargetVersion;
-        }
-        return getRawTargetSdkVersion();
+        return Objects.requireNonNullElseGet(injectedTargetVersion, this::getRawTargetSdkVersion);
     }
 
     /**
@@ -419,47 +420,49 @@ public class XmlDocument {
         // if library is using a code name rather than an API level, make sure this document target
         // sdk version is using the same code name.
         String libraryTargetSdkVersion = lowerPriorityDocument.getTargetSdkVersion();
-        if (!Character.isDigit(libraryTargetSdkVersion.charAt(0))) {
+        if (!Character.isDigit(libraryTargetSdkVersion.charAt(0)) &&
+                !libraryTargetSdkVersion.equals(getTargetSdkVersion())) {
             // this is a code name, ensure this document uses the same code name.
-            if (!libraryTargetSdkVersion.equals(getTargetSdkVersion())) {
-                mergingReport.addMessage(getSourceFile(), MergingReport.Record.Severity.ERROR,
-                        String.format(
-                                "uses-sdk:targetSdkVersion %1$s cannot be different than version "
-                                        + "%2$s declared in library %3$s",
-                                getTargetSdkVersion(),
-                                libraryTargetSdkVersion,
-                                lowerPriorityDocument.getSourceFile().print(false)
-                        )
-                );
-                return;
-            }
+            mergingReport.addMessage(getSourceFile(), MergingReport.Record.Severity.ERROR,
+                    String.format(
+                            "uses-sdk:targetSdkVersion %1$s cannot be different than version "
+                                    + "%2$s declared in library %3$s",
+                            getTargetSdkVersion(),
+                            libraryTargetSdkVersion,
+                            lowerPriorityDocument.getSourceFile().print(false)
+                    )
+            );
+            return;
         }
+
         // same for minSdkVersion, if the library is using a code name, the application must
         // also be using the same code name.
         String libraryMinSdkVersion = lowerPriorityDocument.getRawMinSdkVersion();
-        if (!Character.isDigit(libraryMinSdkVersion.charAt(0))) {
+        if (!Character.isDigit(libraryMinSdkVersion.charAt(0)) &&
+                !libraryMinSdkVersion.equals(getMinSdkVersion())) {
             // this is a code name, ensure this document uses the same code name.
-            if (!libraryMinSdkVersion.equals(getMinSdkVersion())) {
-                mergingReport.addMessage(getSourceFile(), MergingReport.Record.Severity.ERROR,
-                        String.format(
-                                "uses-sdk:minSdkVersion %1$s cannot be different than version "
-                                        + "%2$s declared in library %3$s",
-                                getMinSdkVersion(),
-                                libraryMinSdkVersion,
-                                lowerPriorityDocument.getSourceFile().print(false)
-                        )
-                );
-                return;
-            }
+            mergingReport.addMessage(getSourceFile(), MergingReport.Record.Severity.ERROR,
+                    String.format(
+                            "uses-sdk:minSdkVersion %1$s cannot be different than version "
+                                    + "%2$s declared in library %3$s",
+                            getMinSdkVersion(),
+                            libraryMinSdkVersion,
+                            lowerPriorityDocument.getSourceFile().print(false)
+                    )
+            );
+            return;
         }
+
 
         if (!checkUsesSdkMinVersion(lowerPriorityDocument, mergingReport)) {
             String error = String.format(
-                    "uses-sdk:minSdkVersion %1$s cannot be smaller than version "
-                            + "%2$s declared in library %3$s as the library might be using APIs not available in %1$s\n"
-                            + "\tSuggestion: use a compatible library with a minSdk of at most %1$s,\n"
-                            + "\t\tor increase this project's minSdk version to at least %2$s,\n"
-                            + "\t\tor use tools:overrideLibrary=\"%4$s\" to force usage (may lead to runtime failures)",
+                    """
+                            uses-sdk:minSdkVersion %1$s cannot be smaller than version \
+                            %2$s declared in library %3$s as the library might be using APIs not available in %1$s
+                            \tSuggestion: use a compatible library with a minSdk of at most %1$s,
+                            \t\tor increase this project's minSdk version to at least %2$s,
+                            \t\tor use tools:overrideLibrary="%4$s" to force usage (may lead to runtime failures)
+                            """,
                     getMinSdkVersion(),
                     lowerPriorityDocument.getRawMinSdkVersion(),
                     lowerPriorityDocument.getSourceFile().print(false),
@@ -579,7 +582,7 @@ public class XmlDocument {
      * @param nodeType       the node type to crete
      * @param keyValue       the optional key for the element.
      * @param attributes     the optional array of key value pairs for extra element attribute.
-     * @return the Xml element whether it was created or existed or {@link Optional#absent()} if
+     * @return the Xml element whether it was created or existed or {@link Optional#empty()} if
      * it does not exist in this document.
      */
     private Optional<Element> addIfAbsent(
@@ -591,7 +594,7 @@ public class XmlDocument {
 
         Optional<XmlElement> xmlElementOptional = getByTypeAndKey(nodeType, keyValue);
         if (xmlElementOptional.isPresent()) {
-            return Optional.absent();
+            return Optional.empty();
         }
         Element elementNS = getXml().createElement(nodeType.toXmlName());
 
@@ -645,8 +648,8 @@ public class XmlDocument {
         NodeList childrenNodeList = element.getChildNodes();
         for (int i = 0; i < childrenNodeList.getLength(); i++) {
             Node n = childrenNodeList.item(i);
-            if (n instanceof Element) {
-                clearNodeNamespaces((Element) n);
+            if (n instanceof Element e) {
+                clearNodeNamespaces(e);
             }
         }
     }

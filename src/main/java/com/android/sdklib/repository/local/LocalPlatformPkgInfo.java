@@ -62,7 +62,7 @@ public class LocalPlatformPkgInfo extends LocalPkgInfo {
     @NonNull
     private final IPkgDesc mDesc;
     /**
-     * Android target, lazyly loaded from #getAndroidTarget
+     * Android target, lazily loaded from #getAndroidTarget
      */
     private IAndroidTarget mTarget;
     private boolean mLoaded;
@@ -87,7 +87,7 @@ public class LocalPlatformPkgInfo extends LocalPkgInfo {
      * @param platform The folder containing the platform.
      * @return An error description if platform is rejected; null if no error is detected.
      */
-    @NonNull
+    @Nullable
     private static String checkPlatformContent(IFileOp fileOp, @NonNull File platform) {
         for (String relativePath : sPlatformContentList) {
             File f = new File(platform, relativePath);
@@ -174,10 +174,10 @@ public class LocalPlatformPkgInfo extends LocalPkgInfo {
             return null;
         }
 
-        Map<String, String> platformProp = new HashMap<String, String>();
+        Map<String, String> platformProp = new HashMap<>();
 
         // add all the property files
-        Map<String, String> map = null;
+        Map<String, String> map;
 
         try {
             map = ProjectProperties.parsePropertyStream(
@@ -188,6 +188,7 @@ public class LocalPlatformPkgInfo extends LocalPkgInfo {
                 platformProp.putAll(map);
             }
         } catch (FileNotFoundException ignore) {
+            // this should not happen since we checked the file above.
         }
 
         try {
@@ -199,6 +200,7 @@ public class LocalPlatformPkgInfo extends LocalPkgInfo {
                 platformProp.putAll(map);
             }
         } catch (FileNotFoundException ignore) {
+            // this should not happen since we checked the file above.
         }
 
         File sdkPropFile = new File(platformFolder, SdkConstants.FN_SDK_PROP);
@@ -212,6 +214,7 @@ public class LocalPlatformPkgInfo extends LocalPkgInfo {
                     platformProp.putAll(map);
                 }
             } catch (FileNotFoundException ignore) {
+                // this should not happen since we checked the file above.
             }
         }
 
@@ -306,7 +309,7 @@ public class LocalPlatformPkgInfo extends LocalPkgInfo {
                 sdk.getLatestBuildTool());
 
         // add the skins from the platform. Make a copy to not modify the original collection.
-        List<File> skins = new ArrayList<File>(parseSkinFolder(pt.getFile(IAndroidTarget.SKINS)));
+        List<File> skins = new ArrayList<>(parseSkinFolder(pt.getFile(IAndroidTarget.SKINS)));
 
         // add the system-image specific skins, if any.
         for (ISystemImage systemImage : systemImages) {
@@ -347,7 +350,7 @@ public class LocalPlatformPkgInfo extends LocalPkgInfo {
     private ISystemImage[] getPlatformSystemImages(IFileOp fileOp,
                                                    File platformDir,
                                                    AndroidVersion apiVersion) {
-        Set<ISystemImage> found = new TreeSet<ISystemImage>();
+        Set<ISystemImage> found = new TreeSet<>();
         SetMultimap<IdDisplay, String> tagToAbiFound = TreeMultimap.create();
 
 
@@ -358,28 +361,7 @@ public class LocalPlatformPkgInfo extends LocalPkgInfo {
         LocalPkgInfo[] sysImgInfos = getLocalSdk().getPkgsInfos(PkgType.PKG_SYS_IMAGE);
         for (LocalPkgInfo pkg : sysImgInfos) {
             IPkgDesc d = pkg.getDesc();
-            if (pkg instanceof LocalSysImgPkgInfo &&
-                    !d.hasVendor() &&
-                    apiVersion.equals(d.getAndroidVersion())) {
-                IdDisplay tag = d.getTag();
-                String abi = d.getPath();
-                if (tag != null && abi != null && !tagToAbiFound.containsEntry(tag, abi)) {
-                    List<File> parsedSkins = parseSkinFolder(
-                            new File(pkg.getLocalDir(), SdkConstants.FD_SKINS));
-                    File[] skins = FileOp.EMPTY_FILE_ARRAY;
-                    if (!parsedSkins.isEmpty()) {
-                        skins = parsedSkins.toArray(new File[parsedSkins.size()]);
-                    }
-
-                    found.add(new SystemImage(
-                            pkg.getLocalDir(),
-                            LocationType.IN_SYSTEM_IMAGE,
-                            tag,
-                            abi,
-                            skins));
-                    tagToAbiFound.put(tag, abi);
-                }
-            }
+            findVersion(apiVersion, pkg, d, tagToAbiFound, found);
         }
 
         // Look in either the platform/images/abi or the legacy folder
@@ -389,7 +371,7 @@ public class LocalPlatformPkgInfo extends LocalPkgInfo {
         boolean hasImgFiles = false;
         final IdDisplay defaultTag = SystemImage.DEFAULT_TAG;
 
-        // Look for sub-directories
+        // Look for subdirectories
         for (File file : files) {
             if (fileOp.isDirectory(file)) {
                 useLegacy = false;
@@ -403,18 +385,18 @@ public class LocalPlatformPkgInfo extends LocalPkgInfo {
                             FileOp.EMPTY_FILE_ARRAY));
                     tagToAbiFound.put(defaultTag, abi);
                 }
-            } else if (!hasImgFiles && fileOp.isFile(file)) {
-                if (file.getName().endsWith(".img")) {      //$NON-NLS-1$
-                    hasImgFiles = true;
-                }
+            } else if (!hasImgFiles && fileOp.isFile(file) &&
+                    file.getName().endsWith(".img")) {      //$NON-NLS-1$
+                hasImgFiles = true;
             }
+
         }
 
         if (useLegacy &&
                 hasImgFiles &&
                 fileOp.isDirectory(imgDir) &&
                 !tagToAbiFound.containsEntry(defaultTag, SdkConstants.ABI_ARMEABI)) {
-            // We found no sub-folder system images but it looks like the top directory
+            // We found no sub-folder system images, but it looks like the top directory
             // has some img files in it. It must be a legacy ARM EABI system image folder.
             found.add(new SystemImage(
                     imgDir,
@@ -427,6 +409,32 @@ public class LocalPlatformPkgInfo extends LocalPkgInfo {
         return found.toArray(new ISystemImage[found.size()]);
     }
 
+    private void findVersion(AndroidVersion apiVersion, LocalPkgInfo pkg, IPkgDesc d,
+                             SetMultimap<IdDisplay, String> tagToAbiFound, Set<ISystemImage> found) {
+        if (pkg instanceof LocalSysImgPkgInfo &&
+                !d.hasVendor() &&
+                apiVersion.equals(d.getAndroidVersion())) {
+            IdDisplay tag = d.getTag();
+            String abi = d.getPath();
+            if (tag != null && abi != null && !tagToAbiFound.containsEntry(tag, abi)) {
+                List<File> parsedSkins = parseSkinFolder(
+                        new File(pkg.getLocalDir(), SdkConstants.FD_SKINS));
+                File[] skins = FileOp.EMPTY_FILE_ARRAY;
+                if (!parsedSkins.isEmpty()) {
+                    skins = parsedSkins.toArray(new File[parsedSkins.size()]);
+                }
+
+                found.add(new SystemImage(
+                        pkg.getLocalDir(),
+                        LocationType.IN_SYSTEM_IMAGE,
+                        tag,
+                        abi,
+                        skins));
+                tagToAbiFound.put(tag, abi);
+            }
+        }
+    }
+
     /**
      * Parses the skin folder and builds the skin list.
      *
@@ -437,7 +445,7 @@ public class LocalPlatformPkgInfo extends LocalPkgInfo {
         IFileOp fileOp = getLocalSdk().getFileOp();
 
         if (fileOp.isDirectory(skinRootFolder)) {
-            ArrayList<File> skinList = new ArrayList<File>();
+            ArrayList<File> skinList = new ArrayList<>();
 
             File[] files = fileOp.listFiles(skinRootFolder);
 
@@ -447,7 +455,7 @@ public class LocalPlatformPkgInfo extends LocalPkgInfo {
                     File layout = new File(skinFolder, SdkConstants.FN_SKIN_LAYOUT);
 
                     if (fileOp.isFile(layout)) {
-                        // for now we don't parse the content of the layout and
+                        // for now, we don't parse the content of the layout and
                         // simply add the directory to the list.
                         skinList.add(skinFolder);
                     }

@@ -24,7 +24,10 @@ import com.android.builder.model.SigningConfig;
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Objects;
 
+import java.io.Serial;
+
 public class DefaultBuildType extends BaseConfigImpl implements BuildType {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     private final String mName;
@@ -37,7 +40,7 @@ public class DefaultBuildType extends BaseConfigImpl implements BuildType {
     private String mApplicationIdSuffix = null;
     private String mVersionNameSuffix = null;
     private boolean mMinifyEnabled = false;
-    private SigningConfig mSigningConfig = null;
+    private transient SigningConfig mSigningConfig = null;
     private boolean mEmbedMicroApp = true;
 
     private boolean mZipAlignEnabled = true;

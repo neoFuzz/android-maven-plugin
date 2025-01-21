@@ -1,5 +1,6 @@
 package com.github.cardforge.maven.plugins.android.phase04processclasses;
 
+import com.android.annotations.NonNull;
 import com.github.cardforge.maven.plugins.android.AbstractAndroidMojo;
 import com.github.cardforge.maven.plugins.android.configuration.Emma;
 import com.vladium.emma.instr.InstrProcessor;
@@ -61,7 +62,7 @@ public class EmmaMojo extends AbstractAndroidMojo {
     private String emmaClassFolders;
 
     /**
-     * Path of the emma meta data file (.em).
+     * Path of the emma metadata file (.em).
      */
     @Parameter(property = "android.emma.outputMetaFile", defaultValue = "${project.build.directory}/emma/coverage.em")
     private File emmaOutputMetaFile;
@@ -78,6 +79,12 @@ public class EmmaMojo extends AbstractAndroidMojo {
     private String parsedOutputMetadataFile;
     private String parsedFilters;
 
+    /**
+     * Executes the EmmaMojo by creating an InstrProcessor and running it with the parsed configuration.
+     *
+     * @throws MojoExecutionException if the execution fails
+     * @throws MojoFailureException   if the execution fails
+     */
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
         getLog().debug("Emma start working. Before parse configuration");
@@ -106,6 +113,9 @@ public class EmmaMojo extends AbstractAndroidMojo {
                         + ") target/classes files are safe");
     }
 
+    /**
+     * @throws MojoExecutionException if the configuration is invalid or if the directory does not exist or is not a directory
+     */
     private void parseConfiguration() throws MojoExecutionException {
         if (emma != null) {
             if (emma.isEnable() == null) {
@@ -135,12 +145,20 @@ public class EmmaMojo extends AbstractAndroidMojo {
         }
     }
 
+    /**
+     * @return default metadata file
+     */
+    @NonNull
     private String getDefaultMetaDataFile() {
         File outputFolder = new File(targetDirectory + File.separator + EMMA_FOLDER_NAME
                 + File.separator + COVERAGE_METADATA_NAME);
         return outputFolder.getAbsolutePath();
     }
 
+    /**
+     * @return default compiled folders
+     */
+    @NonNull
     private String[] getDefaultCompiledFolders() {
         File sourceJavaFolder = new File(targetDirectory + File.separator + CLASSES_FOLDER_NAME
                 + File.separator);
@@ -148,6 +166,11 @@ public class EmmaMojo extends AbstractAndroidMojo {
                 {sourceJavaFolder.getAbsolutePath()};
     }
 
+    /**
+     * @return an array of all compiled directories
+     * @throws MojoExecutionException if the directory does not exist or is not a directory
+     */
+    @NonNull
     private String[] getAllCompiledDirectory() throws MojoExecutionException {
         String classFoldersTemp = emma.getClassFolders();
         String[] classFolders;
@@ -157,7 +180,7 @@ public class EmmaMojo extends AbstractAndroidMojo {
         } else {
             classFolders = classFoldersTemp.split(",");
         }
-        ArrayList<String> classFoldersArray = new ArrayList<String>();
+        ArrayList<String> classFoldersArray = new ArrayList<>();
         for (String folder : classFolders) {
             File directory = new File(folder);
             if (directory.exists() && directory.isDirectory()) {

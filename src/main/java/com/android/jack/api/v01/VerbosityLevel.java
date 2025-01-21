@@ -16,13 +16,24 @@
 
 package com.android.jack.api.v01;
 
-
 /**
  * Jack verbosity level
  */
 public enum VerbosityLevel {
+    /**
+     * Error messages only
+     */
     ERROR,
+    /**
+     * Error and warning messages
+     */
     WARNING,
+    /**
+     * Error, warning and info messages
+     */
     INFO,
+    /**
+     * Error, warning, info and debug messages
+     */
     DEBUG
 }

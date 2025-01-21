@@ -27,7 +27,7 @@ import org.apache.maven.plugin.logging.Log;
  */
 public class LogSyncProgressMonitor implements SyncService.ISyncProgressMonitor {
     private static final String INDENT = "  ";
-    private Log log;
+    private final Log log;
 
     public LogSyncProgressMonitor(Log log) {
         this.log = log;

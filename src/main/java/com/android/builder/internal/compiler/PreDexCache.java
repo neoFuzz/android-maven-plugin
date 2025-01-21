@@ -24,12 +24,10 @@ import com.android.ide.common.process.JavaProcessExecutor;
 import com.android.ide.common.process.ProcessException;
 import com.android.ide.common.process.ProcessOutputHandler;
 import com.android.sdklib.BuildToolInfo;
-import com.android.sdklib.repository.FullRevision;
 import com.android.utils.Pair;
 import com.google.common.io.Files;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
-import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
 import java.io.File;
@@ -70,22 +68,16 @@ public class PreDexCache extends PreProcessCache<DexKey> {
 
     private static void checkSame(@NonNull File source, @NonNull File dest) {
         if (source.equals(dest)) {
-            Logger.getAnonymousLogger().info(
-                    String.format("%s l:%d ts:%d", source, source.length(), source.lastModified()));
+            String s = String.format("%s l:%d ts:%d", source, source.length(), source.lastModified());
+            Logger.getAnonymousLogger().info(s);
         }
     }
 
     @Override
     @NonNull
     protected KeyFactory<DexKey> getKeyFactory() {
-        return new KeyFactory<DexKey>() {
-            @Override
-            public DexKey of(@NonNull File sourceFile, @NonNull FullRevision revision,
-                             @NonNull NamedNodeMap attrMap) {
-                return DexKey.of(sourceFile, revision,
-                        Boolean.parseBoolean(attrMap.getNamedItem(ATTR_JUMBO_MODE).getNodeValue()));
-            }
-        };
+        return (sourceFile, revision, attrMap) -> DexKey.of(sourceFile, revision,
+                Boolean.parseBoolean(attrMap.getNamedItem(ATTR_JUMBO_MODE).getNodeValue()));
     }
 
     /**
@@ -98,9 +90,9 @@ public class PreDexCache extends PreProcessCache<DexKey> {
      * @param buildToolInfo   the build tools info
      * @param verbose         verbose flag
      * @param processExecutor the process executor
-     * @throws IOException
-     * @throws ProcessException
-     * @throws InterruptedException
+     * @throws IOException          if an IO error occurs
+     * @throws ProcessException     if the pre-dexing failed
+     * @throws InterruptedException if the pre-dexing was interrupted
      */
     public void preDexLibrary(
             @NonNull File inputFile,
@@ -123,9 +115,9 @@ public class PreDexCache extends PreProcessCache<DexKey> {
         Item item = pair.getFirst();
 
         // if this is a new item
-        if (pair.getSecond()) {
+        if (Boolean.TRUE.equals(pair.getSecond())) {
             try {
-                // haven't process this file yet so do it and record it.
+                // haven't processed this file yet so do it and record it.
                 List<File> files = AndroidBuilder.preDexLibrary(
                         inputFile,
                         outFile,

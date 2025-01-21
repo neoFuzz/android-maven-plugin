@@ -1,5 +1,6 @@
 package com.github.cardforge.maven.plugins.android.common;
 
+import com.android.annotations.NonNull;
 import org.codehaus.plexus.util.DirectoryScanner;
 
 import java.io.File;
@@ -25,7 +26,7 @@ public final class FileRetriever {
      * @return <code>String[]</code> of the files' paths and names, relative to <code>baseDirectory</code>. Empty
      * <code>String[]</code> if <code>baseDirectory</code> does not exist.
      */
-    public String[] getFileNames(File baseDirectory) {
+    public String[] getFileNames(@NonNull File baseDirectory) {
         if (!baseDirectory.exists()) {
             return new String[0];
         }

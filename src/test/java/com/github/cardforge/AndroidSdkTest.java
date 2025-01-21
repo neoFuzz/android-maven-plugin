@@ -135,29 +135,33 @@ public class AndroidSdkTest {
     @Test
     public void validPlatformsAndApiLevelsWithDiffBuildTools1() {
         // Remember to add further platforms to .travis.yml if you add more platforms here, otherwise ci build fails
-        final AndroidSdk sdk = new AndroidSdk(new File(sdkTestSupport.getenvAndroidHome()), "19", "28.0.3");
+        final AndroidSdk sdk = platformSetup("19", "28.0.3");
         Assert.assertTrue(sdk.getAaptPath() != null && !sdk.getAaptPath().equals(""));
     }
 
     @Test
     public void validPlatformsAndApiLevelsWithDiffBuildTools2() {
         // Remember to add further platforms to .travis.yml if you add more platforms here, otherwise ci build fails
-        final AndroidSdk sdk = new AndroidSdk(new File(sdkTestSupport.getenvAndroidHome()), "19", "28");
+        final AndroidSdk sdk = platformSetup("19", "28");
         Assert.assertTrue(sdk.getAaptPath() != null && !sdk.getAaptPath().equals(""));
     }
 
     @Test
     public void validPlatformsAndApiLevelsWithDiffBuildTools3() {
         // Remember to add further platforms to .travis.yml if you add more platforms here, otherwise ci build fails
-        final AndroidSdk sdk = new AndroidSdk(new File(sdkTestSupport.getenvAndroidHome()), "28", "30");
+        final AndroidSdk sdk = platformSetup("28", "30");
         Assert.assertTrue(sdk.getAaptPath() != null && !sdk.getAaptPath().equals(""));
     }
 
     @Test
     public void validPlatformsAndApiLevelsWithDiffBuildTools4() {
         // Remember to add further platforms to .travis.yml if you add more platforms here, otherwise ci build fails
-        final AndroidSdk sdk = new AndroidSdk(new File(sdkTestSupport.getenvAndroidHome()), "35", "35.0.0");
-        Assert.assertTrue(sdk.getAaptPath() != null && !sdk.getAaptPath().equals(""));
+        final AndroidSdk sdk = platformSetup("35", "35.0.1");
+        Assert.assertTrue(sdk.getAaptPath() != null && !sdk.getAaptPath().isEmpty());
+    }
+
+    public AndroidSdk platformSetup(String api, String buildTools) {
+        return new AndroidSdk(new File(sdkTestSupport.getenvAndroidHome()), api, buildTools);
     }
 
 }

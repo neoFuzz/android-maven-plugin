@@ -1,5 +1,6 @@
 package com.android.ddmlib.testrunner;
 
+import com.android.annotations.NonNull;
 import com.android.ddmlib.*;
 
 import java.io.IOException;
@@ -26,14 +27,14 @@ public class MonkeyTestRunner {
     private static final String PACKAGE_ARG_NAME = "-p";
     private static final String CATEGORY_ARG_NAME = "-c";
     private final int eventCount;
-    private IDevice mRemoteDevice;
-    // default to no timeout
-    private int mMaxTimeToOutputResponse = 0;
-    private String mRunName = null;
+    private final IDevice mRemoteDevice;
     /**
      * map of name-value instrumentation argument pairs
      */
-    private List<Entry<String, String>> mArgList;
+    private final List<Entry<String, String>> mArgList;
+    // default to no timeout
+    private int mMaxTimeToOutputResponse = 0;
+    private String mRunName = null;
     private MonkeyResultParser mParser;
     private boolean ignoreCrashes;
     private boolean debugNoEvents;
@@ -46,7 +47,7 @@ public class MonkeyTestRunner {
     public MonkeyTestRunner(int eventCount, IDevice remoteDevice) {
         this.eventCount = eventCount;
         mRemoteDevice = remoteDevice;
-        mArgList = new ArrayList<Entry<String, String>>();
+        mArgList = new ArrayList<>();
     }
 
     /**
@@ -56,7 +57,7 @@ public class MonkeyTestRunner {
         if (name == null || value == null) {
             throw new IllegalArgumentException("name or value arguments cannot be null");
         }
-        mArgList.add(new AbstractMap.SimpleImmutableEntry<String, String>(name, value));
+        mArgList.add(new AbstractMap.SimpleImmutableEntry<>(name, value));
     }
 
     /**
@@ -114,13 +115,13 @@ public class MonkeyTestRunner {
         addLongArg(PERCENT_ANYEVENT_ARG_NAME, percent);
     }
 
-    public void setPackages(String[] packages) {
+    public void setPackages(@NonNull String[] packages) {
         for (String packageName : packages) {
             addArg(PACKAGE_ARG_NAME, packageName);
         }
     }
 
-    public void setCategories(String[] categories) {
+    public void setCategories(@NonNull String[] categories) {
         for (String category : categories) {
             addArg(CATEGORY_ARG_NAME, category);
         }
@@ -193,7 +194,7 @@ public class MonkeyTestRunner {
             mRemoteDevice.executeShellCommand(runCaseCommandStr, mParser, mMaxTimeToOutputResponse);
         } catch (IOException e) {
             Log.w(LOG_TAG,
-                    String.format("IOException %1$s when running monkey tests on %3$s", e.toString(),
+                    String.format("IOException %1$s when running monkey tests on %3$s", e,
                             mRemoteDevice.getSerialNumber()));
             // rely on parser to communicate results to listeners
             mParser.handleTestRunFailed(e.toString());
@@ -201,7 +202,7 @@ public class MonkeyTestRunner {
         } catch (ShellCommandUnresponsiveException e) {
             Log.w(LOG_TAG,
                     String.format("ShellCommandUnresponsiveException %1$s when running monkey tests on %3$s",
-                            e.toString(), mRemoteDevice.getSerialNumber()));
+                            e, mRemoteDevice.getSerialNumber()));
             mParser.handleTestRunFailed(String.format("Failed to receive adb shell test output within %1$d ms. "
                             + "Test may have timed out, or adb connection to device became unresponsive",
                     mMaxTimeToOutputResponse));
@@ -215,7 +216,7 @@ public class MonkeyTestRunner {
         } catch (AdbCommandRejectedException e) {
             Log.w(LOG_TAG,
                     String.format("AdbCommandRejectedException %1$s when running monkey tests %2$s on %3$s",
-                            e.toString(), mRemoteDevice.getSerialNumber()));
+                            e, mRemoteDevice.getSerialNumber()));
             mParser.handleTestRunFailed(e.toString());
             throw e;
         }
@@ -234,6 +235,7 @@ public class MonkeyTestRunner {
      * Returns the full instrumentation command line syntax for the provided instrumentation arguments. Returns an empty
      * string if no arguments were specified.
      */
+    @NonNull
     private String buildArgsCommand() {
         StringBuilder commandBuilder = new StringBuilder();
         for (Entry<String, String> argPair : mArgList) {
@@ -280,15 +282,15 @@ public class MonkeyTestRunner {
 
         private final Collection<ITestRunListener> mTestListeners;
 
-        private String runName;
+        private final String runName;
+        private final HashMap<String, String> runMetrics = new HashMap<>();
         private boolean canceled;
         private TestIdentifier mCurrentTestIndentifier;
         private long elapsedTime;
-        private HashMap<String, String> runMetrics = new HashMap<String, String>();
 
         private MonkeyResultParser(String runName, Collection<ITestRunListener> listeners) {
             this.runName = runName;
-            mTestListeners = new ArrayList<ITestRunListener>(listeners);
+            mTestListeners = new ArrayList<>(listeners);
         }
 
         public void cancel() {
@@ -308,7 +310,7 @@ public class MonkeyTestRunner {
         }
 
         @Override
-        public void processNewLines(String[] lines) {
+        public void processNewLines(@NonNull String[] lines) {
             for (int indexLine = 0; indexLine < lines.length; indexLine++) {
                 String line = lines[indexLine];
                 Log.v("monkey receiver:" + runName, line);
@@ -376,13 +378,13 @@ public class MonkeyTestRunner {
         private void handleTestEnd() {
             if (mCurrentTestIndentifier != null) {
                 for (ITestRunListener listener : mTestListeners) {
-                    listener.testEnded(mCurrentTestIndentifier, new HashMap<String, String>());
+                    listener.testEnded(mCurrentTestIndentifier, new HashMap<>());
                 }
                 mCurrentTestIndentifier = null;
             }
         }
 
-        private int handleCrash(String[] lines, int indexLine) {
+        private int handleCrash(@NonNull String[] lines, int indexLine) {
             StringBuilder errorBuilder = new StringBuilder();
             boolean errorEnd = false;
             boolean errorStart = false;

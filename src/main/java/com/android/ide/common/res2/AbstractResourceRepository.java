@@ -40,7 +40,7 @@ public abstract class AbstractResourceRepository {
     protected static final Object ITEM_MAP_LOCK = new Object();
     private final boolean mFramework;
 
-    public AbstractResourceRepository(boolean isFramework) {
+    protected AbstractResourceRepository(boolean isFramework) {
         mFramework = isFramework;
     }
 
@@ -100,67 +100,6 @@ public abstract class AbstractResourceRepository {
      * Returns true if this resource repository contains a resource of the given
      * name.
      *
-     * @param url the resource URL
-     * @return true if the resource is known
-     */
-    public boolean hasResourceItem(@NonNull String url) {
-        // Handle theme references
-        if (url.startsWith(PREFIX_THEME_REF)) {
-            String remainder = url.substring(PREFIX_THEME_REF.length());
-            if (url.startsWith(ATTR_REF_PREFIX)) {
-                url = PREFIX_RESOURCE_REF + url.substring(PREFIX_THEME_REF.length());
-                return hasResourceItem(url);
-            }
-            int colon = url.indexOf(':');
-            if (colon != -1) {
-                // Convert from ?android:progressBarStyleBig to ?android:attr/progressBarStyleBig
-                if (remainder.indexOf('/', colon) == -1) {
-                    remainder = remainder.substring(0, colon) + RESOURCE_CLZ_ATTR + '/'
-                            + remainder.substring(colon);
-                }
-                url = PREFIX_RESOURCE_REF + remainder;
-                return hasResourceItem(url);
-            } else {
-                int slash = url.indexOf('/');
-                if (slash == -1) {
-                    url = PREFIX_RESOURCE_REF + RESOURCE_CLZ_ATTR + '/' + remainder;
-                    return hasResourceItem(url);
-                }
-            }
-        }
-
-        if (!url.startsWith(PREFIX_RESOURCE_REF)) {
-            return false;
-        }
-
-        assert url.startsWith("@") || url.startsWith("?") : url;
-
-        int typeEnd = url.indexOf('/', 1);
-        if (typeEnd != -1) {
-            int nameBegin = typeEnd + 1;
-
-            // Skip @ and @+
-            int typeBegin = url.startsWith("@+") ? 2 : 1; //$NON-NLS-1$
-
-            int colon = url.lastIndexOf(':', typeEnd);
-            if (colon != -1) {
-                typeBegin = colon + 1;
-            }
-            String typeName = url.substring(typeBegin, typeEnd);
-            ResourceType type = ResourceType.getEnum(typeName);
-            if (type != null) {
-                String name = url.substring(nameBegin);
-                return hasResourceItem(type, name);
-            }
-        }
-
-        return false;
-    }
-
-    /**
-     * Returns true if this resource repository contains a resource of the given
-     * name.
-     *
      * @param resourceType the type of resource to look up
      * @param resourceName the name of the resource
      * @return true if the resource is known
@@ -172,7 +111,7 @@ public abstract class AbstractResourceRepository {
 
             if (map != null) {
                 List<ResourceItem> itemList = map.get(resourceName);
-                return itemList != null && !itemList.isEmpty();
+                return !itemList.isEmpty();
             }
         }
 
@@ -189,13 +128,6 @@ public abstract class AbstractResourceRepository {
         synchronized (ITEM_MAP_LOCK) {
             ListMultimap<String, ResourceItem> map = getMap(resourceType, false);
             return map != null && !map.isEmpty();
-        }
-    }
-
-    @NonNull
-    public List<ResourceType> getAvailableResourceTypes() {
-        synchronized (ITEM_MAP_LOCK) {
-            return Lists.newArrayList(getMap().keySet());
         }
     }
 
@@ -237,7 +169,7 @@ public abstract class AbstractResourceRepository {
             @NonNull String name,
             @NonNull ResourceType type,
             @NonNull FolderConfiguration config) {
-        return getMatchingFiles(name, type, config, new HashSet<String>(), 0);
+        return getMatchingFiles(name, type, config, new HashSet<>(), 0);
     }
 
     @NonNull
@@ -258,7 +190,7 @@ public abstract class AbstractResourceRepository {
                 return Collections.emptyList();
             }
             seenNames.add(name);
-            output = new ArrayList<ResourceFile>();
+            output = new ArrayList<>();
             List<ResourceItem> matchingItems = typeItems.get(name);
             List<Configurable> matches = config.findMatchingConfigurables(matchingItems);
             for (Configurable conf : matches) {
@@ -402,10 +334,10 @@ public abstract class AbstractResourceRepository {
      */
     @NonNull
     public SortedSet<String> getLanguages() {
-        SortedSet<String> set = new TreeSet<String>();
+        SortedSet<String> set = new TreeSet<>();
 
         // As an optimization we could just look for values since that's typically where
-        // the languages are defined -- not on layouts, menus, etc -- especially if there
+        // the languages are defined -- not on layouts, menus, etc. -- especially if there
         // are no translations for it
         Set<String> qualifiers = Sets.newHashSet();
 
@@ -430,46 +362,6 @@ public abstract class AbstractResourceRepository {
         return set;
     }
 
-    /**
-     * Returns the sorted list of regions used in the resources with the given language.
-     *
-     * @param currentLanguage the current language the region must be associated with.
-     */
-    @NonNull
-    public SortedSet<String> getRegions(@NonNull String currentLanguage) {
-        SortedSet<String> set = new TreeSet<String>();
-
-        // As an optimization we could just look for values since that's typically where
-        // the languages are defined -- not on layouts, menus, etc -- especially if there
-        // are no translations for it
-        Set<String> qualifiers = Sets.newHashSet();
-        synchronized (ITEM_MAP_LOCK) {
-            for (ListMultimap<String, ResourceItem> map : getMap().values()) {
-                for (ResourceItem item : map.values()) {
-                    qualifiers.add(item.getQualifiers());
-                }
-            }
-        }
-
-        Splitter splitter = Splitter.on('-');
-        for (String s : qualifiers) {
-            boolean rightLanguage = false;
-            for (String qualifier : splitter.split(s)) {
-                if (currentLanguage.equals(qualifier)) {
-                    rightLanguage = true;
-                } else if (rightLanguage
-                        && qualifier.length() == 3
-                        && qualifier.charAt(0) == 'r'
-                        && Character.isUpperCase(qualifier.charAt(1))
-                        && Character.isUpperCase(qualifier.charAt(2))) {
-                    set.add(qualifier.substring(1));
-                }
-            }
-        }
-
-        return set;
-    }
-
     public void clear() {
         getMap().clear();
     }
@@ -479,10 +371,12 @@ public abstract class AbstractResourceRepository {
         @Override
         public void start(@NonNull DocumentBuilderFactory factory)
                 throws ConsumerException {
+            // unused
         }
 
         @Override
         public void end() throws ConsumerException {
+            // unused
         }
 
         @Override

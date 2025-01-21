@@ -36,48 +36,42 @@ public enum XmlAttributeSortOrder {
     /**
      * Comparator which can be used to sort attributes in the coding style priority order
      */
-    private static final Comparator<Attr> SORTED_ORDER_COMPARATOR = new Comparator<Attr>() {
-        @Override
-        public int compare(Attr attr1, Attr attr2) {
-            // Namespace declarations should always go first
-            String prefix1 = attr1.getPrefix();
-            String prefix2 = attr2.getPrefix();
-            if (XMLNS.equals(prefix1)) {
-                if (XMLNS.equals(prefix2)) {
-                    return 0;
-                }
-                return -1;
-            } else if (XMLNS.equals(attr2.getPrefix())) {
-                return 1;
+    private static final Comparator<Attr> SORTED_ORDER_COMPARATOR = (attr1, attr2) -> {
+        // Namespace declarations should always go first
+        String prefix1 = attr1.getPrefix();
+        String prefix2 = attr2.getPrefix();
+        if (XMLNS.equals(prefix1)) {
+            if (XMLNS.equals(prefix2)) {
+                return 0;
             }
-
-            // Sort by preferred attribute order
-            String name1 = prefix1 != null ? attr1.getLocalName() : attr1.getName();
-            String name2 = prefix2 != null ? attr2.getLocalName() : attr2.getName();
-            return compareAttributes(prefix1, name1, prefix2, name2);
+            return -1;
+        } else if (XMLNS.equals(attr2.getPrefix())) {
+            return 1;
         }
+
+        // Sort by preferred attribute order
+        String name1 = prefix1 != null ? attr1.getLocalName() : attr1.getName();
+        String name2 = prefix2 != null ? attr2.getLocalName() : attr2.getName();
+        return compareAttributes(prefix1, name1, prefix2, name2);
     };
     /**
      * Comparator which can be used to sort attributes into alphabetical order (but xmlns
      * is always first)
      */
-    private static final Comparator<Attr> ALPHABETICAL_COMPARATOR = new Comparator<Attr>() {
-        @Override
-        public int compare(Attr attr1, Attr attr2) {
-            // Namespace declarations should always go first
-            if (XMLNS.equals(attr1.getPrefix())) {
-                if (XMLNS.equals(attr2.getPrefix())) {
-                    return 0;
-                }
-                return -1;
-            } else if (XMLNS.equals(attr2.getPrefix())) {
-                return 1;
+    private static final Comparator<Attr> ALPHABETICAL_COMPARATOR = (attr1, attr2) -> {
+        // Namespace declarations should always go first
+        if (XMLNS.equals(attr1.getPrefix())) {
+            if (XMLNS.equals(attr2.getPrefix())) {
+                return 0;
             }
-
-            // Sort by name rather than local name to ensure we sort by namespaces first,
-            // then by names.
-            return attr1.getName().compareTo(attr2.getName());
+            return -1;
+        } else if (XMLNS.equals(attr2.getPrefix())) {
+            return 1;
         }
+
+        // Sort by name rather than local name to ensure we sort by namespaces first,
+        // then by names.
+        return attr1.getName().compareTo(attr2.getName());
     };
     public final String key;
 
@@ -191,14 +185,10 @@ public enum XmlAttributeSortOrder {
      */
     @Nullable
     public Comparator<Attr> getAttributeComparator() {
-        switch (this) {
-            case NO_SORTING:
-                return null;
-            case ALPHABETICAL:
-                return ALPHABETICAL_COMPARATOR;
-            case LOGICAL:
-            default:
-                return SORTED_ORDER_COMPARATOR;
-        }
+        return switch (this) {
+            case NO_SORTING -> null;
+            case ALPHABETICAL -> ALPHABETICAL_COMPARATOR;
+            default -> SORTED_ORDER_COMPARATOR;
+        };
     }
 }

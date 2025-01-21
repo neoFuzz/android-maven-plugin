@@ -17,21 +17,33 @@
 package com.android.jill.api.v01;
 
 import javax.annotation.Nonnull;
+import java.io.Serial;
 
 /**
  * Thrown when something is wrong in Jill configuration.
  */
 public class ConfigurationException extends Exception {
+    @Serial
     private static final long serialVersionUID = 1L;
 
+    /**
+     * @param message the detail message. The detail message is saved for later retrieval by the
+     */
     public ConfigurationException(@Nonnull String message) {
         super(message);
     }
 
+    /**
+     * @param message the detail message. The detail message is saved for later retrieval by the
+     * @param cause the cause (which is saved for later retrieval by the {@link #getCause()} method).
+     */
     public ConfigurationException(@Nonnull String message, @Nonnull Throwable cause) {
         super(message, cause);
     }
 
+    /**
+     * @param cause the cause (which is saved for later retrieval by the {@link #getCause()} method).
+     */
     public ConfigurationException(@Nonnull Throwable cause) {
         super(cause);
     }

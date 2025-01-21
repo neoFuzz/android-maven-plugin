@@ -156,13 +156,11 @@ public class DefaultProcessExecutor implements ProcessExecutor {
             processOutputHandler.handleOutput(output);
 
             return new ProcessResultImpl(commandString, exitCode);
-        } catch (IOException e) {
+        } catch (IOException | ProcessException e) {
             return new ProcessResultImpl(commandString, e);
         } catch (InterruptedException e) {
             // Restore the interrupted status
             Thread.currentThread().interrupt();
-            return new ProcessResultImpl(commandString, e);
-        } catch (ProcessException e) {
             return new ProcessResultImpl(commandString, e);
         }
     }

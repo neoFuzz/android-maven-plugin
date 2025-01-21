@@ -24,8 +24,6 @@ public class AndroidSigner {
 
     private final Debug debug;
 
-    ;
-
     public AndroidSigner(String debug) {
         if (debug == null) {
             throw new IllegalArgumentException("android.sign.debug must be 'true', 'false', 'both' or 'auto'.");

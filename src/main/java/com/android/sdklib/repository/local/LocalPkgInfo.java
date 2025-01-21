@@ -122,7 +122,7 @@ public abstract class LocalPkgInfo
      * Comparison is solely done based on the {@link IPkgDesc}.
      * <p/>
      * Other local attributes (local directory, source properties, updates available)
-     * are <em>not used</em> in the comparison. Consequently {@link #compareTo(LocalPkgInfo)}
+     * are <em>not used</em> in the comparison. Consequently {@code #compareTo(LocalPkgInfo)}
      * does not match {@link #equals(Object)} and the {@link #hashCode()} properties.
      */
     @Override
@@ -137,10 +137,10 @@ public abstract class LocalPkgInfo
     public String toString() {
         StringBuilder builder = new StringBuilder();
         builder.append('<').append(this.getClass().getSimpleName()).append(' ');
-        builder.append(getDesc().toString());
+        builder.append(getDesc());
         if (mUpdate != null) {
             builder.append(" Updated by: ");                            //$NON-NLS-1$
-            builder.append(mUpdate.toString());
+            builder.append(mUpdate);
         }
         builder.append('>');
         return builder.toString();
@@ -177,10 +177,9 @@ public abstract class LocalPkgInfo
         if (obj == null) {
             return false;
         }
-        if (!(obj instanceof LocalPkgInfo)) {
+        if (!(obj instanceof LocalPkgInfo other)) {
             return false;
         }
-        LocalPkgInfo other = (LocalPkgInfo) obj;
 
         if (!getDesc().equals(other.getDesc())) {
             return false;
@@ -200,13 +199,8 @@ public abstract class LocalPkgInfo
             return false;
         }
         if (mUpdate == null) {
-            if (other.mUpdate != null) {
-                return false;
-            }
-        } else if (!mUpdate.equals(other.mUpdate)) {
-            return false;
-        }
-        return true;
+            return other.mUpdate == null;
+        } else return mUpdate.equals(other.mUpdate);
     }
 
 
@@ -282,7 +276,4 @@ public abstract class LocalPkgInfo
 
         return sb.toString();
     }
-
-
 }
-

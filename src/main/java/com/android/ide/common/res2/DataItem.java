@@ -21,12 +21,14 @@ import com.android.annotations.Nullable;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
+import java.util.Objects;
+
 /**
  * Base item.
  * <p>
  * This includes its name and source file as a {@link DataFile}.
  */
-abstract class DataItem<F extends DataFile> {
+public abstract class DataItem<F extends DataFile> {
 
     private static final int MASK_TOUCHED = 0x01;
     private static final int MASK_REMOVED = 0x02;
@@ -184,10 +186,10 @@ abstract class DataItem<F extends DataFile> {
      * @return the key for this item.
      */
     public String getKey() {
-        return mName;
+        return getName();
     }
 
-    void addExtraAttributes(Document document, Node node, String namespaceUri) {
+    void addExtraAttributes(Document document, Node node, @Nullable String namespaceUri) {
         // nothing
     }
 
@@ -210,7 +212,7 @@ abstract class DataItem<F extends DataFile> {
             return false;
         }
 
-        return !(mSource != null ? !mSource.equals(dataItem.mSource) : dataItem.mSource != null);
+        return Objects.equals(mSource, dataItem.mSource);
     }
 
     @Override

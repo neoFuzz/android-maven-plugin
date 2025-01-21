@@ -16,7 +16,11 @@
 
 package com.android.ide.common.resources.configuration;
 
+import com.android.annotations.NonNull;
+import com.android.annotations.Nullable;
+
 import java.util.Locale;
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -33,7 +37,7 @@ public final class RegionQualifier extends ResourceQualifier {
 
     }
 
-    public RegionQualifier(String value) {
+    public RegionQualifier(@NonNull String value) {
         mValue = value.toUpperCase(Locale.US);
     }
 
@@ -44,6 +48,7 @@ public final class RegionQualifier extends ResourceQualifier {
      * @param segment the folder segment from which to create a qualifier.
      * @return a new {@link RegionQualifier} object or <code>null</code>
      */
+    @Nullable
     public static RegionQualifier getQualifier(String segment) {
         Matcher m = sRegionPattern.matcher(segment);
         if (m.matches()) {
@@ -65,6 +70,7 @@ public final class RegionQualifier extends ResourceQualifier {
      *
      * @param value the value of the qualifier, as returned by {@link #getValue()}.
      */
+    @NonNull
     public static String getFolderSegment(String value) {
         if (value != null) {
             // See http://developer.android.com/reference/java/util/Locale.html#default_locale
@@ -78,11 +84,8 @@ public final class RegionQualifier extends ResourceQualifier {
     }
 
     public String getValue() {
-        if (mValue != null) {
-            return mValue;
-        }
+        return Objects.requireNonNullElse(mValue, "");
 
-        return ""; //$NON-NLS-1$
     }
 
     @Override
@@ -126,11 +129,11 @@ public final class RegionQualifier extends ResourceQualifier {
 
     @Override
     public boolean equals(Object qualifier) {
-        if (qualifier instanceof RegionQualifier) {
+        if (qualifier instanceof RegionQualifier rq) {
             if (mValue == null) {
-                return ((RegionQualifier) qualifier).mValue == null;
+                return rq.mValue == null;
             }
-            return mValue.equals(((RegionQualifier) qualifier).mValue);
+            return mValue.equals(rq.mValue);
         }
 
         return false;
@@ -149,20 +152,19 @@ public final class RegionQualifier extends ResourceQualifier {
      * Returns the string used to represent this qualifier in the folder name.
      */
     @Override
+    @NonNull
     public String getFolderSegment() {
         return getFolderSegment(mValue);
     }
 
     @Override
     public String getShortDisplayValue() {
-        if (mValue != null) {
-            return mValue;
-        }
+        return Objects.requireNonNullElse(mValue, "");
 
-        return ""; //$NON-NLS-1$
     }
 
     @Override
+    @NonNull
     public String getLongDisplayValue() {
         if (mValue != null) {
             return String.format("Region %s", mValue);

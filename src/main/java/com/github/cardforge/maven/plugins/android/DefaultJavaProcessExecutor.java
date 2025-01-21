@@ -139,13 +139,11 @@ public class DefaultJavaProcessExecutor implements JavaProcessExecutor {
             int exitCode = grabProcessOutput(process, output);
             processOutputHandler.handleOutput(output);
             return new ProcessResultImplCopy(commandString, exitCode);
-        } catch (IOException e) {
+        } catch (IOException | ProcessException e) {
             return new ProcessResultImplCopy(commandString, e);
         } catch (InterruptedException e) {
             // Restore the interrupted status
             Thread.currentThread().interrupt();
-            return new ProcessResultImplCopy(commandString, e);
-        } catch (ProcessException e) {
             return new ProcessResultImplCopy(commandString, e);
         }
     }

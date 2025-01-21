@@ -52,7 +52,7 @@ public final class IdDisplay implements Comparable<IdDisplay> {
      * The display value is not used for comparison or ordering.
      */
     @Override
-    public int compareTo(IdDisplay tag) {
+    public int compareTo(@NonNull IdDisplay tag) {
         return mId.compareTo(tag.mId);
     }
 
@@ -70,13 +70,14 @@ public final class IdDisplay implements Comparable<IdDisplay> {
      */
     @Override
     public boolean equals(Object obj) {
-        return (obj instanceof IdDisplay) && mId.equals(((IdDisplay) obj).mId);
+        return (obj instanceof IdDisplay id) && mId.equals(id.mId);
     }
 
     /**
      * Returns a string representation for *debug* purposes only, not for UI display.
      */
     @Override
+    @NonNull
     public String toString() {
         return String.format("%1$s [%2$s]", mId, mDisplay);
     }

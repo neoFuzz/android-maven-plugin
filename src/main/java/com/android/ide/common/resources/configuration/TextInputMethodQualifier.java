@@ -16,6 +16,7 @@
 
 package com.android.ide.common.resources.configuration;
 
+import com.android.annotations.NonNull;
 import com.android.resources.Keyboard;
 import com.android.resources.ResourceEnum;
 
@@ -52,6 +53,7 @@ public final class TextInputMethodQualifier extends EnumBasedResourceQualifier {
     }
 
     @Override
+    @NonNull
     public String getShortName() {
         return "Text Input";
     }
@@ -72,5 +74,16 @@ public final class TextInputMethodQualifier extends EnumBasedResourceQualifier {
         }
 
         return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return mValue.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object qualifier) {
+        return qualifier instanceof TextInputMethodQualifier q &&
+                q.mValue == mValue;
     }
 }

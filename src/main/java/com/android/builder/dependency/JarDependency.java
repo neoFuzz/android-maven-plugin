@@ -39,7 +39,7 @@ public class JarDependency {
     private final boolean mProguarded;
 
     /**
-     * if the dependency is a sub-project, then the project path
+     * if the dependency is a subproject, then the project path
      */
     @Nullable
     private final String mProjectPath;
@@ -83,20 +83,6 @@ public class JarDependency {
 
     public boolean isPackaged() {
         return mPackaged;
-    }
-
-    public boolean isProguarded() {
-        return mProguarded;
-    }
-
-    @Nullable
-    public MavenCoordinates getResolvedCoordinates() {
-        return mResolvedCoordinates;
-    }
-
-    @Nullable
-    public String getProjectPath() {
-        return mProjectPath;
     }
 
     @Override

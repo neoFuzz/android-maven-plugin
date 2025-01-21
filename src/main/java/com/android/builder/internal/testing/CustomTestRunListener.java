@@ -27,7 +27,6 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.Map;
 import java.util.Set;
 
@@ -56,7 +55,7 @@ public class CustomTestRunListener extends XmlTestRunListener {
     }
 
     @Override
-    protected File getResultFile(File reportDir) throws IOException {
+    protected File getResultFile(File reportDir) {
         return new File(reportDir,
                 "TEST-" + mDeviceName + "-" + mProjectName + "-" + mFlavorName + ".xml");
     }
@@ -116,14 +115,13 @@ public class CustomTestRunListener extends XmlTestRunListener {
 
     @Override
     public void testEnded(TestIdentifier test, Map<String, String> testMetrics) {
-        if (!mFailedTests.remove(test)) {
+        if (!mFailedTests.remove(test) && mLogger != null) {
             // if wasn't present in the list, then the test succeeded.
-            if (mLogger != null) {
-                mLogger.info("\n%1$s > %2$s[%3$s] \033[32mSUCCESS \033[0m",
-                        test.getClassName(), test.getTestName(), mDeviceName);
-            }
-
+            mLogger.info("\n%1$s > %2$s[%3$s] \033[32mSUCCESS \033[0m",
+                    test.getClassName(), test.getTestName(), mDeviceName);
         }
+
+
         super.testEnded(test, testMetrics);
     }
 
@@ -144,7 +142,8 @@ public class CustomTestRunListener extends XmlTestRunListener {
         super.testIgnored(test);
     }
 
-    private String getModifiedTrace(String trace) {
+    @NonNull
+    private String getModifiedTrace(@NonNull String trace) {
         // split lines
         String[] lines = trace.split("\n");
 

@@ -1,5 +1,6 @@
 package com.github.cardforge.maven.plugins.android.phase01generatesources;
 
+import com.android.annotations.NonNull;
 import com.android.builder.core.AaptPackageProcessBuilder;
 import com.android.builder.core.DefaultManifestParser;
 import com.android.builder.symbols.RGeneration;
@@ -27,7 +28,7 @@ final class ResourceClassGenerator {
     private final Log log;
     private final ClassLoader compileClassLoader;
 
-    ResourceClassGenerator(final GenerateSourcesMojo mojo,
+    ResourceClassGenerator(@NonNull final GenerateSourcesMojo mojo,
                            final File targetDirectory,
                            final File genDirectory,
                            final ClassLoader compileClassLoader
@@ -50,7 +51,7 @@ final class ResourceClassGenerator {
      *
      * @param libraries AAR libraries for which to generate R java files.
      */
-    public void generateLibraryRs(final Set<Artifact> libraries) throws IOException {
+    public void generateLibraryRs(@NonNull final Set<Artifact> libraries) throws IOException {
         // list of all the symbol tables
         final List<SymbolTable> symbolTables = new ArrayList<>(libraries.size());
 

@@ -1,5 +1,6 @@
 package com.github.cardforge.maven.plugins.android.standalonemojos;
 
+import com.android.annotations.NonNull;
 import com.github.cardforge.maven.plugins.android.AbstractAndroidMojo;
 import com.github.cardforge.maven.plugins.android.CommandExecutor;
 import com.github.cardforge.maven.plugins.android.ExecutionException;
@@ -32,7 +33,7 @@ public class ZipalignMojo extends AbstractAndroidMojo {
 
     /**
      * The configuration for the zipalign goal. As soon as a zipalign goal is invoked the command will be executed
-     * unless the skip parameter is set. By default the input file is the apk produced by the build in target. The
+     * unless the skip parameter is set. By default, the input file is the apk produced by the build in target. The
      * outputApk will use the postfix -aligned.apk. The following shows a default full configuration of the zipalign
      * goal as an example for changes as plugin configuration.
      * <pre>
@@ -116,9 +117,10 @@ public class ZipalignMojo extends AbstractAndroidMojo {
     private String parsedClassifier;
 
     /**
-     * Execute the mojo by parsing the confign and actually doing the zipalign.
+     * Execute the mojo by parsing the config and actually doing the zipalign.
      *
-     * @throws MojoExecutionException
+     * @throws MojoExecutionException if an error occurs
+     * @throws MojoFailureException   if an error occurs
      */
     public void execute() throws MojoExecutionException, MojoFailureException {
 
@@ -141,7 +143,7 @@ public class ZipalignMojo extends AbstractAndroidMojo {
         getLog().debug("outputApk:" + parsedOutputApk);
         getLog().debug("classifier:" + parsedClassifier);
 
-        if (parsedSkip) {
+        if (Boolean.TRUE.equals(parsedSkip)) {
             getLog().info("Skipping zipalign");
         } else {
             boolean outputToSameFile = sameOutputAsInput();
@@ -151,8 +153,8 @@ public class ZipalignMojo extends AbstractAndroidMojo {
 
             String command = getAndroidSdk().getZipalignPath();
 
-            List<String> parameters = new ArrayList<String>();
-            if (parsedVerbose) {
+            List<String> parameters = new ArrayList<>();
+            if (Boolean.TRUE.equals(parsedVerbose)) {
                 parameters.add("-v");
             }
             parameters.add("-f"); // force overwriting existing output file
@@ -193,6 +195,7 @@ public class ZipalignMojo extends AbstractAndroidMojo {
         }
     }
 
+    @NonNull
     private String getFullPathWithName(String filename) {
         return FilenameUtils.getFullPath(filename) + FilenameUtils.getName(filename);
     }
@@ -201,7 +204,8 @@ public class ZipalignMojo extends AbstractAndroidMojo {
         return getFullPathWithName(parsedInputApk).equals(getFullPathWithName(parsedOutputApk));
     }
 
-    // zipalign doesn't allow output file to be same as input
+    /** zipalign doesn't allow output file to be same as input */
+    @NonNull
     private String getTemporaryOutputApkFilename() {
         return parsedOutputApk.substring(0, parsedOutputApk.lastIndexOf('.')) + "-aligned-temp.apk";
     }
@@ -211,7 +215,8 @@ public class ZipalignMojo extends AbstractAndroidMojo {
      *
      * @return absolute path.
      */
-    // used via PullParameter annotation - do not remove
+    @SuppressWarnings("unused") // used via PullParameter annotation - do not remove
+    @NonNull
     private String getInputApkPath() {
         if (apkFile == null) {
             apkFile = new File(targetDirectory, finalName + "." + APK);
@@ -225,7 +230,8 @@ public class ZipalignMojo extends AbstractAndroidMojo {
      *
      * @return absolute path.
      */
-    // used via PullParameter annotation - do not remove
+    @SuppressWarnings("unused")// used via PullParameter annotation - do not remove
+    @NonNull
     private String getOutputApkPath() {
         if (alignedApkFile == null) {
             alignedApkFile = new File(targetDirectory,

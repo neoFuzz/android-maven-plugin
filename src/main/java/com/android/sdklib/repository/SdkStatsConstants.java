@@ -17,6 +17,8 @@
 package com.android.sdklib.repository;
 
 
+import com.android.annotations.NonNull;
+
 import java.io.InputStream;
 
 /**
@@ -79,6 +81,10 @@ public class SdkStatsConstants {
      */
     public static final String NS_URI = getSchemaUri(NS_LATEST_VERSION);
 
+    private SdkStatsConstants() {
+        // Not instantiable
+    }
+
     /**
      * Returns a stream to the requested sdk-stats XML Schema.
      *
@@ -96,6 +102,7 @@ public class SdkStatsConstants {
      *
      * @param version Between 1 and {@link #NS_LATEST_VERSION} included.
      */
+    @NonNull
     public static String getSchemaUri(int version) {
         return String.format(NS_BASE + "%d", version);                      //$NON-NLS-1$
     }

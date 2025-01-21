@@ -1,5 +1,7 @@
 package com.github.cardforge.maven.plugins.android.phase04processclasses;
 
+import com.android.annotations.NonNull;
+import com.android.annotations.Nullable;
 import com.github.cardforge.maven.plugins.android.AbstractAndroidMojo;
 import com.github.cardforge.maven.plugins.android.CommandExecutor;
 import com.github.cardforge.maven.plugins.android.ExecutionException;
@@ -18,7 +20,6 @@ import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.plugins.annotations.ResolutionScope;
-import org.codehaus.plexus.interpolation.os.Os;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -30,7 +31,7 @@ import static com.github.cardforge.maven.plugins.android.common.AndroidExtension
 
 /**
  * Processes both application and dependency classes using the ProGuard byte code obfuscator,
- * minimzer, and optimizer. For more information, see https://proguard.sourceforge.net.
+ * minimizer, and optimizer. For more information, see <a href="https://www.guardsquare.com/proguard">Proguard</a>
  *
  * @author Jonson
  * @author Matthias Kaeppler
@@ -49,12 +50,12 @@ public class ProguardMojo extends AbstractAndroidMojo {
     private static final Collection<String> MAVEN_DESCRIPTOR = Arrays.asList("META-INF/maven/**");
     private static final Collection<String> META_INF_MANIFEST = Arrays.asList("META-INF/MANIFEST.MF");
     /**
-     * For Proguard is required only jar type dependencies, all other like .so or .apklib can be skipped.
+     * For Proguard is required only jar type dependencies, all others like .so or .apklib can be skipped.
      */
     private static final String JAR_DEPENDENCY_TYPE = "jar";
     /**
      * <p>
-     * ProGuard configuration. ProGuard is disabled by default. Set the skip parameter to false to activate proguard.
+     * ProGuard configuration. ProGuard is disabled by default. Set the skip parameter to 'false' to activate proguard.
      * A complete configuration can include any of the following:
      * </p>
      *
@@ -79,7 +80,7 @@ public class ProguardMojo extends AbstractAndroidMojo {
      * A good practice is to create a release profile in your POM, in which you enable ProGuard.
      * ProGuard should be disabled for development builds, since it obfuscates class and field
      * names, and it may interfere with test projects that rely on your application classes.
-     * All parameters can be overridden in profiles or the the proguard* properties. Default values apply and are
+     * All parameters can be overridden in profiles or the proguard* properties. Default values apply and are
      * documented with these properties.
      * </p>
      */
@@ -110,9 +111,9 @@ public class ProguardMojo extends AbstractAndroidMojo {
     @PullParameter(defaultValueGetterMethod = "getDefaultProguardOptions")
     private String[] parsedOptions;
     /**
-     * Path to the proguard jar and therefore version of proguard to be used. By default this will use Proguard
+     * Path to the proguard jar and therefore version of proguard to be used. By default, this will use Proguard
      * from the Central Repository. Overriding it with an absolute path allows you to use a newer or custom proguard
-     * version..
+     * version.
      * <p>
      * You can also reference an external Proguard version as a plugin dependency like this:
      * <pre>
@@ -135,7 +136,7 @@ public class ProguardMojo extends AbstractAndroidMojo {
     @PullParameter(defaultValueGetterMethod = "getProguardJarPath")
     private String parsedProguardJarPath;
     /**
-     * Path relative to the project's build directory (target) where proguard puts folowing files:
+     * Path relative to the project's build directory (target) where proguard puts following files:
      *
      * <ul>
      *   <li>dump.txt</li>
@@ -153,7 +154,7 @@ public class ProguardMojo extends AbstractAndroidMojo {
      * &lt;/proguard&gt;
      * </pre>
      * <p>
-     * Output directory is defined relatively so it could be also outside of the target directory.
+     * Output directory is defined relatively so it could be also be outside the target directory.
      */
     @Parameter(property = "android.proguard.outputDirectory")
     private File outputDirectory;
@@ -189,7 +190,7 @@ public class ProguardMojo extends AbstractAndroidMojo {
     /**
      * You can specify a custom filter which will be used to filter out unnecessary files from ProGuard input.
      *
-     * @see http://proguard.sourceforge.net/manual/usage.html#filefilters
+     * @see <a href="https://www.guardsquare.com/manual/usage.html#filefilters">...</a>
      */
     @Parameter(property = "android.proguard.customfilter")
     private String proguardCustomFilter;
@@ -255,8 +256,8 @@ public class ProguardMojo extends AbstractAndroidMojo {
      */
     @Parameter(property = "artifactSet")
     private IncludeExcludeSet artifactSet;
-    private List<ArtifactPrototype> artifactBlacklist = new LinkedList<ArtifactPrototype>();
-    private List<ArtifactPrototype> artifactsToShift = new LinkedList<ArtifactPrototype>();
+    private final List<ArtifactPrototype> artifactBlacklist = new LinkedList<>();
+    private final List<ArtifactPrototype> artifactsToShift = new LinkedList<>();
     private File javaHomeDir;
     private File javaLibDir;
     private File altJavaLibDir;
@@ -266,6 +267,7 @@ public class ProguardMojo extends AbstractAndroidMojo {
      *
      * @return the full path to the current java executable.
      */
+    @NonNull
     private static File getJavaExecutable() {
         final String javaHome = System.getProperty("java.home");
         final String slash = File.separator;
@@ -282,7 +284,7 @@ public class ProguardMojo extends AbstractAndroidMojo {
         ConfigHandler configHandler = new ConfigHandler(this, this.session, this.execution);
         configHandler.parseConfiguration();
 
-        if (!parsedSkip) {
+        if (Boolean.FALSE.equals(parsedSkip)) {
             if (parsedConfig.exists()) {
                 // TODO: make the property name a constant sometime after switching to @Mojo
                 project.getProperties().setProperty("android.proguard.obfuscatedJar", obfuscatedJar);
@@ -306,19 +308,19 @@ public class ProguardMojo extends AbstractAndroidMojo {
             }
         }
 
-        getLog().info("Proguarding output");
+        getLog().info("Proguarding output...");
         CommandExecutor executor = CommandExecutor.Factory.createDefaultCommmandExecutor();
         executor.setLogger(this.getLog());
-        List<String> commands = new ArrayList<String>();
+        List<String> commands = new ArrayList<>();
 
         collectJvmArguments(commands);
 
         commands.add("-jar");
         commands.add(parsedProguardJarPath);
 
-        List<String> proguardCommands = new ArrayList<String>();
+        List<String> proguardCommands = new ArrayList<>();
 
-        proguardCommands.add("@" + parsedConfig + "");
+        proguardCommands.add("@" + parsedConfig);
 
         for (String config : parsedConfigs) {
             proguardCommands.add("@" + config);
@@ -357,7 +359,7 @@ public class ProguardMojo extends AbstractAndroidMojo {
 
         final String javaExecutable = getJavaExecutable().getAbsolutePath();
 
-        getLog().debug(javaExecutable + " " + commands.toString() + proguardCommands.toString());
+        getLog().debug(javaExecutable + " " + commands + proguardCommands);
 
         FileOutputStream tempConfigFileOutputStream = null;
         try {
@@ -372,7 +374,7 @@ public class ProguardMojo extends AbstractAndroidMojo {
             IOUtils.write(commandStringBuilder, tempConfigFileOutputStream);
 
             executor.setCaptureStdOut(true);
-            commands.add("@" + tempConfigFile.getAbsolutePath() + "");
+            commands.add("@" + tempConfigFile.getAbsolutePath());
             executor.executeCommand(javaExecutable, commands, project.getBasedir(), false);
         } catch (ExecutionException e) {
             throw new MojoExecutionException("", e);
@@ -382,14 +384,14 @@ public class ProguardMojo extends AbstractAndroidMojo {
             IOUtils.closeQuietly(tempConfigFileOutputStream);
         }
 
-        if (parsedAttachMap) {
+        if (Boolean.TRUE.equals(parsedAttachMap)) {
             projectHelper.attachArtifact(project, "map", mapFile);
         }
     }
 
     /**
      * Convert the jvm arguments in parsedJvmArguments as populated by the config in format as needed by the java
-     * command. Also preserve backwards compatibility in terms of dashes required or not..
+     * command. Also preserve backwards compatibility in terms of dashes required or not.
      */
     private void collectJvmArguments(List<String> commands) {
         if (parsedJvmArguments != null) {
@@ -463,20 +465,22 @@ public class ProguardMojo extends AbstractAndroidMojo {
         return false;
     }
 
+    @NonNull
     private List<ProGuardInput> getProgramInputFiles() {
-        final List<ProGuardInput> inJars = new LinkedList<ProguardMojo.ProGuardInput>();
+        final List<ProGuardInput> inJars = new LinkedList<>();
         inJars.add(createProguardInput(projectOutputDirectory.getAbsolutePath()));
         return inJars;
     }
 
+    @NonNull
     private List<ProGuardInput> getProjectDependencyFiles() {
-        final Collection<String> globalInJarExcludes = new HashSet<String>();
-        final List<ProGuardInput> inJars = new LinkedList<ProguardMojo.ProGuardInput>();
+        final Collection<String> globalInJarExcludes = new HashSet<>();
+        final List<ProGuardInput> inJars = new LinkedList<>();
 
-        if (parsedFilterManifest) {
+        if (Boolean.TRUE.equals(parsedFilterManifest)) {
             globalInJarExcludes.addAll(META_INF_MANIFEST);
         }
-        if (parsedFilterMavenDescriptor) {
+        if (Boolean.TRUE.equals(parsedFilterMavenDescriptor)) {
             globalInJarExcludes.addAll(MAVEN_DESCRIPTOR);
         }
         if (parsedCustomFilter != null) {
@@ -506,18 +510,21 @@ public class ProguardMojo extends AbstractAndroidMojo {
         return inJars;
     }
 
+    @NonNull
     private ProGuardInput createProguardInput(String path, Collection<String> filterExpression) {
         return new ProGuardInput(path, filterExpression);
     }
 
+    @NonNull
     private ProGuardInput createProguardInput(String path) {
         return createProguardInput(path, null);
     }
 
+    @NonNull
     private List<ProGuardInput> getLibraryInputFiles() {
-        final List<ProGuardInput> libraryJars = new LinkedList<ProguardMojo.ProGuardInput>();
+        final List<ProGuardInput> libraryJars = new LinkedList<>();
 
-        if (parsedIncludeJdkLibs) {
+        if (Boolean.TRUE.equals(parsedIncludeJdkLibs)) {
             // we have to add the Java framework classes to the library JARs, since they are not
             // distributed with the JAR on Central, and since we'll strip them out of the android.jar
             // that is shipped with the SDK (since that is not a complete Java distribution)
@@ -545,7 +552,7 @@ public class ProguardMojo extends AbstractAndroidMojo {
         // we treat any dependencies with provided scope as library JARs
         for (Artifact artifact : project.getArtifacts()) {
             if (artifact.getScope().equals(Artifact.SCOPE_PROVIDED)) {
-                if (artifact.getArtifactId().equals("android") && parsedIncludeJdkLibs) {
+                if (artifact.getArtifactId().equals("android") && Boolean.TRUE.equals(parsedIncludeJdkLibs)) {
                     getLog().debug("Including dependency as (android) library jar : " + artifact);
                     libraryJars.add(
                             createProguardInput(artifact.getFile().getAbsolutePath(), ANDROID_LIBRARY_EXCLUDED_FILTER)
@@ -579,6 +586,7 @@ public class ProguardMojo extends AbstractAndroidMojo {
         return getProguardJarPathFromDependencies();
     }
 
+    @Nullable
     private String getProguardJarPathFromDependencies() throws MojoExecutionException {
         Artifact proguardArtifact = null;
         int proguardArtifactDistance = -1;
@@ -614,6 +622,7 @@ public class ProguardMojo extends AbstractAndroidMojo {
      * @see #parsedJvmArguments
      */
     @SuppressWarnings("unused") // Provides default value for parsedJvmArguments attribute
+    @NonNull
     private String[] getDefaultJvmArguments() {
         return new String[]{"-Xmx512M"};
     }
@@ -624,6 +633,7 @@ public class ProguardMojo extends AbstractAndroidMojo {
      * @see #parsedConfigs
      */
     @SuppressWarnings("unused") // Provides default value for parsedConfigs attribute
+    @NonNull
     private String[] getDefaultProguardConfigs() {
         return new String[0];
     }
@@ -634,6 +644,7 @@ public class ProguardMojo extends AbstractAndroidMojo {
      * @see #parsedOptions
      */
     @SuppressWarnings("unused") // Provides default value for parsedOptions attribute
+    @NonNull
     private String[] getDefaultProguardOptions() {
         return new String[0];
     }
@@ -656,9 +667,9 @@ public class ProguardMojo extends AbstractAndroidMojo {
     }
 
     /**
-     * Determines the java.home directory.
+     * Determines the {@code java.home} directory.
      *
-     * @return The java.home directory, as a File.
+     * @return The {@code java.home} directory, as a File.
      */
     private File getJavaHomeDir() {
         if (javaHomeDir == null) {
@@ -704,9 +715,9 @@ public class ProguardMojo extends AbstractAndroidMojo {
 
     private static class ProGuardInput {
 
-        private String path;
+        private final String path;
 
-        private Collection<String> excludedFilter;
+        private final Collection<String> excludedFilter;
 
         ProGuardInput(String path, Collection<String> excludedFilter) {
             this.path = path;
@@ -715,15 +726,8 @@ public class ProguardMojo extends AbstractAndroidMojo {
 
         public String toPath() {
             if (excludedFilter != null && !excludedFilter.isEmpty()) {
-                String middleQuote, endQuote;
-
-                if (!Os.isFamily(Os.FAMILY_WINDOWS)) {
-                    middleQuote = "(";
-                    endQuote = ")";
-                } else {
-                    middleQuote = "(";
-                    endQuote = ")";
-                }
+                String middleQuote = "(";
+                String endQuote = ")";
 
                 StringBuilder sb = new StringBuilder();
                 sb.append(path);
@@ -742,6 +746,7 @@ public class ProguardMojo extends AbstractAndroidMojo {
         }
 
         @Override
+        @NonNull
         public String toString() {
             return "ProGuardInput{"
                     + "path='" + path + '\''

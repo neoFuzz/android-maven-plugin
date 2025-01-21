@@ -19,6 +19,7 @@ package com.android.jack.api.v01;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
+import java.io.Serial;
 import java.util.ArrayList;
 import java.util.Iterator;
 
@@ -35,6 +36,7 @@ import java.util.Iterator;
  */
 public abstract class ChainedException extends Exception
         implements Iterable<ChainedException> {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     @Nonnull
@@ -77,7 +79,7 @@ public abstract class ChainedException extends Exception
     @Override
     @Nonnull
     public String getLocalizedMessage() {
-        return message;
+        return getMessage();
     }
 
     @Nonnull
@@ -111,7 +113,7 @@ public abstract class ChainedException extends Exception
     @Override
     @Nonnull
     public Iterator<ChainedException> iterator() {
-        ArrayList<ChainedException> list = new ArrayList<ChainedException>(count);
+        ArrayList<ChainedException> list = new ArrayList<>(count);
 
         ChainedException exception = this;
         do {

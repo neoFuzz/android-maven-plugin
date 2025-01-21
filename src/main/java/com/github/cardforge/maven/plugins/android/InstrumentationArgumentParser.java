@@ -1,5 +1,6 @@
 package com.github.cardforge.maven.plugins.android;
 
+import com.android.annotations.NonNull;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
 
@@ -23,6 +24,10 @@ import java.util.*;
 public class InstrumentationArgumentParser {
     private static final String SEPARATOR = " ";
 
+    private InstrumentationArgumentParser() {
+        // no instances
+    }
+
     /**
      * Parses the given {@code flatArgs} into a map of key/value pairs.
      *
@@ -35,7 +40,7 @@ public class InstrumentationArgumentParser {
             return Collections.EMPTY_MAP;
         }
 
-        final Map<String, String> mappedArgs = new HashMap<String, String>();
+        final Map<String, String> mappedArgs = new HashMap<>();
 
         for (final String flatArg : flatArgs) {
             final AbstractMap.SimpleEntry<String, String> keyValuePair = parseKeyValuePair(flatArg);
@@ -45,6 +50,7 @@ public class InstrumentationArgumentParser {
         return mappedArgs;
     }
 
+    @NonNull
     private static AbstractMap.SimpleEntry<String, String> parseKeyValuePair(final String arg) {
         final List<String> keyValueSplit = Lists.newArrayList(Splitter.on(SEPARATOR).limit(2).split(arg));
 
@@ -52,6 +58,6 @@ public class InstrumentationArgumentParser {
             throw new IllegalArgumentException("Could not separate \"" + arg + "\" by a whitespace into two parts");
         }
 
-        return new AbstractMap.SimpleEntry<String, String>(keyValueSplit.get(0), keyValueSplit.get(1));
+        return new AbstractMap.SimpleEntry<>(keyValueSplit.get(0), keyValueSplit.get(1));
     }
 }

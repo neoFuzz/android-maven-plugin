@@ -15,6 +15,7 @@
  */
 package com.github.cardforge.maven.plugins.android.standalonemojos;
 
+import com.android.annotations.NonNull;
 import com.android.ddmlib.*;
 import com.github.cardforge.maven.plugins.android.AbstractAndroidMojo;
 import com.github.cardforge.maven.plugins.android.DeviceCallback;
@@ -48,7 +49,7 @@ import static com.github.cardforge.maven.plugins.android.common.AndroidExtension
  * Runs the first Activity shown in the top-level launcher as determined by its Intent filters.
  * <p>
  * Android provides a component-based architecture, which means that there is no "main" function which serves as an
- * entry point to the APK. There's an homogeneous collection of Activity(es), Service(s), Receiver(s), etc.
+ * entry point to the APK. There's a homogeneous collection of Activity(es), Service(s), Receiver(s), etc.
  * </p>
  * <p>
  * The Android top-level launcher (whose purpose is to allow users to launch other applications) uses the Intent
@@ -69,7 +70,7 @@ import static com.github.cardforge.maven.plugins.android.common.AndroidExtension
  * &lt;/activity&gt;
  * </pre>
  * <p>
- * This {@link Mojo} will try to to launch the first activity of this kind found in <code>AndroidManifest.xml</code>. In
+ * This {@link Mojo} will try to launch the first activity of this kind found in <code>AndroidManifest.xml</code>. In
  * case multiple activities satisfy the requirements listed above only the first declared one is run. In case there are
  * no "Launcher activities" declared in the manifest or no activities declared at all, this goal aborts throwing an
  * error.
@@ -84,11 +85,12 @@ import static com.github.cardforge.maven.plugins.android.common.AndroidExtension
  * @see "http://developer.android.com/guide/topics/fundamentals.html"
  * @see "http://developer.android.com/guide/topics/intents/intents-filters.html"
  */
+@SuppressWarnings("unused")
 @Mojo(name = "run")
 public class RunMojo extends AbstractAndroidMojo {
 
     /**
-     * Debug parameter for the the run goal. If true, the device or emulator will pause execution of the process at
+     * Debug parameter for the run goal. If true, the device or emulator will pause execution of the process at
      * startup to wait for a debugger to connect. Also see the "run" parameter documentation. Default value is false.
      * If the value is numeric, it is treated as a port number to forward the JDWP protocol
      * of the launched process to.
@@ -119,7 +121,7 @@ public class RunMojo extends AbstractAndroidMojo {
     @PullParameter(defaultValue = "false")
     private String parsedDebug;
 
-    private static void createForward(IDevice device, int debugPort, int pid)
+    private static void createForward(@NonNull IDevice device, int debugPort, int pid)
             throws ClassNotFoundException, NoSuchMethodException, IllegalAccessException, InvocationTargetException {
         Method m = Class.forName("com.android.ddmlib.AdbHelper").
                 getDeclaredMethod(
@@ -169,12 +171,13 @@ public class RunMojo extends AbstractAndroidMojo {
      * Gets the first "Launcher" Activity by running an XPath query on <code>AndroidManifest.xml</code>.
      *
      * @return A {@link LauncherInfo}
-     * @throws MojoFailureException
-     * @throws ParserConfigurationException
-     * @throws IOException
-     * @throws SAXException
-     * @throws XPathExpressionException
+     * @throws MojoFailureException         if the manifest file could not be parsed or the activity could not be found
+     * @throws ParserConfigurationException if a DocumentBuilder cannot be created which satisfies the configuration requested.
+     * @throws IOException                  if any IO errors occur.
+     * @throws SAXException                 if any parse errors occur.
+     * @throws XPathExpressionException     if the XPath expression cannot be compiled.
      */
+    @NonNull
     private LauncherInfo getLauncherActivity()
             throws ParserConfigurationException, SAXException, IOException, XPathExpressionException,
             MojoFailureException {
@@ -208,11 +211,7 @@ public class RunMojo extends AbstractAndroidMojo {
         //
         result = xPathExpression.evaluate(document, XPathConstants.NODESET);
 
-        if (result instanceof NodeList) {
-            NodeList activities;
-
-            activities = (NodeList) result;
-
+        if (result instanceof NodeList activities) {
             if (activities.getLength() > 0) {
                 // Grab the first declared Activity
                 LauncherInfo launcherInfo;
@@ -235,7 +234,7 @@ public class RunMojo extends AbstractAndroidMojo {
 
                 launcherInfo.packageName = renameManifestPackage != null
                         ? renameManifestPackage
-                        : document.getDocumentElement().getAttribute("package").toString();
+                        : document.getDocumentElement().getAttribute("package");
 
                 return launcherInfo;
             } else {
@@ -252,10 +251,10 @@ public class RunMojo extends AbstractAndroidMojo {
      * Executes the "Launcher activity".
      *
      * @param info A {@link LauncherInfo}.
-     * @throws MojoFailureException
-     * @throws MojoExecutionException
+     * @throws MojoFailureException   if the command could not be executed
+     * @throws MojoExecutionException if the command could not be executed
      */
-    private void launch(final LauncherInfo info) throws MojoExecutionException, MojoFailureException {
+    private void launch(@NonNull final LauncherInfo info) throws MojoExecutionException, MojoFailureException {
         final String command;
 
         final int debugPort = findDebugPort();
@@ -310,7 +309,7 @@ public class RunMojo extends AbstractAndroidMojo {
                 }
             }
 
-            private int findPid(IDevice device, final String cmd)
+            private int findPid(@NonNull IDevice device, final String cmd)
                     throws IOException, TimeoutException, AdbCommandRejectedException, ShellCommandUnresponsiveException {
                 CollectingOutputReceiver processOutput = new CollectingOutputReceiver();
                 device.executeShellCommand(cmd, processOutput);
@@ -324,7 +323,7 @@ public class RunMojo extends AbstractAndroidMojo {
                     if (line.endsWith(info.packageName)) {
                         String[] values = line.split(" +");
                         if (values.length > 2) {
-                            pid = Integer.valueOf(values[1]);
+                            pid = Integer.parseInt(values[1]);
                             break;
                         }
                     }

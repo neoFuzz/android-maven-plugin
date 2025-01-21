@@ -38,5 +38,5 @@ public interface IPkgDescAddon extends IPkgDesc {
      * @return A non-null id/display name for the add-on
      */
     @NonNull
-    public IdDisplay getName();
+    IdDisplay getName();
 }

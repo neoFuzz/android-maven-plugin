@@ -20,7 +20,6 @@ import com.android.annotations.NonNull;
 import com.android.annotations.VisibleForTesting;
 import com.android.utils.ILogger;
 import com.android.utils.StdLogger;
-import com.google.common.base.Charsets;
 import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
 import com.google.common.io.Files;
@@ -28,6 +27,7 @@ import com.google.common.io.Files;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.Locale;
@@ -48,17 +48,18 @@ public class Merger {
     }
 
     public static void usage() {
-        System.out.println("Android Manifest Merger Tool Version 2\n");
-        System.out.println("Usage:");
-        System.out.println("Merger --main mainAndroidManifest.xml");
-        System.out.println("\t--log [VERBOSE, INFO, WARNING, ERROR]");
-        System.out.println("\t--libs [path separated list of lib's manifests]");
-        System.out.println("\t--overlays [path separated list of overlay's manifests]");
-        System.out.println("\t--property ["
-                + Joiner.on(" | ").join(ManifestSystemProperty.values())
-                + "=value]");
-        System.out.println("\t--placeholder [name=value]");
-        System.out.println("\t--out [path of the output file]");
+        String sb = "Android Manifest Merger Tool Version 2\n" +
+                "Usage:\n" +
+                "Merger --main mainAndroidManifest.xml\n" +
+                "\t--log [VERBOSE, INFO, WARNING, ERROR]\n" +
+                "\t--libs [path separated list of lib's manifests]\n" +
+                "\t--overlays [path separated list of overlay's manifests]\n" +
+                "\t--property [" +
+                Joiner.on(" | ").join(ManifestSystemProperty.values()) +
+                "=value]\n" +
+                "\t--placeholder [name=value]\n" +
+                "\t--out [path of the output file]";
+        System.out.println(sb);
     }
 
     public int process(String[] args) throws FileNotFoundException {
@@ -95,7 +96,8 @@ public class Merger {
         }
 
         if (mainManifest == null) {
-            System.err.println("--main command switch not provided.");
+            logger.error(null /* throwable */,
+                    "--main command switch not provided.");
             return 1;
         }
 
@@ -171,17 +173,17 @@ public class Merger {
                 if (mergedDocument != null) {
                     if (outFile != null) {
                         try {
-                            Files.write(mergedDocument, outFile, Charsets.UTF_8);
+                            Files.write(mergedDocument, outFile, StandardCharsets.UTF_8);
                         } catch (IOException e) {
                             throw new RuntimeException(e);
                         }
                     } else {
-                        System.out.println(mergedDocument);
+                        logger.info("Merged manifest:\n%s", mergedDocument);
                     }
                 }
             } else {
-                for (MergingReport.Record record : merge.getLoggingRecords()) {
-                    System.err.println(record);
+                for (MergingReport.Record rec : merge.getLoggingRecords()) {
+                    logger.error(null, rec.getMessage());
                 }
             }
         } catch (ManifestMerger2.MergeFailureException e) {

@@ -15,7 +15,6 @@
  */
 package com.github.cardforge.maven.plugins.android.asm;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.codehaus.plexus.util.DirectoryWalkListener;
 import org.codehaus.plexus.util.DirectoryWalker;
@@ -53,21 +52,16 @@ public class AndroidTestFinder {
 
         for (File classFile : classFiles) {
             ClassReader classReader;
-            FileInputStream inputStream = null;
-            try {
-                inputStream = new FileInputStream(classFile);
+            try (FileInputStream inputStream = new FileInputStream(classFile)) {
                 classReader = new ClassReader(inputStream);
-
-                classReader.accept(descendantFinder, ClassReader.SKIP_DEBUG | ClassReader.SKIP_FRAMES
-                        | ClassReader.SKIP_CODE);
-                classReader.accept(annotationFinder, ClassReader.SKIP_DEBUG | ClassReader.SKIP_FRAMES
-                        | ClassReader.SKIP_CODE);
+                classReader.accept(descendantFinder,
+                        ClassReader.SKIP_DEBUG | ClassReader.SKIP_FRAMES | ClassReader.SKIP_CODE);
+                classReader.accept(annotationFinder,
+                        ClassReader.SKIP_DEBUG | ClassReader.SKIP_FRAMES | ClassReader.SKIP_CODE);
             } catch (IOException e) {
                 throw new MojoExecutionException("Error reading " + classFile + ".\nCould not determine whether it "
                         + "contains tests. Please specify with plugin config parameter "
                         + "<enableIntegrationTest>true|false</enableIntegrationTest>.", e);
-            } finally {
-                IOUtils.closeQuietly(inputStream);
             }
         }
 

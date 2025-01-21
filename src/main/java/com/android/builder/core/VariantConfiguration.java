@@ -1449,7 +1449,7 @@ public class VariantConfiguration<T extends BuildType, D extends ProductFlavor, 
     /**
      * Return the merged res values for the variant.
      * <p>
-     * This is made of the variant-specific fields overlayed on top of the build type ones,
+     * This is made of the variant-specific fields over-layed on top of the build type ones,
      * the flavors ones, and the default config ones.
      *
      * @return a map of merged fields
@@ -1621,10 +1621,7 @@ public class VariantConfiguration<T extends BuildType, D extends ProductFlavor, 
             return value;
         }
         value = mMergedFlavor.getMultiDexKeepFile();
-        if (value != null) {
-            return value;
-        }
-        return null;
+        return value;
     }
 
     public File getMultiDexKeepProguard() {

@@ -1,5 +1,6 @@
 package com.github.cardforge.maven.plugins.android;
 
+import com.android.annotations.NonNull;
 import com.android.ddmlib.*;
 import com.android.ddmlib.testrunner.ITestRunListener;
 import com.android.ddmlib.testrunner.TestIdentifier;
@@ -20,7 +21,7 @@ import java.text.NumberFormat;
 import java.util.Map;
 
 /**
- * AndroidTestRunListener produces a nice output for the log for the test run as well as an xml file compatible with
+ * AndroidTestRunListener produces a nice output for the log for the test run as well as an XML file compatible with
  * the junit xml report file format understood by many tools.
  * <p>
  * It will do so for each device/emulator the tests run on.
@@ -89,7 +90,7 @@ public class AndroidTestRunListener implements ITestRunListener {
 
     @Override
     public void testRunStarted(String runName, int tCount) {
-        if (takeScreenshotOnFailure) {
+        if (Boolean.TRUE.equals(takeScreenshotOnFailure)) {
             executeOnAdbShell("rm -f " + screenshotsPathOnDevice + "/*screenshot.png");
             executeOnAdbShell("mkdir " + screenshotsPathOnDevice);
         }
@@ -97,7 +98,7 @@ public class AndroidTestRunListener implements ITestRunListener {
         this.testCount = tCount;
         getLog().info(deviceLogLinePrefix + INDENT + "Run started: " + runName + ", " + testCount + " tests:");
 
-        if (createReport) {
+        if (Boolean.TRUE.equals(createReport)) {
             report = new Testsuite();
             report.setName(runName);
             final Testsuite.Properties props = new Testsuite.Properties();
@@ -119,22 +120,22 @@ public class AndroidTestRunListener implements ITestRunListener {
     }
 
     @Override
-    public void testIgnored(TestIdentifier testIdentifier) {
+    public void testIgnored(@NonNull TestIdentifier testIdentifier) {
         ++testIgnoredCount;
 
-        getLog().info(deviceLogLinePrefix + INDENT + INDENT + testIdentifier.toString());
+        getLog().info(deviceLogLinePrefix + INDENT + INDENT + testIdentifier);
 
     }
 
     @Override
-    public void testStarted(TestIdentifier testIdentifier) {
+    public void testStarted(@NonNull TestIdentifier testIdentifier) {
         testRunCount++;
         getLog().info(
                 deviceLogLinePrefix
                         + String.format("%1$s%1$sStart [%2$d/%3$d]: %4$s", INDENT, testRunCount, testCount,
-                        testIdentifier.toString()));
+                        testIdentifier));
 
-        if (createReport) { // reset start time for each test run
+        if (Boolean.TRUE.equals(createReport)) { // reset start time for each test run
             currentTestCaseStartTime = System.currentTimeMillis();
             currentTestCase = new Testsuite.Testcase();
             currentTestCase.setClassname(testIdentifier.getClassName());
@@ -144,7 +145,7 @@ public class AndroidTestRunListener implements ITestRunListener {
 
     @Override
     public void testFailed(TestIdentifier testIdentifier, String trace) {
-        if (takeScreenshotOnFailure) {
+        if (Boolean.TRUE.equals(takeScreenshotOnFailure)) {
             String suffix = "_error";
             String filepath = testIdentifier.getTestName() + suffix + SCREENSHOT_SUFFIX;
 
@@ -157,7 +158,7 @@ public class AndroidTestRunListener implements ITestRunListener {
         getLog().info(deviceLogLinePrefix + INDENT + INDENT + testIdentifier.toString());
         getLog().info(deviceLogLinePrefix + INDENT + INDENT + trace);
 
-        if (createReport) {
+        if (Boolean.TRUE.equals(createReport)) {
             final Testsuite.Testcase.Error error = new Testsuite.Testcase.Error();
             error.setValue(trace);
             error.setMessage(parseForMessage(trace));
@@ -168,7 +169,7 @@ public class AndroidTestRunListener implements ITestRunListener {
 
     @Override
     public void testAssumptionFailure(TestIdentifier testIdentifier, String trace) {
-        if (takeScreenshotOnFailure) {
+        if (Boolean.TRUE.equals(takeScreenshotOnFailure)) {
             String suffix = "_failure";
             String filepath = testIdentifier.getTestName() + suffix + SCREENSHOT_SUFFIX;
 
@@ -181,7 +182,7 @@ public class AndroidTestRunListener implements ITestRunListener {
         getLog().info(deviceLogLinePrefix + INDENT + INDENT + testIdentifier.toString());
         getLog().info(deviceLogLinePrefix + INDENT + INDENT + trace);
 
-        if (createReport) {
+        if (Boolean.TRUE.equals(createReport)) {
             final Testsuite.Testcase.Failure failure = new Testsuite.Testcase.Failure();
             failure.setValue(trace);
             failure.setMessage(parseForMessage(trace));
@@ -200,10 +201,12 @@ public class AndroidTestRunListener implements ITestRunListener {
 
                 @Override
                 public void flush() {
+                    // none
                 }
 
                 @Override
                 public void addOutput(byte[] data, int offset, int length) {
+                    // none
                 }
             });
         } catch (TimeoutException | AdbCommandRejectedException | IOException | ShellCommandUnresponsiveException e) {
@@ -212,14 +215,14 @@ public class AndroidTestRunListener implements ITestRunListener {
     }
 
     @Override
-    public void testEnded(TestIdentifier testIdentifier, Map<String, String> testMetrics) {
+    public void testEnded(@NonNull TestIdentifier testIdentifier, Map<String, String> testMetrics) {
         getLog().info(
                 deviceLogLinePrefix
                         + String.format("%1$s%1$sEnd [%2$d/%3$d]: %4$s", INDENT, testRunCount, testCount,
-                        testIdentifier.toString()));
+                        testIdentifier));
         logMetrics(testMetrics);
 
-        if (createReport) {
+        if (Boolean.TRUE.equals(createReport)) {
             double seconds = (System.currentTimeMillis() - currentTestCaseStartTime) / 1000.0;
             currentTestCase.setTime(timeFormatter.format(seconds));
             report.getTestcase().add(currentTestCase);
@@ -238,7 +241,7 @@ public class AndroidTestRunListener implements ITestRunListener {
                         + testFailureCount + ",  Errors: " + testErrorCount
                         + ",  Ignored: " + testIgnoredCount);
 
-        if (createReport) {
+        if (Boolean.TRUE.equals(createReport)) {
             report.setTests(Integer.toString(testCount));
             report.setFailures(Integer.toString(testFailureCount));
             report.setErrors(Integer.toString(testErrorCount));
@@ -248,7 +251,7 @@ public class AndroidTestRunListener implements ITestRunListener {
 
         logMetrics(runMetrics);
 
-        if (createReport) {
+        if (Boolean.TRUE.equals(createReport)) {
             writeJunitReportToFile();
         }
     }
@@ -317,7 +320,7 @@ public class AndroidTestRunListener implements ITestRunListener {
      */
     private void writeJunitReportToFile() {
         try {
-            final String directory = String.valueOf(targetDirectory) + "/surefire-reports";
+            final String directory = targetDirectory + "/surefire-reports";
             FileUtils.forceMkdir(new File(directory));
             final StringBuilder b = new StringBuilder(directory).append("/TEST-")
                     .append(DeviceHelper.getDescriptiveName(device));
@@ -349,7 +352,7 @@ public class AndroidTestRunListener implements ITestRunListener {
      *
      * @param metrics key-value pairs reported at the end of a test run
      */
-    private void logMetrics(Map<String, String> metrics) {
+    private void logMetrics(@NonNull Map<String, String> metrics) {
         for (Map.Entry<String, String> entry : metrics.entrySet()) {
             getLog().info(deviceLogLinePrefix + INDENT + INDENT + entry.getKey() + ": " + entry.getValue());
         }

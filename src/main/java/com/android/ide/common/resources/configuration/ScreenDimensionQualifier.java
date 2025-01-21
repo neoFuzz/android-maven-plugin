@@ -16,6 +16,9 @@
 
 package com.android.ide.common.resources.configuration;
 
+import com.android.annotations.NonNull;
+import com.android.annotations.Nullable;
+
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -55,6 +58,7 @@ public final class ScreenDimensionQualifier extends ResourceQualifier {
         mValue2 = value2;
     }
 
+    @Nullable
     public static ScreenDimensionQualifier getQualifier(String size1, String size2) {
         try {
             int s1 = Integer.parseInt(size1);
@@ -92,6 +96,7 @@ public final class ScreenDimensionQualifier extends ResourceQualifier {
     }
 
     @Override
+    @NonNull
     public String getShortName() {
         return "Dimension";
     }
@@ -134,9 +139,8 @@ public final class ScreenDimensionQualifier extends ResourceQualifier {
 
     @Override
     public boolean equals(Object qualifier) {
-        if (qualifier instanceof ScreenDimensionQualifier) {
-            ScreenDimensionQualifier q = (ScreenDimensionQualifier) qualifier;
-            return (mValue1 == q.mValue1 && mValue2 == q.mValue2);
+        if (qualifier instanceof ScreenDimensionQualifier sd) {
+            return (mValue1 == sd.mValue1 && mValue2 == sd.mValue2);
         }
 
         return false;
@@ -151,11 +155,13 @@ public final class ScreenDimensionQualifier extends ResourceQualifier {
      * Returns the string used to represent this qualifier in the folder name.
      */
     @Override
+    @NonNull
     public String getFolderSegment() {
         return String.format("%1$dx%2$d", mValue1, mValue2); //$NON-NLS-1$
     }
 
     @Override
+    @NonNull
     public String getShortDisplayValue() {
         if (isValid()) {
             return String.format("%1$dx%2$d", mValue1, mValue2);
@@ -165,6 +171,7 @@ public final class ScreenDimensionQualifier extends ResourceQualifier {
     }
 
     @Override
+    @NonNull
     public String getLongDisplayValue() {
         if (isValid()) {
             return String.format("Screen resolution %1$dx%2$d", mValue1, mValue2);

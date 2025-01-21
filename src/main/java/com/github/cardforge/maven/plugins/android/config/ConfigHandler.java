@@ -1,13 +1,18 @@
 package com.github.cardforge.maven.plugins.android.config;
 
+import com.android.annotations.NonNull;
+import com.android.annotations.Nullable;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.plugin.PluginParameterExpressionEvaluator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 
 /**
@@ -15,18 +20,19 @@ import java.util.Collection;
  * pojo and annotations for default values on properties named parsed*. See the ProguardMojo for a working
  * implementation.
  *
- * @author Adrian Stabiszewski https://github.com/grundid/
+ * @author <a href="https://github.com/grundid/">Adrian Stabiszewski</a>
  * @author Manfred Moser - manfred@simpligility.com
  * @see ConfigPojo
  * @see PullParameter
  */
 public class ConfigHandler {
 
-    private Object mojo;
+    private static final Logger log = LoggerFactory.getLogger(ConfigHandler.class);
+    private final Object mojo;
+    private final PluginParameterExpressionEvaluator evaluator;
     private Object configPojoInstance;
     private String configPojoName;
     private String configPojoPrefix;
-    private PluginParameterExpressionEvaluator evaluator;
 
     public ConfigHandler(Object mojo, MavenSession session, MojoExecution execution) {
         this.mojo = mojo;
@@ -43,8 +49,9 @@ public class ConfigHandler {
         initConfigPojo();
     }
 
+    @NonNull
     private Collection<Field> findPropertiesByAnnotation(Class<? extends Annotation> annotation) {
-        Collection<Field> result = new ArrayList<Field>();
+        Collection<Field> result = new ArrayList<>();
         for (Class<? extends Object> cls = mojo.getClass(); cls != Object.class; cls = cls.getSuperclass()) {
             for (Field field : cls.getDeclaredFields()) {
                 if (field.isAnnotationPresent(annotation)) {
@@ -70,10 +77,7 @@ public class ConfigHandler {
             // then override with value from properties supplied in pom, settings or command line
             // unless it is null or an empty array
             Object propertyValue = getValueFromMojo(fieldBaseName);
-            if (propertyValue == null || propertyValue instanceof Object[]//
-                    && ((Object[]) propertyValue).length == 0) {
-                // no useful value
-            } else {
+            if (propertyValue != null && (!(propertyValue instanceof Object[] o) || o.length != 0)) {
                 value = propertyValue;
             }
             // and only if we still have no value, get the default as declared in the annotation
@@ -84,12 +88,13 @@ public class ConfigHandler {
             try {
                 field.set(mojo, value);
             } catch (Exception e) {
-                e.printStackTrace();
+                log.warn(Arrays.toString(e.getStackTrace()));
             }
         }
     }
 
-    private Object getValueFromAnnotation(Field field) {
+    @Nullable
+    private Object getValueFromAnnotation(@NonNull Field field) {
         PullParameter annotation = field.getAnnotation(PullParameter.class);
         String[] defaultValue = annotation.defaultValue();
         boolean required = annotation.required();
@@ -144,7 +149,7 @@ public class ConfigHandler {
         }
     }
 
-    private Object convertTo(Class<?> javaType, Object defValue)
+    private Object convertTo(@NonNull Class<?> javaType, Object defValue)
             throws Exception {
         // try valueOf
         try {
@@ -175,7 +180,8 @@ public class ConfigHandler {
         return value;
     }
 
-    private Field findFieldByName(Object object, String name) {
+    @Nullable
+    private Field findFieldByName(@NonNull Object object, String name) {
         for (Field field : object.getClass().getDeclaredFields()) {
             if (field.getName().equals(name)) {
                 field.setAccessible(true);
@@ -185,7 +191,8 @@ public class ConfigHandler {
         return null;
     }
 
-    private String getFieldNameWithoutPrefix(Field field, String prefix) {
+    @NonNull
+    private String getFieldNameWithoutPrefix(@NonNull Field field, String prefix) {
         if (field.getName().startsWith(prefix)) {
             String fieldName = field.getName().substring(prefix.length());
             return fieldName.substring(0, 1).toLowerCase() + fieldName.substring(1);
@@ -194,10 +201,12 @@ public class ConfigHandler {
         }
     }
 
-    private String toFirstLetterUppercase(String s) {
+    @NonNull
+    private String toFirstLetterUppercase(@NonNull String s) {
         return s.substring(0, 1).toUpperCase() + s.substring(1);
     }
 
+    @NonNull
     private String getFieldNameWithoutParsedPrefix(Field field) {
         return getFieldNameWithoutPrefix(field, configPojoPrefix);
     }

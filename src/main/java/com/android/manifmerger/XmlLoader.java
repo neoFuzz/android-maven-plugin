@@ -19,7 +19,7 @@ package com.android.manifmerger;
 import com.android.annotations.NonNull;
 import com.android.ide.common.blame.SourceFile;
 import com.android.utils.PositionXmlParser;
-import com.google.common.base.Optional;
+import java.util.Optional;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
@@ -39,7 +39,7 @@ public final class XmlLoader {
     }
 
     /**
-     * Loads an xml file without doing xml validation and return a {@link XmlDocument}
+     * Loads an XML file without doing xml validation and return a {@link XmlDocument}
      *
      * @param displayName the xml file display name.
      * @param xmlFile     the xml file.
@@ -66,7 +66,7 @@ public final class XmlLoader {
     }
 
     /**
-     * Loads a xml document from its {@link String} representation without doing xml validation and
+     * Loads an XML document from its {@link String} representation without doing xml validation and
      * return a {@link com.android.manifmerger.XmlDocument}
      *
      * @param sourceFile the source location to use for logging and record collection.

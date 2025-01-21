@@ -16,10 +16,13 @@
 
 package com.android.ide.common.signing;
 
+import java.io.Serial;
+
 public class KeytoolException extends Exception {
     /**
      * default serial uid
      */
+    @Serial
     private static final long serialVersionUID = 1L;
     private String mJavaHome = null;
     private String mCommandLine = null;

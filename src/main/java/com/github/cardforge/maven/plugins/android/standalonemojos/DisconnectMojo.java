@@ -15,6 +15,7 @@ import java.util.List;
  *
  * @author demey.emmanuel@gmail.com
  */
+@SuppressWarnings("unused") // used in Maven goals
 @Mojo(name = "disconnect", requiresProject = false)
 public class DisconnectMojo extends AbstractAndroidMojo {
     @Override
@@ -31,7 +32,7 @@ public class DisconnectMojo extends AbstractAndroidMojo {
                 // rather than calling the command line tool
                 String command = getAndroidSdk().getAdbPath();
 
-                List<String> parameters = new ArrayList<String>();
+                List<String> parameters = new ArrayList<>();
                 parameters.add("disconnect");
                 parameters.add(ip);
 

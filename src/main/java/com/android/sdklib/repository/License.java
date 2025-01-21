@@ -18,12 +18,12 @@ package com.android.sdklib.repository;
 
 import com.android.annotations.NonNull;
 import com.android.annotations.Nullable;
-import com.google.common.base.Charsets;
 import com.google.common.hash.Hashing;
 import com.google.common.io.Files;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 
 /**
  * License text, with an optional license XML reference.
@@ -72,13 +72,7 @@ public class License {
      */
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("<License ref:")
-                .append(mLicenseRef)
-                .append(", text:")
-                .append(mLicense)
-                .append(">");
-        return sb.toString();
+        return "<License ref:" + mLicenseRef + ", text:" + mLicense + ">";
     }
 
     @Override
@@ -100,10 +94,9 @@ public class License {
         if (obj == null) {
             return false;
         }
-        if (!(obj instanceof License)) {
+        if (!(obj instanceof License other)) {
             return false;
         }
-        License other = (License) obj;
         if (mLicense == null) {
             if (other.mLicense != null) {
                 return false;
@@ -112,13 +105,8 @@ public class License {
             return false;
         }
         if (mLicenseRef == null) {
-            if (other.mLicenseRef != null) {
-                return false;
-            }
-        } else if (!mLicenseRef.equals(other.mLicenseRef)) {
-            return false;
-        }
-        return true;
+            return other.mLicenseRef == null;
+        } else return mLicenseRef.equals(other.mLicenseRef);
     }
 
     /**
@@ -137,9 +125,9 @@ public class License {
             return false;
         }
         try {
-            String hash = Files.readFirstLine(licenseFile, Charsets.UTF_8);
-            return hash.equals(mLicenseHash);
-        } catch (IOException e) {
+            String hash = Files.readFirstLine(licenseFile, StandardCharsets.UTF_8);
+            return hash != null && hash.equals(mLicenseHash);
+        } catch (Exception e) {
             return false;
         }
     }
@@ -166,7 +154,7 @@ public class License {
         }
         File licenseFile = new File(licenseDir, mLicenseRef == null ? mLicenseHash : mLicenseRef);
         try {
-            Files.write(mLicenseHash, licenseFile, Charsets.UTF_8);
+            Files.write(mLicenseHash, licenseFile, StandardCharsets.UTF_8);
         } catch (IOException e) {
             return false;
         }

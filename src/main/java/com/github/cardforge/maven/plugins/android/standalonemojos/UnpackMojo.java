@@ -17,6 +17,7 @@
 
 package com.github.cardforge.maven.plugins.android.standalonemojos;
 
+import com.android.annotations.NonNull;
 import com.github.cardforge.maven.plugins.android.AbstractAndroidMojo;
 import com.github.cardforge.maven.plugins.android.CommandExecutor;
 import com.github.cardforge.maven.plugins.android.common.JarHelper;
@@ -48,6 +49,7 @@ import java.util.jar.JarFile;
  */
 @Mojo(name = "unpack", requiresDependencyResolution = ResolutionScope.COMPILE)
 public class UnpackMojo extends AbstractAndroidMojo {
+    public static final String INTO = " into ";
     /**
      * If true, the library will be unpacked only when outputDirectory doesn't
      * exist, i.e, a clean build for most cases.
@@ -57,9 +59,6 @@ public class UnpackMojo extends AbstractAndroidMojo {
     @Deprecated(since = "4.8", forRemoval = false)
     @Parameter(property = "android.lazyLibraryUnpack")
     private boolean lazyLibraryUnpack;
-
-    @PullParameter(defaultValueGetterMethod = "getDefaultMetaInf")
-    private MetaInf unpackMetaInf;
 
     @Parameter(property = "android.unpack.lazy")
     @PullParameter(defaultValueGetterMethod = "getLazyLibraryUnpack")
@@ -97,31 +96,7 @@ public class UnpackMojo extends AbstractAndroidMojo {
             outputDirectory.mkdirs();
 
             for (Artifact artifact : getRelevantCompileArtifacts()) {
-
-                if (artifact.getFile().isDirectory()) {
-                    try {
-                        FileUtils.copyDirectory(artifact.getFile(), outputDirectory);
-                    } catch (IOException e) {
-                        throw new MojoExecutionException("IOException while copying "
-                                + artifact.getFile().getAbsolutePath() + " into " + outputDirectory.getAbsolutePath()
-                                , e);
-                    }
-                } else {
-                    try {
-                        JarHelper.unjar(new JarFile(artifact.getFile()), outputDirectory,
-                                new JarHelper.UnjarListener() {
-                                    @Override
-                                    public boolean include(JarEntry jarEntry) {
-                                        return isIncluded(jarEntry);
-                                    }
-                                });
-                    } catch (IOException e) {
-                        throw new MojoExecutionException("IOException while unjarring "
-                                + artifact.getFile().getAbsolutePath() + " into " + outputDirectory.getAbsolutePath()
-                                , e);
-                    }
-                }
-
+                processArtifacts(artifact, outputDirectory);
             }
         }
 
@@ -131,27 +106,40 @@ public class UnpackMojo extends AbstractAndroidMojo {
             }
         } catch (IOException e) {
             throw new MojoExecutionException("IOException while copying " + sourceDirectory.getAbsolutePath()
-                    + " into " + outputDirectory.getAbsolutePath(), e);
+                    + INTO + outputDirectory.getAbsolutePath(), e);
         }
         return outputDirectory;
     }
 
-    boolean isIncluded(JarEntry jarEntry) {
+    private void processArtifacts(@NonNull Artifact artifact, File outputDirectory) throws MojoExecutionException {
+        if (artifact.getFile().isDirectory()) {
+            try {
+                FileUtils.copyDirectory(artifact.getFile(), outputDirectory);
+            } catch (IOException e) {
+                throw new MojoExecutionException("IOException while copying "
+                        + artifact.getFile().getAbsolutePath() + INTO + outputDirectory.getAbsolutePath()
+                        , e);
+            }
+        } else {
+            try {
+                JarHelper.unjar(new JarFile(artifact.getFile()), outputDirectory,
+                        jarEntry -> isIncluded(jarEntry));
+            } catch (IOException e) {
+                throw new MojoExecutionException("IOException while unjarring "
+                        + artifact.getFile().getAbsolutePath() + INTO + outputDirectory.getAbsolutePath()
+                        , e);
+            }
+        }
+    }
+
+    boolean isIncluded(@NonNull JarEntry jarEntry) {
         String entName = jarEntry.getName();
 
         if (entName.endsWith(".class")) {
             return true;
         }
 
-        if (includeNonClassFiles && !entName.startsWith("META-INF/")) {
-            return true;
-        }
-
-        return this.unpackMetaInf != null && this.unpackMetaInf.isIncluded(entName);
-    }
-
-    MetaInf getDefaultMetaInf() {
-        return this.pluginMetaInf;
+        return includeNonClassFiles && !entName.startsWith("META-INF/");
     }
 
     boolean getLazyLibraryUnpack() {

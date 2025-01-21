@@ -16,6 +16,7 @@
  */
 package com.github.cardforge.maven.plugins.android.standalonemojos;
 
+import com.android.annotations.NonNull;
 import com.android.ddmlib.IDevice;
 import com.android.ddmlib.testrunner.ITestRunListener;
 import com.android.ddmlib.testrunner.TestIdentifier;
@@ -32,6 +33,8 @@ import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.codehaus.plexus.interpolation.os.Os;
 import org.codehaus.plexus.util.cli.shell.BourneShell;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -50,11 +53,12 @@ import java.util.regex.Pattern;
  *
  * @author Stéphane Nicolas - snicolas@octo.com
  * @see <a href="http://developer.android.com/tools/help/monkey.html">Monkey docs by Google</a>
- * @see <a href="http://stackoverflow.com/q/3968064/693752">Stack Over Flow thread for parsing monkey output.</a>
+ * @see <a href="http://stackoverflow.com/q/3968064/693752">Stack Overflow thread for parsing monkey output.</a>
  */
 @SuppressWarnings("unused")
 @Mojo(name = "monkeyrunner")
 public class MonkeyRunnerMojo extends AbstractAndroidMojo {
+    private static final Logger log = LoggerFactory.getLogger(MonkeyRunnerMojo.class);
     /**
      * -Dmaven.test.skip is commonly used with Maven to skip tests. We honor it.
      */
@@ -173,10 +177,10 @@ public class MonkeyRunnerMojo extends AbstractAndroidMojo {
     private Boolean parsedCreateReport;
 
     /**
-     * Decides whether or not to inject device serial number as a parameter to each monkey runner script. The parameter
+     * Decides whether to inject device serial number as a parameter to each monkey runner script. The parameter
      * will be the first parameter passed to the script. This parameter allows to support monkey runner tests on
      * multiple devices. In that case, monkey runner scripts have to be modified to take the new parameter into account.
-     * Follow that <a href="http://stackoverflow.com/a/13460438/693752">thread on stack over flow to learn more about
+     * Follow that <a href="http://stackoverflow.com/a/13460438/693752">thread on stack overflow to learn more about
      * it</a>.
      */
     @Parameter(property = "android.monkeyrunner.injectDeviceSerialNumberIntoScript")
@@ -204,31 +208,28 @@ public class MonkeyRunnerMojo extends AbstractAndroidMojo {
         ConfigHandler configHandler = new ConfigHandler(this, this.session, this.execution);
         configHandler.parseConfiguration();
 
-        doWithDevices(new DeviceCallback() {
-            @Override
-            public void doWithDevice(IDevice device) throws MojoExecutionException, MojoFailureException {
-                AndroidTestRunListener testRunListener = new AndroidTestRunListener(device, getLog(),
-                        parsedCreateReport, false, "", "", targetDirectory);
-                if (isEnableIntegrationTest()) {
-                    run(device, testRunListener);
-                }
+        doWithDevices(device -> {
+            AndroidTestRunListener testRunListener = new AndroidTestRunListener(device, getLog(),
+                    parsedCreateReport, false, "", "", targetDirectory);
+            if (isEnableIntegrationTest()) {
+                run(device, testRunListener);
             }
         });
     }
 
     /**
-     * Whether or not tests are enabled.
+     * Whether tests are enabled.
      *
-     * @return a boolean indicating whether or not tests are enabled.
+     * @return a boolean indicating whether tests are enabled.
      */
     protected boolean isEnableIntegrationTest() {
         return !parsedSkip && !mavenTestSkip && !mavenSkipTests;
     }
 
     /**
-     * Whether or not test failures should be ignored.
+     * Whether test failures should be ignored.
      *
-     * @return a boolean indicating whether or not test failures should be ignored.
+     * @return a boolean indicating whether test failures should be ignored.
      */
     protected boolean isIgnoreTestFailures() {
         return mavenIgnoreTestFailure || mavenTestFailureIgnore;
@@ -239,7 +240,7 @@ public class MonkeyRunnerMojo extends AbstractAndroidMojo {
      *
      * @param device            the device on which tests are going to be executed.
      * @param iTestRunListeners test run listeners.
-     * @throws MojoExecutionException if exercising app threw an exception and isIgnoreTestFailures is false..
+     * @throws MojoExecutionException if exercising app threw an exception and isIgnoreTestFailures is false.
      * @throws MojoFailureException   if exercising app failed and isIgnoreTestFailures is false.
      */
     protected void run(IDevice device, ITestRunListener... iTestRunListeners) throws MojoExecutionException,
@@ -257,9 +258,9 @@ public class MonkeyRunnerMojo extends AbstractAndroidMojo {
 
         String command = getAndroidSdk().getMonkeyRunnerPath();
 
-        List<String> pluginParameters = new ArrayList<String>();
+        List<String> pluginParameters = new ArrayList<>();
 
-        if (parsedPlugins != null && parsedPlugins.length != 0) {
+        if (parsedPlugins != null) {
             for (String plugin : parsedPlugins) {
                 String pluginFilePath = new File(project.getBasedir(), plugin).getAbsolutePath();
                 pluginParameters.add("-plugin " + pluginFilePath);
@@ -272,7 +273,7 @@ public class MonkeyRunnerMojo extends AbstractAndroidMojo {
             executor.setErrorListener(errorListener);
 
             for (Program program : parsedPrograms) {
-                List<String> parameters = new ArrayList<String>(pluginParameters);
+                List<String> parameters = new ArrayList<>(pluginParameters);
 
                 String programFileName = new File(project.getBasedir(), program.getFilename()).getAbsolutePath();
                 parameters.add(programFileName);
@@ -325,7 +326,7 @@ public class MonkeyRunnerMojo extends AbstractAndroidMojo {
     }
 
     private void handleTestRunStarted() {
-        runMetrics = new HashMap<String, String>();
+        runMetrics = new HashMap<>();
         elapsedTime = System.currentTimeMillis();
         for (ITestRunListener listener : mTestListeners) {
             listener.testRunStarted(mRunName, eventCount);
@@ -347,7 +348,7 @@ public class MonkeyRunnerMojo extends AbstractAndroidMojo {
     }
 
     private void handleTestStarted() {
-        System.out.println("TEST START " + mTestListeners.length);
+        log.info("TEST START {}", mTestListeners.length);
         for (ITestRunListener listener : mTestListeners) {
             listener.testStarted(mCurrentTestIndentifier);
         }
@@ -356,7 +357,7 @@ public class MonkeyRunnerMojo extends AbstractAndroidMojo {
     private void handleTestEnded() {
         if (mCurrentTestIndentifier != null) {
             for (ITestRunListener listener : mTestListeners) {
-                listener.testEnded(mCurrentTestIndentifier, new HashMap<String, String>());
+                listener.testEnded(mCurrentTestIndentifier, new HashMap<>());
             }
             mCurrentTestIndentifier = null;
         }
@@ -387,8 +388,9 @@ public class MonkeyRunnerMojo extends AbstractAndroidMojo {
 
     private static final class CustomBourneShell extends BourneShell {
         @Override
+        @NonNull
         public List<String> getShellArgsList() {
-            List<String> shellArgs = new ArrayList<String>();
+            List<String> shellArgs = new ArrayList<>();
             List<String> existingShellArgs = super.getShellArgsList();
 
             if (existingShellArgs != null && !existingShellArgs.isEmpty()) {
@@ -399,6 +401,7 @@ public class MonkeyRunnerMojo extends AbstractAndroidMojo {
         }
 
         @Override
+        @NonNull
         public String[] getShellArgs() {
             String[] shellArgs = super.getShellArgs();
             if (shellArgs == null) {
@@ -429,7 +432,7 @@ public class MonkeyRunnerMojo extends AbstractAndroidMojo {
             final Pattern pattern = Pattern.compile(".*error.*|.*exception.*", Pattern.CASE_INSENSITIVE);
             final Matcher matcher = pattern.matcher(error);
 
-            // If the the reg.exp actually matches, we can safely say this is not an error
+            // If the reg.exp actually matches, we can safely say this is not an error
             // since in theory the user told us so
             if (matcher.matches()) {
                 hasError = true;
@@ -441,6 +444,7 @@ public class MonkeyRunnerMojo extends AbstractAndroidMojo {
             return false;
         }
 
+        @NonNull
         public String getStackTrace() {
             if (hasError) {
                 return stackTraceBuilder.toString();

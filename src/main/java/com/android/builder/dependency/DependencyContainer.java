@@ -32,7 +32,7 @@ public interface DependencyContainer {
      * Returns a list top level dependency. Each library object should contain
      * its own dependencies. This is actually a dependency graph.
      *
-     * @return a non null (but possibly empty) list.
+     * @return a non-null (but possibly empty) list.
      */
     @NonNull
     List<? extends LibraryDependency> getAndroidDependencies();

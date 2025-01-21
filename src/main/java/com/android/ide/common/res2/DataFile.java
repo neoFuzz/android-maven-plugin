@@ -17,6 +17,7 @@
 package com.android.ide.common.res2;
 
 import com.android.annotations.NonNull;
+import com.android.annotations.Nullable;
 import com.google.common.collect.Maps;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -41,7 +42,7 @@ public abstract class DataFile<I extends DataItem> {
      * <p>
      * The source file is set on the items with {@link DataItem#setSource(DataFile)}
      * <p>
-     * The type of the DataFile will by {@link FileType#MULTI}.
+     * The type of the DataFile will be {@link FileType#MULTI}.
      *
      * @param file the File
      */
@@ -125,12 +126,12 @@ public abstract class DataFile<I extends DataItem> {
         }
     }
 
-    public void removeItem(ResourceItem item) {
+    public void removeItem(@NonNull ResourceItem item) {
         mItems.remove(item.getKey());
         item.setSource(null);
     }
 
-    void addExtraAttributes(Document document, Node node, String namespaceUri) {
+    void addExtraAttributes(Document document, Node node, @Nullable String namespaceUri) {
         // nothing
     }
 

@@ -16,6 +16,8 @@
 
 package com.android.ide.common.resources;
 
+import com.android.annotations.NonNull;
+import com.android.annotations.Nullable;
 import com.android.annotations.VisibleForTesting;
 import com.android.annotations.VisibleForTesting.Visibility;
 import com.android.ide.common.resources.configuration.Configurable;
@@ -48,8 +50,8 @@ public final class ResourceFolder implements Configurable {
      * @param folder     The associated {@link IAbstractFolder} object.
      * @param repository The associated {@link ResourceRepository}
      */
-    protected ResourceFolder(ResourceFolderType type, FolderConfiguration config,
-                             IAbstractFolder folder, ResourceRepository repository) {
+    ResourceFolder(ResourceFolderType type, FolderConfiguration config,
+                   IAbstractFolder folder, ResourceRepository repository) {
         mType = type;
         mConfiguration = config;
         mFolder = folder;
@@ -91,18 +93,31 @@ public final class ResourceFolder implements Configurable {
         return resFile;
     }
 
+    /**
+     * creates a {@link ResourceFile} instance based on the type of resource
+     * associated with the given {@link IAbstractFile}.
+     *
+     * <p>This method determines the appropriate type of {@link ResourceFile} to create
+     * by examining the types of resources related to the folder type specified by {@code mType}.
+     * The method handles different types of resources such as {@link ResourceType#LAYOUT} and
+     * {@link ResourceType#MENU} specifically, and defaults to a multi-resource file for other types.</p>
+     *
+     * @param file The {@link IAbstractFile} object.
+     * @return The {@link ResourceFile} object.
+     */
+    @NonNull
     private ResourceFile createResourceFile(IAbstractFile file) {
-        // check if that's a single or multi resource type folder. For now we define this by
-        // the number of possible resource type output by files in the folder.
-        // We have a special case for layout/menu folders which can also generate IDs.
-        // This does
-        // not make the difference between several resource types from a single file or
-        // the ability to have 2 files in the same folder generating 2 different types of
-        // resource. The former is handled by MultiResourceFile properly while we don't
-        // handle the latter. If we were to add this behavior we'd have to change this call.
+        /* Check if that's a single or multi resource type folder. For now, we define this by
+         * the number of possible resource type output by files in the folder.
+         * We have a special case for layout/menu folders which can also generate IDs.
+         * This does not make the difference between several resource types from a single file or
+         * the ability to have 2 files in the same folder generating 2 different types of
+         * resource. The former is handled by MultiResourceFile properly while we don't
+         * handle the latter. If we were to add this behavior we'd have to change this call.
+         */
         List<ResourceType> types = FolderTypeRelationship.getRelatedResourceTypes(mType);
 
-        ResourceFile resFile = null;
+        ResourceFile resFile;
         if (types.size() == 1) {
             resFile = new SingleResourceFile(file, this);
         } else if (types.contains(ResourceType.LAYOUT)) {
@@ -149,7 +164,7 @@ public final class ResourceFolder implements Configurable {
                         break;
                     }
                     case LAYOUT: {
-                        // The main layout folder has about ~185 layouts in it;
+                        // The main layout folder has about ~185 layouts in it,
                         // the others are small
                         if (name.indexOf('-') == -1) {
                             initialSize = 200;
@@ -179,21 +194,21 @@ public final class ResourceFolder implements Configurable {
                 }
             }
 
-            mFiles = new ArrayList<ResourceFile>(initialSize);
-            mNames = new HashMap<String, ResourceFile>(initialSize, 2.0f);
+            mFiles = new ArrayList<>(initialSize);
+            mNames = new HashMap<>(initialSize, 2.0f);
         }
 
         mFiles.add(file);
         mNames.put(file.getFile().getName(), file);
     }
 
-    protected void removeFile(ResourceFile file, ScanningContext context) {
+    private void removeFile(@NonNull ResourceFile file, ScanningContext context) {
         file.dispose(context);
         mFiles.remove(file);
         mNames.remove(file.getFile().getName());
     }
 
-    protected void dispose(ScanningContext context) {
+    void dispose(ScanningContext context) {
         if (mFiles != null) {
             for (ResourceFile file : mFiles) {
                 file.dispose(context);
@@ -225,8 +240,9 @@ public final class ResourceFolder implements Configurable {
     /**
      * Returns the list of {@link ResourceType}s generated by the files inside this folder.
      */
+    @NonNull
     public Collection<ResourceType> getResourceTypes() {
-        ArrayList<ResourceType> list = new ArrayList<ResourceType>();
+        ArrayList<ResourceType> list = new ArrayList<>();
 
         if (mFiles != null) {
             for (ResourceFile file : mFiles) {
@@ -235,7 +251,7 @@ public final class ResourceFolder implements Configurable {
                 // loop through those and add them to the main list,
                 // if they are not already present
                 for (ResourceType resType : types) {
-                    if (list.indexOf(resType) == -1) {
+                    if (!list.contains(resType)) {
                         list.add(resType);
                     }
                 }
@@ -274,7 +290,8 @@ public final class ResourceFolder implements Configurable {
      *                as a place to stash errors encountered
      * @return the {@link ResourceFile} or null if no match was found.
      */
-    private ResourceFile getFile(IAbstractFile file, ScanningContext context) {
+    @Nullable
+    private ResourceFile getFile(@NonNull IAbstractFile file, ScanningContext context) {
         assert mFolder.equals(file.getParentFolder());
 
         if (mNames != null) {
@@ -302,6 +319,7 @@ public final class ResourceFolder implements Configurable {
      * @param filename The name of the file to return.
      * @return the {@link ResourceFile} or <code>null</code> if no match was found.
      */
+    @Nullable
     public ResourceFile getFile(String filename) {
         if (mNames != null) {
             ResourceFile resFile = mNames.get(filename);
@@ -341,15 +359,14 @@ public final class ResourceFolder implements Configurable {
             }
         }
 
-        if (valid) {
-            if (mFiles != null) {
+        if (valid && mFiles != null) {
                 for (ResourceFile f : mFiles) {
                     if (f.hasResources(type)) {
                         return true;
                     }
                 }
             }
-        }
+
         return false;
     }
 

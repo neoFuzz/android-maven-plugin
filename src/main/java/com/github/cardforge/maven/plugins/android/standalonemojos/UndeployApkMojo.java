@@ -32,13 +32,14 @@ import java.io.File;
 
 /**
  * Undeploys a specified Android application apk from attached devices and emulators.
- * By default it will undeploy from all, but a subset or single one can be configured
+ * By default, it will undeploy from all, but a subset or single one can be configured
  * with the device and devices parameters. You can supply the package of the
  * application and/or an apk file. This goal can be used in non-android projects and as
  * standalone execution on the command line.<br>
  *
  * @author Manfred Moser - manfred@simpligility.com
  */
+@SuppressWarnings("unused") // Maven goal
 @Mojo(name = "undeploy-apk", requiresProject = false)
 public class UndeployApkMojo extends AbstractAndroidMojo {
     /**
@@ -68,8 +69,10 @@ public class UndeployApkMojo extends AbstractAndroidMojo {
     private String parsedPackagename;
 
     /**
-     * @throws MojoExecutionException
-     * @throws MojoFailureException
+     * Executes the undeploy apk goal.
+     *
+     * @throws MojoExecutionException if an error occurred while undeploying the apk.
+     * @throws MojoFailureException   if the goal was not properly configured.
      */
     public void execute() throws MojoExecutionException, MojoFailureException {
         ConfigHandler configHandler = new ConfigHandler(this, this.session, this.execution);

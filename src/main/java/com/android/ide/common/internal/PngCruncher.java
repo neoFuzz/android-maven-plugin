@@ -27,21 +27,21 @@ public interface PngCruncher {
 
     /**
      * Crunch a given file into another given file. This may be implemented synchronously or
-     * asynchronously. Therefore the output file may not be present until {@link #end()} is called
+     * asynchronously. Therefore, the output file may not be present until {@link #end()} is called
      * and returned. When implemented asynchronously, this act like queueing a crunching request.
      * So this can be called multiple times and when
      * {@link #end()} is called and returned, all output files will be present.
      *
      * @param from the file to crunch
      * @param to   the output file
-     * @throws PngException
+     * @throws PngException if the crunching failed.
      */
     void crunchPng(@NonNull File from, @NonNull File to) throws PngException;
 
     /**
      * Wait until all Png crunching requests have been executed.
      *
-     * @throws InterruptedException
+     * @throws InterruptedException if the thread is interrupted while waiting.
      */
     void end() throws InterruptedException;
 }

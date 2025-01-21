@@ -24,7 +24,6 @@ import com.android.io.IAbstractFile;
 import com.android.io.IAbstractFolder;
 import com.android.resources.ResourceType;
 import com.android.utils.ILogger;
-import com.google.common.base.Charsets;
 import org.kxml2.io.KXmlParser;
 import org.xmlpull.v1.XmlPullParser;
 
@@ -32,18 +31,19 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 /**
  * Framework resources repository.
  * <p>
  * This behaves the same as {@link ResourceRepository} except that it differentiates between
- * resources that are public and non public.
+ * resources that are public and non-public.
  * {@link #getResourceItemsOfType(ResourceType)} and {@link #hasResourcesOfType(ResourceType)} only return
  * public resources. This is typically used to display resource lists in the UI.
  * <p>
  * {@link #getConfiguredResources(com.android.ide.common.resources.configuration.FolderConfiguration)}
- * returns all resources, even the non public ones so that this can be used for rendering.
+ * returns all resources, even the non-public ones so that this can be used for rendering.
  */
 public class FrameworkResources extends ResourceRepository {
 
@@ -52,7 +52,7 @@ public class FrameworkResources extends ResourceRepository {
      * possible values of ResourceType.
      */
     protected final Map<ResourceType, List<ResourceItem>> mPublicResourceMap =
-            new EnumMap<ResourceType, List<ResourceItem>>(ResourceType.class);
+            new EnumMap<>(ResourceType.class);
 
     public FrameworkResources(@NonNull IAbstractFolder resFolder) {
         super(resFolder, true /*isFrameworkRepository*/);
@@ -108,7 +108,7 @@ public class FrameworkResources extends ResourceRepository {
             Reader reader = null;
             try {
                 reader = new BufferedReader(new InputStreamReader(publicXmlFile.getContents(),
-                        Charsets.UTF_8));
+                        StandardCharsets.UTF_8));
                 KXmlParser parser = new KXmlParser();
                 parser.setFeature(XmlPullParser.FEATURE_PROCESS_NAMESPACES, false);
                 parser.setInput(reader);
@@ -140,7 +140,7 @@ public class FrameworkResources extends ResourceRepository {
                         }
 
                         if (name != null && typeName != null) {
-                            ResourceType type = null;
+                            ResourceType type;
                             if (typeName.equals(lastTypeName)) {
                                 type = lastType;
                             } else {
@@ -164,32 +164,15 @@ public class FrameworkResources extends ResourceRepository {
                                         // in one platform version, there are 1500 drawables
                                         // and 1200 strings but only 175 and 25 public ones
                                         // respectively.
-                                        int size;
-                                        switch (type) {
-                                            case STYLE:
-                                                size = 500;
-                                                break;
-                                            case ATTR:
-                                                size = 1050;
-                                                break;
-                                            case DRAWABLE:
-                                                size = 200;
-                                                break;
-                                            case ID:
-                                                size = 50;
-                                                break;
-                                            case LAYOUT:
-                                            case COLOR:
-                                            case STRING:
-                                            case ANIM:
-                                            case INTERPOLATOR:
-                                                size = 30;
-                                                break;
-                                            default:
-                                                size = 10;
-                                                break;
-                                        }
-                                        publicList = new ArrayList<ResourceItem>(size);
+                                        int size = switch (type) {
+                                            case STYLE -> 500;
+                                            case ATTR -> 1050;
+                                            case DRAWABLE -> 200;
+                                            case ID -> 50;
+                                            case LAYOUT, COLOR, STRING, ANIM, INTERPOLATOR -> 30;
+                                            default -> 10;
+                                        };
+                                        publicList = new ArrayList<>(size);
                                         mPublicResourceMap.put(type, publicList);
                                     }
 
@@ -197,10 +180,15 @@ public class FrameworkResources extends ResourceRepository {
                                 } else {
                                     // log that there's a public resource that doesn't actually
                                     // exist?
+                                    if (logger != null)
+                                        logger.warning(null, "Unknown public resource %1$s of type %2$s",
+                                                name, typeName);
                                 }
                             } else {
                                 // log that there was a reference to a typo that doesn't actually
                                 // exist?
+                                if (logger != null)
+                                    logger.warning(null, "Unknown resource type %1$s", typeName);
                             }
                         }
                     } else if (event == XmlPullParser.END_DOCUMENT) {

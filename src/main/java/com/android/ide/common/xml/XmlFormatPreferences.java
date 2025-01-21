@@ -27,25 +27,11 @@ import java.util.Comparator;
  * Formatting preferences used by the Android XML formatter.
  */
 public class XmlFormatPreferences {
-    /**
-     * Use the Eclipse indent (tab/space, indent size) settings?
-     */
-    public boolean useEclipseIndent = false;
 
     /**
      * Remove empty lines in all cases?
      */
     public boolean removeEmptyLines = false;
-
-    /**
-     * Reformat the text and comment blocks?
-     */
-    public boolean reflowText = false;
-
-    /**
-     * Join lines when reformatting text and comment blocks?
-     */
-    public boolean joinLines = false;
 
     /**
      * Can attributes appear on the same line as the opening line if there is just one of them?

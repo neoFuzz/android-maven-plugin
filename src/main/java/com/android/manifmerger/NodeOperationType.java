@@ -16,6 +16,7 @@
 
 package com.android.manifmerger;
 
+import com.android.annotations.NonNull;
 import com.android.utils.SdkUtils;
 
 /**
@@ -44,7 +45,7 @@ public enum NodeOperationType implements ConvertibleName {
     MERGE_ONLY_ATTRIBUTES(false),
 
     /**
-     * Replace further definitions of the same element with this one. There can be 0..n similar
+     * Replace further definitions of the same element with this one. There can be {@code 0..n} similar
      * elements replaced with the annotated xml element.
      */
     REPLACE(false),
@@ -96,11 +97,13 @@ public enum NodeOperationType implements ConvertibleName {
     }
 
     @Override
+    @NonNull
     public String toXmlName() {
         return SdkUtils.constantNameToXmlName(name());
     }
 
     @Override
+    @NonNull
     public String toCamelCaseName() {
         return SdkUtils.constantNameToCamelCase(name());
     }

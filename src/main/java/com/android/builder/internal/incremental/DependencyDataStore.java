@@ -59,6 +59,7 @@ public class DependencyDataStore {
     private final Map<String, DependencyData> mMainFileMap = Maps.newHashMap();
 
     public DependencyDataStore() {
+        // No initialization needed.
     }
 
     private static void writeInt(@NonNull FileOutputStream fos, int value) throws IOException {
@@ -67,7 +68,7 @@ public class DependencyDataStore {
         fos.write(b.array());
     }
 
-    private static void writePath(@NonNull FileOutputStream fos, String path) throws IOException {
+    private static void writePath(@NonNull FileOutputStream fos, @NonNull String path) throws IOException {
         byte[] pathBytes = path.getBytes(Charsets.UTF_8);
 
         writeInt(fos, pathBytes.length);
@@ -98,6 +99,7 @@ public class DependencyDataStore {
         return b.getInt();
     }
 
+    @NonNull
     private static String readPath(@NonNull FileInputStream fis, @NonNull ReusableBuffer buffers)
             throws IOException {
         int length = readInt(fis, buffers);
@@ -158,7 +160,7 @@ public class DependencyDataStore {
      * Saves the dependency data to a given file.
      *
      * @param file the file to save the data to.
-     * @throws IOException
+     * @throws IOException if the file cannot be written.
      */
     public void saveTo(@NonNull File file) throws IOException {
 
@@ -200,7 +202,7 @@ public class DependencyDataStore {
      *
      * @param file the file to load the data from.
      * @return a map of file-> list of impacted dependency data.
-     * @throws IOException
+     * @throws IOException if the file cannot be read.
      */
     public Multimap<String, DependencyData> loadFrom(@NonNull File file) throws IOException {
         Multimap<String, DependencyData> inputMap = ArrayListMultimap.create();
@@ -250,6 +252,7 @@ public class DependencyDataStore {
                     case TAG_2NDARY_OUTPUT:
                         currentData.addSecondaryOutputFile(path);
                         break;
+                    default:
                 }
 
                 // read the next tag.

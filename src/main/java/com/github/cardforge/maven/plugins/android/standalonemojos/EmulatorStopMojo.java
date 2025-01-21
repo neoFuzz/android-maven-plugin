@@ -10,14 +10,15 @@ import org.apache.maven.plugins.annotations.Mojo;
  *
  * @author Manfred Moser - manfred@simpligility.com
  */
+@SuppressWarnings("unused") // used in Maven goals
 @Mojo(name = "emulator-stop", requiresProject = false)
 public class EmulatorStopMojo extends AbstractEmulatorMojo {
 
     /**
      * Stop the emulator(s).
      *
-     * @throws MojoExecutionException
-     * @throws MojoFailureException
+     * @throws MojoExecutionException if the execution fails
+     * @throws MojoFailureException   if the execution fails
      */
     public void execute() throws MojoExecutionException, MojoFailureException {
         stopAndroidEmulator();

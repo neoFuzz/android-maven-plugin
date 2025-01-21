@@ -30,6 +30,7 @@ public class CachedProcessOutputHandler extends BaseProcessOutputHandler {
     private BaseProcessOutput mProcessOutput = null;
 
     public CachedProcessOutputHandler() {
+        // nothing to initialize
     }
 
     public BaseProcessOutput getProcessOutput() {
@@ -43,12 +44,12 @@ public class CachedProcessOutputHandler extends BaseProcessOutputHandler {
         if (mProcessOutput != null) {
             throw new IllegalStateException("CachedProcessOutputHandler cannot be reused");
         }
-
-        return mProcessOutput = (BaseProcessOutput) super.createOutput();
+        mProcessOutput = (BaseProcessOutput) super.createOutput();
+        return mProcessOutput ;
     }
 
     @Override
-    public void handleOutput(@NonNull ProcessOutput processOutput) throws ProcessException {
+    public void handleOutput(@NonNull ProcessOutput processOutput){
         // do nothing
     }
 }

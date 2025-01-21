@@ -10,14 +10,15 @@ import org.apache.maven.plugins.annotations.Mojo;
  *
  * @author Manfred Moser - manfred@simpligility.com
  */
+@SuppressWarnings("unused") // used in Maven goals
 @Mojo(name = "emulator-start", requiresProject = false)
 public class EmulatorStartMojo extends AbstractEmulatorMojo {
 
     /**
      * Start the Android Emulator.
      *
-     * @throws MojoExecutionException
-     * @throws MojoFailureException
+     * @throws MojoExecutionException if the execution fails
+     * @throws MojoFailureException   if the execution fails
      */
     public void execute() throws MojoExecutionException, MojoFailureException {
         startAndroidEmulator();

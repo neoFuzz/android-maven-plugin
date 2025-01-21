@@ -18,9 +18,10 @@ package com.android.manifmerger;
 
 import com.android.SdkConstants;
 import com.android.annotations.NonNull;
-import com.android.xml.AndroidManifest;
 import com.google.common.base.Joiner;
-import com.google.common.base.Optional;
+
+import java.util.Optional;
+
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
 import org.w3c.dom.Attr;
@@ -32,6 +33,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static com.android.manifmerger.ManifestModel.ATTRIBUTE_PACKAGE;
 import static com.android.manifmerger.MergingReport.Record.Severity.ERROR;
 import static com.android.manifmerger.MergingReport.Record.Severity.WARNING;
 import static com.android.manifmerger.XmlNode.NodeKey;
@@ -40,11 +42,11 @@ import static com.android.manifmerger.XmlNode.NodeKey;
  * Validates a loaded {@link XmlDocument} and check for potential inconsistencies in the model due
  * to user error or omission.
  * <p>
- * This is implemented as a separate class so it can be invoked by tools independently from the
+ * This is implemented as a separate class so it can be invoked by tools independently of the
  * merging process.
  * <p>
  * This validator will check the state of the loaded xml document before any merging activity is
- * attempted. It verifies things like a "tools:replace="foo" attribute has a "android:foo"
+ * attempted. It verifies things like a {@code tools:replace="foo"} attribute has a {@code "android:foo"}
  * attribute also declared on the same element (since we want to replace its value).
  */
 public class PreValidator {
@@ -61,7 +63,7 @@ public class PreValidator {
      *     <li>{@link com.android.manifmerger.MergingReport.Result#SUCCESS} : the merging model is
      *     correct, merging should be attempted</li>
      *     <li>{@link com.android.manifmerger.MergingReport.Result#WARNING} : the merging model
-     *     contains non fatal error, user should be notified, merging can be attempted</li>
+     *     contains non-fatal error, user should be notified, merging can be attempted</li>
      *     <li>{@link com.android.manifmerger.MergingReport.Result#ERROR} : the merging model
      *     contains errors, user must be notified, merging should not be attempted</li>
      * </ul>
@@ -94,7 +96,7 @@ public class PreValidator {
         checkSelectorPresence(mergingReport, xmlElement);
 
         // create a temporary hash map of children indexed by key to ensure key uniqueness.
-        Map<NodeKey, XmlElement> childrenKeys = new HashMap<NodeKey, XmlElement>();
+        Map<NodeKey, XmlElement> childrenKeys = new HashMap<>();
         for (XmlElement childElement : xmlElement.getMergeableElements()) {
 
             // if this element is tagged with 'tools:node=removeAll', ensure it has no other
@@ -128,7 +130,7 @@ public class PreValidator {
     }
 
     /**
-     * Validate an xml declaration with 'tools:node="removeAll" annotation. There should not
+     * Validate an XML declaration with {@code tools:node="removeAll"} annotation. There should not
      * be any other attribute declaration on this element.
      */
     private static void validateRemoveAllOperation(@NonNull MergingReport.Builder mergingReport,
@@ -136,7 +138,7 @@ public class PreValidator {
 
         NamedNodeMap attributes = element.getXml().getAttributes();
         if (attributes.getLength() > 1) {
-            List<String> extraAttributeNames = new ArrayList<String>();
+            List<String> extraAttributeNames = new ArrayList<>();
             for (int i = 0; i < attributes.getLength(); i++) {
                 Node item = attributes.item(i);
                 if (!(SdkConstants.TOOLS_URI.equals(item.getNamespaceURI()) &&
@@ -172,8 +174,8 @@ public class PreValidator {
 
     private static void validateManifestAttribute(
             @NonNull MergingReport.Builder mergingReport, @NonNull XmlElement manifest, XmlDocument.Type fileType) {
-        Attr attributeNode = manifest.getXml().getAttributeNode(AndroidManifest.ATTRIBUTE_PACKAGE);
-        // it's ok for an overlay to not have a package name, it's not ok for a main manifest
+        Attr attributeNode = manifest.getXml().getAttributeNode(ATTRIBUTE_PACKAGE);
+        // it's ok for an overlay to not have a package name, it's not ok for a main manifest,
         // and it's a warning for a library.
         if (attributeNode == null && fileType != XmlDocument.Type.OVERLAY) {
             manifest.addMessage(mergingReport,
@@ -189,7 +191,7 @@ public class PreValidator {
      *
      * @param mergingReport report to log warnings and errors.
      * @param xmlElement    xml element to check for key presence.
-     * @return true if the element has a valid key or false it does not need one or it is invalid.
+     * @return true if the element has a valid key or false it does not need one, or it is invalid.
      */
     private static boolean checkKeyPresence(
             @NonNull MergingReport.Builder mergingReport,
@@ -255,17 +257,15 @@ public class PreValidator {
                     break;
                 case REMOVE:
                     // check we are not provided a new value.
-                    if (attribute.isPresent()) {
-                        // Add one to startLine so the first line is displayed as 1.
-                        xmlElement.addMessage(mergingReport, ERROR, String.format(
-                                "tools:remove specified at line:%d for attribute %s, but "
-                                        + "attribute also declared at line:%d, "
-                                        + "do you want to use tools:replace instead ?",
-                                xmlElement.getPosition().getStartLine() + 1,
-                                attributeOperationTypeEntry.getKey(),
-                                attribute.get().getPosition().getStartLine() + 1
-                        ));
-                    }
+                    // Add one to startLine so the first line is displayed as 1.
+                    attribute.ifPresent(xmlAttribute -> xmlElement.addMessage(mergingReport, ERROR, String.format(
+                            "tools:remove specified at line:%d for attribute %s, but "
+                                    + "attribute also declared at line:%d, "
+                                    + "do you want to use tools:replace instead ?",
+                            xmlElement.getPosition().getStartLine() + 1,
+                            attributeOperationTypeEntry.getKey(),
+                            xmlAttribute.getPosition().getStartLine() + 1
+                    )));
                     break;
                 case REPLACE:
                     // check we are provided a new value

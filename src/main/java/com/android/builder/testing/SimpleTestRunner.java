@@ -159,11 +159,11 @@ public class SimpleTestRunner implements TestRunner {
 
             // check if one test failed or if there was an exception.
             for (WaitableExecutor.TaskResult<Boolean> result : results) {
-                if (result.value != null) {
-                    success &= result.value;
+                if (result.getValue() != null) {
+                    success &= result.getValue();
                 } else {
                     success = false;
-                    logger.error(result.exception, null);
+                    logger.error(result.getException(), null);
                 }
             }
             return success;

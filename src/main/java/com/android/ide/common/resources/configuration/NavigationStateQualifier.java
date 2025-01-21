@@ -72,4 +72,18 @@ public final class NavigationStateQualifier extends EnumBasedResourceQualifier {
 
         return false;
     }
+
+    @Override
+    public boolean equals(Object qualifier) {
+        if (qualifier instanceof NavigationStateQualifier q) {
+            return mValue == q.mValue;
+        }
+
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return mValue.hashCode();
+    }
 }

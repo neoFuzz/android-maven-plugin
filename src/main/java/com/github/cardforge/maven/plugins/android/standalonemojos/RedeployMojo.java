@@ -27,13 +27,14 @@ import org.apache.maven.plugins.annotations.ResolutionScope;
 import static com.github.cardforge.maven.plugins.android.common.AndroidExtension.APK;
 
 /**
- * Undeploys and the deploys (= redeploys) the apk(s) of the current project(s) to all
+ * Undeploys and then deploys (= redeploys) the apk(s) of the current project(s) to all
  * attached devices and emulators. Automatically skips other projects in a multi-module
  * build that do not use packaging apk without terminating.<br>
  *
  * @author clement.escoffier@akquinet.de
  * @author Manfred Moser - manfred@simpligility.com
  */
+@SuppressWarnings("unused") // Maven goal
 @Mojo(name = "redeploy", requiresDependencyResolution = ResolutionScope.RUNTIME)
 public class RedeployMojo extends AbstractAndroidMojo {
 

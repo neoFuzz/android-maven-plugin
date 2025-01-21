@@ -29,6 +29,7 @@ import org.apache.maven.plugins.annotations.Mojo;
  *
  * @author hugo.josefson@jayway.com
  */
+@SuppressWarnings("unused") // if it works as documented
 @Mojo(name = "internal-pre-integration-test", defaultPhase = LifecyclePhase.PRE_INTEGRATION_TEST)
 public class InternalPreIntegrationTestMojo extends AbstractInstrumentationMojo {
 

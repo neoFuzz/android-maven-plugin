@@ -186,7 +186,7 @@ public class ActionRecorder {
     }
 
     /**
-     * Records a {@link com.android.manifmerger.Actions.NodeRecord} action on a xml element.
+     * Records a {@link com.android.manifmerger.Actions.NodeRecord} action on an XML element.
      *
      * @param mergedElement the target element of the action.
      * @param nodeRecord    the record of the action.
@@ -203,7 +203,7 @@ public class ActionRecorder {
     private synchronized Actions.DecisionTreeRecord getDecisionTreeRecord(
             @NonNull XmlElement xmlElement) {
         return mRecords.computeIfAbsent(
-                xmlElement.getOriginalId(),  k -> new Actions.DecisionTreeRecord());
+                xmlElement.getOriginalId(), k -> new Actions.DecisionTreeRecord());
     }
 
     /**
@@ -253,7 +253,7 @@ public class ActionRecorder {
 
     /**
      * Record a {@link com.android.manifmerger.Actions.AttributeRecord} action for an attribute of
-     * a xml element.
+     * an XML element.
      *
      * @param attribute       the attribute in question.
      * @param attributeRecord the record of the action.
@@ -328,7 +328,7 @@ public class ActionRecorder {
         // by now the node should have been added for this element.
         Preconditions.checkNotNull(nodeDecisionTree, "No record for key [%s]", storageKey);
         return nodeDecisionTree.mAttributeRecords.computeIfAbsent(
-                        attribute.getName(), k -> new ArrayList<>());
+                attribute.getName(), k -> new ArrayList<>());
     }
 
     @NonNull

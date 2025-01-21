@@ -16,8 +16,8 @@
  */
 package com.github.cardforge.maven.plugins.android;
 
+import com.android.annotations.NonNull;
 import com.android.ddmlib.AdbCommandRejectedException;
-import com.android.ddmlib.IDevice;
 import com.android.ddmlib.ShellCommandUnresponsiveException;
 import com.android.ddmlib.TimeoutException;
 import com.android.ddmlib.testrunner.IRemoteAndroidTestRunner;
@@ -260,11 +260,11 @@ public abstract class AbstractInstrumentationMojo extends AbstractAndroidMojo {
      * @return Comma separated String from given list
      */
     protected static String buildCommaSeparatedString(List<String> lines) {
-        if (lines == null || lines.size() == 0) {
+        if (lines == null || lines.isEmpty()) {
             return null;
         }
 
-        List<String> strings = new ArrayList<String>(lines.size());
+        List<String> strings = new ArrayList<>(lines.size());
         for (String str : lines) { // filter out blank strings
             if (StringUtils.isNotBlank(str)) {
                 strings.add(StringUtils.trimToEmpty(str));
@@ -290,7 +290,7 @@ public abstract class AbstractInstrumentationMojo extends AbstractAndroidMojo {
         packagesExists = StringUtils.isNotBlank(packagesList);
 
         if (parsedClasses != null) {
-            classesExists = parsedClasses.size() > 0;
+            classesExists = !parsedClasses.isEmpty();
         } else {
             classesExists = false;
         }
@@ -302,80 +302,78 @@ public abstract class AbstractInstrumentationMojo extends AbstractAndroidMojo {
                     + "http://developer.android.com/guide/developing/testing/testing_otheride.html");
         }
 
-        DeviceCallback instrumentationTestExecutor = new DeviceCallback() {
-            public void doWithDevice(final IDevice device) throws MojoExecutionException, MojoFailureException {
-                String deviceLogLinePrefix = DeviceHelper.getDeviceLogLinePrefix(device);
+        DeviceCallback instrumentationTestExecutor = device -> {
+            String deviceLogLinePrefix = DeviceHelper.getDeviceLogLinePrefix(device);
 
-                RemoteAndroidTestRunner remoteAndroidTestRunner = new RemoteAndroidTestRunner(
-                        parsedInstrumentationPackage, parsedInstrumentationRunner, device);
+            RemoteAndroidTestRunner remoteAndroidTestRunner = new RemoteAndroidTestRunner(
+                    parsedInstrumentationPackage, parsedInstrumentationRunner, device);
 
-                if (packagesExists) {
-                    for (String str : packagesList.split(",")) {
-                        remoteAndroidTestRunner.setTestPackageName(str);
-                        getLog().info(deviceLogLinePrefix + "Running tests for specified test package: " + str);
-                    }
+            if (packagesExists) {
+                for (String str : packagesList.split(",")) {
+                    remoteAndroidTestRunner.setTestPackageName(str);
+                    getLog().info(deviceLogLinePrefix + "Running tests for specified test package: " + str);
+                }
+            }
+
+            if (classesExists) {
+                remoteAndroidTestRunner
+                        .setClassNames(parsedClasses.toArray(new String[parsedClasses.size()]));
+                getLog().info(deviceLogLinePrefix + "Running tests for specified test classes/methods: "
+                        + parsedClasses);
+            }
+
+            if (parsedAnnotations != null) {
+                for (String annotation : parsedAnnotations) {
+                    remoteAndroidTestRunner.addInstrumentationArg("annotation", annotation);
+                }
+            }
+
+            if (parsedExcludeAnnotations != null) {
+                for (String annotation : parsedExcludeAnnotations) {
+                    remoteAndroidTestRunner.addInstrumentationArg("notAnnotation", annotation);
                 }
 
-                if (classesExists) {
-                    remoteAndroidTestRunner
-                            .setClassNames(parsedClasses.toArray(new String[parsedClasses.size()]));
-                    getLog().info(deviceLogLinePrefix + "Running tests for specified test classes/methods: "
-                            + parsedClasses);
+            }
+
+            remoteAndroidTestRunner.setDebug(parsedDebug);
+            remoteAndroidTestRunner.setCoverage(parsedCoverage);
+            if (StringUtils.isNotBlank(parsedCoverageFile)) {
+                remoteAndroidTestRunner.addInstrumentationArg("coverageFile", parsedCoverageFile);
+            }
+            remoteAndroidTestRunner.setLogOnly(parsedLogOnly);
+
+            if (StringUtils.isNotBlank(parsedTestSize)) {
+                IRemoteAndroidTestRunner.TestSize validSize = IRemoteAndroidTestRunner.TestSize
+                        .getTestSize(parsedTestSize);
+                remoteAndroidTestRunner.setTestSize(validSize);
+            }
+
+            addAllInstrumentationArgs(remoteAndroidTestRunner, parsedInstrumentationArgs);
+
+            getLog().info(deviceLogLinePrefix + "Running instrumentation tests in "
+                    + parsedInstrumentationPackage);
+            try {
+                AndroidTestRunListener testRunListener = new AndroidTestRunListener(device, getLog(),
+                        parsedCreateReport, false, "", "", targetDirectory);
+                remoteAndroidTestRunner.run(testRunListener);
+                if (testRunListener.hasFailuresOrErrors() && Boolean.TRUE.equals(!testFailSafe)) {
+                    throw new MojoFailureException(deviceLogLinePrefix + "Tests failed on device.");
                 }
-
-                if (parsedAnnotations != null) {
-                    for (String annotation : parsedAnnotations) {
-                        remoteAndroidTestRunner.addInstrumentationArg("annotation", annotation);
-                    }
+                if (testRunListener.testRunFailed() && Boolean.TRUE.equals(!testFailSafe)) {
+                    throw new MojoFailureException(deviceLogLinePrefix + "Test run failed to complete: "
+                            + testRunListener.getTestRunFailureCause());
                 }
-
-                if (parsedExcludeAnnotations != null) {
-                    for (String annotation : parsedExcludeAnnotations) {
-                        remoteAndroidTestRunner.addInstrumentationArg("notAnnotation", annotation);
-                    }
-
+                if (testRunListener.threwException() && Boolean.TRUE.equals(!testFailSafe)) {
+                    throw new MojoFailureException(deviceLogLinePrefix + testRunListener.getExceptionMessages());
                 }
-
-                remoteAndroidTestRunner.setDebug(parsedDebug);
-                remoteAndroidTestRunner.setCoverage(parsedCoverage);
-                if (StringUtils.isNotBlank(parsedCoverageFile)) {
-                    remoteAndroidTestRunner.addInstrumentationArg("coverageFile", parsedCoverageFile);
-                }
-                remoteAndroidTestRunner.setLogOnly(parsedLogOnly);
-
-                if (StringUtils.isNotBlank(parsedTestSize)) {
-                    IRemoteAndroidTestRunner.TestSize validSize = IRemoteAndroidTestRunner.TestSize
-                            .getTestSize(parsedTestSize);
-                    remoteAndroidTestRunner.setTestSize(validSize);
-                }
-
-                addAllInstrumentationArgs(remoteAndroidTestRunner, parsedInstrumentationArgs);
-
-                getLog().info(deviceLogLinePrefix + "Running instrumentation tests in "
-                        + parsedInstrumentationPackage);
-                try {
-                    AndroidTestRunListener testRunListener = new AndroidTestRunListener(device, getLog(),
-                            parsedCreateReport, false, "", "", targetDirectory);
-                    remoteAndroidTestRunner.run(testRunListener);
-                    if (testRunListener.hasFailuresOrErrors() && !testFailSafe) {
-                        throw new MojoFailureException(deviceLogLinePrefix + "Tests failed on device.");
-                    }
-                    if (testRunListener.testRunFailed() && !testFailSafe) {
-                        throw new MojoFailureException(deviceLogLinePrefix + "Test run failed to complete: "
-                                + testRunListener.getTestRunFailureCause());
-                    }
-                    if (testRunListener.threwException() && !testFailSafe) {
-                        throw new MojoFailureException(deviceLogLinePrefix + testRunListener.getExceptionMessages());
-                    }
-                } catch (TimeoutException e) {
-                    throw new MojoExecutionException(deviceLogLinePrefix + "timeout", e);
-                } catch (AdbCommandRejectedException e) {
-                    throw new MojoExecutionException(deviceLogLinePrefix + "adb command rejected", e);
-                } catch (ShellCommandUnresponsiveException e) {
-                    throw new MojoExecutionException(deviceLogLinePrefix + "shell command " + "unresponsive", e);
-                } catch (IOException e) {
-                    throw new MojoExecutionException(deviceLogLinePrefix + "IO problem", e);
-                }
+            } catch (TimeoutException e) {
+                throw new MojoExecutionException(deviceLogLinePrefix + "timeout", e);
+            } catch (AdbCommandRejectedException e) {
+                throw new MojoExecutionException(deviceLogLinePrefix + "adb command rejected", e);
+            } catch (ShellCommandUnresponsiveException e) {
+                throw new MojoExecutionException(deviceLogLinePrefix + "shell command " + "unresponsive", e);
+            } catch (IOException e) {
+                throw new MojoExecutionException(deviceLogLinePrefix + "IO problem", e);
             }
         };
 
@@ -386,7 +384,7 @@ public abstract class AbstractInstrumentationMojo extends AbstractAndroidMojo {
 
     private void addAllInstrumentationArgs(
             final RemoteAndroidTestRunner remoteAndroidTestRunner,
-            final Map<String, String> parsedInstrumentationArgs) {
+            @NonNull final Map<String, String> parsedInstrumentationArgs) {
         for (final Map.Entry<String, String> entry : parsedInstrumentationArgs.entrySet()) {
             remoteAndroidTestRunner.addInstrumentationArg(entry.getKey(), entry.getValue());
         }
@@ -395,71 +393,20 @@ public abstract class AbstractInstrumentationMojo extends AbstractAndroidMojo {
     private void parseConfiguration() {
         // we got config in pom ... lets use it,
         if (test != null) {
-            if (StringUtils.isNotEmpty(test.getSkip())) {
-                parsedSkip = test.getSkip();
-            } else {
-                parsedSkip = testSkip;
-            }
-            if (StringUtils.isNotEmpty(test.getInstrumentationPackage())) {
-                parsedInstrumentationPackage = test.getInstrumentationPackage();
-            } else {
-                parsedInstrumentationPackage = testInstrumentationPackage;
-            }
-            if (StringUtils.isNotEmpty(test.getInstrumentationRunner())) {
-                parsedInstrumentationRunner = test.getInstrumentationRunner();
-            } else {
-                parsedInstrumentationRunner = testInstrumentationRunner;
-            }
-            if (test.getClasses() != null && !test.getClasses().isEmpty()) {
-                parsedClasses = test.getClasses();
-            } else {
-                parsedClasses = testClasses;
-            }
-            if (test.getAnnotations() != null && !test.getAnnotations().isEmpty()) {
-                parsedAnnotations = test.getAnnotations();
-            } else {
-                parsedAnnotations = testAnnotations;
-            }
-            if (test.getExcludeAnnotations() != null && !test.getExcludeAnnotations().isEmpty()) {
-                parsedExcludeAnnotations = test.getExcludeAnnotations();
-            } else {
-                parsedExcludeAnnotations = testExcludeAnnotations;
-            }
-            if (test.getPackages() != null && !test.getPackages().isEmpty()) {
-                parsedPackages = test.getPackages();
-            } else {
-                parsedPackages = testPackages;
-            }
-            if (StringUtils.isNotEmpty(test.getTestSize())) {
-                parsedTestSize = test.getTestSize();
-            } else {
-                parsedTestSize = testTestSize;
-            }
-            if (test.isCoverage() != null) {
-                parsedCoverage = test.isCoverage();
-            } else {
-                parsedCoverage = testCoverage;
-            }
-            if (test.getCoverageFile() != null) {
-                parsedCoverageFile = test.getCoverageFile();
-            } else {
-                parsedCoverageFile = "";
-            }
-            if (test.isDebug() != null) {
-                parsedDebug = test.isDebug();
-            } else {
-                parsedDebug = testDebug;
-            }
-            if (test.isLogOnly() != null) {
-                parsedLogOnly = test.isLogOnly();
-            } else {
-                parsedLogOnly = testLogOnly;
-            }
-            if (test.isCreateReport() != null) {
-                parsedCreateReport = test.isCreateReport();
-            } else {
-                parsedCreateReport = testCreateReport;
-            }
+            parsedSkip = getOrFallback(test.getSkip(), testSkip);
+
+            parsedInstrumentationPackage = getOrFallback(test.getInstrumentationPackage(), testInstrumentationPackage);
+            parsedInstrumentationRunner = getOrFallback(test.getInstrumentationRunner(), testInstrumentationRunner);
+            parsedClasses = getOrFallback(test.getClasses(), testClasses);
+            parsedAnnotations = getOrFallback(test.getAnnotations(), testAnnotations);
+            parsedExcludeAnnotations = getOrFallback(test.getExcludeAnnotations(), testExcludeAnnotations);
+            parsedPackages = getOrFallback(test.getPackages(), testPackages);
+            parsedTestSize = getOrFallback(test.getTestSize(), testTestSize);
+            parsedCoverage = getOrFallback(test.isCoverage(), testCoverage);
+            parsedCoverageFile = getOrFallback(test.getCoverageFile(), "");
+            parsedDebug = getOrFallback(test.isDebug(), testDebug);
+            parsedLogOnly = getOrFallback(test.isLogOnly(), testLogOnly);
+            parsedCreateReport = getOrFallback(test.isCreateReport(), testCreateReport);
 
             parsedInstrumentationArgs = InstrumentationArgumentParser.parse(test.getInstrumentationArgs());
         }
@@ -483,7 +430,28 @@ public abstract class AbstractInstrumentationMojo extends AbstractAndroidMojo {
     }
 
     /**
-     * Whether or not to execute integration test related goals. Reads from configuration parameter
+     * Returns the first non-null and non-empty value. If the primary value is null or empty, returns the fallback value.
+     * This works for String, List, Boolean, and other types.
+     *
+     * @param value    the primary value to check (can be null or empty)
+     * @param fallback the fallback value if the primary value is null or empty
+     * @return the value of `value` if it's not null/empty, otherwise the `fallback` value
+     */
+    public <T> T getOrFallback(T value, T fallback) {
+        if (value instanceof String) {
+            return (StringUtils.isNotEmpty((String) value)) ? value : fallback;
+        } else if (value instanceof List) {
+            return (value != null && !((List<?>) value).isEmpty()) ? value : fallback;
+        } else if (value instanceof Boolean) {
+            return value;
+        } else {
+            // For other types, fallback if value is null
+            return (value != null) ? value : fallback;
+        }
+    }
+
+    /**
+     * Whether to execute integration test related goals. Reads from configuration parameter
      * <code>enableIntegrationTest</code>, but can be overridden with <code>-Dmaven.test.skip</code>.
      *
      * @return <code>true</code> if integration test goals should be executed, <code>false</code> otherwise.

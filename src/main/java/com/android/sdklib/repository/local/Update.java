@@ -31,6 +31,7 @@ import java.util.Set;
  */
 public abstract class Update {
 
+    @NonNull
     public static UpdateResult computeUpdates(@NonNull LocalPkgInfo[] localPkgs,
                                               @NonNull Multimap<PkgType, RemotePkgInfo> remotePkgs) {
 

@@ -26,18 +26,24 @@ public class Program {
     /**
      * Constructor used for testing.
      *
-     * @param filename
-     * @param options
+     * @param filename The file name
+     * @param options The options to use
      */
     public Program(String filename, String options) {
         this.filename = filename;
         this.options = options;
     }
 
+    /**
+     * @return the filename of the program to execute.
+     */
     public String getFilename() {
         return filename;
     }
 
+    /**
+     * @return the options to use when executing the program.
+     */
     public String getOptions() {
         return options;
     }
@@ -45,6 +51,9 @@ public class Program {
     // ----------------------------------
     // TESTING METHODS
     // ----------------------------------
+    /**
+     * @return The hash code of the object
+     */
     @Override
     public int hashCode() {
         final int prime = 31;
@@ -54,6 +63,10 @@ public class Program {
         return result;
     }
 
+    /**
+     * @param obj The object to compare with
+     * @return <code>true</code> if the objects are equal, <code>false</code> otherwise
+     */
     @Override
     public boolean equals(Object obj) {
         if (this == obj) {
@@ -74,13 +87,8 @@ public class Program {
             return false;
         }
         if (options == null) {
-            if (other.options != null) {
-                return false;
-            }
-        } else if (!options.equals(other.options)) {
-            return false;
-        }
-        return true;
+            return other.options == null;
+        } else return options.equals(other.options);
     }
 
 }

@@ -10,7 +10,7 @@ import java.lang.annotation.Target;
 /**
  * PullParameter is an annotation identifying a property as a configuration property for ConfigHandler.
  *
- * @author Adrian Stabiszewski https://github.com/grundid/
+ * @author <a href="https://github.com/grundid/">Adrian Stabiszewski</a>
  * @author Manfred Moser - manfred@simpligility.com
  * @see ConfigHandler
  */

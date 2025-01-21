@@ -6,12 +6,12 @@ import com.android.repository.api.ProgressIndicator;
 public class ProgressIndicatorImpl implements ProgressIndicator {
 
     public ProgressIndicatorImpl() {
-
+        // empty
     }
 
     @Override
     public void setText(String s) {
-
+        // empty
     }
 
     @Override
@@ -21,7 +21,7 @@ public class ProgressIndicatorImpl implements ProgressIndicator {
 
     @Override
     public void cancel() {
-
+        // empty
     }
 
     @Override
@@ -31,7 +31,7 @@ public class ProgressIndicatorImpl implements ProgressIndicator {
 
     @Override
     public void setCancellable(boolean b) {
-
+        // empty
     }
 
     @Override
@@ -41,7 +41,7 @@ public class ProgressIndicatorImpl implements ProgressIndicator {
 
     @Override
     public void setIndeterminate(boolean b) {
-
+        // empty
     }
 
     @Override
@@ -51,37 +51,37 @@ public class ProgressIndicatorImpl implements ProgressIndicator {
 
     @Override
     public void setFraction(double v) {
-
+        // empty
     }
 
     @Override
     public void setSecondaryText(String s) {
-
+        // empty
     }
 
     @Override
     public void logWarning(String s) {
-
+        // empty
     }
 
     @Override
     public void logWarning(String s, Throwable throwable) {
-
+        // empty
     }
 
     @Override
     public void logError(String s) {
-
+        // empty
     }
 
     @Override
     public void logError(String s, Throwable throwable) {
-
+        // empty
     }
 
     @Override
     public void logInfo(String s) {
-
+        // empty
     }
 }
 

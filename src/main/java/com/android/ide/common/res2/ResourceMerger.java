@@ -26,6 +26,7 @@ import org.w3c.dom.*;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.ParserConfigurationException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -54,6 +55,7 @@ public class ResourceMerger extends DataMerger<ResourceItem, ResourceFile, Resou
      * @param node the node representing the resource.
      * @return a ResourceItem object or null.
      */
+    @Nullable
     static MergedResourceItem getMergedResourceItem(@NonNull Node node, @NonNull String qualifiers) {
         ResourceType type = ValueResourceParser2.getType(node, null);
         String name = ValueResourceParser2.getName(node);
@@ -174,7 +176,7 @@ public class ResourceMerger extends DataMerger<ResourceItem, ResourceFile, Resou
                 if (removed) {
                     consumer.removeItem(previouslyWrittenItem, null);
                 } else {
-                    // don't need to compute but we need to write the item anyway since
+                    // don't need to compute, but we need to write the item anyway since
                     // the item might be written due to the values file requiring (re)writing due
                     // to another res change
                     consumer.addItem(previouslyWrittenItem);
@@ -236,7 +238,7 @@ public class ResourceMerger extends DataMerger<ResourceItem, ResourceFile, Resou
     }
 
     @Override
-    protected void writeMergedItems(Document document, Node rootNode) {
+    protected void writeMergedItems(@NonNull Document document, @NonNull Node rootNode) {
         Node mergedItemsNode = document.createElement(NODE_MERGED_ITEMS);
         rootNode.appendChild(mergedItemsNode);
 
@@ -259,13 +261,9 @@ public class ResourceMerger extends DataMerger<ResourceItem, ResourceFile, Resou
     }
 
     private void addMergedItem(@NonNull String qualifier, @NonNull ResourceItem item) {
-        Map<String, ResourceItem> map = mMergedItems.get(qualifier);
-        if (map == null) {
-            map = Maps.newHashMap();
-            mMergedItems.put(qualifier, map);
-        }
-
-        map.put(item.getName(), item);
+        mMergedItems
+                .computeIfAbsent(qualifier, k -> new HashMap<>())
+                .put(item.getName(), item);
     }
 
     /**
@@ -308,6 +306,30 @@ public class ResourceMerger extends DataMerger<ResourceItem, ResourceFile, Resou
         @NonNull
         public FileType getSourceType() {
             return FileType.MULTI;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj) {
+                return true;
+            }
+
+            if (obj == null || getClass() != obj.getClass()) {
+                return false;
+            }
+
+            ResourceItem other = (ResourceItem) obj;
+            return getName().equals(other.getName()) &&
+                    getType() == other.getType() &&
+                    getQualifiers().equals(other.getQualifiers());
+        }
+
+        @Override
+        public int hashCode() {
+            int result = getName().hashCode();
+            result = 31 * result + getType().hashCode();
+            result = 31 * result + getQualifiers().hashCode();
+            return result;
         }
     }
 }

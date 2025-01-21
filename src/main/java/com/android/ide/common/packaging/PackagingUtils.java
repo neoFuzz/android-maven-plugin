@@ -16,10 +16,15 @@
 
 package com.android.ide.common.packaging;
 
+import com.android.annotations.NonNull;
+
 /**
  * Utility class for packaging.
  */
 public class PackagingUtils {
+    private PackagingUtils() {
+        // hide constructor
+    }
 
     /**
      * Checks whether a folder and its content is valid for packaging into the .apk as
@@ -28,7 +33,7 @@ public class PackagingUtils {
      * @param folderName the name of the folder.
      * @return true if the folder is valid for packaging.
      */
-    public static boolean checkFolderForPackaging(String folderName) {
+    public static boolean checkFolderForPackaging(@NonNull String folderName) {
         return !folderName.equalsIgnoreCase("CVS") &&
                 !folderName.equalsIgnoreCase(".svn") &&
                 !folderName.equalsIgnoreCase("SCCS") &&
@@ -41,7 +46,7 @@ public class PackagingUtils {
      * @param fileName the name of the file (including extension)
      * @return true if the file should be packaged as standard java resources.
      */
-    public static boolean checkFileForPackaging(String fileName) {
+    public static boolean checkFileForPackaging(@NonNull String fileName) {
         String[] fileSegments = fileName.split("\\.");
         String fileExt = "";
         if (fileSegments.length > 1) {
@@ -58,7 +63,7 @@ public class PackagingUtils {
      * @param extension the extension of the file (excluding '.')
      * @return true if the file should be packaged as standard java resources.
      */
-    public static boolean checkFileForPackaging(String fileName, String extension) {
+    public static boolean checkFileForPackaging(@NonNull String fileName, String extension) {
         // ignore hidden files and backup files
         return !(fileName.charAt(0) == '.' || fileName.charAt(fileName.length() - 1) == '~') &&
                 !"aidl".equalsIgnoreCase(extension) &&        // Aidl files

@@ -16,6 +16,7 @@
  */
 package com.github.cardforge.maven.plugins.android.phase01generatesources;
 
+import com.android.annotations.NonNull;
 import com.github.cardforge.maven.plugins.android.AbstractAndroidMojo;
 import com.github.cardforge.maven.plugins.android.CommandExecutor;
 import com.github.cardforge.maven.plugins.android.ExecutionException;
@@ -59,7 +60,7 @@ import static com.github.cardforge.maven.plugins.android.common.AndroidExtension
  * @author Manfred Moser - manfred@simpligility.com
  * @author William Ferguson - william.ferguson@xandar.com.au
  * @author Malachi de AElfweald malachid@gmail.com
- */
+ */@SuppressWarnings("deprecation")
 @Mojo(
         name = "generate-sources",
         defaultPhase = LifecyclePhase.GENERATE_SOURCES,
@@ -120,9 +121,9 @@ public class GenerateSourcesMojo extends AbstractAndroidMojo {
     @Parameter(defaultValue = "true")
     private boolean failOnDuplicatePackages;
     /**
-     *
+     * RepositorySystem object
      */
-    @Component
+    //@Component
     private RepositorySystem repositorySystem;
     /**
      * Pre AMP-4 AndroidManifest file.
@@ -130,12 +131,12 @@ public class GenerateSourcesMojo extends AbstractAndroidMojo {
     @Parameter(readonly = true, defaultValue = "${project.basedir}/AndroidManifest.xml")
     private File androidManifestFilePre4;
     /**
-     * Pre AMP-4 android resources folder.
+     * Pre AMP-4 android resources' folder.
      */
     @Parameter(readonly = true, defaultValue = "${project.basedir}/res")
     private File resourceDirectoryPre4;
     /**
-     * Pre AMP-4 android assets directory.
+     * Pre AMP-4 android assets' directory.
      */
     @Parameter(readonly = true, defaultValue = "${project.basedir}/assets")
     private File assetsDirectoryPre4;
@@ -185,7 +186,7 @@ public class GenerateSourcesMojo extends AbstractAndroidMojo {
 
             final String[] relativeAidlFileNames1 = findRelativeAidlFileNames(aidlSourceDirectory);
             final String[] relativeAidlFileNames2 = findRelativeAidlFileNames(extractedDependenciesJavaSources);
-            final Map<String, String[]> relativeApklibAidlFileNames = new HashMap<String, String[]>();
+            final Map<String, String[]> relativeApklibAidlFileNames = new HashMap<>();
 
             if (!isInstrumentationTest()) {
                 // Only add transitive APKLIB deps if we are building an APK and not an instrumentation test apk.
@@ -205,7 +206,7 @@ public class GenerateSourcesMojo extends AbstractAndroidMojo {
             // make sure we compile AIDL for dependencies as well.
             // This is so project A, which depends on project B, can
             // use AIDL info from project B in its own AIDL
-            final Map<File, String[]> files = new HashMap<File, String[]>();
+            final Map<File, String[]> files = new HashMap<>();
             files.put(aidlSourceDirectory, relativeAidlFileNames1);
             files.put(extractedDependenciesJavaSources, relativeAidlFileNames2);
 
@@ -275,7 +276,7 @@ public class GenerateSourcesMojo extends AbstractAndroidMojo {
     /**
      * Copy the AndroidManifest.xml from androidManifestFile to destinationManifestFile
      *
-     * @throws MojoExecutionException
+     * @throws MojoExecutionException if it fails.
      */
     protected void copyManifest() throws MojoExecutionException {
         getLog().debug("copyManifest: " + androidManifestFile + " -> " + destinationManifestFile);
@@ -300,10 +301,10 @@ public class GenerateSourcesMojo extends AbstractAndroidMojo {
 
                 writer = new FileWriter(destinationManifestFile, false);
                 if (doc.getXmlEncoding() != null && doc.getXmlVersion() != null) {
-                    String xmldecl = String.format("<?xml version=\"%s\" encoding=\"%s\"?>%n",
+                    String s = String.format("<?xml version=\"%s\" encoding=\"%s\"?>%n",
                             doc.getXmlVersion(), doc.getXmlEncoding());
 
-                    writer.write(xmldecl);
+                    writer.write(s);
                 }
                 Result result = new StreamResult(writer);
                 xformer.transform(source, result);
@@ -345,7 +346,7 @@ public class GenerateSourcesMojo extends AbstractAndroidMojo {
      * @deprecated Support <code>APKSOURCES</code> artifacts has been deprecated. Use APKLIB instead.
      */
     @Deprecated(since = "4.8", forRemoval = false)
-    private void extractApksources(File apksourcesFile) throws MojoExecutionException {
+    private void extractApksources(@NonNull File apksourcesFile) throws MojoExecutionException {
         if (apksourcesFile.isDirectory()) {
             getLog().warn("The apksources artifact points to '" + apksourcesFile
                     + "' which is a directory; skipping unpacking it.");
@@ -395,8 +396,8 @@ public class GenerateSourcesMojo extends AbstractAndroidMojo {
     private void extractApklib(Artifact apklibArtifact) throws MojoExecutionException {
         getUnpackedLibHelper().extractApklib(apklibArtifact);
 
-        // Copy the assets to the the combinedAssets folder.
-        // Add the apklib source and resource to the compile.
+        // Copy the assets to the combinedAssets folder.
+        // Add the apklib source and resource to compile.
         // NB apklib sources are added to compileSourceRoot because we may need to compile against them.
         //    This means the apklib classes will be compiled into target/classes and packaged with this build.
         copyFolder(getUnpackedLibAssetsFolder(apklibArtifact), combinedAssets);
@@ -413,7 +414,7 @@ public class GenerateSourcesMojo extends AbstractAndroidMojo {
     private void extractAarLib(Artifact aarArtifact) throws MojoExecutionException {
         getUnpackedLibHelper().extractAarLib(aarArtifact);
 
-        // Copy the assets to the the combinedAssets folder, but only if an APK build.
+        // Copy the assets to the combinedAssets folder, but only if an APK build.
         // Ie we only want to package assets that we own.
         // Assets should only live within their owners or the final APK.
         if (isAPKBuild()) {
@@ -432,7 +433,7 @@ public class GenerateSourcesMojo extends AbstractAndroidMojo {
     /**
      * Copies a dependent APK jar over the top of the placeholder created for it in AarMavenLifeCycleParticipant.
      * <p>
-     * This is necessary because we need the classes of the APK added to the compile classpath.
+     * This is necessary because we need the classes of the APK added to compile classpath.
      * NB APK dependencies are uncommon as they should really only be used in a project that tests an apk.
      *
      * @param artifact APK dependency for this project whose classes will be copied over.
@@ -456,7 +457,7 @@ public class GenerateSourcesMojo extends AbstractAndroidMojo {
      * produces a warning message to inform the user. Future plugin versions may default to skipping or not handling
      * unsupported artifacts during build lifecycle.
      *
-     * @throws MojoExecutionException
+     * @throws MojoExecutionException if failOnApklibInAar is true
      */
     private void checkForApklibDependencies() throws MojoExecutionException {
         final boolean isAarBuild = project.getPackaging().equals(AAR);
@@ -498,7 +499,7 @@ public class GenerateSourcesMojo extends AbstractAndroidMojo {
      * <p>Generate warning if duplicates presents.
      * <p>(in case of packages similarity R.java and BuildConfig files will be overridden)
      *
-     * @throws MojoExecutionException
+     * @throws MojoExecutionException if duplicates presents and failOnDuplicatePackages is true
      */
     private void checkPackagesForDuplicates() throws MojoExecutionException {
         Set<Artifact> dependencyArtifacts = getTransitiveDependencyArtifacts(AAR, APKLIB);
@@ -510,14 +511,14 @@ public class GenerateSourcesMojo extends AbstractAndroidMojo {
 
         Map<String, Set<Artifact>> packageCompareMap = getPackageCompareMap(dependencyArtifacts);
 
-        List<String> duplicatesMessageList = new ArrayList<String>();
+        List<String> duplicatesMessageList = new ArrayList<>();
         for (Map.Entry<String, Set<Artifact>> entry : packageCompareMap.entrySet()) {
             Set<Artifact> artifacts = entry.getValue();
             if (artifacts != null && artifacts.size() > 1) {
                 StringBuilder messageBuilder = new StringBuilder();
                 for (Artifact item : artifacts) {
                     messageBuilder
-                            .append(messageBuilder.length() > 0 ? ", " : "    [")
+                            .append(!messageBuilder.isEmpty() ? ", " : "    [")
                             .append(item.getGroupId())
                             .append(":")
                             .append(item.getArtifactId())
@@ -533,7 +534,7 @@ public class GenerateSourcesMojo extends AbstractAndroidMojo {
             }
         }
         if (!duplicatesMessageList.isEmpty()) {
-            List<String> messageList = new ArrayList<String>();
+            List<String> messageList = new ArrayList<>();
             messageList.add("");
             messageList.add("Duplicate packages detected in AndroidManifest.xml files");
             messageList.add("");
@@ -568,7 +569,7 @@ public class GenerateSourcesMojo extends AbstractAndroidMojo {
      * or one of the other dependencies. If such a duplicate occurs then it will fail the build or generate a warning
      * depending upon the value of the <strong>failOnConflictingLayouts</strong> build parameter.
      *
-     * @throws MojoExecutionException
+     * @throws MojoExecutionException if the build should fail due to conflicting layouts
      */
     private void checkForConflictingLayouts() throws MojoExecutionException {
         final ConflictingLayoutDetector detector = new ConflictingLayoutDetector();
@@ -587,7 +588,7 @@ public class GenerateSourcesMojo extends AbstractAndroidMojo {
         final Collection<ConflictingLayout> conflictingLayouts = detector.getConflictingLayouts();
         getLog().debug("checkConflictingLayouts - conflicts : " + conflictingLayouts);
         if (!conflictingLayouts.isEmpty()) {
-            final List<String> sb = new ArrayList<String>();
+            final List<String> sb = new ArrayList<>();
             sb.add("");
             sb.add("");
             sb.add("Duplicate layout files have been detected across more than one Android package.");
@@ -602,7 +603,7 @@ public class GenerateSourcesMojo extends AbstractAndroidMojo {
             sb.add("");
             sb.add("Conflicting Layouts:");
             for (final ConflictingLayout layout : conflictingLayouts) {
-                sb.add("    " + layout.getLayoutFileName() + "  packages=" + layout.getPackageNames().toString());
+                sb.add("    " + layout.getLayoutFileName() + "  packages=" + layout.getPackageNames());
             }
             sb.add("");
 
@@ -627,7 +628,7 @@ public class GenerateSourcesMojo extends AbstractAndroidMojo {
      * @param dependencyArtifacts artifacts that should be grouped by package name
      * @return map of with package names(String) and sets of artifacts (Set<Artifact>)
      * that have similar package names
-     * @throws MojoExecutionException
+     * @throws MojoExecutionException if dependencies are not initialized
      */
     public Map<String, Set<Artifact>> getPackageCompareMap(Set<Artifact> dependencyArtifacts)
             throws MojoExecutionException {
@@ -635,9 +636,9 @@ public class GenerateSourcesMojo extends AbstractAndroidMojo {
             throw new IllegalArgumentException("dependencies must be initialized");
         }
 
-        Map<String, Set<Artifact>> packageCompareMap = new HashMap<String, Set<Artifact>>();
+        Map<String, Set<Artifact>> packageCompareMap = new HashMap<>();
 
-        Set<Artifact> artifactSet = new HashSet<Artifact>();
+        Set<Artifact> artifactSet = new HashSet<>();
         artifactSet.add(project.getArtifact());
         packageCompareMap.put(getAndroidManifestPackageName(), artifactSet);
 
@@ -646,7 +647,7 @@ public class GenerateSourcesMojo extends AbstractAndroidMojo {
 
             Set<Artifact> artifacts = packageCompareMap.get(libPackage);
             if (artifacts == null) {
-                artifacts = new HashSet<Artifact>();
+                artifacts = new HashSet<>();
                 packageCompareMap.put(libPackage, artifacts);
             }
             artifacts.add(artifact);
@@ -654,6 +655,12 @@ public class GenerateSourcesMojo extends AbstractAndroidMojo {
         return packageCompareMap;
     }
 
+    /**
+     * Generates R.java file for the project and all dependent libraries.
+     *
+     * @throws MojoExecutionException if an error occurs during R file generation
+     * @throws IOException            if an I/O error occurs during R file generation
+     */
     private void generateR() throws MojoExecutionException, IOException {
         getLog().info("Generating R file for " + project.getArtifact());
 
@@ -713,6 +720,7 @@ public class GenerateSourcesMojo extends AbstractAndroidMojo {
     /**
      * @return ClassLoader containing the compile paths.
      */
+    @NonNull
     private ClassLoader getCompileClassLoader() {
         try {
             final List<String> runtimeClasspathElements = project.getCompileClasspathElements();
@@ -726,7 +734,7 @@ public class GenerateSourcesMojo extends AbstractAndroidMojo {
     /**
      * Generate correct R.java for apklibs dependencies of a current project
      *
-     * @throws MojoExecutionException
+     * @throws MojoExecutionException if it could not generate the R java for one of the libraries.
      */
     private void generateCorrectRJavaForApklibDependencies(ResourceClassGenerator resourceGenerator)
             throws MojoExecutionException, IOException {
@@ -767,8 +775,12 @@ public class GenerateSourcesMojo extends AbstractAndroidMojo {
         }
     }
 
+    /**
+     * @return List of folders containing resources for all library dependencies.
+     */
+    @NonNull
     private List<File> getLibraryResourceFolders() {
-        final List<File> resourceFolders = new ArrayList<File>();
+        final List<File> resourceFolders = new ArrayList<>();
         for (Artifact artifact : getTransitiveDependencyArtifacts(AAR, APKLIB)) {
             getLog().debug("Considering dep artifact : " + artifact);
             final File resourceFolder = getUnpackedLibResourceFolder(artifact);
@@ -793,7 +805,7 @@ public class GenerateSourcesMojo extends AbstractAndroidMojo {
         final File apklibManifest = new File(unpackDir, "AndroidManifest.xml");
         final File apklibResDir = new File(unpackDir, "res");
 
-        List<File> dependenciesResDirectories = new ArrayList<File>();
+        List<File> dependenciesResDirectories = new ArrayList<>();
         final Set<Artifact> apklibDeps = getDependencyResolver()
                 .getLibraryDependenciesFor(this.session, this.repositorySystem, apklibArtifact);
         getLog().debug("apklib=" + apklibArtifact + "  dependencies=" + apklibDeps);
@@ -842,7 +854,7 @@ public class GenerateSourcesMojo extends AbstractAndroidMojo {
                 // It also needs to be consumed when packaging aar.
                 .generateRTextFile(unpackDir);
 
-        getLog().debug(getAndroidSdk().getAaptPath() + " " + commandBuilder.toString());
+        getLog().debug(getAndroidSdk().getAaptPath() + " " + commandBuilder);
         try {
             executor.setCaptureStdOut(true);
             final List<String> commands = commandBuilder.build();
@@ -852,6 +864,11 @@ public class GenerateSourcesMojo extends AbstractAndroidMojo {
         }
     }
 
+    /**
+     * Generates the BuildConfig class for the given package.
+     *
+     * @throws MojoExecutionException if it could not generate the BuildConfig class for the given package
+     */
     private void generateBuildConfig() throws MojoExecutionException {
         getLog().debug("Generating BuildConfig file");
 
@@ -882,7 +899,12 @@ public class GenerateSourcesMojo extends AbstractAndroidMojo {
         }
     }
 
-    private boolean skipBuildConfigGeneration(Artifact artifact) throws MojoExecutionException {
+    /**
+     * Check if given artifact includes a matching BuildConfig class
+     *
+     * @throws MojoExecutionException If the extract process fails
+     */
+    private boolean skipBuildConfigGeneration(@NonNull Artifact artifact) throws MojoExecutionException {
         if (artifact.getType().equals(AAR)) {
             String depPackageName = extractPackageNameFromAndroidArtifact(artifact);
 
@@ -905,7 +927,7 @@ public class GenerateSourcesMojo extends AbstractAndroidMojo {
     /**
      * Check if given artifact includes a matching BuildConfig class
      *
-     * @throws MojoExecutionException
+     * @throws MojoExecutionException If the extract process fails
      */
     private boolean isBuildConfigPresent(Artifact artifact) throws MojoExecutionException {
         String depPackageName = extractPackageNameFromAndroidArtifact(artifact);
@@ -918,9 +940,10 @@ public class GenerateSourcesMojo extends AbstractAndroidMojo {
      *
      * @param artifact    an AAR artifact to look for BuildConfig in
      * @param packageName BuildConfig package name
-     * @throws MojoExecutionException
+     * @return true if BuildConfig is present, false otherwise
+     * @throws MojoExecutionException If the extract process fails
      */
-    private boolean isBuildConfigPresent(Artifact artifact, String packageName) throws MojoExecutionException {
+    private boolean isBuildConfigPresent(Artifact artifact, @NonNull String packageName) throws MojoExecutionException {
         try {
             JarFile jar = new JarFile(getUnpackedAarClassesJar(artifact));
             JarEntry entry = jar.getJarEntry(packageName.replace('.', '/') + "/BuildConfig.class");
@@ -932,7 +955,14 @@ public class GenerateSourcesMojo extends AbstractAndroidMojo {
         }
     }
 
-    private void generateBuildConfigForPackage(String packageName) throws MojoExecutionException {
+
+    /**
+     * Generates the BuildConfig for the given package name.
+     *
+     * @param packageName The package name to generate the BuildConfig for.
+     * @throws MojoExecutionException If the BuildConfig cannot be generated.
+     */
+    private void generateBuildConfigForPackage(@NonNull String packageName) throws MojoExecutionException {
         getLog().debug("Creating BuildConfig for " + packageName);
 
         File outputFolder = new File(genDirectory, packageName.replace(".", File.separator));
@@ -975,9 +1005,9 @@ public class GenerateSourcesMojo extends AbstractAndroidMojo {
      * @param files Map of source directory File instances to the relative paths to all AIDL files within
      * @throws MojoExecutionException If the AIDL compiler fails
      */
-    private void generateAidlFiles(Map<File /*sourceDirectory*/, String[] /*relativeAidlFileNames*/> files)
+    private void generateAidlFiles(@NonNull Map<File /*sourceDirectory*/, String[] /*relativeAidlFileNames*/> files)
             throws MojoExecutionException {
-        List<String> protoCommands = new ArrayList<String>();
+        List<String> protoCommands = new ArrayList<>();
         protoCommands.add("-p" + getAndroidSdk().getPathForFrameworkAidl());
 
         genDirectoryAidl.mkdirs();
@@ -997,7 +1027,7 @@ public class GenerateSourcesMojo extends AbstractAndroidMojo {
                         + ".java";
                 final File aidlFileInSourceDirectory = new File(sourceDir, relativeAidlFileName);
 
-                List<String> commands = new ArrayList<String>(protoCommands);
+                List<String> commands = new ArrayList<>(protoCommands);
                 commands.add(aidlFileInSourceDirectory.getAbsolutePath());
                 commands.add(new File(targetDirectory, shortJavaFileName).getAbsolutePath());
                 try {
@@ -1013,6 +1043,13 @@ public class GenerateSourcesMojo extends AbstractAndroidMojo {
         }
     }
 
+    /**
+     * Finds all aidl files in the given source directory and its subdirectories.
+     *
+     * @param sourceDirectory The directory to search for aidl files
+     * @return An array of relative paths to aidl files found in the source directory
+     */
+    @NonNull
     private String[] findRelativeAidlFileNames(File sourceDirectory) {
         final FileRetriever retriever = new FileRetriever("**/*.aidl");
         final String[] relativeAidlFileNames = retriever.getFileNames(sourceDirectory);
@@ -1028,7 +1065,7 @@ public class GenerateSourcesMojo extends AbstractAndroidMojo {
      * @return true if the pom type is APK, APKLIB, or APKSOURCES
      */
     private boolean isCurrentProjectAndroid() {
-        Set<String> androidArtifacts = new HashSet<String>() {
+        Set<String> androidArtifacts = new HashSet<>() {
             {
                 addAll(Arrays.asList(APK, APKLIB, APKSOURCES, AAR));
             }

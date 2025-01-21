@@ -24,7 +24,6 @@ import com.android.sdklib.repository.descriptors.IdDisplay;
 import com.google.common.collect.ImmutableList;
 
 import java.io.File;
-import java.io.FileFilter;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -46,10 +45,9 @@ public final class AddOnTarget implements IAndroidTarget {
     private final String mDescription;
     private final boolean mHasRenderingLibrary;
     private final boolean mHasRenderingResources;
-
+    private final ImmutableList<OptionalLibrary> mLibraries;
     private File[] mSkins;
     private File mDefaultSkin;
-    private ImmutableList<OptionalLibrary> mLibraries;
     private int mVendorId = NO_USB_ID;
 
     /**
@@ -68,7 +66,7 @@ public final class AddOnTarget implements IAndroidTarget {
      * @param basePlatform          the platform the add-on is extending.
      */
     public AddOnTarget(
-            String location,
+            @NonNull String location,
             String name,
             String vendor,
             int revision,
@@ -92,7 +90,7 @@ public final class AddOnTarget implements IAndroidTarget {
         mBasePlatform = basePlatform;
 
         // If the add-on does not have any system-image of its own, the list here
-        // is empty and it's up to the callers to query the parent platform.
+        // is empty, and it's up to the callers to query the parent platform.
         mSystemImages = systemImages == null ? new ISystemImage[0] : systemImages;
         Arrays.sort(mSystemImages);
 
@@ -146,16 +144,19 @@ public final class AddOnTarget implements IAndroidTarget {
     }
 
     @Override
+    @NonNull
     public String getFullName() {
         return String.format("%1$s (%2$s)", mName, mVendor);
     }
 
     @Override
+    @NonNull
     public String getClasspathName() {
         return String.format("%1$s [%2$s]", mName, mBasePlatform.getClasspathName());
     }
 
     @Override
+    @NonNull
     public String getShortClasspathName() {
         return String.format("%1$s [%2$s]", mName, mBasePlatform.getVersionName());
     }
@@ -226,13 +227,7 @@ public final class AddOnTarget implements IAndroidTarget {
                 // only return the add-on samples folder if there is actually a sample (or more)
                 File sampleLoc = new File(mLocation, SdkConstants.FD_SAMPLES);
                 if (sampleLoc.isDirectory()) {
-                    File[] files = sampleLoc.listFiles(new FileFilter() {
-                        @Override
-                        public boolean accept(File pathname) {
-                            return pathname.isDirectory();
-                        }
-
-                    });
+                    File[] files = sampleLoc.listFiles(pathname -> pathname.isDirectory());
                     if (files != null && files.length > 0) {
                         return sampleLoc.getAbsolutePath();
                     }
@@ -244,6 +239,7 @@ public final class AddOnTarget implements IAndroidTarget {
     }
 
     @Override
+    @NonNull
     public File getFile(int pathId) {
         return new File(getPath(pathId));
     }
@@ -294,6 +290,7 @@ public final class AddOnTarget implements IAndroidTarget {
      * {@inheritDoc}
      */
     @Override
+    @NonNull
     public String[] getPlatformLibraries() {
         return mBasePlatform.getPlatformLibraries();
     }
@@ -369,6 +366,7 @@ public final class AddOnTarget implements IAndroidTarget {
     }
 
     @Override
+    @NonNull
     public String hashString() {
         return String.format(AndroidTargetHash.ADD_ON_FORMAT, mVendor, mName,
                 mBasePlatform.getVersion().getApiString());
@@ -381,9 +379,7 @@ public final class AddOnTarget implements IAndroidTarget {
 
     @Override
     public boolean equals(Object obj) {
-        if (obj instanceof AddOnTarget) {
-            AddOnTarget addon = (AddOnTarget) obj;
-
+        if (obj instanceof AddOnTarget addon) {
             return mVendor.equals(addon.mVendor) && mName.equals(addon.mName) &&
                     mBasePlatform.getVersion().equals(addon.mBasePlatform.getVersion());
         }
@@ -440,6 +436,7 @@ public final class AddOnTarget implements IAndroidTarget {
      * @see #getDescription()
      */
     @Override
+    @NonNull
     public String toString() {
         return String.format("AddonTarget %1$s rev %2$d (based on %3$s)",     //$NON-NLS-1$
                 getVersion(),
@@ -451,7 +448,7 @@ public final class AddOnTarget implements IAndroidTarget {
         mDefaultSkin = defaultSkin;
 
         // we mix the add-on and base platform skins
-        HashSet<File> skinSet = new HashSet<File>();
+        HashSet<File> skinSet = new HashSet<>();
         skinSet.addAll(Arrays.asList(skins));
         skinSet.addAll(Arrays.asList(mBasePlatform.getSkins()));
 

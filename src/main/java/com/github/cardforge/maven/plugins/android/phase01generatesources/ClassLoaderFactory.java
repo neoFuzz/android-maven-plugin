@@ -16,6 +16,8 @@
  */
 package com.github.cardforge.maven.plugins.android.phase01generatesources;
 
+import com.android.annotations.NonNull;
+
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -31,6 +33,9 @@ import java.util.List;
 final class ClassLoaderFactory {
     private final List<String> classpathElements;
 
+    /**
+     * @param classpathElements List of classpath elements to create the ClassLoader from.
+     */
     ClassLoaderFactory(List<String> classpathElements) {
         this.classpathElements = classpathElements;
     }
@@ -38,6 +43,7 @@ final class ClassLoaderFactory {
     /**
      * @return ClassLoader containing the classpaths.
      */
+    @NonNull
     ClassLoader create() {
         final List<URL> urls = new ArrayList<>();
         for (final String element : classpathElements) {

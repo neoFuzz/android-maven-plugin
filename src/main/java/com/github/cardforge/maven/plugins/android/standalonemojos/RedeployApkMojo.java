@@ -32,13 +32,14 @@ import java.io.File;
 
 /**
  * Reploys a specified Android application apk to attached devices and emulators.
- * By default it will deploy to all, but a asubset or single one can be configured
+ * By default, it will deploy to all, but a subset or single one can be configured
  * with the device and devices parameters. This simply tries to undeploy the APK
  * first and then deploy it again. This goal can be used in non-android projects and
  * as standalone execution on the command line.<br>
  *
  * @author Manfred Moser - manfred@simpligility.com
  */
+@SuppressWarnings("unused") // Maven Goal
 @Mojo(name = "redeploy-apk", requiresProject = false)
 public class RedeployApkMojo extends AbstractAndroidMojo {
     /**

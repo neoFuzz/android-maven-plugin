@@ -20,8 +20,6 @@ import com.android.annotations.VisibleForTesting;
 import com.android.ide.common.rendering.api.*;
 import com.android.ide.common.rendering.api.Result.Status;
 import com.android.ide.common.rendering.api.SessionParams.RenderingMode;
-import com.android.ide.common.rendering.legacy.ILegacyPullParser;
-import com.android.ide.common.rendering.legacy.LegacyCallback;
 import com.android.ide.common.resources.ResourceResolver;
 import com.android.ide.common.sdk.LoadStatus;
 import com.android.layoutlib.api.ILayoutLog;
@@ -55,14 +53,6 @@ import static com.android.ide.common.rendering.api.Result.Status.ERROR_REFLECTIO
  * Use the layout library with:
  * {@link #init}, {@link #supports(int)}, {@link #createSession(SessionParams)},
  * {@link #dispose()}, {@link #clearCaches(Object)}.
- * <p>
- * <p/>
- * For client wanting to access both new and old (pre API level 5) layout libraries, it is
- * important that the following interfaces be used:<br>
- * {@link ILegacyPullParser} instead of {@link ILayoutPullParser}<br>
- * {@link LegacyCallback} instead of {@link com.android.ide.common.rendering.api.IProjectCallback}.
- * <p/>
- * These interfaces will ensure that both new and older Layout libraries can be accessed.
  */
 @SuppressWarnings("deprecation")
 public class LayoutLibrary {

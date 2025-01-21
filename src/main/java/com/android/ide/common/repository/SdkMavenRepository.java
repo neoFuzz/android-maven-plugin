@@ -68,7 +68,7 @@ public enum SdkMavenRepository {
      *
      * @param groupId      the artifact group id
      * @param artifactId   the artifact id
-     * @param repository   the path to the m2repository directory
+     * @param repository   the path to the {@code m2repository} directory
      * @param filter       an optional filter which the matched coordinate's version name must start with
      * @param allowPreview whether preview versions are allowed to match
      * @return the best (highest version) matching coordinate, or null if none were found
@@ -88,20 +88,12 @@ public enum SdkMavenRepository {
         if (versions != null) {
             List<GradleCoordinate> versionCoordinates = Lists.newArrayList();
             for (File dir : versions) {
-                if (!dir.isDirectory()) {
-                    continue;
-                }
-                if (filter != null && !dir.getName().startsWith(filter)) {
-                    continue;
-                }
+                if (notDirNotFiltered(filter, dir)) continue;
                 GradleCoordinate gc = GradleCoordinate.parseCoordinateString(
                         groupId + ":" + artifactId + ":" + dir.getName());
 
-                if (gc != null && (allowPreview || !gc.getFullRevision().contains("-rc"))) {
-                    if (!allowPreview && "5.2.08".equals(gc.getFullRevision()) &&
-                            "play-services".equals(gc.getArtifactId())) {
-                        // This specific version is actually a preview version which should
-                        // not be used (https://code.google.com/p/android/issues/detail?id=75292)
+                if (matchesReleaseCandidatePolicy(allowPreview, gc)) {
+                    if (isInvalidPlayServicesVersion(allowPreview, gc)) {
                         continue;
                     }
                     FullRevision.parseRevision(gc.getFullRevision());
@@ -116,12 +108,45 @@ public enum SdkMavenRepository {
         return null;
     }
 
+    private static boolean notDirNotFiltered(@Nullable String filter, @NonNull File dir) {
+        if (!dir.isDirectory()) {
+            return true;
+        }
+        if (filter != null && !dir.getName().startsWith(filter)) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * This specific version is actually a preview version which should not be used.
+     *
+     * @param allowPreview whether preview versions are allowed to match
+     * @param gc           the coordinate to check
+     * @return true if the version is a preview version
+     */
+    private static boolean isInvalidPlayServicesVersion(boolean allowPreview, GradleCoordinate gc) {
+        return !allowPreview && "5.2.08".equals(gc.getFullRevision()) &&
+                "play-services".equals(gc.getArtifactId());
+    }
+
+    /**
+     * This specific version is actually a release candidate which should not be used.
+     *
+     * @param allowPreview whether preview versions are allowed to match
+     * @param gc           the coordinate to check
+     * @return true if the version is a release candidate
+     */
+    private static boolean matchesReleaseCandidatePolicy(boolean allowPreview, GradleCoordinate gc) {
+        return gc != null && (allowPreview || !gc.getFullRevision().contains("-rc"));
+    }
+
     /**
      * Returns the location of the repository within a given SDK home
      *
      * @param sdkHome       the SDK home, or null
      * @param requireExists if true, the location will only be returned if it also exists
-     * @return the location of the this repository within a given SDK
+     * @return the location of the repository within a given SDK
      */
     @Nullable
     public File getRepositoryLocation(@Nullable File sdkHome, boolean requireExists) {

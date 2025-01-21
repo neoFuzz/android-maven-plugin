@@ -17,15 +17,19 @@
 package com.android.manifmerger;
 
 /**
- * List of other http://schemas.android.com/tools namespace instructions that can be present in a
+ * List of other <a href="http://schemas.android.com/tools">tools</a> namespace instructions that can be present in a
  * manifest file.
  */
 public enum OtherOperationType {
 
-    // used to direct lint
+    /**
+     * used to direct lint
+     */
     ignore,
 
-    // used to direct lint
+    /**
+     * used to direct lint
+     */
     targetapi // deliberately lowercase because we do lowercase before valueOf call
 
 }

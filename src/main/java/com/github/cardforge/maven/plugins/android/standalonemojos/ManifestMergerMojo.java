@@ -30,7 +30,7 @@ import java.util.Set;
 
 /**
  * Manifest Merger V2 <code>AndroidManifest.xml</code> file.
- * http://tools.android.com/tech-docs/new-build-system/user-guide/manifest-merger
+ * <a href="http://tools.android.com/tech-docs/new-build-system/user-guide/manifest-merger">User Guide</a>
  *
  * @author Benoit Billington - benoit.billington@gmail.com
  */
@@ -52,10 +52,10 @@ public class ManifestMergerMojo extends AbstractAndroidMojo {
     protected Integer manifestVersionCode;
     /**
      * Update the <code>android:versionCode</code> attribute automatically from the project version
-     * e.g 3.2.1 will become version code 3002001. As described in this blog post
-     * http://www.simpligility.com/2010/11/release-version-management-for-your-android-application/
+     * e.g 3.2.1 will become version code 3002001. As described in this
+     * <a href="http://www.simpligility.com/2010/11/release-version-management-for-your-android-application/">blog post</a>
      * but done without using resource filtering. The value is exposed via the project property
-     * property <code>android.manifest.versionCodeUpdateFromVersion</code> and the resulting value
+     * <code>android.manifest.versionCodeUpdateFromVersion</code> and the resulting value
      * as <code>android.manifest.versionCode</code>.
      * For the purpose of generating the versionCode, if a version element is missing it is presumed to be 0.
      * The maximum values for the version increment and version minor values are 999,
@@ -158,8 +158,10 @@ public class ManifestMergerMojo extends AbstractAndroidMojo {
     private File parsedMergeReportFile;
 
     /**
-     * @throws org.apache.maven.plugin.MojoExecutionException
-     * @throws org.apache.maven.plugin.MojoFailureException
+     * Execute.
+     *
+     * @throws org.apache.maven.plugin.MojoExecutionException the mojo execution exception
+     * @throws org.apache.maven.plugin.MojoFailureException   the mojo failure exception
      */
     public void execute() throws MojoExecutionException, MojoFailureException {
         if (!AndroidExtension.isAndroidPackaging(project.getPackaging())) {
@@ -263,7 +265,7 @@ public class ManifestMergerMojo extends AbstractAndroidMojo {
             minSdkVersion = parsedUsesSdk.getMinSdkVersion();
             targetSdkVersion = parsedUsesSdk.getTargetSdkVersion();
         }
-        if (parsedVersionCodeUpdateFromVersion) {
+        if (Boolean.TRUE.equals(parsedVersionCodeUpdateFromVersion)) {
             VersionGenerator gen = new VersionGenerator(parsedVersionDigits, parsedVersionNamingPattern);
 
             versionCode = gen.generate(parsedVersionName);
@@ -272,7 +274,7 @@ public class ManifestMergerMojo extends AbstractAndroidMojo {
         }
         List<AndroidDependency> manifestDependencies = new ArrayList<>();
 
-        if (parsedMergeLibraries) {
+        if (Boolean.TRUE.equals(parsedMergeLibraries)) {
             final Set<Artifact> allArtifacts = project.getDependencyArtifacts();
             Set<Artifact> dependencyArtifacts = getArtifactResolverHelper().getFilteredArtifacts(allArtifacts);
 
@@ -297,24 +299,6 @@ public class ManifestMergerMojo extends AbstractAndroidMojo {
                 }
             }
         }
-        /**
-         File mainManifest,
-         List<File> manifestOverlays,
-         List<? extends AndroidLibrary> libraries,
-         String packageOverride,
-         int versionCode,
-         String versionName,
-         String minSdkVersion,
-         String targetSdkVersion,
-         Integer maxSdkVersion,
-         String outManifestLocation,
-         String outAaptSafeManifestLocation,
-         String outInstantRunManifestLocation,
-         MergeType mergeType,
-         Map<String, Object> placeHolders,
-         List<Feature> optionalFeatures,
-         File reportFile)
-         */
 
         builder.mergeManifestsForApplication(
                 androidManifestFile,     // mainManifest

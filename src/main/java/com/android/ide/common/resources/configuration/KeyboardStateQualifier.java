@@ -16,6 +16,7 @@
 
 package com.android.ide.common.resources.configuration;
 
+import com.android.annotations.NonNull;
 import com.android.resources.KeyboardState;
 import com.android.resources.ResourceEnum;
 
@@ -51,6 +52,7 @@ public final class KeyboardStateQualifier extends EnumBasedResourceQualifier {
     }
 
     @Override
+    @NonNull
     public String getShortName() {
         return "Keyboard";
     }
@@ -75,9 +77,7 @@ public final class KeyboardStateQualifier extends EnumBasedResourceQualifier {
 
     @Override
     public boolean isMatchFor(ResourceQualifier qualifier) {
-        if (qualifier instanceof KeyboardStateQualifier) {
-            KeyboardStateQualifier referenceQualifier = (KeyboardStateQualifier) qualifier;
-
+        if (qualifier instanceof KeyboardStateQualifier referenceQualifier) {
             // special case where EXPOSED can be used for SOFT
             if (referenceQualifier.mValue == KeyboardState.SOFT &&
                     mValue == KeyboardState.EXPOSED) {
@@ -99,14 +99,24 @@ public final class KeyboardStateQualifier extends EnumBasedResourceQualifier {
         KeyboardStateQualifier compareQualifier = (KeyboardStateQualifier) compareTo;
         KeyboardStateQualifier referenceQualifier = (KeyboardStateQualifier) reference;
 
-        if (referenceQualifier.mValue == KeyboardState.SOFT) { // only case where there could be a
-            // better qualifier
-            // only return true if it's a better value.
-            if (compareQualifier.mValue == KeyboardState.EXPOSED && mValue == KeyboardState.SOFT) {
-                return true;
-            }
+        // better qualifier
+        // only return true if it's a better value.
+        return referenceQualifier.mValue == KeyboardState.SOFT &&
+                compareQualifier.mValue == KeyboardState.EXPOSED &&
+                mValue == KeyboardState.SOFT;
+    }
+
+    @Override
+    public boolean equals(Object qualifier) {
+        if (qualifier instanceof KeyboardStateQualifier q) {
+            return mValue == q.mValue;
         }
 
         return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return mValue.hashCode();
     }
 }

@@ -20,11 +20,13 @@ import com.android.annotations.NonNull;
 import com.android.builder.signing.SignedJarBuilder.IZipEntryFilter.ZipAbortException;
 
 import java.io.File;
+import java.io.Serial;
 
 /**
  * An exception thrown during packaging of an APK file.
  */
 public final class DuplicateFileException extends ZipAbortException {
+    @Serial
     private static final long serialVersionUID = 1L;
     private final String mArchivePath;
     private final File mFile1;
@@ -51,13 +53,10 @@ public final class DuplicateFileException extends ZipAbortException {
     }
 
     @Override
+    @NonNull
     public String getMessage() {
-        StringBuilder sb = new StringBuilder();
-
-        sb.append("Duplicate files copied in APK ").append(mArchivePath).append('\n');
-        sb.append("\tFile 1: ").append(mFile1).append('\n');
-        sb.append("\tFile 2: ").append(mFile2).append('\n');
-
-        return sb.toString();
+        return "Duplicate files copied in APK " + mArchivePath + '\n' +
+                "\tFile 1: " + mFile1 + '\n' +
+                "\tFile 2: " + mFile2 + '\n';
     }
 }

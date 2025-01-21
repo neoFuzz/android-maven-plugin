@@ -16,6 +16,7 @@
  */
 package com.github.cardforge.maven.plugins.android;
 
+import com.android.annotations.NonNull;
 import org.apache.maven.plugin.logging.Log;
 import org.codehaus.plexus.util.cli.CommandLineException;
 import org.codehaus.plexus.util.cli.CommandLineUtils;
@@ -34,6 +35,9 @@ import java.util.Map;
  *
  */
 public interface CommandExecutor {
+
+    String RESULT = ", Result = ";
+
     /**
      * Sets the plexus logger.
      *
@@ -44,7 +48,7 @@ public interface CommandExecutor {
     /**
      * Executes the command for the specified executable and list of command options.
      *
-     * @param executable the name of the executable (csc, xsd, etc).
+     * @param executable the name of the executable (csc, xsd, etc.).
      * @param commands   the command options for the compiler/executable
      * @throws ExecutionException if compiler or executable writes anything to the standard error stream or
      *                            if the process returns a process result != 0.
@@ -54,8 +58,8 @@ public interface CommandExecutor {
     /**
      * Executes the command for the specified executable and list of command options.
      *
-     * @param executable         the name of the executable (csc, xsd, etc).
-     * @param commands           the commands options for the compiler/executable
+     * @param executable         the name of the executable (csc, xsd, etc.).
+     * @param commands           the commands' options for the compiler/executable
      * @param failsOnErrorOutput if true, throws an <code>ExecutionException</code> if the compiler or
      *                           executable writes anything to the error output stream. By default, this value is true
      * @throws ExecutionException if compiler or executable writes anything to the standard error stream (provided the
@@ -121,7 +125,7 @@ public interface CommandExecutor {
     /**
      *
      */
-    public interface ErrorListener {
+    interface ErrorListener {
         boolean isError(String error);
     }
 
@@ -141,6 +145,7 @@ public interface CommandExecutor {
          *
          * @return a default instance of the command executor
          */
+        @NonNull
         public static CommandExecutor createDefaultCommmandExecutor() {
             return new DefaultCommandExecutor();
 
@@ -224,15 +229,15 @@ public interface CommandExecutor {
                     result = CommandLineUtils.executeCommandLine(commandline, stdOut, stdErr);
                     if (logger != null) {
                         logger.debug("ANDROID-040-000: Executed command: Commandline = " + commandline +
-                                ", Result = "
+                                RESULT
                                 + result);
                     } else {
-                        System.out.println("ANDROID-040-000: Executed command: Commandline = " + commandline
-                                + ", Result = " + result);
+                        System.out.println("ANDROID-040-000: Executed command: Commandline = " + commandline // NOSONAR
+                                + RESULT + result);
                     }
                     if (failsOnErrorOutput && stdErr.hasError() || result != 0) {
                         throw new ExecutionException("ANDROID-040-001: Could not execute: Command = "
-                                + commandline.toString() + ", Result = " + result);
+                                + commandline.toString() + RESULT + result);
                     }
                 } catch (CommandLineException e) {
                     throw new ExecutionException("ANDROID-040-002: Could not execute: Command = "
@@ -293,7 +298,7 @@ public interface CommandExecutor {
             @Override
             public void addEnvironment(String name, String value) {
                 if (environment == null) {
-                    environment = new HashMap<String, String>();
+                    environment = new HashMap<>();
                 }
                 environment.put(name, value);
             }
@@ -333,7 +338,7 @@ public interface CommandExecutor {
          */
         static class StreamConsumerImpl implements StreamConsumer {
             private final Log logger;
-            private StringBuffer sb = new StringBuffer();
+            private final StringBuilder sb = new StringBuilder();
             private boolean captureStdOut;
 
             StreamConsumerImpl(Log logger, boolean captureStdOut) {
@@ -371,13 +376,13 @@ public interface CommandExecutor {
             private final Log logger;
             private final ErrorListener errorListener;
             /**
+             * Buffer to store the stream
+             */
+            private final StringBuilder sbe = new StringBuilder();
+            /**
              * Is true if there was anything consumed from the stream, otherwise false
              */
             private boolean error;
-            /**
-             * Buffer to store the stream
-             */
-            private StringBuffer sbe = new StringBuffer();
             private boolean captureStdErr;
 
             ErrorStreamConsumer(Log logger, ErrorListener errorListener, boolean captureStdErr) {
@@ -386,7 +391,7 @@ public interface CommandExecutor {
                 this.captureStdErr = captureStdErr;
 
                 if (logger == null) {
-                    System.out.println("ANDROID-040-003: Error Log not set: Will not output error logs");
+                    System.out.println("ANDROID-040-003: Error Log not set: Will not output error logs"); // NOSONAR
                 }
                 error = false;
             }

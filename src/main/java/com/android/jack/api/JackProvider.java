@@ -42,7 +42,6 @@ public interface JackProvider {
      * @param cls the {@link JackConfig} API interface
      * @return <code>true</true> if the config is supported
      */
-    @Nonnull
     <T extends JackConfig> boolean isConfigSupported(@Nonnull Class<T> cls);
 
     /**
@@ -115,7 +114,7 @@ public interface JackProvider {
     /**
      * The kind of sub-release.
      */
-    public enum SubReleaseKind {
+    enum SubReleaseKind {
         /**
          * A sub-release from an engineering development, not tested, not in the code base repository.
          */
@@ -139,6 +138,6 @@ public interface JackProvider {
         /**
          * A production and stable sub-release.
          */
-        RELEASE;
+        RELEASE
     }
 }

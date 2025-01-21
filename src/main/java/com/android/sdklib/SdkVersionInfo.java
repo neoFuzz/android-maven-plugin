@@ -25,6 +25,9 @@ import java.util.Locale;
  * Information about available SDK Versions
  */
 public class SdkVersionInfo {
+    private SdkVersionInfo() {
+        // Not instantiable
+    }
     /**
      * The highest known API level. Note that the tools may also look at the
      * installed platforms to see if they can find more recently released
@@ -53,7 +56,7 @@ public class SdkVersionInfo {
      * @param api the api level
      * @return a suitable version display name
      */
-    @Nullable
+    @NonNull
     public static String getAndroidName(int api) {
         // See http://source.android.com/source/build-numbers.html
         String codeName = getCodeName(api);
@@ -69,107 +72,59 @@ public class SdkVersionInfo {
 
     @Nullable
     public static String getVersionString(int api) {
-        switch (api) {
-            case 1:
-                return "1.0";
-            case 2:
-                return "1.1";
-            case 3:
-                return "1.5";
-            case 4:
-                return "1.6";
-            case 5:
-                return "2.0";
-            case 6:
-                return "2.0.1";
-            case 7:
-                return "2.1";
-            case 8:
-                return "2.2";
-            case 9:
-                return "2.3";
-            case 10:
-                return "2.3.3";
-            case 11:
-                return "3.0";
-            case 12:
-                return "3.1";
-            case 13:
-                return "3.2";
-            case 14:
-                return "4.0";
-            case 15:
-                return "4.0.3";
-            case 16:
-                return "4.1";
-            case 17:
-                return "4.2";
-            case 18:
-                return "4.3";
-            case 19:
-                return "4.4";
-            case 20:
-                return "4.4";
-            case 21:
-                return "5.0";
-            case 22:
-                return "5.1";
-            case 23:
-                return "5.X";
+        return switch (api) {
+            case 1 -> "1.0";
+            case 2 -> "1.1";
+            case 3 -> "1.5";
+            case 4 -> "1.6";
+            case 5 -> "2.0";
+            case 6 -> "2.0.1";
+            case 7 -> "2.1";
+            case 8 -> "2.2";
+            case 9 -> "2.3";
+            case 10 -> "2.3.3";
+            case 11 -> "3.0";
+            case 12 -> "3.1";
+            case 13 -> "3.2";
+            case 14 -> "4.0";
+            case 15 -> "4.0.3";
+            case 16 -> "4.1";
+            case 17 -> "4.2";
+            case 18 -> "4.3";
+            case 19 -> "4.4";
+            case 20 -> "4.4";
+            case 21 -> "5.0";
+            case 22 -> "5.1";
+            case 23 -> "5.X";
             // If you add more versions here, also update #getBuildCodes and
             // #HIGHEST_KNOWN_API
 
-            default:
-                return null;
-        }
+            default -> null;
+        };
     }
 
     @Nullable
     public static String getCodeName(int api) {
-        switch (api) {
-            case 1:
-            case 2:
-                return null;
-            case 3:
-                return "Cupcake";
-            case 4:
-                return "Donut";
-            case 5:
-            case 6:
-            case 7:
-                return "Eclair";
-            case 8:
-                return "Froyo";
-            case 9:
-            case 10:
-                return "Gingerbread";
-            case 11:
-            case 12:
-            case 13:
-                return "Honeycomb";
-            case 14:
-            case 15:
-                return "IceCreamSandwich";
-            case 16:
-            case 17:
-            case 18:
-                return "Jelly Bean";
-            case 19:
-                return "KitKat";
-            case 20:
-                return "KitKat Wear";
-            case 21:
-            case 22:
-                return "Lollipop";
-            case 23:
-                return "MNC";
+        return switch (api) {
+            case 1, 2 -> null;
+            case 3 -> "Cupcake";
+            case 4 -> "Donut";
+            case 5, 6, 7 -> "Eclair";
+            case 8 -> "Froyo";
+            case 9, 10 -> "Gingerbread";
+            case 11, 12, 13 -> "Honeycomb";
+            case 14, 15 -> "IceCreamSandwich";
+            case 16, 17, 18 -> "Jelly Bean";
+            case 19 -> "KitKat";
+            case 20 -> "KitKat Wear";
+            case 21, 22 -> "Lollipop";
+            case 23 -> "MNC";
 
             // If you add more versions here, also update #getBuildCodes and
             // #HIGHEST_KNOWN_API
 
-            default:
-                return null;
-        }
+            default -> null;
+        };
     }
 
     /**
@@ -184,65 +139,43 @@ public class SdkVersionInfo {
     @Nullable
     public static String getBuildCode(int api) {
         // See http://developer.android.com/reference/android/os/Build.VERSION_CODES.html
-        switch (api) {
-            case 1:
-                return "BASE"; //$NON-NLS-1$
-            case 2:
-                return "BASE_1_1"; //$NON-NLS-1$
-            case 3:
-                return "CUPCAKE"; //$NON-NLS-1$
-            case 4:
-                return "DONUT"; //$NON-NLS-1$
-            case 5:
-                return "ECLAIR"; //$NON-NLS-1$
-            case 6:
-                return "ECLAIR_0_1"; //$NON-NLS-1$
-            case 7:
-                return "ECLAIR_MR1"; //$NON-NLS-1$
-            case 8:
-                return "FROYO"; //$NON-NLS-1$
-            case 9:
-                return "GINGERBREAD"; //$NON-NLS-1$
-            case 10:
-                return "GINGERBREAD_MR1"; //$NON-NLS-1$
-            case 11:
-                return "HONEYCOMB"; //$NON-NLS-1$
-            case 12:
-                return "HONEYCOMB_MR1"; //$NON-NLS-1$
-            case 13:
-                return "HONEYCOMB_MR2"; //$NON-NLS-1$
-            case 14:
-                return "ICE_CREAM_SANDWICH"; //$NON-NLS-1$
-            case 15:
-                return "ICE_CREAM_SANDWICH_MR1"; //$NON-NLS-1$
-            case 16:
-                return "JELLY_BEAN"; //$NON-NLS-1$
-            case 17:
-                return "JELLY_BEAN_MR1"; //$NON-NLS-1$
-            case 18:
-                return "JELLY_BEAN_MR2"; //$NON-NLS-1$
-            case 19:
-                return "KITKAT"; //$NON-NLS-1$
-            case 20:
-                return "KITKAT_WATCH"; //$NON-NLS-1$
-            case 21:
-                return "LOLLIPOP"; //$NON-NLS-1$
-            case 22:
-                return "LOLLIPOP_MR1"; //$NON-NLS-1$
-            case 23:
-                return "MNC"; //$NON-NLS-1$
-            // If you add more versions here, also update #getAndroidName and
-            // #HIGHEST_KNOWN_API
-        }
+        return switch (api) {
+            case 1 -> "BASE"; //$NON-NLS-1$
+            case 2 -> "BASE_1_1"; //$NON-NLS-1$
+            case 3 -> "CUPCAKE"; //$NON-NLS-1$
+            case 4 -> "DONUT"; //$NON-NLS-1$
+            case 5 -> "ECLAIR"; //$NON-NLS-1$
+            case 6 -> "ECLAIR_0_1"; //$NON-NLS-1$
+            case 7 -> "ECLAIR_MR1"; //$NON-NLS-1$
+            case 8 -> "FROYO"; //$NON-NLS-1$
+            case 9 -> "GINGERBREAD"; //$NON-NLS-1$
+            case 10 -> "GINGERBREAD_MR1"; //$NON-NLS-1$
+            case 11 -> "HONEYCOMB"; //$NON-NLS-1$
+            case 12 -> "HONEYCOMB_MR1"; //$NON-NLS-1$
+            case 13 -> "HONEYCOMB_MR2"; //$NON-NLS-1$
+            case 14 -> "ICE_CREAM_SANDWICH"; //$NON-NLS-1$
+            case 15 -> "ICE_CREAM_SANDWICH_MR1"; //$NON-NLS-1$
+            case 16 -> "JELLY_BEAN"; //$NON-NLS-1$
+            case 17 -> "JELLY_BEAN_MR1"; //$NON-NLS-1$
+            case 18 -> "JELLY_BEAN_MR2"; //$NON-NLS-1$
+            case 19 -> "KITKAT"; //$NON-NLS-1$
+            case 20 -> "KITKAT_WATCH"; //$NON-NLS-1$
+            case 21 -> "LOLLIPOP"; //$NON-NLS-1$
+            case 22 -> "LOLLIPOP_MR1"; //$NON-NLS-1$
+            case 23 -> "MNC";
+            default -> //$NON-NLS-1$
+                // If you add more versions here, also update #getAndroidName and
+                // #HIGHEST_KNOWN_API
+                    null;
+        };
 
-        return null;
     }
 
     /**
      * Returns the API level of the given build code (e.g. JELLY_BEAN_MR1 => 17), or -1 if not
      * recognized
      *
-     * @param buildCode         the build code name (not case sensitive)
+     * @param buildCode         the build code name (not case-sensitive)
      * @param recognizeUnknowns if true, treat an unrecognized code name as a newly released
      *                          platform the tools are not yet aware of, and set its API level to
      *                          some higher number than all the currently known API versions
@@ -268,7 +201,7 @@ public class SdkVersionInfo {
      * Returns the API level of the given preview code name (e.g. JellyBeanMR2 => 17), or -1 if not
      * recognized
      *
-     * @param previewName       the preview name (not case sensitive)
+     * @param previewName       the preview name (not case-sensitive)
      * @param recognizeUnknowns if true, treat an unrecognized code name as a newly released
      *                          platform the tools are not yet aware of, and set its API level to
      *                          some higher number than all the currently known API versions
@@ -379,15 +312,8 @@ public class SdkVersionInfo {
 
         // Codename
         if (targets != null) {
-            for (int i = targets.length - 1; i >= 0; i--) {
-                IAndroidTarget target = targets[i];
-                if (target.isPlatform()) {
-                    AndroidVersion version = target.getVersion();
-                    if (version.isPreview() && apiOrPreviewName.equalsIgnoreCase(version.getCodename())) {
-                        return new AndroidVersion(version.getApiLevel(), version.getCodename());
-                    }
-                }
-            }
+            AndroidVersion version = findAndroidVersion(apiOrPreviewName, targets);
+            if (version != null) return version;
         }
 
         int api = getApiByPreviewName(apiOrPreviewName, false);
@@ -397,5 +323,19 @@ public class SdkVersionInfo {
 
         // Must be a future SDK platform
         return new AndroidVersion(HIGHEST_KNOWN_API, apiOrPreviewName);
+    }
+
+    @Nullable
+    private static AndroidVersion findAndroidVersion(@NonNull String apiOrPreviewName, @NonNull IAndroidTarget[] targets) {
+        for (int i = targets.length - 1; i >= 0; i--) {
+            IAndroidTarget target = targets[i];
+            if (target.isPlatform()) {
+                AndroidVersion version = target.getVersion();
+                if (version.isPreview() && apiOrPreviewName.equalsIgnoreCase(version.getCodename())) {
+                    return new AndroidVersion(version.getApiLevel(), version.getCodename());
+                }
+            }
+        }
+        return null;
     }
 }

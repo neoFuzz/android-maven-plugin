@@ -13,7 +13,6 @@ import javax.xml.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.List;
 
-
 /**
  * <p>Java class for anonymous complex type.
  *
@@ -138,6 +137,7 @@ import java.util.List;
  * &lt;/complexType&gt;
  * </pre>
  */
+@SuppressWarnings("JavadocLinkAsPlainText")
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "", propOrder = {
         "properties",

@@ -1,5 +1,6 @@
 package com.github.cardforge.maven.plugins.android.standalonemojos;
 
+import com.android.annotations.NonNull;
 import com.github.cardforge.maven.plugins.android.AbstractAndroidMojo;
 import com.github.cardforge.maven.plugins.android.CommandExecutor;
 import com.github.cardforge.maven.plugins.android.ExecutionException;
@@ -32,7 +33,7 @@ public class ConnectMojo extends AbstractAndroidMojo {
                 String command = getAndroidSdk().getAdbPath();
                 // We first have to the put the bridge in tcpip mode or else it will fail to connect
                 // First make sure everything is clean ...
-                List<String> parameters = new ArrayList<String>();
+                List<String> parameters = new ArrayList<>();
                 parameters.add("kill-server");
 
                 try {
@@ -47,9 +48,9 @@ public class ConnectMojo extends AbstractAndroidMojo {
                     parameters.clear();
                     // ... now put in wireless mode ...
                     executor = getExecutor();
-                    String hostport[] = ip.split(":");
+                    String[] hostPort = ip.split(":");
                     parameters.add("tcpip");
-                    parameters.add(hostport[1]);
+                    parameters.add(hostPort[1]);
                     executor.executeCommand(command, parameters, false);
                     parameters.clear();
                     // ... and finally really connect
@@ -64,6 +65,7 @@ public class ConnectMojo extends AbstractAndroidMojo {
         }
     }
 
+    @NonNull
     private CommandExecutor getExecutor() {
         CommandExecutor executor = CommandExecutor.Factory.createDefaultCommmandExecutor();
         executor.setLogger(this.getLog());

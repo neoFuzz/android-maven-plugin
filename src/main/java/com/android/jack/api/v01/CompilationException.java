@@ -17,12 +17,14 @@
 package com.android.jack.api.v01;
 
 import javax.annotation.Nonnull;
+import java.io.Serial;
 
 /**
  * A fatal problem that caused Jack to abort the compilation. The problem should already have
  * reported, so it is safe to ignore its message.
  */
 public class CompilationException extends Exception {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     public CompilationException() {

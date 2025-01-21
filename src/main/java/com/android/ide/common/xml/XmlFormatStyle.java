@@ -19,7 +19,6 @@ package com.android.ide.common.xml;
 import com.android.SdkConstants;
 import com.android.annotations.NonNull;
 import com.android.annotations.Nullable;
-import com.android.xml.AndroidManifest;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -65,27 +64,32 @@ public enum XmlFormatStyle {
             if (doc != null) {
                 Element root = doc.getDocumentElement();
                 if (root != null) {
-                    String tag = root.getTagName();
-                    if (tag.equals(SdkConstants.TAG_RESOURCES)) {
-                        return RESOURCE;
-                    } else if (tag.equals(AndroidManifest.NODE_MANIFEST)) {
-                        return MANIFEST;
-                    }
-
-                    // How do we detect a layout vs other files such as drawables??
-                    // For now, assume that capitalized tags are view names, or names
-                    // with package components are custom views
-                    if (Character.isUpperCase(tag.charAt(0))
-                            || SdkConstants.VIEW_TAG.equals(tag)
-                            || SdkConstants.VIEW_INCLUDE.equals(tag)
-                            || SdkConstants.VIEW_MERGE.equals(tag)
-                            || tag.indexOf('.') != -1) {
-                        return LAYOUT;
-                    }
+                    XmlFormatStyle resource = getXmlFormatStyle(root);
+                    if (resource != null) return resource;
                 }
             }
         }
 
         return FILE;
+    }
+
+    @Nullable
+    private static XmlFormatStyle getXmlFormatStyle(@NonNull Element root) {
+        String tag = root.getTagName();
+        if (tag.equals(SdkConstants.TAG_RESOURCES)) {
+            return RESOURCE;
+        }
+
+        // How do we detect a layout vs other files such as drawables??
+        // For now, assume that capitalized tags are view names, or names
+        // with package components are custom views
+        if (Character.isUpperCase(tag.charAt(0))
+                || SdkConstants.VIEW_TAG.equals(tag)
+                || SdkConstants.VIEW_INCLUDE.equals(tag)
+                || SdkConstants.VIEW_MERGE.equals(tag)
+                || tag.indexOf('.') != -1) {
+            return LAYOUT;
+        }
+        return null;
     }
 }

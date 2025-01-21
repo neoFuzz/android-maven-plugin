@@ -17,13 +17,13 @@
 package com.android.builder.internal.packaging;
 
 
+import com.android.annotations.NonNull;
 import com.android.builder.packaging.DuplicateFileException;
 import com.android.builder.packaging.PackagerException;
 import com.android.builder.packaging.SealedPackageException;
 import com.android.ide.common.packaging.PackagingUtils;
 
 import java.io.File;
-import java.io.IOException;
 
 public class JavaResourceProcessor {
 
@@ -52,9 +52,7 @@ public class JavaResourceProcessor {
                 for (File file : files) {
                     processFileForResource(file, null);
                 }
-            } catch (DuplicateFileException e) {
-                throw e;
-            } catch (SealedPackageException e) {
+            } catch (DuplicateFileException | SealedPackageException e) {
                 throw e;
             } catch (Exception e) {
                 throw new PackagerException(e, "Failed to add %s", sourceFolder);
@@ -74,43 +72,41 @@ public class JavaResourceProcessor {
      * @param file the {@link File} to process.
      * @param path the relative path of this file to the source folder.
      *             Can be <code>null</code> to identify a root file.
-     * @throws IOException
      * @throws DuplicateFileException if a file conflicts with another already added
      *                                to the APK at the same location inside the APK archive.
      * @throws PackagerException      if an error occurred
      * @throws SealedPackageException if the APK is already sealed.
      */
-    private void processFileForResource(File file, String path)
-            throws IOException, DuplicateFileException, PackagerException, SealedPackageException {
-        if (file.isDirectory()) {
-            // a directory? we check it
-            if (PackagingUtils.checkFolderForPackaging(file.getName())) {
-                // if it's valid, we append its name to the current path.
-                if (path == null) {
-                    path = file.getName();
-                } else {
-                    path = path + "/" + file.getName();
-                }
+    private void processFileForResource(@NonNull File file, String path)
+            throws DuplicateFileException, PackagerException, SealedPackageException {
+        // Initialize path if null
+        String currentPath = (path == null) ? file.getName() : path + File.separatorChar + file.getName();
 
-                // and process its content.
-                File[] files = file.listFiles();
+        if (file.isDirectory()) {
+            processDirectory(file, currentPath);
+        } else {
+            processFile(file, currentPath);
+        }
+    }
+
+    private void processDirectory(@NonNull File directory, String path)
+            throws DuplicateFileException, PackagerException, SealedPackageException {
+        // Check if the directory should be processed
+        if (PackagingUtils.checkFolderForPackaging(directory.getName())) {
+            File[] files = directory.listFiles();
+            if (files != null) {
                 for (File contentFile : files) {
                     processFileForResource(contentFile, path);
                 }
             }
-        } else {
-            // a file? we check it to make sure it should be added
-            if (PackagingUtils.checkFileForPackaging(file.getName())) {
-                // we append its name to the current path
-                if (path == null) {
-                    path = file.getName();
-                } else {
-                    path = path + "/" + file.getName();
-                }
+        }
+    }
 
-                // and add it to the apk
-                mBuilder.addFile(file, path);
-            }
+    private void processFile(@NonNull File file, String path)
+            throws DuplicateFileException, PackagerException, SealedPackageException {
+        // Check if the file should be processed
+        if (PackagingUtils.checkFileForPackaging(file.getName())) {
+            mBuilder.addFile(file, path);
         }
     }
 

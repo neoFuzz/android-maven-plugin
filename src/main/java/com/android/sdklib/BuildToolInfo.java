@@ -210,7 +210,7 @@ public class BuildToolInfo {
      * @return The absolute path for that tool, with a / separator if it's a folder.
      * Null if the path-id is unknown.
      */
-    public String getPath(PathId pathId) {
+    public String getPath(@NonNull PathId pathId) {
         assert pathId.isPresentIn(mRevision);
 
         return mPaths.get(pathId);

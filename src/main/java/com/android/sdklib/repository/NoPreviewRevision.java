@@ -20,7 +20,7 @@ import com.android.annotations.NonNull;
 
 
 /**
- * Package multi-part revision number composed of a tuple
+ * Package multipart revision number composed of a tuple
  * (major.minor.micro) but without support for any optional preview number.
  *
  * @see FullRevision

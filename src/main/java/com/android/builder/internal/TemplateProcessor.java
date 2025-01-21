@@ -42,7 +42,7 @@ class TemplateProcessor {
      * Creates a processor
      *
      * @param templateStream the stream to read the template file from
-     * @param placeHolderMap
+     * @param placeHolderMap a map of <placeholder, Value> to search for in the template
      */
     public TemplateProcessor(@NonNull InputStream templateStream,
                              @NonNull Map<String, String> placeHolderMap) {
@@ -70,6 +70,7 @@ class TemplateProcessor {
      * @return null if the file could not be read
      * @throws java.io.IOException
      */
+    @NonNull
     private String readEmbeddedTextFile(InputStream templateStream) throws IOException {
         InputStreamReader reader = new InputStreamReader(templateStream, Charsets.UTF_8);
 
@@ -91,7 +92,8 @@ class TemplateProcessor {
      * @param parameters a map of <placeholder, Value> to search for in the string
      * @return A new String object with the placeholder replaced by the values.
      */
-    private String replaceParameters(String str, Map<String, String> parameters) {
+    @NonNull
+    private String replaceParameters(String str, @NonNull Map<String, String> parameters) {
 
         for (Entry<String, String> entry : parameters.entrySet()) {
             String value = entry.getValue();
