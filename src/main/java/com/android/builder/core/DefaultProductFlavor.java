@@ -44,42 +44,99 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * do not contain any flavors.
  */
 public class DefaultProductFlavor extends BaseConfigImpl implements ProductFlavor {
+    /**
+     * Serialization version for the class.
+     */
     @Serial
     private static final long serialVersionUID = 1L;
 
+    /**
+     * The name of the flavor.
+     */
     private final String mName;
+    /**
+     * The dimension for this flavor.
+     */
     @Nullable
     private String mDimension;
+    /**
+     * The minimum SDK version
+     */
     @Nullable
     private transient ApiVersion mMinSdkVersion;
+    /**
+     * The target SDK version
+     */
     @Nullable
     private transient ApiVersion mTargetSdkVersion;
+    /**
+     * The maximum SDK version
+     */
     @Nullable
     private Integer mMaxSdkVersion;
+    /**
+     * Render script Target API
+     */
     @Nullable
     private Integer mRenderscriptTargetApi;
+    /**
+     * Render script support mode enabled
+     */
     @Nullable
     private Boolean mRenderscriptSupportModeEnabled;
+    /**
+     * Render script NDK mode enabled
+     */
     @Nullable
     private Boolean mRenderscriptNdkModeEnabled;
+    /**
+     * Version code
+     */
     @Nullable
     private Integer mVersionCode;
+    /**
+     * Version name
+     */
     @Nullable
     private String mVersionName;
+    /**
+     * Application ID
+     */
     @Nullable
     private String mApplicationId;
+    /**
+     * Test application ID
+     */
     @Nullable
     private String mTestApplicationId;
+    /**
+     * Test instrumentation runner
+     */
     @Nullable
     private String mTestInstrumentationRunner;
+    /**
+     * Test instrumentation runner arguments
+     */
     @NonNull
     private Map<String, String> mTestInstrumentationRunnerArguments = Maps.newHashMap();
+    /**
+     * Test handle profiling
+     */
     @Nullable
     private Boolean mTestHandleProfiling;
+    /**
+     * Test functional test
+     */
     @Nullable
     private Boolean mTestFunctionalTest;
+    /**
+     * Resource configuration
+     */
     @Nullable
     private transient SigningConfig mSigningConfig;
+    /**
+     * Resource configuration
+     */
     @Nullable
     private Set<String> mResourceConfiguration;
 
@@ -233,10 +290,19 @@ public class DefaultProductFlavor extends BaseConfigImpl implements ProductFlavo
         return flavor;
     }
 
+    /**
+     * @param overlay the flavor to merge on top of
+     * @param base    the flavor to apply on top of the base.
+     * @param <T>     the type of the value to merge
+     * @return the value to use for the merge
+     */
     private static <T> T chooseNotNull(T overlay, T base) {
         return overlay != null ? overlay : base;
     }
 
+    /**
+     * @return the name of the flavor.
+     */
     @Override
     @NonNull
     public String getName() {
@@ -245,6 +311,8 @@ public class DefaultProductFlavor extends BaseConfigImpl implements ProductFlavo
 
     /**
      * Name of the dimension this product flavor belongs to.
+     *
+     * @return the name of the dimension for this flavor, or null if not set
      */
     @Nullable
     @Override
@@ -252,12 +320,18 @@ public class DefaultProductFlavor extends BaseConfigImpl implements ProductFlavo
         return mDimension;
     }
 
+    /**
+     * @param dimension the dimension for this flavor
+     */
     public void setDimension(@NonNull String dimension) {
         mDimension = dimension;
     }
 
     /**
      * Sets the application id.
+     *
+     * @param applicationId the application id
+     * @return the flavor object
      */
     @NonNull
     public ProductFlavor setApplicationId(String applicationId) {
@@ -269,6 +343,8 @@ public class DefaultProductFlavor extends BaseConfigImpl implements ProductFlavo
      * Returns the application ID.
      *
      * <p>See <a href="http://tools.android.com/tech-docs/new-build-system/applicationid-vs-packagename">ApplicationId versus PackageName</a>
+     *
+     * @return the application ID, or null if not set
      */
     @Override
     @Nullable
@@ -292,6 +368,8 @@ public class DefaultProductFlavor extends BaseConfigImpl implements ProductFlavo
      * Version code.
      *
      * <p>See <a href="http://developer.android.com/tools/publishing/versioning.html">Versioning Your Application</a>
+     *
+     * @return the version code, or null if not set
      */
     @Override
     @Nullable
@@ -315,6 +393,8 @@ public class DefaultProductFlavor extends BaseConfigImpl implements ProductFlavo
      * Version name.
      *
      * <p>See <a href="http://developer.android.com/tools/publishing/versioning.html">Versioning Your Application</a>
+     *
+     * @return the version name, or null if not set
      */
     @Override
     @Nullable
@@ -324,6 +404,9 @@ public class DefaultProductFlavor extends BaseConfigImpl implements ProductFlavo
 
     /**
      * Sets the minSdkVersion to the given value.
+     *
+     * @param minSdkVersion the min SDK version
+     * @return the flavor object
      */
     @NonNull
     public ProductFlavor setMinSdkVersion(ApiVersion minSdkVersion) {
@@ -333,6 +416,8 @@ public class DefaultProductFlavor extends BaseConfigImpl implements ProductFlavo
 
     /**
      * Min SDK version.
+     *
+     * @return the min SDK version, or null if not set
      */
     @Nullable
     @Override
@@ -342,6 +427,9 @@ public class DefaultProductFlavor extends BaseConfigImpl implements ProductFlavo
 
     /**
      * Sets the targetSdkVersion to the given value.
+     *
+     * @param targetSdkVersion the target SDK version
+     * @return the flavor object
      */
     @NonNull
     public ProductFlavor setTargetSdkVersion(@Nullable ApiVersion targetSdkVersion) {
@@ -351,6 +439,8 @@ public class DefaultProductFlavor extends BaseConfigImpl implements ProductFlavo
 
     /**
      * Target SDK version.
+     *
+     * @return the target SDK version, or null if not set
      */
     @Nullable
     @Override
@@ -358,18 +448,28 @@ public class DefaultProductFlavor extends BaseConfigImpl implements ProductFlavo
         return mTargetSdkVersion;
     }
 
+    /**
+     * @param maxSdkVersion the maxSdkVersion to set
+     * @return the flavor object
+     */
     @NonNull
     public ProductFlavor setMaxSdkVersion(Integer maxSdkVersion) {
         mMaxSdkVersion = maxSdkVersion;
         return this;
     }
 
+    /**
+     * @return the maxSdkVersion, or null if not set
+     */
     @Nullable
     @Override
     public Integer getMaxSdkVersion() {
         return mMaxSdkVersion;
     }
 
+    /**
+     * @return the target API to use for renderscript code generation.
+     */
     @Override
     @Nullable
     public Integer getRenderscriptTargetApi() {
@@ -378,11 +478,17 @@ public class DefaultProductFlavor extends BaseConfigImpl implements ProductFlavo
 
     /**
      * Sets the renderscript target API to the given value.
+     *
+     * @param renderscriptTargetApi the target API to set
      */
     public void setRenderscriptTargetApi(Integer renderscriptTargetApi) {
         mRenderscriptTargetApi = renderscriptTargetApi;
     }
 
+    /**
+     * @return whether the renderscript code should be compiled in support mode to make it compatible
+     * with older versions of Android.
+     */
     @Override
     @Nullable
     public Boolean getRenderscriptSupportModeEnabled() {
@@ -392,12 +498,18 @@ public class DefaultProductFlavor extends BaseConfigImpl implements ProductFlavo
     /**
      * Sets whether the renderscript code should be compiled in support mode to make it compatible
      * with older versions of Android.
+     *
+     * @param renderscriptSupportMode whether the renderscript code should be compiled in support mode
+     * @return the flavor object
      */
     public ProductFlavor setRenderscriptSupportModeEnabled(Boolean renderscriptSupportMode) {
         mRenderscriptSupportModeEnabled = renderscriptSupportMode;
         return this;
     }
 
+    /**
+     * @return whether the renderscript code should be compiled to generate C/C++ bindings.
+     */
     @Override
     @Nullable
     public Boolean getRenderscriptNdkModeEnabled() {
@@ -406,6 +518,9 @@ public class DefaultProductFlavor extends BaseConfigImpl implements ProductFlavo
 
     /**
      * Sets whether the renderscript code should be compiled to generate C/C++ bindings.
+     *
+     * @param renderscriptNdkMode whether the renderscript code should be compiled to generate C/C++ bindings
+     * @return the flavor object
      */
     public ProductFlavor setRenderscriptNdkModeEnabled(Boolean renderscriptNdkMode) {
         mRenderscriptNdkModeEnabled = renderscriptNdkMode;
@@ -414,6 +529,9 @@ public class DefaultProductFlavor extends BaseConfigImpl implements ProductFlavo
 
     /**
      * Sets the test application ID.
+     *
+     * @param applicationId the test application ID
+     * @return the flavor object
      */
     @NonNull
     public ProductFlavor setTestApplicationId(String applicationId) {
@@ -434,6 +552,9 @@ public class DefaultProductFlavor extends BaseConfigImpl implements ProductFlavo
 
     /**
      * Sets the test instrumentation runner to the given value.
+     *
+     * @param testInstrumentationRunner the test instrumentation runner
+     * @return the flavor object
      */
     @NonNull
     public ProductFlavor setTestInstrumentationRunner(String testInstrumentationRunner) {
@@ -458,6 +579,9 @@ public class DefaultProductFlavor extends BaseConfigImpl implements ProductFlavo
 
     /**
      * Sets the test instrumentation runner custom arguments.
+     *
+     * @param testInstrumentationRunnerArguments the custom arguments to pass to the test runner.
+     * @return the flavor object
      */
     @NonNull
     public ProductFlavor setTestInstrumentationRunnerArguments(
@@ -477,7 +601,7 @@ public class DefaultProductFlavor extends BaseConfigImpl implements ProductFlavo
      *
      * <p>Test runner arguments can also be specified from the command line:
      *
-     * <p><pre>
+     * <pre>
      * INSTRUMENTATION_TEST_RUNNER_ARGS=size=medium,foo=bar ./gradlew connectedAndroidTest
      * ./gradlew connectedAndroidTest -Pcom.android.tools.instrumentationTestRunnerArgs=size=medium,foo=bar
      * </pre>
@@ -498,6 +622,10 @@ public class DefaultProductFlavor extends BaseConfigImpl implements ProductFlavo
         return mTestHandleProfiling;
     }
 
+    /**
+     * @param handleProfiling whether test profiling is enabled.
+     * @return the flavor object
+     */
     @NonNull
     public ProductFlavor setTestHandleProfiling(boolean handleProfiling) {
         mTestHandleProfiling = handleProfiling;
@@ -507,6 +635,8 @@ public class DefaultProductFlavor extends BaseConfigImpl implements ProductFlavo
     /**
      * See <a href="http://developer.android.com/guide/topics/manifest/instrumentation-element.html">
      * instrumentation</a>.
+     *
+     * @return whether test functional testing is enabled.
      */
     @Override
     @Nullable
@@ -514,6 +644,10 @@ public class DefaultProductFlavor extends BaseConfigImpl implements ProductFlavo
         return mTestFunctionalTest;
     }
 
+    /**
+     * @param functionalTest whether test functional testing is enabled.
+     * @return the flavor object
+     */
     @NonNull
     public ProductFlavor setTestFunctionalTest(boolean functionalTest) {
         mTestFunctionalTest = functionalTest;
@@ -522,6 +656,8 @@ public class DefaultProductFlavor extends BaseConfigImpl implements ProductFlavo
 
     /**
      * Signing config used by this product flavor.
+     *
+     * @return the signing config or null if not set
      */
     @Override
     @Nullable
@@ -531,6 +667,9 @@ public class DefaultProductFlavor extends BaseConfigImpl implements ProductFlavo
 
     /**
      * Sets the signing configuration. e.g.: {@code signingConfig signingConfigs.myConfig}
+     *
+     * @param signingConfig the signing configuration
+     * @return The product flavor object
      */
     @NonNull
     public ProductFlavor setSigningConfig(SigningConfig signingConfig) {
@@ -540,6 +679,8 @@ public class DefaultProductFlavor extends BaseConfigImpl implements ProductFlavo
 
     /**
      * Adds a res config filter (for instance 'hdpi')
+     *
+     * @param configuration the configuration to add
      */
     public void addResourceConfiguration(@NonNull String configuration) {
         if (mResourceConfiguration == null) {
@@ -551,6 +692,8 @@ public class DefaultProductFlavor extends BaseConfigImpl implements ProductFlavo
 
     /**
      * Adds a res config filter (for instance 'hdpi')
+     *
+     * @param configurations the configurations to add
      */
     public void addResourceConfigurations(@NonNull String... configurations) {
         if (mResourceConfiguration == null) {
@@ -562,6 +705,8 @@ public class DefaultProductFlavor extends BaseConfigImpl implements ProductFlavo
 
     /**
      * Adds a res config filter (for instance 'hdpi')
+     *
+     * @param configurations the configurations to add
      */
     public void addResourceConfigurations(@NonNull Collection<String> configurations) {
         if (mResourceConfiguration == null) {
@@ -584,6 +729,10 @@ public class DefaultProductFlavor extends BaseConfigImpl implements ProductFlavo
         return mResourceConfiguration;
     }
 
+    /**
+     * @param o the object to compare with
+     * @return true if the given object is equal to this flavor
+     */
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -620,6 +769,9 @@ public class DefaultProductFlavor extends BaseConfigImpl implements ProductFlavo
                 Objects.equal(mVersionName, that.mVersionName);
     }
 
+    /**
+     * @return a hash code for this flavor
+     */
     @Override
     public int hashCode() {
         return Objects.hashCode(
@@ -644,6 +796,9 @@ public class DefaultProductFlavor extends BaseConfigImpl implements ProductFlavo
                 mResourceConfiguration);
     }
 
+    /**
+     * @return a user-friendly name for the flavor that can be displayed to the user
+     */
     @Override
     @NonNull
     public String toString() {

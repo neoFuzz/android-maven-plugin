@@ -27,7 +27,7 @@ public class Program {
      * Constructor used for testing.
      *
      * @param filename The file name
-     * @param options The options to use
+     * @param options  The options to use
      */
     public Program(String filename, String options) {
         this.filename = filename;
@@ -51,6 +51,7 @@ public class Program {
     // ----------------------------------
     // TESTING METHODS
     // ----------------------------------
+
     /**
      * @return The hash code of the object
      */

@@ -125,32 +125,31 @@ public class SdkRepoSource extends SdkSource {
 
     /**
      * The purpose of this method is to support forward evolution of our schema.
-     * <p/>
+     * <p>
      * At this point, we know that xml does not point to any schema that this version of
      * the tool knows how to process, so it's not one of the possible 1..N versions of our
      * XSD schema.
-     * <p/>
+     * <p>
      * We thus try to interpret the byte stream as a possible XML stream. It may not be
      * one at all in the first place. If it looks anything line an XML schema, we try to
      * find its &lt;tool&gt; and the &lt;platform-tools&gt; elements. If we find any,
      * we recreate a suitable document that conforms to what we expect from our XSD schema
      * with only those elements.
-     * <p/>
+     * <p>
      * To be valid, the &lt;tool&gt; and the &lt;platform-tools&gt; elements must have at
      * least one &lt;archive&gt; compatible with this platform.
-     * <p/>
+     * <p>
      * Starting the sdk-repository schema v3, &lt;tools&gt; has a &lt;min-platform-tools-rev&gt;
      * node, so technically the corresponding XML schema will be usable only if there's a
      * &lt;platform-tools&gt; with the request revision number. We don't enforce that here, as
      * this is done at install time.
-     * <p/>
+     * <p>
      * If we don't find anything suitable, we drop the whole thing.
      *
      * @param xml The input XML stream. Can be null.
      * @return Either a new XML document conforming to our schema with at least one &lt;tool&gt;
      * and &lt;platform-tools&gt; element or null.
      * @throws IOException if InputStream.reset() fails
-     * @null Can return null on failure.
      */
     @Override
     protected Document findAlternateToolsXml(@Nullable InputStream xml) throws IOException {
@@ -167,7 +166,6 @@ public class SdkRepoSource extends SdkSource {
      * @return Either a new XML document conforming to our schema with at least one &lt;tool&gt;
      * and &lt;platform-tools&gt; element or null.
      * @throws IOException if InputStream.reset() fails
-     * @null Can return null on failure.
      * @see #findAlternateToolsXml(InputStream) findAlternateToolsXml() provides more details.
      */
     protected Document findAlternateToolsXml(

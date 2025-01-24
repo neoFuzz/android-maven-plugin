@@ -23,13 +23,12 @@ import com.android.ide.common.blame.SourceFile;
 import com.android.ide.common.blame.SourceFilePosition;
 import com.android.ide.common.blame.SourcePosition;
 import com.google.common.base.Joiner;
-
-import java.util.Optional;
-
 import com.google.common.base.Preconditions;
 import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableSet;
 import org.w3c.dom.Attr;
+
+import java.util.Optional;
 
 /**
  * Defines an XML attribute inside a {@link XmlElement}.

@@ -20,8 +20,18 @@ import com.android.resources.ResourceType;
 
 @SuppressWarnings("deprecation")
 public class DensityBasedResourceValue extends ResourceValue implements IDensityBasedResourceValue {
+    /**
+     * Value for the resource
+     */
     private final com.android.resources.Density mDensity;
 
+    /**
+     * @param type        The {@link ResourceType} of the resource
+     * @param name        The name of the resource
+     * @param value       The value of the resource
+     * @param density     the density for which this resource is configured.
+     * @param isFramework Whether this resource is a framework resource or not
+     */
     public DensityBasedResourceValue(ResourceType type, String name, String value,
                                      com.android.resources.Density density, boolean isFramework) {
         super(type, name, value, isFramework);
@@ -48,6 +58,9 @@ public class DensityBasedResourceValue extends ResourceValue implements IDensity
         return Density.getEnum(mDensity.getDpiValue());
     }
 
+    /**
+     * @return a string representation of this resource value
+     */
     @Override
     public String toString() {
         return "DensityBasedResourceValue ["
@@ -55,7 +68,8 @@ public class DensityBasedResourceValue extends ResourceValue implements IDensity
                 + " (density:" + mDensity + ", framework:" + isFramework() + ")]";
     }
 
-    /* (non-Javadoc)
+    /**
+     * @return the hash code of this resource value
      * @see java.lang.Object#hashCode()
      */
     @Override
@@ -66,7 +80,9 @@ public class DensityBasedResourceValue extends ResourceValue implements IDensity
         return result;
     }
 
-    /* (non-Javadoc)
+    /**
+     * @param obj the object to compare with
+     * @return true if the two objects are equal, false otherwise
      * @see java.lang.Object#equals(java.lang.Object)
      */
     @Override

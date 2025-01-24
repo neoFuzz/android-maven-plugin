@@ -22,9 +22,10 @@ import com.android.sdklib.repository.SdkRepoConstants;
 /**
  * Interface used to decorate a {@link Package} that has a dependency
  * on a minimal tools revision, e.g. which XML has a <code>&lt;min-tools-rev&gt;</code> element.
- * <p/>
+ * <p>
  * A package that has this dependency can only be installed if the requested tools revision
  * is present or installed at the same time.
+ * </p>
  *
  * @deprecated com.android.sdklib.internal.repository has moved into Studio as
  * com.android.tools.idea.sdk.remote.internal.

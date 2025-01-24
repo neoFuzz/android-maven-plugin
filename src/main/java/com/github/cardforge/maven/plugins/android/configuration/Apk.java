@@ -11,6 +11,7 @@ public class Apk {
 
     /**
      * Mirror of {@link com.github.cardforge.maven.plugins.android.phase09package.ApkMojo#apkMetaIncludes}.
+     *
      * @deprecated going to be unused
      */
     @Deprecated(since = "4.8")

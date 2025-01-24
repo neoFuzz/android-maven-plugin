@@ -4,30 +4,30 @@ import java.util.List;
 
 /**
  * Configuration for the monkey runner tests runs. This class is only the definition of the parameters that are shadowed
- * in {@link com.jayway.maven.plugins.android.standalonemojos.MonkeyRunner} and used there.
+ * in {@code com.jayway.maven.plugins.android.standalonemojos.MonkeyRunner} and used there.
  *
  * @author Stéphane Nicolas - snicolas@octo.com
  */
 public class MonkeyRunner {
     /**
-     * Mirror of {@link com.jayway.maven.plugins.android.standalonemojos.MonkeyRunner#testSkip}
+     * Mirror of {@code com.jayway.maven.plugins.android.standalonemojos.MonkeyRunner#testSkip}
      */
     private Boolean skip;
     /**
-     * Mirror of {@link com.jayway.maven.plugins.android.standalonemojos.MonkeyRunner#programs}
+     * Mirror of {@code com.jayway.maven.plugins.android.standalonemojos.MonkeyRunner#programs}
      */
     private List<Program> programs;
     /**
-     * Mirror of {@link com.jayway.maven.plugins.android.standalonemojos.MonkeyRunner#plugins}
+     * Mirror of {@code com.jayway.maven.plugins.android.standalonemojos.MonkeyRunner#plugins}
      */
     private String[] plugins;
     /**
-     * Mirror of {@link com.jayway.maven.plugins.android.standalonemojos.MonkeyRunner#createReport}
+     * Mirror of {@code com.jayway.maven.plugins.android.standalonemojos.MonkeyRunner#createReport}
      */
     private Boolean createReport;
     /**
      * Mirror of
-     * {@link com.jayway.maven.plugins.android.standalonemojos.MonkeyRunner#injectDeviceSerialNumberIntoScript}
+     * {@code com.jayway.maven.plugins.android.standalonemojos.MonkeyRunner#injectDeviceSerialNumberIntoScript}
      */
     private Boolean injectDeviceSerialNumberIntoScript;
 

@@ -31,7 +31,10 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.DependencyResolutionRequiredException;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
-import org.apache.maven.plugins.annotations.*;
+import org.apache.maven.plugins.annotations.LifecyclePhase;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
+import org.apache.maven.plugins.annotations.ResolutionScope;
 import org.apache.maven.repository.RepositorySystem;
 import org.codehaus.plexus.archiver.ArchiverException;
 import org.codehaus.plexus.archiver.UnArchiver;
@@ -60,7 +63,8 @@ import static com.github.cardforge.maven.plugins.android.common.AndroidExtension
  * @author Manfred Moser - manfred@simpligility.com
  * @author William Ferguson - william.ferguson@xandar.com.au
  * @author Malachi de AElfweald malachid@gmail.com
- */@SuppressWarnings("deprecation")
+ */
+@SuppressWarnings("deprecation")
 @Mojo(
         name = "generate-sources",
         defaultPhase = LifecyclePhase.GENERATE_SOURCES,
@@ -626,7 +630,7 @@ public class GenerateSourcesMojo extends AbstractAndroidMojo {
      * Provides map with all provided dependencies or project itself grouped by package name
      *
      * @param dependencyArtifacts artifacts that should be grouped by package name
-     * @return map of with package names(String) and sets of artifacts (Set<Artifact>)
+     * @return map of with package names(String) and sets of artifacts {@code Set<Artifact>}
      * that have similar package names
      * @throws MojoExecutionException if dependencies are not initialized
      */

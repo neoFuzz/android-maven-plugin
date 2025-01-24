@@ -304,7 +304,7 @@ public class ValueXmlHelper {
      * the escaping rules described here:
      * <a href="http://developer.android.com/guide/topics/resources/string-resource.html">here</a>
      * More examples of the escaping rules can be found here:
-     * <a href="http://androidcookbook.com/Recipe.seam?recipeId=2219&recipeFrom=ViewTOC">here</a
+     * <a href="http://androidcookbook.com/Recipe.seam?recipeId=2219">here</a>
      * This method assumes that the String is not escaped already.
      * <p>
      * Rules:
@@ -329,7 +329,7 @@ public class ValueXmlHelper {
      * the escaping rules described here:
      * <a href="http://developer.android.com/guide/topics/resources/string-resource.html">here</a>
      * More examples of the escaping rules can be found here:
-     * <a href="http://androidcookbook.com/Recipe.seam?recipeId=2219&recipeFrom=ViewTOC">here</a>
+     * <a href="http://androidcookbook.com/Recipe.seam?recipeId=2219">here</a>
      * This method assumes that the String is not escaped already.
      * <p>
      * Rules:

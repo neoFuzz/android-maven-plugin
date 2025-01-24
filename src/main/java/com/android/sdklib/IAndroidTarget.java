@@ -51,7 +51,7 @@ public interface IAndroidTarget extends Comparable<IAndroidTarget> {
      */
     int TEMPLATES = 6;
     /**
-     * OS Path to the "data" folder which contains data & libraries for the SDK tools.
+     * OS Path to the "data" folder which contains data &amp; libraries for the SDK tools.
      */
     int DATA = 7;
     /**
@@ -118,63 +118,87 @@ public interface IAndroidTarget extends Comparable<IAndroidTarget> {
 
     /**
      * Returns the target location.
+     *
+     * @return the target location.
      */
     String getLocation();
 
     /**
      * Returns the name of the vendor of the target.
+     *
+     * @return the name of the vendor of the target.
      */
     String getVendor();
 
     /**
      * Returns the name of the target.
+     *
+     * @return the name of the target.
      */
     String getName();
 
     /**
      * Returns the full name of the target, possibly including vendor name.
+     *
+     * @return the full name of the target, possibly including vendor name.
      */
     String getFullName();
 
     /**
      * Returns the name to be displayed when representing all the libraries this target contains.
+     *
+     * @return the name to be displayed when representing all the libraries this target contains.
      */
     String getClasspathName();
 
     /**
      * Returns the name to be displayed when representing all the libraries this target contains.
+     *
+     * @return the name to be displayed when representing all the libraries this target contains.
      */
     String getShortClasspathName();
 
     /**
      * Returns the description of the target.
+     *
+     * @return the description of the target.
      */
     String getDescription();
 
     /**
      * Returns the version of the target. This is guaranteed to be non-null.
+     *
+     * @return the version of the target.
      */
     @NonNull
     AndroidVersion getVersion();
 
     /**
      * Returns the platform version as a readable string.
+     *
+     * @return the platform version or null if this is not a platform.
      */
     String getVersionName();
 
     /**
      * Returns the revision number for the target.
+     *
+     * @return the revision number or 0 if there is none.
      */
     int getRevision();
 
     /**
      * Returns true if the target is a standard Android platform.
+     *
+     * @return True if the target is a standard Android platform.
      */
     boolean isPlatform();
 
     /**
      * Returns the parent target. This is likely to only be non <code>null</code> if
      * {@link #isPlatform()} returns <code>false</code>
+     *
+     * @return the parent target or null if this is a platform target
      */
     IAndroidTarget getParent();
 
@@ -183,16 +207,18 @@ public interface IAndroidTarget extends Comparable<IAndroidTarget> {
      *
      * @param pathId the id representing the path to return.
      *               Any of the constants defined in the {@link IAndroidTarget} interface can be used.
+     * @return the path as a string or null if the path is not available.
      */
     String getPath(int pathId);
 
     /**
      * Returns the path of a platform component.
-     * <p/>
+     * <p>
      * This is like the legacy {@link #getPath(int)} method except it returns a {@link File}.
      *
      * @param pathId the id representing the path to return.
      *               Any of the constants defined in the {@link IAndroidTarget} interface can be used.
+     * @return a {@link File} object or null if the path is not available.
      */
     File getFile(int pathId);
 
@@ -241,12 +267,14 @@ public interface IAndroidTarget extends Comparable<IAndroidTarget> {
 
     /**
      * Returns whether the target is able to render layouts.
+     *
+     * @return true if the target is able to render layouts.
      */
     boolean hasRenderingLibrary();
 
     /**
      * Returns the available skin folders for this target.
-     * <p/>
+     * <p>
      * To get the skin names, use {@link File#getName()}. <br/>
      * Skins come either from:
      * <ul>
@@ -255,14 +283,18 @@ public interface IAndroidTarget extends Comparable<IAndroidTarget> {
      * <li>a tagged system-image ({@code sdk/system-images/platform-N/tag/abi/skins/name}.)</li>
      * </ul>
      * The array can be empty but not null.
+     *
+     * @return an array of skin folders.
      */
     @NonNull
     File[] getSkins();
 
     /**
      * Returns the default skin folder for this target.
-     * <p/>
+     * <p>
      * To get the skin name, use {@link File#getName()}.
+     *
+     * @return the default skin or <code>null</code> if there is none.
      */
     @Nullable
     File getDefaultSkin();
@@ -277,28 +309,31 @@ public interface IAndroidTarget extends Comparable<IAndroidTarget> {
     /**
      * Return the value of a given property for this target.
      *
+     * @param name the name of the property to return
      * @return the property value or <code>null</code> if it was not found.
      */
     String getProperty(String name);
 
     /**
      * Returns the value of a given property for this target as an Integer value.
-     * <p/> If the value is missing or is not an integer, the method will return the given default
+     * <p> If the value is missing or is not an integer, the method will return the given default
      * value.
      *
      * @param name         the name of the property to return
      * @param defaultValue the default value to return.
+     * @return the property value or <code>null</code> if it was not found.
      * @see Integer#decode(String)
      */
     Integer getProperty(String name, Integer defaultValue);
 
     /**
      * Returns the value of a given property for this target as a Boolean value.
-     * <p/> If the value is missing or is not a boolean, the method will return the given default
+     * <p> If the value is missing or is not a boolean, the method will return the given default
      * value.
      *
      * @param name         the name of the property to return
      * @param defaultValue the default value to return.
+     * @return the property value or <code>null</code> if it was not found.
      * @see Boolean#valueOf(String)
      */
     Boolean getProperty(String name, Boolean defaultValue);
@@ -306,18 +341,24 @@ public interface IAndroidTarget extends Comparable<IAndroidTarget> {
     /**
      * Returns all the properties associated with this target. This can be null if the target has
      * no properties.
+     *
+     * @return a map of property name-value.
      */
     Map<String, String> getProperties();
 
     /**
      * Returns the USB Vendor ID for the vendor of this target.
-     * <p/>If the target defines no USB Vendor ID, then the method return 0.
+     * <p>If the target defines no USB Vendor ID, then the method return 0.
+     *
+     * @return the USB Vendor ID or 0 if none is defined.
      */
     int getUsbVendorId();
 
     /**
      * Returns an array of system images for this target.
      * The array can be empty but not null.
+     *
+     * @return an array of {@link ISystemImage}.
      */
     ISystemImage[] getSystemImages();
 
@@ -334,7 +375,7 @@ public interface IAndroidTarget extends Comparable<IAndroidTarget> {
 
     /**
      * Returns whether the given target is compatible with the receiver.
-     * <p/>
+     * <p>
      * This means that a project using the receiver's target can run on the given target.
      * <br/>
      * Example:
@@ -343,6 +384,7 @@ public interface IAndroidTarget extends Comparable<IAndroidTarget> {
      * </pre>.
      *
      * @param target the IAndroidTarget to test.
+     * @return true if the target is compatible with the receiver.
      */
     boolean canRunOn(IAndroidTarget target);
 
@@ -350,8 +392,10 @@ public interface IAndroidTarget extends Comparable<IAndroidTarget> {
      * Returns a string able to uniquely identify a target.
      * Typically, the target will encode information such as api level, whether it's a platform
      * or add-on, and if it's an add-on vendor and add-on name.
-     * <p/>
+     * <p>
      * See {@link AndroidTargetHash} for helper methods to manipulate hash strings.
+     *
+     * @return a non-null string
      */
     String hashString();
 
@@ -361,24 +405,32 @@ public interface IAndroidTarget extends Comparable<IAndroidTarget> {
     interface OptionalLibrary {
         /**
          * The name of the library, as used in the manifest (&lt;uses-library&gt;).
+         *
+         * @return the name of the library.
          */
         @NonNull
         String getName();
 
         /**
          * Location of the jar file.
+         *
+         * @return the location of the jar file.
          */
         @NonNull
         File getJar();
 
         /**
          * Description of the library.
+         *
+         * @return the description of the library.
          */
         @NonNull
         String getDescription();
 
         /**
          * Whether the library requires a manifest entry
+         *
+         * @return true if the library requires a manifest entry, false otherwise.
          */
         boolean isManifestEntryRequired();
 
@@ -386,6 +438,9 @@ public interface IAndroidTarget extends Comparable<IAndroidTarget> {
          * Path to the library jar file relative to the {@code libs} directory in the package.
          * Can be {@code null} when retrieved from a {@link LocalPackage} that was installed from
          * a legacy source.
+         *
+         * @return the path to the library jar file relative to the {@code libs} directory in the
+         * package.
          */
         @Nullable
         String getLocalJarPath();

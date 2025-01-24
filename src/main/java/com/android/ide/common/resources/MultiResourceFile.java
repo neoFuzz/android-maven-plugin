@@ -34,8 +34,9 @@ import java.util.*;
 /**
  * Represents a resource file able to declare multiple resources, which could be of
  * different {@link ResourceType}.
- * <p/>
+ * <p>
  * This is typically an XML file inside res/values.
+ * </p>
  */
 public final class MultiResourceFile extends ResourceFile implements IValueResourceRepository {
 

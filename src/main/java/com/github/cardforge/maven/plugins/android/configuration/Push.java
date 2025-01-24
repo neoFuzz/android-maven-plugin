@@ -1,5 +1,7 @@
 package com.github.cardforge.maven.plugins.android.configuration;
 
+import com.github.cardforge.maven.plugins.android.standalonemojos.PushMojo;
+
 /**
  * Configuration for the integration test runs. This class is only the definition of the parameters that are
  * shadowed in
@@ -9,11 +11,11 @@ package com.github.cardforge.maven.plugins.android.configuration;
  */
 public class Push {
     /**
-     * Mirror of {@link PushMojo#source}
+     * Mirror of {@link PushMojo}#source
      */
     private String source;
     /**
-     * Mirror of {@link PushMojo#destination}
+     * Mirror of {@link PushMojo}#destination
      */
     private String destination;
 

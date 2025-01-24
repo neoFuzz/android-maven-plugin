@@ -141,14 +141,14 @@ public class SamplePackage extends MinToolsPackage
     /**
      * Creates a new sample package based on an actual {@link IAndroidTarget} (which
      * must have {@link IAndroidTarget#isPlatform()} true) from the {@link SdkManager}.
-     * <p/>
+     * <p>
      * The target <em>must</em> have an existing sample directory that uses the /samples
      * root form rather than the old form where the samples dir was located under the
      * platform dir.
-     * <p/>
+     * <p>
      * This is used to list local SDK folders in which case there is one archive which
      * URL is the actual samples path location.
-     * <p/>
+     * <p>
      * By design, this creates a package with one and only one archive.
      */
     public static Package create(IAndroidTarget target, Properties props) {
@@ -158,10 +158,10 @@ public class SamplePackage extends MinToolsPackage
     /**
      * Creates a new sample package from an actual directory path and previously
      * saved properties.
-     * <p/>
+     * <p>
      * This is used to list local SDK folders in which case there is one archive which
      * URL is the actual samples path location.
-     * <p/>
+     * <p>
      * By design, this creates a package with one and only one archive.
      *
      * @throws AndroidVersionException if the {@link AndroidVersion} can't be restored
@@ -214,7 +214,7 @@ public class SamplePackage extends MinToolsPackage
     /**
      * Returns a string identifier to install this package from the command line.
      * For samples, we use "sample-N" where N is the API or the preview codename.
-     * <p/>
+     * <p>
      * {@inheritDoc}
      */
     @Override
@@ -224,7 +224,7 @@ public class SamplePackage extends MinToolsPackage
 
     /**
      * Returns a description of this package that is suitable for a list display.
-     * <p/>
+     * <p>
      * {@inheritDoc}
      */
     @Override
@@ -287,7 +287,7 @@ public class SamplePackage extends MinToolsPackage
     /**
      * Computes a potential installation folder if an archive of this package were
      * to be installed right away in the given SDK root.
-     * <p/>
+     * <p>
      * A sample package is typically installed in SDK/samples/android-"version".
      * However if we can find a different directory that already has this sample
      * version installed, we'll use that one.

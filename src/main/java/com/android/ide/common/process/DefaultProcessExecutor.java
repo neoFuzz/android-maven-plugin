@@ -34,8 +34,14 @@ import java.util.Map;
  */
 public class DefaultProcessExecutor implements ProcessExecutor {
 
+    /**
+     * Logger for the executor.
+     */
     private final ILogger mLogger;
 
+    /**
+     * @param logger the logger to use
+     */
     public DefaultProcessExecutor(ILogger logger) {
         mLogger = logger;
     }

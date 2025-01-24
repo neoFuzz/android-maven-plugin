@@ -38,13 +38,13 @@ public interface IProjectCallback {
 
     /**
      * Returns the namespace of the application.
-     * <p/>This lets the Layout Lib load custom attributes for custom views.
+     * <p>This lets the Layout Lib load custom attributes for custom views.
      */
     String getNamespace();
 
     /**
      * Resolves the id of a resource Id.
-     * <p/>The resource id is the value of a <code>R.&lt;type&gt;.&lt;name&gt;</code>, and
+     * <p>The resource id is the value of a <code>R.&lt;type&gt;.&lt;name&gt;</code>, and
      * this method will return both the type and name of the resource.
      *
      * @param id the Id to resolve.
@@ -55,7 +55,7 @@ public interface IProjectCallback {
 
     /**
      * Resolves the id of a resource Id of type int[]
-     * <p/>The resource id is the value of a R.styleable.&lt;name&gt;, and this method will
+     * <p>The resource id is the value of a R.styleable.&lt;name&gt;, and this method will
      * return the name of the resource.
      *
      * @param id the Id to resolve.
@@ -65,7 +65,7 @@ public interface IProjectCallback {
 
     /**
      * Returns the id of a resource.
-     * <p/>The provided type and name must match an existing constant defined as
+     * <p>The provided type and name must match an existing constant defined as
      * <code>R.&lt;type&gt;.&lt;name&gt;</code>.
      *
      * @param type the type of the resource

@@ -23,9 +23,10 @@ import com.android.sdklib.repository.SdkRepoConstants;
  * Interface used to decorate a {@link Package} that has a dependency
  * on a minimal platform-tools revision, e.g. which XML has a
  * <code>&lt;min-platform-tools-rev&gt;</code> element.
- * <p/>
+ * <p>
  * A package that has this dependency can only be installed if the requested platform-tools
  * revision is present or installed at the same time.
+ * </p>
  *
  * @deprecated com.android.sdklib.internal.repository has moved into Studio as
  * com.android.tools.idea.sdk.remote.internal.
@@ -45,7 +46,7 @@ public interface IMinPlatformToolsDependency {
     /**
      * The minimal revision of the tools package required by this package if > 0,
      * or {@link #MIN_PLATFORM_TOOLS_REV_INVALID} if the value was missing.
-     * <p/>
+     * <p>
      * This attribute is mandatory and should not be normally missing.
      * It can only happen when dealing with an invalid repository XML.
      */

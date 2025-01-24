@@ -1,5 +1,8 @@
 package com.github.cardforge.maven.plugins.android.configuration;
 
+import com.github.cardforge.maven.plugins.android.standalonemojos.MonkeyMojo;
+import com.github.cardforge.maven.plugins.android.standalonemojos.UIAutomatorMojo;
+
 /**
  * Configuration for the monkey test runs. This class is only the definition of the parameters that are shadowed in
  * {@link MonkeyMojo} and used there.
@@ -8,92 +11,92 @@ package com.github.cardforge.maven.plugins.android.configuration;
  */
 public class Monkey {
     /**
-     * Mirror of {@link UIAutomatorMojo#testSkip}
+     * Mirror of {@link UIAutomatorMojo}#testSkip
      */
     private Boolean skip;
     /**
-     * Mirror of {@link com.jayway.maven.plugins.android.standalonemojos.Monkey#eventCount}
+     * Mirror of {@link Monkey#eventCount}
      */
     private Integer eventCount;
     /**
-     * Mirror of {@link com.jayway.maven.plugins.android.standalonemojos.Monkey#seed}
+     * Mirror of {@link Monkey#seed}
      */
     private Long seed;
     /**
-     * Mirror of {@link com.jayway.maven.plugins.android.standalonemojos.Monkey#throttle}
+     * Mirror of {@link Monkey#throttle}
      */
     private Long throttle;
     /**
-     * Mirror of {@link com.jayway.maven.plugins.android.standalonemojos.Monkey#percentTouch}
+     * Mirror of {@link Monkey#percentTouch}
      */
     private Integer percentTouch;
     /**
-     * Mirror of {@link com.jayway.maven.plugins.android.standalonemojos.Monkey#percentMotion}
+     * Mirror of {@link Monkey#percentMotion}
      */
     private Integer percentMotion;
     /**
-     * Mirror of {@link com.jayway.maven.plugins.android.standalonemojos.Monkey#percentTrackball}
+     * Mirror of {@link Monkey#percentTrackball}
      */
     private Integer percentTrackball;
     /**
-     * Mirror of {@link com.jayway.maven.plugins.android.standalonemojos.Monkey#percentNav}
+     * Mirror of {@link Monkey#percentNav}
      */
     private Integer percentNav;
     /**
-     * Mirror of {@link com.jayway.maven.plugins.android.standalonemojos.Monkey#percentMajorNav}
+     * Mirror of {@link Monkey#percentMajorNav}
      */
     private Integer percentMajorNav;
     /**
-     * Mirror of {@link com.jayway.maven.plugins.android.standalonemojos.Monkey#percentSyskeys}
+     * Mirror of {@link Monkey#percentSyskeys}
      */
     private Integer percentSyskeys;
     /**
-     * Mirror of {@link com.jayway.maven.plugins.android.standalonemojos.Monkey#percentAppswitch}
+     * Mirror of {@link Monkey#percentAppswitch}
      */
     private Integer percentAppswitch;
     /**
-     * Mirror of {@link com.jayway.maven.plugins.android.standalonemojos.Monkey#percentAnyevent}
+     * Mirror of {@link Monkey#percentAnyevent}
      */
     private Integer percentAnyevent;
 
     /**
-     * Mirror of {@link com.jayway.maven.plugins.android.standalonemojos.Monkey#packages}
+     * Mirror of {@link Monkey#packages}
      */
     private String[] packages;
     /**
-     * Mirror of {@link com.jayway.maven.plugins.android.standalonemojos.Monkey#categories}
+     * Mirror of {@link Monkey#categories}
      */
     private String[] categories;
     /**
-     * Mirror of {@link UIAutomatorMojo#debugNoEvents}
+     * Mirror of {@link UIAutomatorMojo}#debugNoEvents
      */
     private Boolean debugNoEvents;
     /**
-     * Mirror of {@link UIAutomatorMojo#hprof}
+     * Mirror of {@link UIAutomatorMojo}#hprof
      */
     private Boolean hprof;
     /**
-     * Mirror of {@link com.jayway.maven.plugins.android.standalonemojos.Monkey#ignoreCrashes}
+     * Mirror of {@link Monkey#ignoreCrashes}
      */
     private Boolean ignoreCrashes;
     /**
-     * Mirror of {@link com.jayway.maven.plugins.android.standalonemojos.Monkey#ignoreTimeouts}
+     * Mirror of {@link Monkey#ignoreTimeouts}
      */
     private Boolean ignoreTimeouts;
     /**
-     * Mirror of {@link com.jayway.maven.plugins.android.standalonemojos.Monkey#ignoreSecurityExceptions}
+     * Mirror of {@link Monkey#ignoreSecurityExceptions}
      */
     private Boolean ignoreSecurityExceptions;
     /**
-     * Mirror of {@link com.jayway.maven.plugins.android.standalonemojos.Monkey#killProcessAfterError}
+     * Mirror of {@link Monkey#killProcessAfterError}
      */
     private Boolean killProcessAfterError;
     /**
-     * Mirror of {@link com.jayway.maven.plugins.android.standalonemojos.Monkey#monitorNativeCrashes}
+     * Mirror of {@link Monkey#monitorNativeCrashes}
      */
     private Boolean monitorNativeCrashes;
     /**
-     * Mirror of {@link com.jayway.maven.plugins.android.standalonemojos.Monkey#createReport}
+     * Mirror of {@link Monkey#createReport}
      */
     private Boolean createReport;
 

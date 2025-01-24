@@ -105,12 +105,16 @@ public class SdkManager {
      * Creates an @{linkplain SdkManager} for an existing @{link LocalSdk}.
      *
      * @param localSdk the SDK to use with the SDK manager
+     * @return the created {@link SdkManager}
      */
     @NonNull
     public static SdkManager createManager(@NonNull LocalSdk localSdk) {
         return new SdkManager(localSdk);
     }
 
+    /**
+     * @return the local SDK object
+     */
     @NonNull
     public LocalSdk getLocalSdk() {
         return mLocalSdk;
@@ -152,6 +156,8 @@ public class SdkManager {
 
     /**
      * Returns the location of the SDK.
+     *
+     * @return the location string
      */
     @NonNull
     public String getLocation() {
@@ -162,11 +168,13 @@ public class SdkManager {
     }
 
     /**
-     * Returns the targets (platforms & addons) that are available in the SDK.
+     * Returns the targets (platforms &amp; addons) that are available in the SDK.
      * The target list is created on demand the first time then cached.
      * It will not be refreshed unless {@link #reloadSdk(ILogger)} is called.
-     * <p/>
+     * <p>
      * The array can be empty but not null.
+     *
+     * @return An array of {@link IAndroidTarget}.
      */
     @NonNull
     public IAndroidTarget[] getTargets() {
@@ -176,6 +184,7 @@ public class SdkManager {
     /**
      * Returns an unmodifiable set of known build-tools revisions. Can be empty but not null.
      *
+     * @return A set of {@link FullRevision} for the known build-tools.
      * @deprecated I don't think anything uses this.
      */
     // todo: 19/01/2025 Remove this method.
@@ -262,7 +271,7 @@ public class SdkManager {
     /**
      * Returns the greatest {@link LayoutlibVersion} found amongst all platform
      * targets currently loaded in the SDK.
-     * <p/>
+     * <p>
      * We only started recording Layoutlib Versions recently in the platform metadata
      * so it's possible to have an SDK with many platforms loaded but no layoutlib
      * version defined.
@@ -320,7 +329,7 @@ public class SdkManager {
 
     /**
      * Returns a map of all the extras found in the <em>local</em> SDK with their major revision.
-     * <p/>
+     * <p>
      * Map keys are in the form "vendor-id/path-id". These ids uniquely identify an extra package.
      * The version is the incremental integer major revision of the package.
      *
@@ -349,6 +358,8 @@ public class SdkManager {
 
     /**
      * Returns the platform tools version if installed, null otherwise.
+     *
+     * @return The platform tools version, or null if not installed.
      */
     @Nullable
     public String getPlatformToolsVersion() {
@@ -361,7 +372,7 @@ public class SdkManager {
     }
 
     /**
-     *
+     * Helper class to represent a Layoutlib version.
      */
     public static class LayoutlibVersion implements Comparable<LayoutlibVersion> {
         public static final int NOT_SPECIFIED = 0;

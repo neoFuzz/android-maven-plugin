@@ -14,7 +14,6 @@ import org.apache.maven.plugins.annotations.Parameter;
  * DevicesMojo lists all attached devices and emulators found with the android debug bridge. It uses the same
  * naming convention for the emulator as used in other places in the Android Maven Plugin and adds the status
  * of the device in the list.
- * <p>
  *
  * @author Manfred Moser - manfred@simpligility.com
  */

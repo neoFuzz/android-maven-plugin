@@ -16,6 +16,7 @@
 
 package com.android.layoutlib.api;
 
+import com.android.annotations.Nullable;
 import com.android.ide.common.rendering.api.DensityBasedResourceValue;
 
 /**
@@ -29,6 +30,7 @@ public interface IDensityBasedResourceValue extends IResourceValue {
     /**
      * Returns the density associated to the resource.
      *
+     * @return the density associated to the resource.
      * @deprecated use {@link DensityBasedResourceValue#getResourceDensity()}
      */
     @Deprecated
@@ -40,15 +42,36 @@ public interface IDensityBasedResourceValue extends IResourceValue {
      * @deprecated use {@link com.android.resources.Density}.
      */
     @Deprecated
-    public static enum Density {
+    enum Density {
+        /**
+         * Extra high density (xhdpi)
+         */
         XHIGH(320),
+        /**
+         * High density (hdpi)
+         */
         HIGH(240),
+        /**
+         * Medium density (mdpi)
+         */
         MEDIUM(160),
+        /**
+         * Low density (ldpi)
+         */
         LOW(120),
+        /**
+         * No density (for text resources)
+         */
         NODPI(0);
 
+        /**
+         * The density value.
+         */
         private final int mValue;
 
+        /**
+         * @param value The density value.
+         */
         Density(int value) {
             mValue = value;
         }
@@ -59,6 +82,7 @@ public interface IDensityBasedResourceValue extends IResourceValue {
          * @param value The density value.
          * @return the enum for the density value or null if no match was found.
          */
+        @Nullable
         public static Density getEnum(int value) {
             for (Density d : values()) {
                 if (d.mValue == value) {
@@ -69,6 +93,9 @@ public interface IDensityBasedResourceValue extends IResourceValue {
             return null;
         }
 
+        /**
+         * @return the int value of the density
+         */
         public int getValue() {
             return mValue;
         }

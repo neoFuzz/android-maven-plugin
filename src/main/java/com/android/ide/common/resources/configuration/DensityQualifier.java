@@ -26,42 +26,77 @@ import java.util.regex.Pattern;
  * Resource Qualifier for Screen Pixel Density.
  */
 public final class DensityQualifier extends EnumBasedResourceQualifier {
+    /**
+     * Pattern to match folder segment of a density qualifier
+     */
     public static final String NAME = "Density";
+    /**
+     * Pattern to match folder segment of a density qualifier
+     */
     private static final Pattern sDensityLegacyPattern = Pattern.compile("^(\\d+)dpi$");//$NON-NLS-1$
+    /**
+     * The enum value
+     */
     private Density mValue = Density.MEDIUM;
 
+    /**
+     * Constructor
+     */
     public DensityQualifier() {
         // pass
     }
 
+    /**
+     * @param value Density enum value
+     */
     public DensityQualifier(Density value) {
         mValue = value;
     }
 
+    /**
+     * @return Density enum value
+     */
     public Density getValue() {
         return mValue;
     }
 
+    /**
+     * @return enum value
+     */
     @Override
     ResourceEnum getEnumValue() {
         return mValue;
     }
 
+    /**
+     * @return Name of qualifier
+     */
     @Override
     public String getName() {
         return NAME;
     }
 
+    /**
+     * @return Short name
+     */
     @Override
     public String getShortName() {
         return NAME;
     }
 
+    /**
+     * @return 4
+     */
     @Override
     public int since() {
         return 4;
     }
 
+    /**
+     * @param value  The value to check and set. Must not be null.
+     * @param config The folder configuration to receive the value. Must not be null.
+     * @return Returns true if the value was accepted
+     */
     @Override
     public boolean checkAndSet(String value, FolderConfiguration config) {
         Density density = Density.getEnum(value);

@@ -20,15 +20,13 @@ import com.android.SdkConstants;
 import com.android.annotations.NonNull;
 import com.android.annotations.concurrency.Immutable;
 import com.android.utils.ILogger;
-
-import java.util.Optional;
-
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import org.w3c.dom.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static com.android.manifmerger.MergingReport.Result.ERROR;
 

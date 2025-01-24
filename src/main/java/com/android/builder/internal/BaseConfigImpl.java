@@ -57,6 +57,8 @@ public abstract class BaseConfigImpl implements Serializable, BaseConfig {
 
     /**
      * Adds a BuildConfig field.
+     *
+     * @param field the field to add.
      */
     public void addBuildConfigField(@NonNull ClassField field) {
         mBuildConfigFields.put(field.getName(), field);
@@ -64,6 +66,8 @@ public abstract class BaseConfigImpl implements Serializable, BaseConfig {
 
     /**
      * Adds a generated resource value.
+     *
+     * @param field the field to add
      */
     public void addResValue(@NonNull ClassField field) {
         mResValues.put(field.getName(), field);
@@ -71,6 +75,8 @@ public abstract class BaseConfigImpl implements Serializable, BaseConfig {
 
     /**
      * Adds a generated resource value.
+     *
+     * @param values a map of values to add
      */
     public void addResValues(@NonNull Map<String, ClassField> values) {
         mResValues.putAll(values);
@@ -92,6 +98,8 @@ public abstract class BaseConfigImpl implements Serializable, BaseConfig {
 
     /**
      * Adds BuildConfig fields.
+     *
+     * @param fields the fields to add
      */
     public void addBuildConfigFields(@NonNull Map<String, ClassField> fields) {
         mBuildConfigFields.putAll(fields);
@@ -169,6 +177,8 @@ public abstract class BaseConfigImpl implements Serializable, BaseConfig {
      *
      * <p>See <a href="http://tools.android.com/tech-docs/new-build-system/user-guide/manifest-merger#TOC-Placeholder-support">
      * Manifest merger</a>.
+     *
+     * @param manifestPlaceholders the placeholders to set
      */
     public void setManifestPlaceholders(@NonNull Map<String, Object> manifestPlaceholders) {
         mManifestPlaceholders.clear();
@@ -180,11 +190,16 @@ public abstract class BaseConfigImpl implements Serializable, BaseConfig {
      *
      * <p>See <a href="http://tools.android.com/tech-docs/new-build-system/user-guide/manifest-merger#TOC-Placeholder-support">
      * Manifest merger</a>.
+     *
+     * @param manifestPlaceholders the placeholders to add
      */
     public void addManifestPlaceholders(@NonNull Map<String, Object> manifestPlaceholders) {
         mManifestPlaceholders.putAll(manifestPlaceholders);
     }
 
+    /**
+     * @param that the object to merge with
+     */
     protected void _initWith(@NonNull BaseConfig that) {
         setBuildConfigFields(that.getBuildConfigFields());
         setResValues(that.getResValues());
@@ -211,6 +226,8 @@ public abstract class BaseConfigImpl implements Serializable, BaseConfig {
 
     /**
      * Whether Multi-Dex is enabled for this variant.
+     *
+     * @return the value of multidex, or null if not set
      */
     @Override
     @Nullable
@@ -218,40 +235,65 @@ public abstract class BaseConfigImpl implements Serializable, BaseConfig {
         return mMultiDexEnabled;
     }
 
+    /**
+     * @param multiDex the value to set for multidex
+     */
     public void setMultiDexEnabled(@Nullable Boolean multiDex) {
         mMultiDexEnabled = multiDex;
     }
 
+    /**
+     * @return the file to use for the multidex keep file
+     */
     @Override
     @Nullable
     public File getMultiDexKeepFile() {
         return mMultiDexKeepFile;
     }
 
+    /**
+     * @param file the file to set for the multidex keep file
+     */
     public void setMultiDexKeepFile(@Nullable File file) {
         mMultiDexKeepFile = file;
     }
 
+    /**
+     * @return the file to use for the multidex keep proguard rules
+     */
     @Override
     @Nullable
     public File getMultiDexKeepProguard() {
         return mMultiDexKeepProguard;
     }
 
+    /**
+     * @param file the file to set for the multidex keep proguard rules
+     */
     public void setMultiDexKeepProguard(@Nullable File file) {
         mMultiDexKeepProguard = file;
     }
 
+    /**
+     * @return the list of jarjar rule files to use
+     */
     @NonNull
     @Override
     public List<File> getJarJarRuleFiles() {
         return mJarJarRuleFiles;
     }
 
+    /**
+     * @param files the list of jarjar rule files to set
+     */
     public void setJarJarRuleFiles(@NonNull List<File> files) {
         mJarJarRuleFiles = files;
     }
 
+    /**
+     * @param o the object to compare with
+     * @return true if the objects are equal
+     */
     @Override
     public boolean equals(Object o) {
         if (this == o) {

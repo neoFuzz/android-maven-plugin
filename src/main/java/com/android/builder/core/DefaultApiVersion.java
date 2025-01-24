@@ -27,24 +27,44 @@ import java.util.Objects;
  */
 public class DefaultApiVersion implements ApiVersion {
 
+    /**
+     * The API level
+     */
     private final int mApiLevel;
 
+    /**
+     * The API codename, or null if none
+     */
     @Nullable
     private final String mCodename;
 
+    /**
+     * @param apiLevel the API level
+     * @param codename the API codename, or null if none
+     */
     public DefaultApiVersion(int apiLevel, @Nullable String codename) {
         mApiLevel = apiLevel;
         mCodename = codename;
     }
 
+    /**
+     * @param apiLevel the API level
+     */
     public DefaultApiVersion(int apiLevel) {
         this(apiLevel, null);
     }
 
+    /**
+     * @param codename the API codename
+     */
     public DefaultApiVersion(@NonNull String codename) {
         this(1, codename);
     }
 
+    /**
+     * @param value the value to create the ApiVersion from
+     * @return the ApiVersion
+     */
     @NonNull
     public static ApiVersion create(@NonNull Object value) {
         if (value instanceof Integer i) {
@@ -56,23 +76,36 @@ public class DefaultApiVersion implements ApiVersion {
         return new DefaultApiVersion(1, null);
     }
 
+    /**
+     * @return the API level
+     */
     @Override
     public int getApiLevel() {
         return mApiLevel;
     }
 
+    /**
+     * @return the API codename, or null if none
+     */
     @Nullable
     @Override
     public String getCodename() {
         return mCodename;
     }
 
+    /**
+     * @return the API string for this version
+     */
     @NonNull
     @Override
     public String getApiString() {
         return mCodename != null ? mCodename : Integer.toString(mApiLevel);
     }
 
+    /**
+     * @param o the object to compare to
+     * @return true if the objects are equal, false otherwise
+     */
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -90,6 +123,9 @@ public class DefaultApiVersion implements ApiVersion {
         return Objects.equals(mCodename, that.mCodename);
     }
 
+    /**
+     * @return a hash code value for this object.
+     */
     @Override
     public int hashCode() {
         int result = mApiLevel;
@@ -97,6 +133,9 @@ public class DefaultApiVersion implements ApiVersion {
         return result;
     }
 
+    /**
+     * @return a string suitable for debugging purposes.
+     */
     @Override
     public String toString() {
         return "ApiVersionImpl{" +

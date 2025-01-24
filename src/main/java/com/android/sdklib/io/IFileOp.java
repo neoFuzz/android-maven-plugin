@@ -23,7 +23,7 @@ import java.util.Properties;
 
 /**
  * Wraps some common {@link File} operations on files and folders.
- * <p/>
+ * <p>
  * This makes it possible to override/mock/stub some file operations in unit tests.
  */
 public interface IFileOp {
@@ -34,17 +34,20 @@ public interface IFileOp {
      * Files that cannot be deleted right away are marked for deletion on exit.
      * It's ok for the file or folder to not exist at all.
      * The argument can be null.
+     *
+     * @param fileOrFolder The file or folder to delete.
+     * @see File#deleteOnExit()
      */
     void deleteFileOrFolder(@NonNull File fileOrFolder);
 
     /**
      * Sets the executable Unix permission (+x) on a file or folder.
-     * <p/>
+     * <p>
      * This attempts to use File#setExecutable through reflection if
      * it's available.
      * If this is not available, this invokes a chmod exec instead,
      * so there is no guarantee of it being fast.
-     * <p/>
+     * <p>
      * Caller must make sure to not invoke this under Windows.
      *
      * @param file The file to set permissions on.
@@ -74,6 +77,7 @@ public interface IFileOp {
      *
      * @param file1 the source file to copy
      * @param file2 the destination file to write
+     * @return true if the files are the same
      * @throws FileNotFoundException if the source files don't exist.
      * @throws IOException           if there's a problem reading the files.
      */
@@ -82,32 +86,50 @@ public interface IFileOp {
 
     /**
      * Invokes {@link File#exists()} on the given {@code file}.
+     *
+     * @param file The file to check for existence
+     * @return true if the file exists, false otherwise
      */
     boolean exists(@NonNull File file);
 
     /**
      * Invokes {@link File#isFile()} on the given {@code file}.
+     *
+     * @param file The file to check if it's a regular file
+     * @return true if the file is a regular file, false otherwise
      */
     boolean isFile(@NonNull File file);
 
     /**
      * Invokes {@link File#isDirectory()} on the given {@code file}.
+     *
+     * @param file The file to check if it's a directory
+     * @return true if the file is a directory, false otherwise
      */
     boolean isDirectory(@NonNull File file);
 
     /**
      * Invokes {@link File#length()} on the given {@code file}.
+     *
+     * @param file The file to get the length of
+     * @return The length of the file in bytes
      */
     long length(@NonNull File file);
 
     /**
      * Invokes {@link File#delete()} on the given {@code file}.
      * Note: for a recursive folder version, consider {@link #deleteFileOrFolder(File)}.
+     *
+     * @param file The file to delete
+     * @return true if the file was successfully deleted, false otherwise
      */
     boolean delete(@NonNull File file);
 
     /**
      * Invokes {@link File#mkdirs()} on the given {@code file}.
+     *
+     * @param file The file or directory to create
+     * @return true if the directory was successfully created, false otherwise
      */
     boolean mkdirs(@NonNull File file);
 
@@ -115,17 +137,29 @@ public interface IFileOp {
      * Invokes {@link File#listFiles()} on the given {@code file}.
      * Contrary to the Java API, this returns an empty array instead of null when the
      * directory does not exist.
+     *
+     * @param file The directory to list files in
+     * @return An array of files in the directory, or an empty array if the directory does not exist
      */
     @NonNull
     File[] listFiles(@NonNull File file);
 
     /**
      * Invokes {@link File#renameTo(File)} on the given files.
+     *
+     * @param oldDir The source file or directory
+     * @param newDir The destination file or directory
+     * @return true if the rename operation was successful, false otherwise
      */
     boolean renameTo(@NonNull File oldDir, @NonNull File newDir);
 
     /**
      * Creates a new {@link OutputStream} for the given {@code file}.
+     * The file will be created if it does not exist.
+     *
+     * @param file The file to create an output stream for
+     * @return An output stream for writing to the file
+     * @throws FileNotFoundException if the file cannot be created
      */
     @NonNull
     OutputStream newFileOutputStream(@NonNull File file)
@@ -133,6 +167,10 @@ public interface IFileOp {
 
     /**
      * Creates a new {@link InputStream} for the given {@code file}.
+     *
+     * @param file The file to create an input stream for
+     * @return An input stream for reading from the file
+     * @throws FileNotFoundException if the file does not exist
      */
     @NonNull
     InputStream newFileInputStream(@NonNull File file)

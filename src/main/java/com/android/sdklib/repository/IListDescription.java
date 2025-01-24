@@ -22,11 +22,13 @@ public interface IListDescription {
     /**
      * Returns a description of this package that is suitable for a list display.
      * Should not be empty. Must never be null.
-     * <p/>
+     * <p>
      * Note that this is the "base" name for the package
      * with no specific revision nor API mentioned.
      * In contrast, {@link IDescription#getShortDescription()} should be used if you
      * want more details such as the package revision number or the API, if applicable.
+     *
+     * @return a short description of the package. Should not be empty.
      */
     String getListDescription();
 }

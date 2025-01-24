@@ -58,12 +58,12 @@ public class SdkAddonsListConstants {
     public static final String NODE_NAME = "name";                          //$NON-NLS-1$
     /**
      * The URL of the site.
-     * <p/>
+     * <p>
      * This can be either the exact URL of the an XML resource conforming
      * to the latest sdk-addon-N.xsd schema, or it can be the URL of a
      * 'directory', in which case the manager will look for a resource
      * named 'addon.xml' at this location.
-     * <p/>
+     * <p>
      * Examples:
      * <pre>
      *    http://www.example.com/android/my_addons.xml
@@ -109,12 +109,17 @@ public class SdkAddonsListConstants {
      * Returns the URI of the sdk-addon schema for the given version number.
      *
      * @param version Between 1 and {@link #NS_LATEST_VERSION} included.
+     * @return The URI of the schema for the given version number.
      */
     @NonNull
     public static String getSchemaUri(int version) {
         return String.format(NS_BASE + "%d", version);                      //$NON-NLS-1$
     }
 
+    /**
+     * @param version Between 1 and {@link #NS_LATEST_VERSION} included.
+     * @return The default filename for the given version number.
+     */
     @NonNull
     public static String getDefaultName(int version) {
         return String.format("addons_list-%1$d.xml", version);              //$NON-NLS-1$

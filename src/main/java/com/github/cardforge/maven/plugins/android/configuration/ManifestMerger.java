@@ -1,5 +1,7 @@
 package com.github.cardforge.maven.plugins.android.configuration;
 
+import com.github.cardforge.maven.plugins.android.standalonemojos.ManifestMergerMojo;
+
 import java.io.File;
 
 /**
@@ -11,18 +13,18 @@ import java.io.File;
 public class ManifestMerger {
 
     /**
-     * Mirror of {@link ManifestMergerMojo#manifestVersionName}.
+     * Mirror of {@link ManifestMergerMojo}#manifestVersionName.
      */
     protected String versionName;
 
     /**
-     * Mirror of {@link ManifestMergerMojo#manifestVersionCode}.
+     * Mirror of {@link ManifestMergerMojo}#manifestVersionCode.
      */
     protected Integer versionCode;
 
     /**
      * Mirror of
-     * {@link ManifestMergerMojo#manifestUsesSdk}
+     * {@link ManifestMergerMojo}#manifestUsesSdk
      */
     protected UsesSdk usesSdk;
 

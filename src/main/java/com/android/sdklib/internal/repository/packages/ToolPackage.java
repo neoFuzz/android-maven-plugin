@@ -142,7 +142,7 @@ public class ToolPackage extends FullRevisionPackage implements IMinPlatformTool
      * Manually create a new package with one archive and the given attributes or properties.
      * This is used to create packages from local directories in which case there must be
      * one archive which URL is the actual target location.
-     * <p/>
+     * <p>
      * By design, this creates a package with one and only one archive.
      */
     public static Package create(
@@ -171,7 +171,7 @@ public class ToolPackage extends FullRevisionPackage implements IMinPlatformTool
     /**
      * Returns a string identifier to install this package from the command line.
      * For tools, we use "tools" or "tools-preview" since this package is unique.
-     * <p/>
+     * <p>
      * {@inheritDoc}
      */
     @Override
@@ -185,7 +185,7 @@ public class ToolPackage extends FullRevisionPackage implements IMinPlatformTool
 
     /**
      * Returns a description of this package that is suitable for a list display.
-     * <p/>
+     * <p>
      * {@inheritDoc}
      */
     @Override
@@ -236,7 +236,7 @@ public class ToolPackage extends FullRevisionPackage implements IMinPlatformTool
     /**
      * Computes a potential installation folder if an archive of this package were
      * to be installed right away in the given SDK root.
-     * <p/>
+     * <p>
      * A "tool" package should always be located in SDK/tools.
      *
      * @param osSdkRoot  The OS path of the SDK root folder.

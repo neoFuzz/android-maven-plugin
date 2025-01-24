@@ -170,7 +170,6 @@ public abstract class SdkSource implements IDescription, Comparable<SdkSource> {
      * @param xml The input XML stream. Can be null.
      * @return Null on failure, otherwise returns an XML DOM with just the tools we
      * need to update this SDK Manager.
-     * @null Can return null on failure.
      */
     protected abstract Document findAlternateToolsXml(@Nullable InputStream xml)
             throws IOException;
@@ -244,7 +243,7 @@ public abstract class SdkSource implements IDescription, Comparable<SdkSource> {
 
     /**
      * Indicates if the source is enabled.
-     * <p/>
+     * <p>
      * A 3rd-party add-on source can be disabled by the user to prevent from loading it.
      *
      * @return True if the source is enabled (default is true).
@@ -256,7 +255,7 @@ public abstract class SdkSource implements IDescription, Comparable<SdkSource> {
 
     /**
      * Changes whether the source is marked as enabled.
-     * <p/>
+     * <p>
      * When <em>changing</em> the enable state, the current package list is purged
      * and the next {@code load} will either return an empty list (if disabled) or
      * the actual package list (if enabled.)
@@ -277,7 +276,7 @@ public abstract class SdkSource implements IDescription, Comparable<SdkSource> {
     /**
      * Returns the short description of the source, if not null.
      * Otherwise returns the default Object toString result.
-     * <p/>
+     * <p>
      * This is mostly helpful for debugging.
      * For UI display, use the {@link IDescription} interface.
      */
@@ -327,7 +326,7 @@ public abstract class SdkSource implements IDescription, Comparable<SdkSource> {
     /**
      * Tries to fetch the repository index for the given URL and updates the package list.
      * When a source is disabled, this create an empty non-null package list.
-     * <p/>
+     * <p>
      * Callers can get the package list using {@link #getPackages()} after this. It will be
      * null in case of error, in which case {@link #getFetchError()} can be used to an
      * error message.

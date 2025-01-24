@@ -37,7 +37,7 @@ public enum ChecksumType {
     /**
      * Constructs a {@link ChecksumType} with the algorithm name
      * suitable for {@link MessageDigest#getInstance(String)}.
-     * <p/>
+     * <p>
      * These names are officially documented at
      * http://java.sun.com/javase/6/docs/technotes/guides/security/StandardNames.html#MessageDigest
      */
@@ -48,6 +48,7 @@ public enum ChecksumType {
     /**
      * Returns a new {@link MessageDigest} instance for this checksum type.
      *
+     * @return a new {@link MessageDigest} instance for this checksum type.
      * @throws NoSuchAlgorithmException if this algorithm is not available.
      */
     public MessageDigest getMessageDigest() throws NoSuchAlgorithmException {

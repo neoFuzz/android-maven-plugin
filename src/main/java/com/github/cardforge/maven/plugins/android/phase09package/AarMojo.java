@@ -42,7 +42,10 @@ import org.codehaus.plexus.archiver.jar.JarArchiver;
 import org.codehaus.plexus.archiver.util.DefaultFileSet;
 import org.codehaus.plexus.archiver.zip.ZipArchiver;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -71,7 +74,13 @@ public class AarMojo extends AbstractAndroidMojo {
      * The name of the top level folder in the AAR where JAR libraries are found.
      */
     public static final String LIBRARIES_FOLDER = "libs";
+    /**
+     * Static 'file' text used in logging
+     */
     public static final String FILE = " file.";
+    /**
+     * Static 'IOException while creating .' text used in logging
+     */
     public static final String IOEXCEPTION_WHILE_CREATING = "IOException while creating .";
 
     /**
@@ -183,7 +192,7 @@ public class AarMojo extends AbstractAndroidMojo {
 
     /**
      * @throws MojoExecutionException if an error occurs during the execution of the Mojo
-     * @throws MojoFailureException if an error occurs during the execution of the Mojo
+     * @throws MojoFailureException   if an error occurs during the execution of the Mojo
      */
     public void execute() throws MojoExecutionException, MojoFailureException {
         String out = targetDirectory.getPath();
@@ -248,6 +257,7 @@ public class AarMojo extends AbstractAndroidMojo {
     }
 
     /**
+     * @param classesJar The classes.jar file to be included in the AAR.
      * @return AAR file.
      * @throws MojoExecutionException if an error occurs while creating the AAR file
      */
@@ -335,7 +345,7 @@ public class AarMojo extends AbstractAndroidMojo {
     /**
      * @param zipArchiver ZipArchiver to add files to.
      * @throws MojoExecutionException if an error occurs while adding the R.txt file to the archive
-     * @throws IOException if an error occurs while creating the R.txt file
+     * @throws IOException            if an error occurs while creating the R.txt file
      */
     private void addR(ZipArchiver zipArchiver) throws MojoExecutionException, IOException {
         final File rFile = new File(targetDirectory, "R.txt");

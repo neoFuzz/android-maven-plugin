@@ -63,10 +63,18 @@ public abstract class FullRevisionPackage extends Package
      * Manually create a new package with one archive and the given attributes.
      * This is used to create packages from local directories in which case there must be
      * one archive which URL is the actual target location.
-     * <p/>
+     * <p>
      * Properties from props are used first when possible, e.g. if props is non null.
-     * <p/>
+     * <p>
      * By design, this creates a package with one and only one archive.
+     *
+     * @param source        The {@link SdkSource} where this is loaded from.
+     * @param props         The properties to be used for the package.
+     * @param revision      The revision of the package.
+     * @param license       The license of the package.
+     * @param description   The description of the package.
+     * @param descUrl       The description URL of the package.
+     * @param archiveOsPath The path of the archive inside the package.
      */
     public FullRevisionPackage(
             SdkSource source,
@@ -128,10 +136,10 @@ public abstract class FullRevisionPackage extends Package
 
     /**
      * Computes whether the given package is a suitable update for the current package.
-     * <p/>
+     * <p>
      * A specific case here is that a release package can update a preview, whereas
      * a preview can only update another preview.
-     * <p/>
+     * <p>
      * {@inheritDoc}
      */
     @Override

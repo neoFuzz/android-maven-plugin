@@ -49,9 +49,10 @@ import java.util.regex.Pattern;
 
 /**
  * Retrieves stats on platforms.
- * <p/>
+ * <p>
  * This returns information stored on the repository in a different XML file
  * and isn't directly tied to the existence of the listed platforms.
+ * </p>
  *
  * @deprecated com.android.sdklib.internal.repository has moved into Studio as
  * com.android.tools.idea.sdk.remote.internal.

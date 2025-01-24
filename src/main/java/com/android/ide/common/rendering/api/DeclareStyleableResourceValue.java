@@ -38,6 +38,11 @@ public class DeclareStyleableResourceValue extends ResourceValue {
     @NonNull
     private List<AttrResourceValue> mAttrs = new ArrayList<>();
 
+    /**
+     * @param type        the {@link ResourceType} of the resource.
+     * @param name        the name of the resource.
+     * @param isFramework whether the resource is a framework resource or not.
+     */
     public DeclareStyleableResourceValue(@NonNull ResourceType type, @NonNull String name,
                                          boolean isFramework) {
         super(type, name, isFramework);
@@ -70,11 +75,17 @@ public class DeclareStyleableResourceValue extends ResourceValue {
         return null;
     }
 
+    /**
+     * @return the list of attributes defined in the declare-styleable.
+     */
     @NonNull
     public List<AttrResourceValue> getAllAttributes() {
         return mAttrs;
     }
 
+    /**
+     * @param attr the attribute to add.
+     */
     public void addValue(@NonNull AttrResourceValue attr) {
         assert attr.isFramework() || !isFramework()
                 : "Can't add non-framework attributes to framework resource.";

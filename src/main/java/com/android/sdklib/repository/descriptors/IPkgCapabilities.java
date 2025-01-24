@@ -23,8 +23,9 @@ import com.android.sdklib.repository.MajorRevision;
 /**
  * {@link IPkgCapabilities} describe which attributes are available for each kind of
  * SDK Manager package type.
- * <p/>
+ * <p>
  * To query packages capabilities, rely on {@code PkgType.hasXxx()} or {@code PkgDesc.hasXxx()}.
+ * </p>
  *
  * @see PkgType
  * @see PkgDesc

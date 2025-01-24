@@ -23,17 +23,30 @@ import java.io.Serial;
  * Thrown when something is wrong in Jack's configuration.
  */
 public class ConfigurationException extends ChainedException {
+    /**
+     * @serial
+     */
     @Serial
     private static final long serialVersionUID = 1L;
 
+    /**
+     * @param message the message to display.
+     */
     public ConfigurationException(@Nonnull String message) {
         super(message);
     }
 
+    /**
+     * @param message the message to display.
+     * @param cause   the cause of the exception.
+     */
     public ConfigurationException(@Nonnull String message, @Nonnull Throwable cause) {
         super(message, cause);
     }
 
+    /**
+     * @param cause the cause of the exception.
+     */
     public ConfigurationException(@Nonnull Throwable cause) {
         super(cause);
     }

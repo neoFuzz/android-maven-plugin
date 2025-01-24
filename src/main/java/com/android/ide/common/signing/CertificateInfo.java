@@ -29,18 +29,34 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * Both the {@link PrivateKey} and the {@link X509Certificate} are guaranteed to be non-null.
  */
 public class CertificateInfo {
+    /**
+     * The {@link PrivateKey} that contains the private key.
+     */
     public final PrivateKey mKey;
+    /**
+     * The {@link X509Certificate} that contains the public key.
+     */
     public final X509Certificate mCertificate;
 
+    /**
+     * @param key         the {@link PrivateKey} that contains the private key.
+     * @param certificate the {@link X509Certificate} that contains the public key.
+     */
     public CertificateInfo(@NonNull PrivateKey key, @NonNull X509Certificate certificate) {
         mKey = checkNotNull(key, "Key cannot be null.");
         mCertificate = checkNotNull(certificate, "Certificate cannot be null.");
     }
 
+    /**
+     * @return the {@link PrivateKey} that contains the private key.
+     */
     public PrivateKey getKey() {
         return mKey;
     }
 
+    /**
+     * @return the {@link X509Certificate} that contains the public key.
+     */
     public X509Certificate getCertificate() {
         return mCertificate;
     }

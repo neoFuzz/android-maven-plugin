@@ -47,9 +47,9 @@ import static com.android.ide.common.rendering.api.Result.Status.ERROR_REFLECTIO
 
 /**
  * Class to use the Layout library.
- * <p/>
+ * <p>
  * Use {@link #load(String, ILogger, String)} to load the jar file.
- * <p/>
+ * </p>
  * Use the layout library with:
  * {@link #init}, {@link #supports(int)}, {@link #createSession(SessionParams)},
  * {@link #dispose()}, {@link #clearCaches(Object)}.
@@ -113,7 +113,7 @@ public class LayoutLibrary {
     /**
      * Loads the layoutlib.jar file located at the given path and returns a {@link LayoutLibrary}
      * object representing the result.
-     * <p/>
+     * <p>
      * If loading failed {@link #getStatus()} will reflect this, and {@link #mBridge} will
      * be null.
      *
@@ -340,7 +340,7 @@ public class LayoutLibrary {
     /**
      * Starts a layout session by inflating and rendering it. The method returns a
      * {@link RenderSession} on which further actions can be taken.
-     * <p/>
+     * <p>
      * Before taking further actions on the scene, it is recommended to use
      * {@link #supports(int)} to check what the scene can do.
      *
@@ -387,9 +387,9 @@ public class LayoutLibrary {
 
     /**
      * Clears the resource cache for a specific project.
-     * <p/>This cache contains bitmaps and nine patches that are loaded from the disk and reused
+     * <p>This cache contains bitmaps and nine patches that are loaded from the disk and reused
      * until this method is called.
-     * <p/>The cache is not configuration dependent and should only be cleared when a
+     * <p>The cache is not configuration dependent and should only be cleared when a
      * resource changes (at this time only bitmaps and 9 patches go into the cache).
      *
      * @param projectKey the key for the project.
@@ -453,10 +453,10 @@ public class LayoutLibrary {
 
     /**
      * Returns the API level of the legacy bridge.
-     * <p/>
+     * <p>
      * This handles the case where ILayoutBridge does not have a {@link ILayoutBridge#getApiLevel()}
      * (at API level 1).
-     * <p/>
+     * <p>
      * {@link ILayoutBridge#getApiLevel()} should never called directly.
      *
      * @return the api level of {@link #mLegacyBridge}.

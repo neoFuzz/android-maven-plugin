@@ -19,7 +19,6 @@ package com.android.manifmerger;
 import com.android.annotations.NonNull;
 import com.android.ide.common.blame.SourceFile;
 import com.android.utils.PositionXmlParser;
-import java.util.Optional;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
@@ -27,6 +26,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Optional;
 
 import static com.android.manifmerger.PlaceholderHandler.KeyBasedValueResolver;
 

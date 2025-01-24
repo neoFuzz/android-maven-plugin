@@ -140,34 +140,60 @@ public class ApkInfoParser {
      * Information about an APK
      */
     public static final class ApkInfo {
+        /**
+         * The package name
+         */
         @NonNull
         private final String mPackageName;
+        /**
+         * The version code or null if not found
+         */
         @Nullable
         private final Integer mVersionCode;
+        /**
+         * The version name or null if not found
+         */
         @Nullable
         private final String mVersionName;
 
+        /**
+         * @param packageName the package name
+         * @param versionCode the version code or null if not found
+         * @param versionName the version name or null if not found
+         */
         private ApkInfo(@NonNull String packageName, @Nullable Integer versionCode, @Nullable String versionName) {
             mPackageName = packageName;
             mVersionCode = versionCode;
             mVersionName = versionName;
         }
 
+        /**
+         * @return the package name
+         */
         @NonNull
         public String getPackageName() {
             return mPackageName;
         }
 
+        /**
+         * @return the version code or null if not found
+         */
         @Nullable
         public Integer getVersionCode() {
             return mVersionCode;
         }
 
+        /**
+         * @return the version name or null if not found
+         */
         @Nullable
         public String getVersionName() {
             return mVersionName;
         }
 
+        /**
+         * @return a string representation of the ApkInfo object
+         */
         @Override
         public String toString() {
             return MoreObjects.toStringHelper(this)

@@ -52,12 +52,13 @@ import java.util.*;
 /**
  * This class keeps information on the current locally installed SDK.
  * It tries to lazily load information as much as possible.
- * <p/>
+ * <p>
  * Packages are accessed by their type and a main query attribute, depending on the
  * package type. There are different versions of {@link #getPkgInfo} which depend on the
  * query attribute.
  *
- * <table border='1' cellpadding='3'>
+ * <table border='1' style="padding: 3px">
+ *     <caption>Package types and query attributes</caption>
  * <tr>
  * <th>Type</th>
  * <th>Query parameter</th>
@@ -129,13 +130,12 @@ import java.util.*;
  * <p>
  * Apps/libraries that use it are encouraged to keep an existing instance around
  * (using a singleton or similar mechanism).
- * <p/>
+ * <p>
  * Threading: All accessor methods are synchronized on the same internal lock so
  * it's safe to call them from any thread, even concurrently. <br/>
  * A method like {@code getPkgsInfos} returns a copy of its data array, which objects are
  * not altered after creation, so its value is not influenced by the internal state after
  * it returns.
- * <p/>
  * <p>
  * Implementation Background:
  * <ul>
@@ -259,7 +259,7 @@ public class LocalSdk {
     }
 
     /**
-     * Clear the tracked visited folders & the cached {@link LocalPkgInfo} for the
+     * Clear the tracked visited folders &amp; the cached {@link LocalPkgInfo} for the
      * given filter types.
      *
      * @param filters A set of PkgType constants or {@link PkgType#PKG_ALL} to clear everything.
@@ -351,7 +351,7 @@ public class LocalSdk {
 
     /**
      * Retrieves information on a package identified by its {@link FullRevision}.
-     * <p/>
+     * <p>
      * Note that {@link PkgType#PKG_TOOLS} and {@link PkgType#PKG_PLATFORM_TOOLS}
      * are unique in a local SDK so you'll want to use {@link #getPkgInfo(PkgType)}
      * to retrieve them instead.
@@ -375,7 +375,7 @@ public class LocalSdk {
 
     /**
      * Retrieves information on a package identified by its {@link String} path.
-     * <p/>
+     * <p>
      * For add-ons and platforms, the path is the target hash string
      * (see {@link AndroidTargetHash} for helpers methods to generate this string.)
      *
@@ -398,7 +398,7 @@ public class LocalSdk {
 
     /**
      * Retrieves information on a package identified by both vendor and path strings.
-     * <p/>
+     * <p>
      * For add-ons the path is target hash string
      * (see {@link AndroidTargetHash} for helpers methods to generate this string.)
      *
@@ -495,7 +495,7 @@ public class LocalSdk {
      * This is used for the package types that have one or more instances, each with different
      * versions.
      * The resulting array is sorted according to the PkgInfo's sort order.
-     * <p/>
+     * <p>
      * Note: you can use this with {@link PkgType#PKG_TOOLS}, {@link PkgType#PKG_PLATFORM_TOOLS} and
      * {@link PkgType#PKG_DOC} but since there can only be one package of these types, it is
      * more efficient to use {@link #getPkgInfo(PkgType)} to query them.
@@ -513,10 +513,10 @@ public class LocalSdk {
      * This is used for the package types that have one or more instances, each with different
      * versions.
      * The resulting array is sorted according to the PkgInfo's sort order.
-     * <p/>
+     * <p>
      * To force the LocalSdk parser to load <b>everything</b>, simply call this method
      * with the {@link PkgType#PKG_ALL} argument to load all the known package types.
-     * <p/>
+     * <p>
      * Note: you can use this with {@link PkgType#PKG_TOOLS}, {@link PkgType#PKG_PLATFORM_TOOLS} and
      * {@link PkgType#PKG_DOC} but since there can only be one package of these types, it is
      * more efficient to use {@link #getPkgInfo(PkgType)} to query them.
@@ -620,7 +620,7 @@ public class LocalSdk {
 
     /**
      * Returns the highest build-tool revision known, or null if there are no build-tools.
-     * <p/>
+     * <p>
      * If no specific build-tool package is installed but the platform-tools is lower than 17,
      * then this creates and returns a "legacy" built-tool package using platform-tools.
      * (We only split build-tools out of platform-tools starting with revision 17,
@@ -685,11 +685,11 @@ public class LocalSdk {
     }
 
     /**
-     * Returns the targets (platforms & addons) that are available in the SDK.
+     * Returns the targets (platforms &amp; addons) that are available in the SDK.
      * The target list is created on demand the first time then cached.
      * It will not be refreshed unless {@link #clearLocalPkg} is called to clear platforms
      * and/or add-ons.
-     * <p/>
+     * <p>
      * The array can be empty but not null.
      */
     @NonNull

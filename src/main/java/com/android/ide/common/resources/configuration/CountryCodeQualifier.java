@@ -74,6 +74,7 @@ public final class CountryCodeQualifier extends ResourceQualifier {
      * {@link #toString()} on a {@link CountryCodeQualifier} object.
      *
      * @param code the value of the qualifier, as returned by {@link #getCode()}.
+     * @return the folder segment
      */
     @NonNull
     public static String getFolderSegment(int code) {
@@ -84,36 +85,59 @@ public final class CountryCodeQualifier extends ResourceQualifier {
         return ""; //$NON-NLS-1$
     }
 
+    /**
+     * @return the code value of this qualifier
+     */
     public int getCode() {
         return mCode;
     }
 
+    /**
+     * @return the name of the qualifier
+     */
     @Override
     public String getName() {
         return NAME;
     }
 
+    /**
+     * @return the short name of the qualifier
+     */
     @Override
     @NonNull
     public String getShortName() {
         return "Country Code";
     }
 
+    /**
+     * @return since version of the qualifier
+     */
     @Override
     public int since() {
         return 1;
     }
 
+    /**
+     * @return true if the qualifier is valid, false otherwise
+     */
     @Override
     public boolean isValid() {
         return mCode != DEFAULT_CODE;
     }
 
+    /**
+     * @return true if the qualifier has a fake value, false otherwise
+     */
     @Override
     public boolean hasFakeValue() {
         return false;
     }
 
+    /**
+     * @param value  The value to check and set. Must not be null.
+     * @param config The folder configuration to receive the value. Must not be null.
+     * @return true if the value was set, false otherwise
+     */
     @Override
     public boolean checkAndSet(String value, FolderConfiguration config) {
         CountryCodeQualifier qualifier = getQualifier(value);
@@ -125,6 +149,10 @@ public final class CountryCodeQualifier extends ResourceQualifier {
         return false;
     }
 
+    /**
+     * @param qualifier The qualifier to compare with. Must not be null.
+     * @return true if the given qualifier is equal to this qualifier, false otherwise
+     */
     @Override
     public boolean equals(Object qualifier) {
         if (qualifier instanceof CountryCodeQualifier q) {
@@ -134,6 +162,9 @@ public final class CountryCodeQualifier extends ResourceQualifier {
         return false;
     }
 
+    /**
+     * @return the hash code value of this qualifier
+     */
     @Override
     public int hashCode() {
         return mCode;
@@ -141,6 +172,8 @@ public final class CountryCodeQualifier extends ResourceQualifier {
 
     /**
      * Returns the string used to represent this qualifier in the folder name.
+     *
+     * @return the string used to represent this qualifier in the folder name.
      */
     @Override
     @NonNull
@@ -148,6 +181,9 @@ public final class CountryCodeQualifier extends ResourceQualifier {
         return getFolderSegment(mCode);
     }
 
+    /**
+     * @return the display value of this qualifier
+     */
     @Override
     @NonNull
     public String getShortDisplayValue() {
@@ -158,6 +194,9 @@ public final class CountryCodeQualifier extends ResourceQualifier {
         return ""; //$NON-NLS-1$
     }
 
+    /**
+     * @return the long display value of this qualifier
+     */
     @Override
     @NonNull
     public String getLongDisplayValue() {

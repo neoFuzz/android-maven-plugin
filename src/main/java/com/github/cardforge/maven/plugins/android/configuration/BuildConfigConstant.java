@@ -29,14 +29,23 @@ public class BuildConfigConstant {
     @Parameter(property = "android.buildConfigConstants[].value", required = true)
     private String value;
 
+    /**
+     * @return the BuildConfigConstant type.
+     */
     public String getType() {
         return type;
     }
 
+    /**
+     * @return the BuildConfigConstant value.
+     */
     public String getValue() {
         return value;
     }
 
+    /**
+     * @return the BuildConfigConstant name.
+     */
     public String getName() {
         return name;
     }

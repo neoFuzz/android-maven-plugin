@@ -28,17 +28,23 @@ public interface IResourceValue {
 
     /**
      * Returns the name of the resource, as defined in the XML.
+     *
+     * @return the name of the resource
      */
     String getName();
 
     /**
      * Returns the value of the resource, as defined in the XML. This can be <code>null</code>
+     *
+     * @return the value of the resource, or <code>null</code>
      */
     String getValue();
 
     /**
      * Returns whether the resource is a framework resource (<code>true</code>) or a project
-     * resource (<code>false</false>).
+     * resource (<code>false</code>).
+     *
+     * @return true if the resource is a framework resource, false otherwise.
      */
     boolean isFramework();
 }

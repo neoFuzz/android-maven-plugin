@@ -17,9 +17,7 @@
 package com.github.cardforge.maven.plugins.android.phase09package;
 
 import com.android.annotations.NonNull;
-
 import com.android.annotations.Nullable;
-import com.google.common.graph.*;
 import com.android.sdklib.build.ApkBuilder;
 import com.android.sdklib.build.ApkCreationException;
 import com.android.sdklib.build.DuplicateFileException;
@@ -33,6 +31,7 @@ import com.github.cardforge.maven.plugins.android.config.PullParameter;
 import com.github.cardforge.maven.plugins.android.configuration.Apk;
 import com.github.cardforge.maven.plugins.android.configuration.MetaInf;
 import com.github.cardforge.maven.plugins.android.configuration.Sign;
+import com.google.common.graph.Traverser;
 import com.google.common.io.Files;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.DirectoryFileFilter;
@@ -564,6 +563,9 @@ public class ApkMojo extends AbstractAndroidMojo {
 
     /**
      * Collect all Files from Folder (recursively) that are not class files.
+     *
+     * @param folder         the folder
+     * @param collectedFiles the collected files
      */
     private void collectFiles(@NonNull File folder, final List<File> collectedFiles) {
         folder.listFiles(file -> {
@@ -581,6 +583,13 @@ public class ApkMojo extends AbstractAndroidMojo {
 
     /**
      * Adds all non-class files from folder, so that we can add META-INF/services resources.
+     *
+     * @param builder the APK builder
+     * @param folder  the folder
+     * @throws ApkCreationException   if the APK cannot be created.
+     * @throws SealedApkException     if the APK is sealed
+     * @throws DuplicateFileException if a duplicate file is found
+     * @throws IOException            if an I/O error occurs
      */
     private void addResourcesFromFolder(ApkBuilder builder, @NonNull File folder)
             throws SealedApkException, DuplicateFileException, ApkCreationException, IOException {
@@ -599,6 +608,13 @@ public class ApkMojo extends AbstractAndroidMojo {
         }
     }
 
+    /**
+     * @param dexFile    the dex file
+     * @param apkBuilder the APK builder
+     * @throws ApkCreationException   if the APK cannot be created.
+     * @throws SealedApkException     if the APK is sealed
+     * @throws DuplicateFileException if a duplicate file is found
+     */
     private void addSecondaryDexes(File dexFile, ApkBuilder apkBuilder) throws ApkCreationException,
             SealedApkException, DuplicateFileException {
         int dexNumber = 2;
@@ -612,16 +628,33 @@ public class ApkMojo extends AbstractAndroidMojo {
         }
     }
 
+    /**
+     * @param dexFile     the dex file
+     * @param dexFileName the name of the dex file
+     * @return the next dex file
+     */
     @NonNull
     private File createNextDexFile(@NonNull File dexFile, String dexFileName) {
         return new File(dexFile.getParentFile(), dexFileName);
     }
 
+    /**
+     * @param dexNumber the number of the dex file
+     * @return the name of the dex file
+     */
     @NonNull
     private String getNextDexFileName(int dexNumber) {
         return CLASSES + dexNumber + DEX_SUFFIX;
     }
 
+    /**
+     * @param in              the input jar file
+     * @param duplicates      the list of duplicates found in the jar
+     * @param duplicatesAdded the set of duplicates already added to the duplicate-resources.jar
+     * @param duplicateZos    the duplicate-resources.jar
+     * @param num             the number of the duplicate-resources.jar
+     * @return the new jar file or null if the output file already exists
+     */
     @Nullable
     private File removeDuplicatesFromJar(@NonNull File in, List<String> duplicates,
                                          Set<String> duplicatesAdded, ZipOutputStream duplicateZos, int num) {
@@ -710,6 +743,13 @@ public class ApkMojo extends AbstractAndroidMojo {
         return out;
     }
 
+    /**
+     * @param root            The root folder to remove duplicates from.
+     * @param in              The folder to remove duplicates from.
+     * @param duplicates      The list of duplicates to remove.
+     * @param duplicatesAdded The set of duplicates already added to the duplicates jar.
+     * @param duplicateZos    The ZipOutputStream to write the duplicates to.
+     */
     private void removeDuplicatesFromFolder(@NonNull File root, @NonNull File in, List<String> duplicates,
                                             Set<String> duplicatesAdded, ZipOutputStream duplicateZos) {
         String rPath = root.getAbsolutePath();
@@ -755,6 +795,10 @@ public class ApkMojo extends AbstractAndroidMojo {
         }
     }
 
+    /**
+     * @return The collection of native folders to be included in the APK.
+     * @throws MojoExecutionException if there is a problem resolving the artifacts.
+     */
     @NonNull
     private Collection<File> getNativeLibraryFolders() throws MojoExecutionException {
         final List<File> natives = new ArrayList<>();
@@ -808,6 +852,12 @@ public class ApkMojo extends AbstractAndroidMojo {
         return getNativeHelper().getNativeDependenciesArtifacts(this, getUnpackedLibsDirectory(), true);
     }
 
+    /**
+     * @param artifact             The artifact to copy the native library from.
+     * @param destinationDirectory The directory to copy the native library to.
+     * @param ndkArchitecture      The architecture to copy the native library for.
+     * @throws MojoExecutionException if an error occurs during the copy process
+     */
     private void copyNativeLibraryArtifact(Artifact artifact,
                                            File destinationDirectory,
                                            String ndkArchitecture) throws MojoExecutionException {
@@ -834,9 +884,12 @@ public class ApkMojo extends AbstractAndroidMojo {
         }
     }
 
-
     /**
      * Copy the Ndk GdbServer into the architecture output folder if the folder exists but the GdbServer doesn't.
+     *
+     * @param destinationDirectory The directory to copy the gdbserver binary to.
+     * @param architecture         The architecture to copy the gdbserver binary for.
+     * @throws MojoExecutionException if an error occurs during the copy process
      */
     private void copyGdbServer(File destinationDirectory, String architecture) throws MojoExecutionException {
 
@@ -860,6 +913,11 @@ public class ApkMojo extends AbstractAndroidMojo {
 
     }
 
+    /**
+     * @param localNativeLibrariesDirectory The directory containing the native libraries to copy from.
+     * @param destinationDirectory          The directory to copy the native libraries to.
+     * @throws MojoExecutionException if an error occurs during the copy process
+     */
     private void copyLocalNativeLibraries(final File localNativeLibrariesDirectory, final File destinationDirectory)
             throws MojoExecutionException {
         getLog().debug("Copying existing native libraries from " + localNativeLibrariesDirectory);
@@ -880,7 +938,6 @@ public class ApkMojo extends AbstractAndroidMojo {
             throw new MojoExecutionException("Could not copy native dependency.", e);
         }
     }
-
 
     /**
      * Generates an intermediate apk file (actually .ap_) containing the resources and assets.
@@ -932,6 +989,9 @@ public class ApkMojo extends AbstractAndroidMojo {
         }
     }
 
+    /**
+     * @return an AndroidSigner instance based on the signDebug parameter.
+     */
     protected AndroidSigner getAndroidSigner() {
         if (sign == null) {
             return new AndroidSigner(signDebug);

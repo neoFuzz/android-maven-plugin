@@ -27,6 +27,9 @@ import java.util.List;
  * com.android.ide.common.rendering.api.ResourceValue} items, one for array element.
  */
 public class ArrayResourceValue extends ResourceValue implements Iterable<String> {
+    /**
+     * List of items to work with.
+     */
     private final List<String> mItems = new ArrayList<>();
 
     /**
@@ -41,6 +44,8 @@ public class ArrayResourceValue extends ResourceValue implements Iterable<String
 
     /**
      * Adds an element into the array
+     *
+     * @param value the value of the element to add
      */
     public void addElement(String value) {
         mItems.add(value);
@@ -67,6 +72,8 @@ public class ArrayResourceValue extends ResourceValue implements Iterable<String
 
     /**
      * Returns an iterator over the resource values
+     *
+     * @return an iterator over the resource values
      */
     @Override
     @NonNull
@@ -78,11 +85,16 @@ public class ArrayResourceValue extends ResourceValue implements Iterable<String
      * Returns the index of the element to pick by default if a client
      * of layoutlib asks for the {@link #getValue()} rather than the more
      * specific {@linkplain ArrayResourceValue} iteration methods
+     *
+     * @return the index of the element to pick by default
      */
     protected int getDefaultIndex() {
         return 0;
     }
 
+    /**
+     * @return the value of the array element to return by default
+     */
     @Override
     public String getValue() {
         // Clients should normally not call this method on ArrayResourceValues; they should

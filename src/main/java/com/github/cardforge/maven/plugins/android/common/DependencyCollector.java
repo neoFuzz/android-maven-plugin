@@ -49,6 +49,7 @@ final class DependencyCollector {
 
     /**
      * Returns the set of dependencies found.
+     *
      * @return Set of dependencies found.
      */
     @NonNull

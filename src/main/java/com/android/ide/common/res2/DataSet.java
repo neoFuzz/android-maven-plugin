@@ -189,6 +189,10 @@ public abstract class DataSet<I extends DataItem<F>, F extends DataFile<I>> impl
         return ignore;
     }
 
+    /**
+     * @param name the name of the set.
+     * @return a new DataSet with the given name.
+     */
     protected abstract DataSet<I, F> createSet(String name);
 
     /**
@@ -208,11 +212,19 @@ public abstract class DataSet<I extends DataItem<F>, F extends DataFile<I>> impl
      * {@link #processNewDataFile(java.io.File, DataFile, boolean)}.
      *
      * @param sourceFolder the source folder to load the resources from.
+     * @param logger       the logger
      * @throws MergingException if something goes wrong
      */
     protected abstract void readSourceFolder(File sourceFolder, ILogger logger)
             throws MergingException;
 
+    /**
+     * @param sourceFolder the source folder to load the resources from.
+     * @param file         the file to load the resources from.
+     * @param logger       the logger
+     * @return the DataFile, or null if the file is ignored.
+     * @throws MergingException if something goes wrong
+     */
     @Nullable
     protected abstract F createFileAndItems(File sourceFolder, File file, ILogger logger)
             throws MergingException;
@@ -322,6 +334,7 @@ public abstract class DataSet<I extends DataItem<F>, F extends DataFile<I>> impl
      * <p>
      * This also checks for duplicates items.
      *
+     * @param logger the logger
      * @throws MergingException if something goes wrong
      */
     public void loadFromFiles(ILogger logger) throws MergingException {
@@ -487,6 +500,7 @@ public abstract class DataSet<I extends DataItem<F>, F extends DataFile<I>> impl
      * @param sourceFolder the sourceFile containing the changedFile
      * @param changedFile  The changed file
      * @param fileStatus   the change state
+     * @param logger       the logger
      * @return true if the set was properly updated, false otherwise
      * @throws MergingException if something goes wrong
      */
@@ -515,10 +529,22 @@ public abstract class DataSet<I extends DataItem<F>, F extends DataFile<I>> impl
         return false;
     }
 
+    /**
+     * @param sourceFolder the source folder that contains the file.
+     * @param file         the file to check
+     * @return true if the file is valid, false otherwise
+     */
     protected boolean isValidSourceFile(@NonNull File sourceFolder, @NonNull File file) {
         return checkFileForAndroidRes(file);
     }
 
+    /**
+     * @param sourceFolder the source folder that contains the file.
+     * @param file         the file to check
+     * @param logger       the logger
+     * @return true if the file is valid, false otherwise
+     * @throws MergingException if something goes wrong
+     */
     protected boolean handleNewFile(File sourceFolder, File file, ILogger logger)
             throws MergingException {
         F dataFile = createFileAndItems(sourceFolder, file, logger);
@@ -528,6 +554,11 @@ public abstract class DataSet<I extends DataItem<F>, F extends DataFile<I>> impl
         return true;
     }
 
+    /**
+     * @param sourceFolder the source folder that contains the file.
+     * @param dataFile     the DataFile to process
+     * @param setTouched   whether the items should be set to TOUCHED
+     */
     protected void processNewDataFile(@NonNull File sourceFolder,
                                       @NonNull F dataFile,
                                       boolean setTouched) {
@@ -543,6 +574,12 @@ public abstract class DataSet<I extends DataItem<F>, F extends DataFile<I>> impl
         }
     }
 
+    /**
+     * @param sourceFolder the source folder that contains the file.
+     * @param changedFile  the changed file
+     * @return true if the file is valid, false otherwise
+     * @throws MergingException if something goes wrong
+     */
     protected boolean handleChangedFile(@NonNull File sourceFolder,
                                         @NonNull File changedFile) throws MergingException {
         F dataFile = mDataFileMap.get(changedFile);
@@ -550,6 +587,10 @@ public abstract class DataSet<I extends DataItem<F>, F extends DataFile<I>> impl
         return true;
     }
 
+    /**
+     * @param item the item to add.
+     * @param key  the key for the item. If null, the item's key will be used.
+     */
     protected void addItem(@NonNull I item, @Nullable String key) {
         if (key == null) {
             key = item.getKey();
@@ -558,6 +599,10 @@ public abstract class DataSet<I extends DataItem<F>, F extends DataFile<I>> impl
         mItems.put(key, item);
     }
 
+    /**
+     * @param file the file to get the DataFile from.
+     * @return the DataFile or null if not found.
+     */
     protected F getDataFile(@NonNull File file) {
         return mDataFileMap.get(file);
     }
@@ -573,6 +618,9 @@ public abstract class DataSet<I extends DataItem<F>, F extends DataFile<I>> impl
         mDataFileMap.put(dataFile.getFile(), dataFile);
     }
 
+    /**
+     * @return a string representation of this DataSet.
+     */
     @Override
     public String toString() {
         return Arrays.toString(mSourceFiles.toArray());

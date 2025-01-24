@@ -318,9 +318,9 @@ public class UpdaterData implements IUpdaterData {
 
     /**
      * Reloads the SDK content (targets).
-     * <p/>
+     * <p>
      * This also reloads the AVDs in case their status changed.
-     * <p/>
+     * <p>
      * This does not notify the listeners ({@link ISdkChangeListener}).
      */
     public void reloadSdk() {
@@ -344,7 +344,7 @@ public class UpdaterData implements IUpdaterData {
 
     /**
      * Reloads the AVDs.
-     * <p/>
+     * <p>
      * This does not notify the listeners.
      */
     public void reloadAvds() {
@@ -389,7 +389,7 @@ public class UpdaterData implements IUpdaterData {
 
     /**
      * Returns the list of installed packages, parsing them if this has not yet been done.
-     * <p/>
+     * <p>
      * The package list is cached in the {@link LocalSdkParser} and will be reset when
      * {@link #reloadSdk()} is invoked.
      */
@@ -591,7 +591,7 @@ public class UpdaterData implements IUpdaterData {
 
     /**
      * Attempts to restart ADB.
-     * <p/>
+     * <p>
      * If the "ask before restart" setting is set (the default), prompt the user whether
      * now is a good time to restart ADB.
      */
@@ -706,7 +706,7 @@ public class UpdaterData implements IUpdaterData {
     /**
      * Tries to update all the *existing* local packages.
      * This version *requires* to be run with a GUI.
-     * <p/>
+     * <p>
      * There are two modes of operation:
      * <ul>
      * <li>If selectedArchives is null, refreshes all sources, compares the available remote
@@ -935,7 +935,7 @@ public class UpdaterData implements IUpdaterData {
 
     /**
      * Validates that all archive licenses are accepted.
-     * <p/>
+     * <p>
      * There are 2 cases: <br/>
      * - When {@code acceptLicenses} is given, the licenses specified are automatically
      * accepted and all those not specified are automatically rejected. <br/>

@@ -6,9 +6,8 @@ import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-//import java.lang.Compiler; // unsure if replaced
-import org.codehaus.plexus.compiler.*;
 import org.codehaus.plexus.compiler.Compiler;
+import org.codehaus.plexus.compiler.*;
 import org.codehaus.plexus.compiler.CompilerMessage.Kind;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.util.cli.*;
@@ -20,8 +19,8 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * @plexus.component role="org.codehaus.plexus.compiler.Compiler"
- * role-hint="jack"
+ * {@code @plexus.component role="org.codehaus.plexus.compiler.Compiler"
+ * role-hint="jack"}
  */
 @Component(role = Compiler.class, hint = "jack")
 public class JackCompiler extends AbstractCompiler {

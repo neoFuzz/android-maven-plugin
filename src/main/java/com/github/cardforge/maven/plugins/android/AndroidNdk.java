@@ -31,14 +31,32 @@ import java.util.List;
  */
 public class AndroidNdk {
 
+    /**
+     * Static string message for proper NDK home location.
+     */
     public static final String PROPER_NDK_HOME_DIRECTORY_MESSAGE = "Please provide a proper Android NDK directory path"
             + " as configuration parameter <ndk><path>...</path></ndk> in the plugin <configuration/>. As an "
             + "alternative, you may add the parameter to commandline: -Dandroid.ndk.path=... or set environment "
             + "variable ANDROID_ND_HOME.";
 
+    /**
+     * Static string for armeabi platform
+     */
     public static final String ARMEABI = "armeabi";
+
+    /**
+     * Static string for mips platform
+     */
     public static final String MIPS_64 = "mips64";
+
+    /**
+     * Static string for x86 platform
+     */
     public static final String X_86_64 = "x86_64";
+
+    /**
+     * Static list with all supported NDK architectures
+     */
     public static final String[] NDK_ARCHITECTURES = {ARMEABI, "armeabi-v7a", "arm64-v8a", "mips", MIPS_64,
             "x86", X_86_64};
 
@@ -80,13 +98,22 @@ public class AndroidNdk {
     private static final String[] GDB_SERVER_LOCATIONS = {"toolchains/%s/prebuilt/gdbserver",
             "prebuilt/%s/gdbserver/gdbserver"};
 
+    /**
+     * The path to the NDK installation
+     */
     private final File ndkPath;
 
+    /**
+     * @param ndkPath The path to the NDK installation
+     */
     public AndroidNdk(File ndkPath) {
         assertPathIsDirectory(ndkPath);
         this.ndkPath = ndkPath;
     }
 
+    /**
+     * @param path The path to check
+     */
     private void assertPathIsDirectory(final File path) {
         if (path == null) {
             throw new InvalidNdkException(PROPER_NDK_HOME_DIRECTORY_MESSAGE);
@@ -97,6 +124,10 @@ public class AndroidNdk {
         }
     }
 
+    /**
+     * @param toolchain The toolchain to resolve the stripper for
+     * @return File that is the tool
+     */
     @Nullable
     private File findStripper(String toolchain) {
         List<String> osDirectories = new ArrayList<>();
@@ -140,6 +171,11 @@ public class AndroidNdk {
         return null;
     }
 
+    /**
+     * @param toolchain The toolchain to resolve the stripper for
+     * @return File
+     * @throws MojoExecutionException When no toolchain is found
+     */
     public File getStripper(String toolchain) throws MojoExecutionException {
         final File stripper = findStripper(toolchain);
         if (stripper == null) {
@@ -214,6 +250,11 @@ public class AndroidNdk {
         }
     }
 
+    /**
+     * @param ndkArchitecture The architecture of the NDK
+     * @return File that is the gdb server
+     * @throws MojoExecutionException When no gdb server is found
+     */
     public File getGdbServer(@NonNull String ndkArchitecture) throws MojoExecutionException {
         // create a list of possible gdb server parent folder locations
         List<String> gdbServerLocations = new ArrayList<>();

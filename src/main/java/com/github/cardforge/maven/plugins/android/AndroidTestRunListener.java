@@ -27,6 +27,9 @@ import java.util.Map;
  * It will do so for each device/emulator the tests run on.
  */
 public class AndroidTestRunListener implements ITestRunListener {
+    /**
+     * Suffix for the screenshot files that will be stored on the device.
+     */
     private static final String SCREENSHOT_SUFFIX = "_screenshot.png";
 
     /**
@@ -42,34 +45,93 @@ public class AndroidTestRunListener implements ITestRunListener {
      * the emulator or device we are running the tests on *
      */
     private final IDevice device;
+    /**
+     * the logger to use
+     */
     private final Log log;
+    /**
+     * whether to create a report or not
+     */
     private final Boolean createReport;
+    /**
+     * whether to take a screenshot on failure or not
+     */
     private final Boolean takeScreenshotOnFailure;
+    /**
+     * path on the device where the screenshots should be stored
+     */
     private final String screenshotsPathOnDevice;
+    /**
+     * suffix for the report file name
+     */
     private final String reportSuffix;
+    /**
+     * target directory where the report file should be stored
+     */
     private final File targetDirectory;
+    /**
+     * prefix for the device log line to filter for
+     */
     private final String deviceLogLinePrefix;
+    /**
+     * object factory for creating xml objects
+     */
     private final ObjectFactory objectFactory = new ObjectFactory();
+    /**
+     * StringBuilder to build a list of exceptions
+     */
     private final StringBuilder exceptionMessages = new StringBuilder();
+    /**
+     * Test count indicator
+     */
     private int testCount = 0;
+    /**
+     * Test run count indicator
+     */
     private int testRunCount = 0;
+    /**
+     * Test ignored indicator
+     */
     private int testIgnoredCount = 0;
+    /**
+     * Test failure count indicator
+     */
     private int testFailureCount = 0;
+    /**
+     * Test error count
+     */
     private int testErrorCount = 0;
+    /**
+     * Test run failure cause
+     */
     private String testRunFailureCause = null;
+    /**
+     * Test report object
+     */
     private Testsuite report;
+    /**
+     * current test case being executed, reset with each test start
+     */
     private Testsuite.Testcase currentTestCase;
     /**
      * start time of current test case in millis, reset with each test start
      */
     private long currentTestCaseStartTime;
-    // we track if we have problems and then report upstream
+    /**
+     * we track if we have problems and then report upstream
+     */
     private boolean threwException = false;
 
     /**
      * Create a new test run listener.
      *
-     * @param device the device on which test is executed.
+     * @param device                  the device on which test is executed.
+     * @param log                     the logger to use
+     * @param createReport            whether to create a report or not
+     * @param takeScreenshotOnFailure whether to take a screenshot on failure or not
+     * @param screenshotsPathOnDevice path on the device where the screenshots should be stored
+     * @param reportSuffix            suffix for the report file name
+     * @param targetDirectory         target directory where the report file should be stored
      */
     public AndroidTestRunListener(IDevice device, Log log, Boolean createReport,
                                   Boolean takeScreenshotOnFailure, String screenshotsPathOnDevice,
@@ -84,10 +146,17 @@ public class AndroidTestRunListener implements ITestRunListener {
         this.targetDirectory = targetDirectory;
     }
 
+    /**
+     * @return the logger to use
+     */
     public Log getLog() {
         return this.log;
     }
 
+    /**
+     * @param runName the test run name
+     * @param tCount  total number of tests in test run
+     */
     @Override
     public void testRunStarted(String runName, int tCount) {
         if (Boolean.TRUE.equals(takeScreenshotOnFailure)) {
@@ -119,6 +188,9 @@ public class AndroidTestRunListener implements ITestRunListener {
         }
     }
 
+    /**
+     * @param testIdentifier identifies the test
+     */
     @Override
     public void testIgnored(@NonNull TestIdentifier testIdentifier) {
         ++testIgnoredCount;
@@ -127,6 +199,9 @@ public class AndroidTestRunListener implements ITestRunListener {
 
     }
 
+    /**
+     * @param testIdentifier identifies the test
+     */
     @Override
     public void testStarted(@NonNull TestIdentifier testIdentifier) {
         testRunCount++;
@@ -143,6 +218,10 @@ public class AndroidTestRunListener implements ITestRunListener {
         }
     }
 
+    /**
+     * @param testIdentifier identifies the test
+     * @param trace          stack trace of failure
+     */
     @Override
     public void testFailed(TestIdentifier testIdentifier, String trace) {
         if (Boolean.TRUE.equals(takeScreenshotOnFailure)) {
@@ -167,6 +246,10 @@ public class AndroidTestRunListener implements ITestRunListener {
         }
     }
 
+    /**
+     * @param testIdentifier identifies the test
+     * @param trace          stack trace of failure
+     */
     @Override
     public void testAssumptionFailure(TestIdentifier testIdentifier, String trace) {
         if (Boolean.TRUE.equals(takeScreenshotOnFailure)) {
@@ -191,19 +274,33 @@ public class AndroidTestRunListener implements ITestRunListener {
         }
     }
 
+    /**
+     * @param command the command to execute on the device
+     */
     private void executeOnAdbShell(String command) {
         try {
             device.executeShellCommand(command, new IShellOutputReceiver() {
+                /**
+                 * @return <code>false</code> since we don't want to stop execution
+                 */
                 @Override
                 public boolean isCancelled() {
                     return false;
                 }
 
+                /**
+                 * nothing
+                 */
                 @Override
                 public void flush() {
                     // none
                 }
 
+                /**
+                 * @param data   The new data.
+                 * @param offset The offset at which the new data starts.
+                 * @param length The length of the new data.
+                 */
                 @Override
                 public void addOutput(byte[] data, int offset, int length) {
                     // none
@@ -214,6 +311,10 @@ public class AndroidTestRunListener implements ITestRunListener {
         }
     }
 
+    /**
+     * @param testIdentifier identifies the test
+     * @param testMetrics    a {@link Map} of the metrics emitted
+     */
     @Override
     public void testEnded(@NonNull TestIdentifier testIdentifier, Map<String, String> testMetrics) {
         getLog().info(
@@ -229,6 +330,10 @@ public class AndroidTestRunListener implements ITestRunListener {
         }
     }
 
+    /**
+     * @param elapsedTime device reported elapsed time, in milliseconds
+     * @param runMetrics  key-value pairs reported at the end of a test run
+     */
     @Override
     public void testRunEnded(long elapsedTime, Map<String, String> runMetrics) {
         getLog().info(deviceLogLinePrefix + INDENT + "Run ended: " + elapsedTime + " ms");
@@ -256,12 +361,18 @@ public class AndroidTestRunListener implements ITestRunListener {
         }
     }
 
+    /**
+     * @param errorMessage {@link String} describing reason for run failure.
+     */
     @Override
     public void testRunFailed(String errorMessage) {
         testRunFailureCause = errorMessage;
         getLog().info(deviceLogLinePrefix + INDENT + "Run failed: " + errorMessage);
     }
 
+    /**
+     * @param elapsedTime device reported elapsed time, in milliseconds
+     */
     @Override
     public void testRunStopped(long elapsedTime) {
         getLog().info(deviceLogLinePrefix + INDENT + "Run stopped:" + elapsedTime);

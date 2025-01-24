@@ -23,11 +23,12 @@ import com.android.sdklib.repository.MajorRevision;
 
 /**
  * Interface for packages that provide a {@link FullRevision},
- * which is a multi-part revision number (major.minor.micro) and an optional preview revision.
- * <p/>
+ * which is a multipart revision number (major.minor.micro) and an optional preview revision.
+ * <p>
  * This interface is a tag. It indicates that {@link Package#getRevision()} returns a
  * {@link FullRevision} instead of a limited {@link MajorRevision}. <br/>
  * The preview version number is available via {@link Package#getRevision()}.
+ * </p>
  *
  * @deprecated com.android.sdklib.internal.repository has moved into Studio as
  * com.android.tools.idea.sdk.remote.internal.
@@ -37,7 +38,7 @@ public interface IFullRevisionProvider {
 
     /**
      * Returns whether the given package represents the same item as the current package.
-     * <p/>
+     * <p>
      * Two packages are considered the same if they represent the same thing, except for the
      * revision number.
      *

@@ -33,15 +33,30 @@ import java.util.List;
  */
 public class DependencyData {
 
+    /**
+     * List of secondary output files
+     */
     @NonNull
     List<String> mSecondaryOutputFiles = Lists.newArrayList();
+    /**
+     * Main input file
+     */
     @NonNull
     private String mMainFile;
+    /**
+     * List of secondary input files
+     */
     @NonNull
     private List<String> mSecondaryFiles = Lists.newArrayList();
+    /**
+     * List of output files
+     */
     @NonNull
     private List<String> mOutputFiles = Lists.newArrayList();
 
+    /**
+     * Initializes a new instance of the {@link DependencyData} class
+     */
     DependencyData() {
     }
 
@@ -49,6 +64,8 @@ public class DependencyData {
      * Parses the given dependency file and returns the parsed data
      *
      * @param dependencyFile the dependency file
+     * @return the parsed data, or null if the file does not exist
+     * @throws IOException if the dependency file cannot be read
      */
     @Nullable
     public static DependencyData parseDependencyFile(@NonNull File dependencyFile)
@@ -63,6 +80,10 @@ public class DependencyData {
         return processDependencyData(content);
     }
 
+    /**
+     * @param content
+     * @return
+     */
     @VisibleForTesting
     @Nullable
     static DependencyData processDependencyData(@NonNull List<String> content) {
@@ -132,42 +153,69 @@ public class DependencyData {
         return data;
     }
 
+    /**
+     * @return
+     */
     @NonNull
     public String getMainFile() {
         return mMainFile;
     }
 
+    /**
+     * @param path
+     */
     void setMainFile(@NonNull String path) {
         mMainFile = path;
     }
 
+    /**
+     * @return
+     */
     @NonNull
     public List<String> getSecondaryFiles() {
         return mSecondaryFiles;
     }
 
+    /**
+     * @param path
+     */
     void addSecondaryFile(@NonNull String path) {
         mSecondaryFiles.add(path);
     }
 
+    /**
+     * @return
+     */
     @NonNull
     public List<String> getOutputFiles() {
         return mOutputFiles;
     }
 
+    /**
+     * @param path
+     */
     void addOutputFile(@NonNull String path) {
         mOutputFiles.add(path);
     }
 
+    /**
+     * @param path
+     */
     public void addSecondaryOutputFile(@NonNull String path) {
         mSecondaryOutputFiles.add(path);
     }
 
+    /**
+     * @return
+     */
     @NonNull
     public List<String> getSecondaryOutputFiles() {
         return mSecondaryOutputFiles;
     }
 
+    /**
+     * @return
+     */
     @Override
     public String toString() {
         return "DependencyData{" +
@@ -177,7 +225,25 @@ public class DependencyData {
                 '}';
     }
 
+    /**
+     *
+     */
     private enum ParseMode {
-        OUTPUT, MAIN, SECONDARY, DONE
+        /**
+         *
+         */
+        OUTPUT,
+        /**
+         *
+         */
+        MAIN,
+        /**
+         *
+         */
+        SECONDARY,
+        /**
+         *
+         */
+        DONE
     }
 }

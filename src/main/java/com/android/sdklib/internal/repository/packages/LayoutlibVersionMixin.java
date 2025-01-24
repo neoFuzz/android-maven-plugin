@@ -87,11 +87,11 @@ public class LayoutlibVersionMixin implements ILayoutlibVersion {
 
     /**
      * Returns the layoutlib version.
-     * <p/>
+     * <p>
      * The first integer is the API of layoublib, which should be > 0.
      * It will be equal to {@link #LAYOUTLIB_API_NOT_SPECIFIED} (0) if the layoutlib
      * version isn't specified.
-     * <p/>
+     * <p>
      * The second integer is the revision for that given API. It is >= 0
      * and works as a minor revision number, incremented for the same API level.
      *

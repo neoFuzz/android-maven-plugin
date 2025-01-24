@@ -143,7 +143,7 @@ public class PlatformPackage extends MinToolsPackage
      * must have {@link IAndroidTarget#isPlatform()} true) from the {@link SdkManager}.
      * This is used to list local SDK folders in which case there is one archive which
      * URL is the actual target location.
-     * <p/>
+     * <p>
      * By design, this creates a package with one and only one archive.
      */
     public static Package create(@NonNull IAndroidTarget target, @Nullable Properties props) {
@@ -205,11 +205,11 @@ public class PlatformPackage extends MinToolsPackage
 
     /**
      * Returns the layoutlib version. Mandatory starting with repository XSD rev 4.
-     * <p/>
+     * <p>
      * The first integer is the API of layoublib, which should be > 0.
      * It will be equal to {@link ILayoutlibVersion#LAYOUTLIB_API_NOT_SPECIFIED} (0)
      * if the layoutlib version isn't specified.
-     * <p/>
+     * <p>
      * The second integer is the revision for that given API. It is >= 0
      * and works as a minor revision number, incremented for the same API level.
      *
@@ -223,7 +223,7 @@ public class PlatformPackage extends MinToolsPackage
     /**
      * Returns a string identifier to install this package from the command line.
      * For platforms, we use "android-N" where N is the API or the preview codename.
-     * <p/>
+     * <p>
      * {@inheritDoc}
      */
     @Override
@@ -233,7 +233,7 @@ public class PlatformPackage extends MinToolsPackage
 
     /**
      * Returns a description of this package that is suitable for a list display.
-     * <p/>
+     * <p>
      * {@inheritDoc}
      */
     @Override
@@ -312,7 +312,7 @@ public class PlatformPackage extends MinToolsPackage
     /**
      * Computes a potential installation folder if an archive of this package were
      * to be installed right away in the given SDK root.
-     * <p/>
+     * <p>
      * A platform package is typically installed in SDK/platforms/android-"version".
      * However if we can find a different directory under SDK/platform that already
      * has this platform version installed, we'll use that one.

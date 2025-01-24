@@ -53,6 +53,8 @@ public class ArchiveReplacement implements IDescription {
     /**
      * Returns the "new archive" to be installed.
      * This <em>may</em> be null for missing archives.
+     *
+     * @return The new archive to be installed.
      */
     public Archive getNewArchive() {
         return mNewArchive;
@@ -61,6 +63,8 @@ public class ArchiveReplacement implements IDescription {
     /**
      * Returns an optional local archive that the new one will replace.
      * Can be null if this archive does not replace anything.
+     *
+     * @return The local archive that will be replaced, or null.
      */
     public Archive getReplaced() {
         return mReplaced;
@@ -68,7 +72,9 @@ public class ArchiveReplacement implements IDescription {
 
     /**
      * Returns the long description of the parent package of the new archive, if not null.
-     * Otherwise returns an empty string.
+     * Otherwise, returns an empty string.
+     *
+     * @return The long description of the parent package, or an empty string.
      */
     @Override
     public String getLongDescription() {
@@ -83,7 +89,9 @@ public class ArchiveReplacement implements IDescription {
 
     /**
      * Returns the short description of the parent package of the new archive, if not null.
-     * Otherwise returns an empty string.
+     * Otherwise, returns an empty string.
+     *
+     * @return The short description of the parent package, or an empty string.
      */
     @Override
     public String getShortDescription() {
@@ -98,10 +106,12 @@ public class ArchiveReplacement implements IDescription {
 
     /**
      * Returns the short description of the parent package of the new archive, if not null.
-     * Otherwise returns the default Object toString result.
-     * <p/>
+     * Otherwise, returns the default Object toString result.
+     * <p>
      * This is mostly helpful for debugging. For UI display, use the {@link IDescription}
      * interface.
+     *
+     * @return The short description of the parent package, or the default Object toString result.
      */
     @Override
     public String toString() {

@@ -26,29 +26,81 @@ import com.google.common.base.Objects;
 
 import java.io.Serial;
 
+/**
+ * Default implementation of the {@link BuildType} interface.
+ */
 public class DefaultBuildType extends BaseConfigImpl implements BuildType {
+    /**
+     * Serial version UID for serialization purposes.
+     */
     @Serial
     private static final long serialVersionUID = 1L;
 
+    /**
+     * Name of this build type.
+     */
     private final String mName;
+    /**
+     * Whether this build type should generate a debuggable apk.
+     */
     private boolean mDebuggable = false;
+    /**
+     * Whether this build type should generate a pseudo-localized apk.
+     */
     private boolean mPseudoLocalesEnabled = false;
+    /**
+     * Whether this build type should generate a debuggable apk.
+     */
     private boolean mTestCoverageEnabled = false;
+    /**
+     * Whether this build type should generate a debuggable apk.
+     */
     private boolean mJniDebuggable = false;
+    /**
+     * Whether this build type should generate a debuggable apk.
+     */
     private boolean mRenderscriptDebuggable = false;
+    /**
+     * The optimization level to use when generating a debuggable apk.
+     */
     private int mRenderscriptOptimLevel = 3;
+    /**
+     * The application id suffix
+     */
     private String mApplicationIdSuffix = null;
+    /**
+     * The version name suffix
+     */
     private String mVersionNameSuffix = null;
+    /**
+     * Whether this build type should be minified.
+     */
     private boolean mMinifyEnabled = false;
+    /**
+     * The signing configuration
+     */
     private transient SigningConfig mSigningConfig = null;
+    /**
+     * Whether this build type should be embedded with micro app
+     */
     private boolean mEmbedMicroApp = true;
 
+    /**
+     * Whether this build type should be zip-aligned
+     */
     private boolean mZipAlignEnabled = true;
 
+    /**
+     * @param name the name of the build type
+     */
     public DefaultBuildType(@NonNull String name) {
         mName = name;
     }
 
+    /**
+     * @param that the build type to copy from
+     * @return a new build type with the same data as <code>that</code>
+     */
     public DefaultBuildType initWith(DefaultBuildType that) {
         _initWith(that);
 
@@ -70,6 +122,8 @@ public class DefaultBuildType extends BaseConfigImpl implements BuildType {
 
     /**
      * Name of this build type.
+     *
+     * @return the name
      */
     @Override
     @NonNull
@@ -79,6 +133,9 @@ public class DefaultBuildType extends BaseConfigImpl implements BuildType {
 
     /**
      * Whether this build type should generate a debuggable apk.
+     *
+     * @param debuggable whether this build type should generate a debuggable apk.
+     * @return true if debuggable, false otherwise
      */
     @NonNull
     public BuildType setDebuggable(boolean debuggable) {
@@ -88,6 +145,8 @@ public class DefaultBuildType extends BaseConfigImpl implements BuildType {
 
     /**
      * Whether this build type should generate a debuggable apk.
+     *
+     * @return true if debuggable, false otherwise
      */
     @Override
     public boolean isDebuggable() {
@@ -109,12 +168,17 @@ public class DefaultBuildType extends BaseConfigImpl implements BuildType {
      *   }
      * }
      * </pre>
+     *
+     * @return true if test coverage is enabled, false otherwise
      */
     @Override
     public boolean isTestCoverageEnabled() {
         return mTestCoverageEnabled;
     }
 
+    /**
+     * @param testCoverageEnabled whether test coverage is enabled for this build type
+     */
     public void setTestCoverageEnabled(boolean testCoverageEnabled) {
         mTestCoverageEnabled = testCoverageEnabled;
     }
@@ -124,18 +188,26 @@ public class DefaultBuildType extends BaseConfigImpl implements BuildType {
      *
      * <p>If enabled, 2 fake pseudo locales (en-XA and ar-XB) will be added to the APK to help
      * test internationalization support in the app.
+     *
+     * @return true if pseudo locales are enabled, false otherwise
      */
     @Override
     public boolean isPseudoLocalesEnabled() {
         return mPseudoLocalesEnabled;
     }
 
+    /**
+     * @param pseudoLocalesEnabled whether to generate pseudo locale in the APK
+     */
     public void setPseudoLocalesEnabled(boolean pseudoLocalesEnabled) {
         mPseudoLocalesEnabled = pseudoLocalesEnabled;
     }
 
     /**
      * Whether this build type is configured to generate an APK with debuggable native code.
+     *
+     * @param jniDebugBuild whether jni debug is enabled
+     * @return the build type with jni debug enabled
      */
     @NonNull
     public BuildType setJniDebuggable(boolean jniDebugBuild) {
@@ -145,6 +217,8 @@ public class DefaultBuildType extends BaseConfigImpl implements BuildType {
 
     /**
      * Whether this build type is configured to generate an APK with debuggable native code.
+     *
+     * @return if jni debug is enabled
      */
     @Override
     public boolean isJniDebuggable() {
@@ -153,6 +227,8 @@ public class DefaultBuildType extends BaseConfigImpl implements BuildType {
 
     /**
      * Whether the build type is configured to generate an apk with debuggable RenderScript code.
+     *
+     * @return if renderscript debug is enabled
      */
     @Override
     public boolean isRenderscriptDebuggable() {
@@ -161,6 +237,9 @@ public class DefaultBuildType extends BaseConfigImpl implements BuildType {
 
     /**
      * Whether the build type is configured to generate an apk with debuggable RenderScript code.
+     *
+     * @param renderscriptDebugBuild whether renderscript debug is enabled
+     * @return the build type with renderscript debug enabled
      */
     public BuildType setRenderscriptDebuggable(boolean renderscriptDebugBuild) {
         mRenderscriptDebuggable = renderscriptDebugBuild;
@@ -169,6 +248,8 @@ public class DefaultBuildType extends BaseConfigImpl implements BuildType {
 
     /**
      * Optimization level to use by the renderscript compiler.
+     *
+     * @return the optimization level
      */
     @Override
     public int getRenderscriptOptimLevel() {
@@ -177,6 +258,8 @@ public class DefaultBuildType extends BaseConfigImpl implements BuildType {
 
     /**
      * Optimization level to use by the renderscript compiler.
+     *
+     * @param renderscriptOptimLevel the optimization level
      */
     public void setRenderscriptOptimLevel(int renderscriptOptimLevel) {
         mRenderscriptOptimLevel = renderscriptOptimLevel;
@@ -184,6 +267,9 @@ public class DefaultBuildType extends BaseConfigImpl implements BuildType {
 
     /**
      * Application id suffix applied to this build type.
+     *
+     * @param applicationIdSuffix the application id suffix
+     * @return the build type with the application id suffix
      */
     @NonNull
     public BuildType setApplicationIdSuffix(@Nullable String applicationIdSuffix) {
@@ -193,6 +279,8 @@ public class DefaultBuildType extends BaseConfigImpl implements BuildType {
 
     /**
      * Application id suffix applied to this build type.
+     *
+     * @return the application id suffix
      */
     @Override
     @Nullable
@@ -202,6 +290,9 @@ public class DefaultBuildType extends BaseConfigImpl implements BuildType {
 
     /**
      * Version name suffix.
+     *
+     * @param versionNameSuffix the version name suffix
+     * @return the build type with the version name suffix
      */
     @NonNull
     public BuildType setVersionNameSuffix(@Nullable String versionNameSuffix) {
@@ -211,6 +302,8 @@ public class DefaultBuildType extends BaseConfigImpl implements BuildType {
 
     /**
      * Version name suffix.
+     *
+     * @return the version name suffix
      */
     @Override
     @Nullable
@@ -220,6 +313,9 @@ public class DefaultBuildType extends BaseConfigImpl implements BuildType {
 
     /**
      * Whether Minify is enabled for this build type.
+     *
+     * @param enabled whether minify is enabled for this build type
+     * @return the build type with minify enabled
      */
     @NonNull
     public BuildType setMinifyEnabled(boolean enabled) {
@@ -229,6 +325,8 @@ public class DefaultBuildType extends BaseConfigImpl implements BuildType {
 
     /**
      * Whether Minify is enabled for this build type.
+     *
+     * @return if minify is enabled
      */
     @Override
     public boolean isMinifyEnabled() {
@@ -238,6 +336,9 @@ public class DefaultBuildType extends BaseConfigImpl implements BuildType {
 
     /**
      * Whether zipalign is enabled for this build type.
+     *
+     * @param zipAlign whether zipalign is enabled for this build type
+     * @return the build type with zipAlign enabled
      */
     @NonNull
     public BuildType setZipAlignEnabled(boolean zipAlign) {
@@ -247,6 +348,8 @@ public class DefaultBuildType extends BaseConfigImpl implements BuildType {
 
     /**
      * Whether zipalign is enabled for this build type.
+     *
+     * @return true if zipalign is enabled, false otherwise
      */
     @Override
     public boolean isZipAlignEnabled() {
@@ -255,6 +358,9 @@ public class DefaultBuildType extends BaseConfigImpl implements BuildType {
 
     /**
      * Sets the signing configuration. e.g.: {@code signingConfig signingConfigs.myConfig}
+     *
+     * @param signingConfig the signing configuration
+     * @return the signing configuration
      */
     @NonNull
     public BuildType setSigningConfig(@Nullable SigningConfig signingConfig) {
@@ -264,6 +370,8 @@ public class DefaultBuildType extends BaseConfigImpl implements BuildType {
 
     /**
      * Sets the signing configuration. e.g.: {@code signingConfig signingConfigs.myConfig}
+     *
+     * @return the signing configuration
      */
     @Override
     @Nullable
@@ -282,16 +390,26 @@ public class DefaultBuildType extends BaseConfigImpl implements BuildType {
      *   wearApp project(':wear:base') // applies to all other variants
      * }
      * </pre>
+     *
+     * @return whether a linked Android Wear app should be embedded in variant using this build type
      */
     @Override
     public boolean isEmbedMicroApp() {
         return mEmbedMicroApp;
     }
 
+    /**
+     * @param embedMicroApp whether a linked Android Wear app should be embedded in variant using
+     *                      this build type
+     */
     public void setEmbedMicroApp(boolean embedMicroApp) {
         mEmbedMicroApp = embedMicroApp;
     }
 
+    /**
+     * @param o the object to compare with
+     * @return true if the objects are equal, false otherwise
+     */
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -315,6 +433,9 @@ public class DefaultBuildType extends BaseConfigImpl implements BuildType {
                 Objects.equal(mSigningConfig, buildType.mSigningConfig);
     }
 
+    /**
+     * @return a hash code value for this object.
+     */
     @Override
     public int hashCode() {
         return Objects.hashCode(
@@ -334,6 +455,9 @@ public class DefaultBuildType extends BaseConfigImpl implements BuildType {
                 mEmbedMicroApp);
     }
 
+    /**
+     * @return a string suitable for debugging purposes.
+     */
     @Override
     @NonNull
     public String toString() {

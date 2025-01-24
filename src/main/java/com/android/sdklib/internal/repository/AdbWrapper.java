@@ -22,7 +22,7 @@ import java.io.File;
 import java.io.IOException;
 
 /**
- * A lightweight wrapper to start & stop ADB.
+ * A lightweight wrapper to start &amp; stop ADB.
  * This is <b>specific</b> to the SDK Manager install process.
  *
  * @deprecated com.android.sdklib.internal.repository has moved into Studio as

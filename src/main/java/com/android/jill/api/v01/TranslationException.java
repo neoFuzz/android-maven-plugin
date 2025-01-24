@@ -43,7 +43,7 @@ public class TranslationException extends Exception {
 
     /**
      * @param message the detail message. The detail message is saved for later retrieval by the
-     * @param cause the cause (which is saved for later retrieval by the {@link #getCause()} method).
+     * @param cause   the cause (which is saved for later retrieval by the {@link #getCause()} method).
      */
     public TranslationException(@Nonnull String message, @Nonnull Throwable cause) {
         super(message, cause);

@@ -65,16 +65,16 @@ public class RemoteSdk {
 
     /**
      * Fetches the remote list of packages.
-     * <p/>
+     * <p>
      * This respects the settings from the {@link SettingsController} which
      * dictates whether the {@link DownloadCache} is used and whether HTTP
      * is enforced over HTTPS.
-     * <p/>
+     * <p>
      * The call may block on network access. Callers will likely want to invoke this
      * from a thread and make sure the logger is thread-safe with regard to UI updates.
      *
      * @param sources The sources to download from.
-     * @param logger  A logger to report status & progress.
+     * @param logger  A logger to report status &amp; progress.
      * @return A non-null map of {@link PkgType} to {@link RemotePkgInfo}
      * describing the remote packages available for install/download.
      */
@@ -123,7 +123,7 @@ public class RemoteSdk {
      * Returns the {@link SdkSources} object listing all sources to load from.
      * This includes the main {@code repository.xml}, the main {@code addon.xml} as well as all the
      * add-ons or sys-img XMLs listed in the {@code addons-list.xml}.
-     * <p/>
+     * <p>
      * The method caches the last access and only refresh it if data is either not
      * present or the expiration time has be passed.
      *

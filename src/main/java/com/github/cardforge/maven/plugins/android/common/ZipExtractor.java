@@ -6,7 +6,6 @@ import org.apache.maven.plugin.logging.Log;
 import org.codehaus.plexus.archiver.ArchiverException;
 import org.codehaus.plexus.archiver.UnArchiver;
 import org.codehaus.plexus.archiver.zip.ZipUnArchiver;
-
 import org.codehaus.plexus.components.io.fileselectors.FileSelector;
 
 import java.io.File;

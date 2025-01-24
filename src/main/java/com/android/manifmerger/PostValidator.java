@@ -20,14 +20,13 @@ import com.android.SdkConstants;
 import com.android.annotations.NonNull;
 import com.android.annotations.VisibleForTesting;
 import com.android.utils.XmlUtils;
-
-import java.util.*;
-
 import com.google.common.base.Preconditions;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+
+import java.util.*;
 
 import static com.android.manifmerger.Actions.ActionType;
 
@@ -35,13 +34,13 @@ import static com.android.manifmerger.Actions.ActionType;
  * Validator that runs post merging activities and verifies that all "tools:" instructions
  * triggered an action by the merging tool.
  * <p>
- * <p>
  * This is primarily to catch situations like a user entered a tools:remove="foo" directory on one
  * of its elements and that particular attribute was never removed during the merges possibly
  * indicating an unforeseen change of configuration.
- * <p>
+ * </p>
  * <p>
  * Most of the output from this validation should be warnings.
+ * </p>
  */
 public class PostValidator {
     private PostValidator() {
@@ -305,16 +304,16 @@ public class PostValidator {
             }
         } else if ((operationType == NodeOperationType.REMOVE || operationType == NodeOperationType.REMOVE_ALL) &&
                 !isNodeOperationPresent(xmlElement, actions, ActionType.REJECTED)) {
-                // we should find at least one rejected twin.
-                xmlElement.addMessage(mergingReport, MergingReport.Record.Severity.WARNING,
-                        String.format(
-                                "%1$s was tagged at %2$s:%3$d to remove other declarations "
-                                        + "but no other declaration present",
-                                xmlElement.getId(),
-                                xmlElement.getDocument().getSourceFile().print(true),
-                                xmlElement.getPosition().getStartLine() + 1
-                        ));
-            }
+            // we should find at least one rejected twin.
+            xmlElement.addMessage(mergingReport, MergingReport.Record.Severity.WARNING,
+                    String.format(
+                            "%1$s was tagged at %2$s:%3$d to remove other declarations "
+                                    + "but no other declaration present",
+                            xmlElement.getId(),
+                            xmlElement.getDocument().getSourceFile().print(true),
+                            xmlElement.getPosition().getStartLine() + 1
+                    ));
+        }
 
         validateAndroidAttributes(xmlElement, mergingReport);
         for (XmlElement child : xmlElement.getMergeableElements()) {

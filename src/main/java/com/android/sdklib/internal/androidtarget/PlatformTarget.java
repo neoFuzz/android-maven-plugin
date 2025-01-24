@@ -159,7 +159,7 @@ public final class PlatformTarget implements IAndroidTarget {
 
     /**
      * {@inheritDoc}
-     * <p/>
+     * <p>
      * For Platform, the vendor name is always "Android".
      *
      * @see com.android.sdklib.IAndroidTarget#getVendor()
@@ -315,7 +315,7 @@ public final class PlatformTarget implements IAndroidTarget {
     /**
      * <p>
      * Currently always return a fixed list with "android.test.runner" in it.
-     * <p/>
+     * <p>
      * {@inheritDoc}
      */
     @Override

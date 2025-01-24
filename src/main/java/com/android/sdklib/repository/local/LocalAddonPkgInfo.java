@@ -431,7 +431,7 @@ public class LocalAddonPkgInfo extends LocalPlatformPkgInfo {
      * If none are found but the directory exists and is not empty, assume it's a legacy
      * arm eabi system image.
      * If any given API appears twice or more, the first occurrence wins.
-     * <p/>
+     * <p>
      * Note that it's OK for an add-on to have no system-images at all, since it can always
      * rely on the ones from its base platform.
      *

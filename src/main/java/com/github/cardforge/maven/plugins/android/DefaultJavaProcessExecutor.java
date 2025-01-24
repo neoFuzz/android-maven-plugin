@@ -33,8 +33,14 @@ import java.util.Map;
  * Simple implementation of ProcessExecutor, using the standard Java Process(Builder) API.
  */
 public class DefaultJavaProcessExecutor implements JavaProcessExecutor {
+    /**
+     * {@link ILogger} instance to use when logging process executions
+     */
     private final ILogger mLogger;
 
+    /**
+     * @param logger the logger to use
+     */
     public DefaultJavaProcessExecutor(ILogger logger) {
         mLogger = logger;
     }
@@ -112,6 +118,11 @@ public class DefaultJavaProcessExecutor implements JavaProcessExecutor {
         return process.waitFor();
     }
 
+    /**
+     * @param processInfo          the specification of what to run.
+     * @param processOutputHandler the output handler
+     * @return the result of the execution
+     */
     @NonNull
     @Override
     public ProcessResult execute(

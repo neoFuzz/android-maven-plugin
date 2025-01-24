@@ -1,6 +1,8 @@
 package com.github.cardforge.maven.plugins.android.configuration;
 
 
+import com.github.cardforge.maven.plugins.android.standalonemojos.UIAutomatorMojo;
+
 /**
  * Configuration for the ui automator test runs. This class is only the definition of the parameters that are shadowed
  * in {@link UIAutomatorMojo} and used there.
@@ -9,51 +11,51 @@ package com.github.cardforge.maven.plugins.android.configuration;
  */
 public class UIAutomator {
     /**
-     * Mirror of {@link UIAutomatorMojo#testSkip}
+     * Mirror of {@link UIAutomatorMojo}#testSkip
      */
     private Boolean skip;
     /**
-     * Mirror of {@link UIAutomatorMojo#jarFile}
+     * Mirror of {@link UIAutomatorMojo}#jarFile
      */
     private String jarFile;
     /**
-     * Mirror of {@link UIAutomatorMojo#testClassOrMethods}
+     * Mirror of {@link UIAutomatorMojo}#testClassOrMethods
      */
     private String[] testClassOrMethods;
     /**
-     * Mirror of {@link UIAutomatorMojo#noHup}
+     * Mirror of {@link UIAutomatorMojo}#noHup
      */
     private Boolean noHup = false;
     /**
-     * Mirror of {@link UIAutomatorMojo#debug}
+     * Mirror of {@link UIAutomatorMojo}#debug
      */
     private Boolean debug = false;
     /**
-     * Mirror of {@link UIAutomatorMojo#useDump}
+     * Mirror of {@link UIAutomatorMojo}#useDump
      */
     private Boolean useDump = false;
     /**
-     * Mirror of {@link UIAutomatorMojo#dumpFilePath}
+     * Mirror of {@link UIAutomatorMojo}#dumpFilePath
      */
     private String dumpFilePath;
     /**
-     * Mirror of {@link UIAutomatorMojo#createReport}
+     * Mirror of {@link UIAutomatorMojo}#createReport
      */
     private Boolean createReport;
     /**
-     * Mirror of {@link UIAutomatorMojo#reportSuffix}
+     * Mirror of {@link UIAutomatorMojo}#reportSuffix
      */
     private String reportSuffix;
     /**
-     * Mirror of {@link UIAutomatorMojo#takeScreenshotOnFailure}
+     * Mirror of {@link UIAutomatorMojo}#takeScreenshotOnFailure
      */
     private Boolean takeScreenshotOnFailure;
     /**
-     * Mirror of {@link UIAutomatorMojo#screenshotsPathOnDevice}
+     * Mirror of {@link UIAutomatorMojo}#screenshotsPathOnDevice
      */
     private String screenshotsPathOnDevice;
     /**
-     * Mirror of {@link UIAutomatorMojo#parameterPrefix}
+     * Mirror of {@link UIAutomatorMojo}#parameterPrefix
      */
     private String propertiesKeyPrefix;
 

@@ -21,7 +21,7 @@ import com.android.annotations.NonNull;
 
 /**
  * Package revision number composed of a <em>single</em> major revision.
- * <p/>
+ * <p>
  * Contrary to a {@link FullRevision}, a {@link MajorRevision} does not
  * provide minor, micro and preview revision numbers -- these are all
  * set to zero.

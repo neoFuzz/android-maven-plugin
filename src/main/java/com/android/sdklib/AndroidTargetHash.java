@@ -38,7 +38,7 @@ public abstract class AndroidTargetHash {
      * String to compute hash for add-on targets. <br/>
      * Format is {@code vendor:name:apiVersion}. <br/>
      *
-     * <em>Important<em/>: the vendor and name components are the display strings, not the
+     * <em>Important</em>: the vendor and name components are the display strings, not the
      * newer id strings.
      */
     public static final String ADD_ON_FORMAT = "%s:%s:%s"; //$NON-NLS-1$
@@ -48,6 +48,9 @@ public abstract class AndroidTargetHash {
      */
     static final String PLATFORM_HASH = PLATFORM_HASH_PREFIX + "%s";
 
+    /**
+     * Non-instantiable.
+     */
     private AndroidTargetHash() {
         // not instantiable
     }
@@ -97,6 +100,10 @@ public abstract class AndroidTargetHash {
         return null;
     }
 
+    /**
+     * @param hashString hash string to check
+     * @return AndroidVersion object if the hash string represents a platform, or null
+     */
     @Nullable
     private static AndroidVersion checkAndroidVersion(@NonNull String hashString) {
         if (!hashString.isEmpty() && Character.isDigit(hashString.charAt(0))) {
@@ -111,6 +118,10 @@ public abstract class AndroidTargetHash {
         return null;
     }
 
+    /**
+     * @param hashString hash string to check
+     * @return Addon's AndroidVersion
+     */
     @Nullable
     public static AndroidVersion getAddOnVersion(@NonNull String hashString) {
         List<String> parts = Splitter.on(':').splitToList(hashString);
@@ -130,6 +141,8 @@ public abstract class AndroidTargetHash {
     /**
      * Gets the API level from a hash string, either a platform version or add-on version.
      *
+     * @param hashString A non-null hash string.
+     * @return Hash's version
      * @see #getAddOnVersion(String)
      * @see #getPlatformVersion(String)
      */

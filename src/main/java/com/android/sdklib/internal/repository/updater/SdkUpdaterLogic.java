@@ -33,9 +33,10 @@ import java.util.*;
 /**
  * The logic to compute which packages to install, based on the choices
  * made by the user. This adds required packages as needed.
- * <p/>
+ * <p>
  * When the user doesn't provide a selection, looks at local package to find
  * those that can be updated and compute dependencies too.
+ * </p>
  *
  * @deprecated com.android.sdklib.internal.repository has moved into Studio as
  * com.android.tools.idea.sdk.remote.internal.
@@ -181,12 +182,12 @@ public class SdkUpdaterLogic {
     /**
      * Finds new packages that the user does not have in his/her local SDK
      * and adds them to the list of archives to install.
-     * <p/>
+     * <p>
      * The default is to only find "new" platforms, that is anything more
      * recent than the highest platform currently installed.
      * A side effect is that for an empty SDK install this will list *all*
      * platforms available (since there's no "highest" installed platform.)
-     * <p/>
+     * <p>
      * This also adds "silent" dependencies. For example the user probably
      * needs to have at least one version of the build-tools package although
      * there is nothing that directly depends on it. So if the user doesn't have
@@ -382,7 +383,7 @@ public class SdkUpdaterLogic {
     /**
      * Create a array of {@link ArchiveInfo} based on all local (already installed)
      * packages. The array is always non-null but may be empty.
-     * <p/>
+     * <p>
      * The local {@link ArchiveInfo} are guaranteed to have one non-null archive
      * that you can retrieve using {@link ArchiveInfo#getNewArchive()}.
      */
@@ -412,10 +413,10 @@ public class SdkUpdaterLogic {
 
     /**
      * Find suitable updates to all current local packages.
-     * <p/>
+     * <p>
      * Returns a list of potential updates for *existing* packages. This does NOT solve
      * dependencies for the new packages.
-     * <p/>
+     * <p>
      * Always returns a non-null collection, which can be empty.
      */
     private Collection<Archive> findUpdates(
@@ -1332,12 +1333,12 @@ public class SdkUpdaterLogic {
 
     /**
      * Fetch all remote packages only if really needed.
-     * <p/>
+     * <p>
      * This method takes a list of sources. Each source is only fetched once -- that is each
      * source keeps the list of packages that we fetched from the remote XML file. If the list
      * is null, it means this source has never been fetched so we'll do it once here. Otherwise
      * we rely on the cached list of packages from this source.
-     * <p/>
+     * <p>
      * This method also takes a remote package list as input, which it will fill out.
      * If a source has already been fetched, we'll add its packages to the remote package list
      * if they are not already present. Otherwise, the source will be fetched and the packages
@@ -1426,11 +1427,11 @@ public class SdkUpdaterLogic {
     /**
      * A {@link LocalArchiveInfo} is an {@link ArchiveInfo} that wraps an already installed
      * "local" package/archive.
-     * <p/>
+     * <p>
      * In this case, the "new Archive" is still expected to be non null and the
      * "replaced Archive" is null. Installed archives are always accepted and never
      * rejected.
-     * <p/>
+     * <p>
      * Dependencies are not set.
      */
     private static class LocalArchiveInfo extends ArchiveInfo {
@@ -1459,9 +1460,9 @@ public class SdkUpdaterLogic {
     /**
      * A {@link MissingPlatformArchiveInfo} is an {@link ArchiveInfo} that represents a
      * package/archive that we <em>really</em> need as a dependency but that we don't have.
-     * <p/>
+     * <p>
      * This is currently used for addons and extras in case we can't find a matching base platform.
-     * <p/>
+     * <p>
      * This kind of archive has specific properties: the new archive to install is null,
      * there are no dependencies and no archive is being replaced. The info can never be
      * accepted and is always rejected.
@@ -1506,10 +1507,10 @@ public class SdkUpdaterLogic {
     /**
      * A {@link MissingArchiveInfo} is an {@link ArchiveInfo} that represents a
      * package/archive that we <em>really</em> need as a dependency but that we don't have.
-     * <p/>
+     * <p>
      * This is currently used for extras in case we can't find a matching tool revision
      * or when a platform-tool is missing.
-     * <p/>
+     * <p>
      * This kind of archive has specific properties: the new archive to install is null,
      * there are no dependencies and no archive is being replaced. The info can never be
      * accepted and is always rejected.

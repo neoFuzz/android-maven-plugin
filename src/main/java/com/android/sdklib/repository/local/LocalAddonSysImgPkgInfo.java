@@ -31,7 +31,7 @@ import java.util.Properties;
  * Local add-on system-image package, for a given addon's {@link AndroidVersion} and given ABI.
  * The system-image tag is the add-on name.
  * The package itself has a major revision.
- * There should be only one for a given android platform version & ABI.
+ * There should be only one for a given android platform version &amp; ABI.
  */
 public class LocalAddonSysImgPkgInfo extends LocalPkgInfo {
 

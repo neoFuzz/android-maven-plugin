@@ -98,7 +98,7 @@ public class PlatformToolPackage extends FullRevisionPackage {
      * Manually create a new package with one archive and the given attributes or properties.
      * This is used to create packages from local directories in which case there must be
      * one archive which URL is the actual target location.
-     * <p/>
+     * <p>
      * By design, this creates a package with one and only one archive.
      */
     public static Package create(
@@ -184,7 +184,7 @@ public class PlatformToolPackage extends FullRevisionPackage {
      * Returns a string identifier to install this package from the command line.
      * For platform-tools, we use "platform-tools" or "platform-tools-preview" since
      * this package type is unique.
-     * <p/>
+     * <p>
      * {@inheritDoc}
      */
     @Override
@@ -198,7 +198,7 @@ public class PlatformToolPackage extends FullRevisionPackage {
 
     /**
      * Returns a description of this package that is suitable for a list display.
-     * <p/>
+     * <p>
      * {@inheritDoc}
      */
     @Override
@@ -252,7 +252,7 @@ public class PlatformToolPackage extends FullRevisionPackage {
     /**
      * Computes a potential installation folder if an archive of this package were
      * to be installed right away in the given SDK root.
-     * <p/>
+     * <p>
      * A "platform-tool" package should always be located in SDK/platform-tools.
      * There can be only one installed at once.
      *

@@ -21,14 +21,16 @@ import com.android.sdklib.repository.RepoConstants;
 /**
  * Interface used to decorate a {@link Package} that has a dependency
  * on a specific API level, e.g. which XML has a {@code <api-level>} element.
- * <p/>
+ * <p>
  * For example an add-on package requires a platform with an exact API level to be installed
  * at the same time.
  * This is not the same as {@link IMinApiLevelDependency} which requests that a platform with at
  * least the requested API level be present or installed at the same time.
- * <p/>
+ * </p>
+ * <p>
  * Such package requires the {@code <api-level>} element. It is not an optional
  * property, however it can be invalid.
+ * </p>
  *
  * @deprecated com.android.sdklib.internal.repository has moved into Studio as
  * com.android.tools.idea.sdk.remote.internal.
@@ -45,9 +47,12 @@ public interface IExactApiLevelDependency {
     /**
      * Returns the exact API level required by this package, if > 0,
      * or {@link #API_LEVEL_INVALID} if the value was missing.
-     * <p/>
+     * <p>
      * This attribute is mandatory and should not be normally missing.
      * It can only happen when dealing with an invalid repository XML.
+     *
+     * @return The exact API level required by this package, if > 0,
+     * or {@link #API_LEVEL_INVALID} if the value was missing.
      */
     int getExactApiLevel();
 }

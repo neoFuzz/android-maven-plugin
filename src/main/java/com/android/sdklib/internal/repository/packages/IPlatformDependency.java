@@ -21,13 +21,15 @@ import com.android.sdklib.AndroidVersion;
 /**
  * Interface used to decorate a {@link Package} that has a dependency
  * on a specific platform (API level and/or code name).
- * <p/>
+ * <p>
  * A package that has this dependency can only be installed if a platform with at least the
  * requested API level is present or installed at the same time.
- * <p/>
+ * </p>
+ * <p>
  * Note that although this interface looks like {@link IAndroidVersionProvider}, it does
  * not convey the same semantic since {@link IAndroidVersionProvider} does <em>not</em>
  * imply any dependency being a limiting factor as far as installation is concerned.
+ * </p>
  *
  * @deprecated com.android.sdklib.internal.repository has moved into Studio as
  * com.android.tools.idea.sdk.remote.internal.
@@ -37,6 +39,8 @@ public interface IPlatformDependency {
 
     /**
      * Returns the version of the platform dependency of this package.
+     *
+     * @return The version of the platform dependency of this package.
      */
     AndroidVersion getAndroidVersion();
 

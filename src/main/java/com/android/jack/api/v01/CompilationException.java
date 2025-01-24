@@ -24,21 +24,37 @@ import java.io.Serial;
  * reported, so it is safe to ignore its message.
  */
 public class CompilationException extends Exception {
+    /**
+     * Serial version UID for serialization
+     */
     @Serial
     private static final long serialVersionUID = 1L;
 
+    /**
+     * Default constructor
+     */
     public CompilationException() {
         super();
     }
 
+    /**
+     * @param message display message
+     */
     public CompilationException(@Nonnull String message) {
         super(message);
     }
 
+    /**
+     * @param message message of the exception
+     * @param cause   the cause of the exception
+     */
     public CompilationException(@Nonnull String message, @Nonnull Throwable cause) {
         super(message, cause);
     }
 
+    /**
+     * @param cause the cause of the exception
+     */
     public CompilationException(@Nonnull Throwable cause) {
         super(cause);
     }

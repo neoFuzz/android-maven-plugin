@@ -105,12 +105,12 @@ public class PackageLoader {
     /**
      * Loads all packages from the remote repository.
      * This runs in an {@link ITask}. The call is blocking.
-     * <p/>
+     * <p>
      * The callback is called with each set of {@link PkgItem} found in each source.
      * The caller is responsible to accumulate the packages given to the callback
      * after each source is finished loaded. In return the callback tells the loader
      * whether to continue loading sources.
-     * <p/>
+     * <p>
      * Normally this method doesn't access the remote source if it's already
      * been loaded in the in-memory source (e.g. don't fetch twice).
      *
@@ -186,19 +186,19 @@ public class PackageLoader {
      * and executes the given {@link IAutoInstallTask} on the current package list.
      * That is for each package known, the install task is queried to find if
      * the package is the one to be installed or updated.
-     * <p/>
+     * <p>
      * - If an already installed package is accepted by the task, it is returned. <br/>
      * - If a new package (remotely available but not installed locally) is accepted,
      * the user will be <em>prompted</em> for permission to install it. <br/>
      * - If an existing package has updates, the install task will be accept if it
      * accepts one of the updating packages, and if yes the the user will be
      * <em>prompted</em> for permission to install it. <br/>
-     * <p/>
+     * <p>
      * Only one package can be accepted, after which the task is completed.
      * There is no direct return value, {@link IAutoInstallTask#setResult} is called on the
      * result of the accepted package.
      * When the task is completed, {@link IAutoInstallTask#taskCompleted()} is called.
-     * <p/>
+     * <p>
      * The call is blocking. Although the name says "Task", this is not an {@link ITask}
      * running in its own thread but merely a synchronous call.
      *
@@ -401,15 +401,16 @@ public class PackageLoader {
     /**
      * Interface for the callback called by
      * {@link PackageLoader#loadPackages(boolean, ISourceLoadedCallback)}.
-     * <p/>
+     * <p>
      * After processing each source, the package loader calls {@link #onUpdateSource}
      * with the list of packages found in that source.
      * By returning true from {@link #onUpdateSource}, the client tells the loader to
      * continue and process the next source. By returning false, it tells to stop loading.
-     * <p/>
+     * </p><p>
      * The {@link #onLoadCompleted()} method is guaranteed to be called at the end, no
      * matter how the loader stopped, so that the client can clean up or perform any
      * final action.
+     * </p>
      */
     public interface ISourceLoadedCallback {
         /**
@@ -418,7 +419,7 @@ public class PackageLoader {
          * By returning true from {@link #onUpdateSource}, the client tells
          * the loader to continue and process the next source.
          * By returning false, it tells to stop loading.
-         * <p/>
+         * <p>
          * <em>Important</em>: This method is called from a sub-thread, so clients which
          * try to access any UI widgets must wrap their calls into
          * {@code Display.syncExec(Runnable)} or {@code Display.asyncExec(Runnable)}.
@@ -458,7 +459,7 @@ public class PackageLoader {
          * Called by the install task for every package available (new ones, updates as well
          * as existing ones that don't have a potential update.)
          * The method should return true if this is a package that should be installed.
-         * <p/>
+         * <p>
          * <em>Important</em>: This method is called from a sub-thread, so clients who try
          * to access any UI widgets must wrap their calls into {@code Display.syncExec(Runnable)}
          * or {@code Display.asyncExec(Runnable)}.
@@ -469,7 +470,7 @@ public class PackageLoader {
          * Called when the accepted package has been installed, successfully or not.
          * If an already installed (aka existing) package has been accepted, this will
          * be called with a 'true' success and the actual install paths.
-         * <p/>
+         * <p>
          * <em>Important</em>: This method is called from a sub-thread, so clients who try
          * to access any UI widgets must wrap their calls into {@code Display.syncExec(Runnable)}
          * or {@code Display.asyncExec(Runnable)}.

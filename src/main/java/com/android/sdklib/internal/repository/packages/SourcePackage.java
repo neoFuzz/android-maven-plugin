@@ -41,10 +41,11 @@ import java.util.Properties;
 
 /**
  * Represents a source XML node in an SDK repository.
- * <p/>
+ * <p>
  * Note that a source package has a version and thus implements {@link IAndroidVersionProvider}.
- * However there is no mandatory dependency that limits installation so this does not
+ * However, there is no mandatory dependency that limits installation so this does not
  * implement {@link IPlatformDependency}.
+ * </p>
  *
  * @deprecated com.android.sdklib.internal.repository has moved into Studio as
  * com.android.tools.idea.sdk.remote.internal.
@@ -119,7 +120,7 @@ public class SourcePackage extends MajorRevisionPackage implements IAndroidVersi
 
     /**
      * Creates either a valid {@link SourcePackage} or a {@link BrokenPackage}.
-     * <p/>
+     * <p>
      * If the source directory contains valid properties, this creates a new {@link SourcePackage}
      * with the android version listed in the properties.
      * Otherwise returns a new {@link BrokenPackage} with some explanation on what failed.
@@ -219,7 +220,7 @@ public class SourcePackage extends MajorRevisionPackage implements IAndroidVersi
     /**
      * Returns a string identifier to install this package from the command line.
      * For sources, we use "source-N" where N is the API or the preview codename.
-     * <p/>
+     * <p>
      * {@inheritDoc}
      */
     @Override
@@ -229,7 +230,7 @@ public class SourcePackage extends MajorRevisionPackage implements IAndroidVersi
 
     /**
      * Returns a description of this package that is suitable for a list display.
-     * <p/>
+     * <p>
      * {@inheritDoc}
      */
     @Override
@@ -301,7 +302,7 @@ public class SourcePackage extends MajorRevisionPackage implements IAndroidVersi
     /**
      * Computes a potential installation folder if an archive of this package were
      * to be installed right away in the given SDK root.
-     * <p/>
+     * <p>
      * A sources package is typically installed in SDK/sources/platform.
      *
      * @param osSdkRoot  The OS path of the SDK root folder.

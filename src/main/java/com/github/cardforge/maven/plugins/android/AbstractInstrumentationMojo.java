@@ -274,6 +274,10 @@ public abstract class AbstractInstrumentationMojo extends AbstractAndroidMojo {
         return StringUtils.join(strings, ",");
     }
 
+    /**
+     * @throws MojoExecutionException if the configuration is invalid
+     * @throws MojoFailureException   if the configuration is invalid
+     */
     protected void instrument() throws MojoExecutionException, MojoFailureException {
         parseConfiguration();
 
@@ -429,10 +433,12 @@ public abstract class AbstractInstrumentationMojo extends AbstractAndroidMojo {
         }
     }
 
+
     /**
      * Returns the first non-null and non-empty value. If the primary value is null or empty, returns the fallback value.
      * This works for String, List, Boolean, and other types.
      *
+     * @param <T>      the type of the values
      * @param value    the primary value to check (can be null or empty)
      * @param fallback the fallback value if the primary value is null or empty
      * @return the value of `value` if it's not null/empty, otherwise the `fallback` value
@@ -455,6 +461,8 @@ public abstract class AbstractInstrumentationMojo extends AbstractAndroidMojo {
      * <code>enableIntegrationTest</code>, but can be overridden with <code>-Dmaven.test.skip</code>.
      *
      * @return <code>true</code> if integration test goals should be executed, <code>false</code> otherwise.
+     * @throws MojoFailureException   if the configuration is invalid
+     * @throws MojoExecutionException if the configuration is invalid
      */
     protected boolean isEnableIntegrationTest() throws MojoFailureException, MojoExecutionException {
         parseConfiguration();

@@ -220,7 +220,7 @@ public class LocalSdkParser {
 
     /**
      * Returns the packages found by the last call to {@link #parseSdk}.
-     * <p/>
+     * <p>
      * This returns initially returns null.
      * Once the parseSdk() method has been called, this returns a possibly empty but non-null array.
      */
@@ -238,10 +238,10 @@ public class LocalSdkParser {
 
     /**
      * Scan the give SDK to find all the packages already installed at this location.
-     * <p/>
+     * <p>
      * Store the packages internally. You can use {@link #getPackages()} to retrieve them
      * at any time later.
-     * <p/>
+     * <p>
      * Equivalent to calling {@code parseSdk(..., PARSE_ALL, ...); }
      *
      * @param osSdkRoot  The path to the SDK folder, typically {@code sdkManager.getLocation()}.
@@ -259,7 +259,7 @@ public class LocalSdkParser {
 
     /**
      * Scan the give SDK to find all the packages already installed at this location.
-     * <p/>
+     * <p>
      * Store the packages internally. You can use {@link #getPackages()} to retrieve them
      * at any time later.
      *
@@ -472,7 +472,7 @@ public class LocalSdkParser {
     /**
      * Find any other sub-directories under the /samples root that hasn't been visited yet
      * and assume they contain sample packages. This is <em>not</em> a recursive search.
-     * <p/>
+     * <p>
      * The use case is to find samples dirs under /samples when their target isn't loaded.
      */
     private void scanMissingSamples(SdkManager sdkManager,
@@ -501,7 +501,7 @@ public class LocalSdkParser {
     /**
      * The sdk manager only lists valid addons. However here we also want to find "broken"
      * addons, i.e. addons that failed to load for some reason.
-     * <p/>
+     * <p>
      * Find any other sub-directories under the /add-ons root that hasn't been visited yet
      * and assume they contain broken addons.
      */

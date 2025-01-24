@@ -33,23 +33,58 @@ import java.util.List;
  */
 public class AidlProcessor implements SourceSearcher.SourceFileProcessor {
 
+    /**
+     * Path to the aidl executable
+     */
     @NonNull
     private final String mAidlExecutable;
+    /**
+     * Path to the framework that contains aidl
+     */
     @NonNull
     private final String mFrameworkLocation;
+    /**
+     * List of folders that contain imported aidl files
+     */
     @NonNull
     private final List<File> mImportFolders;
+    /**
+     * Output folder for the generated source files
+     */
     @NonNull
     private final File mSourceOutputDir;
+    /**
+     * Output folder for the generated Java files that correspond to the parcelable definitions
+     */
     @Nullable
     private final File mParcelableOutputDir;
+    /**
+     * object to process the output of aidl.
+     */
     @NonNull
     private final DependencyFileProcessor mDependencyFileProcessor;
+    /**
+     * object to use when running the aidl compiler.
+     */
     @NonNull
     private final ProcessExecutor mProcessExecutor;
+    /**
+     * object to handle the output of the aidl compiler.
+     */
     @NonNull
     private final ProcessOutputHandler mProcessOutputHandler;
 
+    /**
+     * @param aidlExecutable          Path to the aidl executable
+     * @param frameworkLocation       Path to the framework that contains aidl
+     * @param importFolders           List of folders that contain imported aidl files
+     * @param sourceOutputDir         Output folder for the generated source files
+     * @param parcelableOutputDir     Output folder for the generated Java files that correspond to the
+     *                                parcelable definitions
+     * @param dependencyFileProcessor object to process the output of aidl.
+     * @param processExecutor         object to use when running the aidl compiler.
+     * @param processOutputHandler    object to handle the output of the aidl compiler.
+     */
     public AidlProcessor(
             @NonNull String aidlExecutable,
             @NonNull String frameworkLocation,

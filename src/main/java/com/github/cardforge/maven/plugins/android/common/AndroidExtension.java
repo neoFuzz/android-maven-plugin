@@ -42,7 +42,7 @@ public final class AndroidExtension {
      * @return True if an Android project.
      */
     public static boolean isAndroidPackaging(String packaging) {
-        return APK.equals(packaging)|| AAR.equalsIgnoreCase(packaging) ||
+        return APK.equals(packaging) || AAR.equalsIgnoreCase(packaging) ||
                 APKLIB.equals(packaging) || APKSOURCES.equals(packaging);
     }
 }

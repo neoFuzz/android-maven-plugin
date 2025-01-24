@@ -183,7 +183,7 @@ public final class FolderConfiguration implements Comparable<FolderConfiguration
 
     /**
      * Sets the config from the qualifiers of a given <var>config</var>.
-     * <p/>This is equivalent to <code>set(config, false)</code>
+     * <p>This is equivalent to <code>set(config, false)</code>
      *
      * @param config the configuration to set
      * @see #set(FolderConfiguration, boolean)
@@ -213,7 +213,7 @@ public final class FolderConfiguration implements Comparable<FolderConfiguration
 
     /**
      * Reset the config.
-     * <p/>This makes qualifiers at all indices <code>null</code>.
+     * <p>This makes qualifiers at all indices <code>null</code>.
      */
     public void reset() {
         Arrays.fill(mQualifiers, null);
@@ -244,7 +244,7 @@ public final class FolderConfiguration implements Comparable<FolderConfiguration
     }
 
     /**
-     * Returns the first invalid qualifier, or <code>null<code> if they are all valid (or if none
+     * Returns the first invalid qualifier, or <code>null</code> if they are all valid (or if none
      * exists).
      */
     @Nullable
@@ -977,7 +977,7 @@ public final class FolderConfiguration implements Comparable<FolderConfiguration
 
     /**
      * Returns whether the configuration is a match for the given reference config.
-     * <p/>A match means that, for each qualifier of this config
+     * <p>A match means that, for each qualifier of this config
      * <ul>
      * <li>The reference config has no value set
      * <li>or, the qualifier of the reference config is a match. Depending on the qualifier type
@@ -1025,7 +1025,7 @@ public final class FolderConfiguration implements Comparable<FolderConfiguration
 
     /**
      * Create default qualifiers.
-     * <p/>This creates qualifiers with no values for all indices.
+     * <p>This creates qualifiers with no values for all indices.
      */
     public void createDefault() {
         mQualifiers[INDEX_COUNTRY_CODE] = new CountryCodeQualifier();

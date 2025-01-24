@@ -1,5 +1,7 @@
 package com.github.cardforge.maven.plugins.android.configuration;
 
+import com.github.cardforge.maven.plugins.android.phase04processclasses.ProguardMojo;
+
 import java.io.File;
 
 /**

@@ -56,8 +56,18 @@ import java.util.regex.Pattern;
 @Deprecated
 public class ArchiveInstaller {
 
+    /**
+     * The name of the environment variable that can be used to force the use of a specific
+     * {@link ArchiveInstaller} implementation.
+     */
     public static final String ENV_VAR_IGNORE_COMPAT = "ANDROID_SDK_IGNORE_COMPAT"; //$NON-NLS-1$
+    /**
+     * Number of monitor increments to use when downloading a file.
+     */
     public static final int NUM_MONITOR_INC = 100;
+    /**
+     * Static string for pop status
+     */
     private static final String PROP_STATUS_CODE = "StatusCode";                    //$NON-NLS-1$
     /**
      * The current {@link FileOp} to use. Never null.
@@ -82,6 +92,8 @@ public class ArchiveInstaller {
 
     /**
      * Returns current {@link FileOp} to use. Never null.
+     *
+     * @return The current {@link FileOp} to use.
      */
     protected IFileOp getFileOp() {
         return mFileOp;
@@ -93,9 +105,15 @@ public class ArchiveInstaller {
      * (c.f. {@link ArchiveReplacement#getNewArchive()} and an <em>optional</em>
      * archive being replaced (c.f. {@link ArchiveReplacement#getReplaced()}.
      * In the case of a new install, the later should be null.
-     * <p/>
+     * <p>
      * The new archive to install will be skipped if it is incompatible.
      *
+     * @param archiveInfo The archive to install
+     * @param osSdkRoot   The OS/SDK root path
+     * @param forceHttp   Whether to force HTTP download
+     * @param sdkManager  The SDK manager
+     * @param cache       The download cache
+     * @param monitor     The task monitor
      * @return True if the archive was installed, false otherwise.
      */
     public boolean install(ArchiveReplacement archiveInfo,
@@ -148,6 +166,13 @@ public class ArchiveInstaller {
     /**
      * Downloads an archive and returns the temp file with it.
      * Caller is responsible with deleting the temp file when done.
+     *
+     * @param archive   The archive to download
+     * @param osSdkRoot The OS/SDK root path
+     * @param cache     The download cache
+     * @param monitor   The task monitor
+     * @param forceHttp Whether to force HTTP download
+     * @return A pair of files: the downloaded file and the properties file
      */
     @VisibleForTesting(visibility = Visibility.PRIVATE)
     protected Pair<File, File> downloadFile(Archive archive,
@@ -358,10 +383,10 @@ public class ArchiveInstaller {
     /**
      * Actually performs the download.
      * Also computes the SHA1 of the file on the fly.
-     * <p/>
+     * <p>
      * Success is defined as downloading as many bytes as was expected and having the same
      * SHA1 as expected. Returns true on success or false if any of those checks fail.
-     * <p/>
+     * <p>
      * Increments the monitor by {@link #NUM_MONITOR_INC}.
      *
      * @param archive       The archive we're trying to download.
@@ -830,7 +855,7 @@ public class ArchiveInstaller {
 
     /**
      * Tries to rename/move a folder.
-     * <p/>
+     * <p>
      * Contract:
      * <ul>
      * <li> When we start, oldDir must exist and be a directory. newDir must not exist. </li>
@@ -839,7 +864,7 @@ public class ArchiveInstaller {
      * <li> On failure completion, oldDir must have the same content as before.
      *      newDir must not exist. </li>
      * </ul>
-     * <p/>
+     * <p>
      * The simple "rename" operation on a folder can typically fail on Windows for a variety
      * of reason, in fact as soon as a single process holds a reference on a directory. The
      * most common case are the Explorer, the system's file indexer, Tortoise SVN cache or
@@ -874,7 +899,13 @@ public class ArchiveInstaller {
      * Unzips a zip file into the given destination directory.
      * <p>
      * The archive file MUST have a unique "root" folder.
-     * This root folder is skipped when unarchiving.
+     * This root folder is skipped when un-archiving.
+     *
+     * @param archiveInfo     The {@link Archive} to unzip.
+     * @param archiveFile     The archive file to unzip.
+     * @param unzipDestFolder The destination folder.
+     * @param monitor         The {@link ITaskMonitor} to use.
+     * @return if file unzipped successfully
      */
     @SuppressWarnings("unchecked")
     @VisibleForTesting(visibility = Visibility.PRIVATE)
@@ -1031,16 +1062,21 @@ public class ArchiveInstaller {
 
     /**
      * Returns an unused temp folder path in the form of osBasePath/temp/prefix.suffixNNN.
-     * <p/>
+     * <p>
      * This does not actually <em>create</em> the folder. It just scan the base path for
      * a free folder name to use and returns the file to use to reference it.
-     * <p/>
+     * <p>
      * This operation is not atomic so there's no guarantee the folder can't get
      * created in between. This is however unlikely and the caller can assume the
      * returned folder does not exist yet.
-     * <p/>
+     * <p>
      * Returns null if no such folder can be found (e.g. if all candidates exist,
      * which is rather unlikely) or if the base temp folder cannot be created.
+     *
+     * @param osBasePath The OS base path to use.
+     * @param prefix     The prefix to use for the folder name.
+     * @param suffix     The suffix to use for the folder name.
+     * @return The folder to use or null if none can be found.
      */
     private File getNewTempFolder(String osBasePath, String prefix, String suffix) {
         File baseTempFolder = getTempFolder(osBasePath);
@@ -1067,8 +1103,11 @@ public class ArchiveInstaller {
     /**
      * Returns the single fixed "temp" folder used by the SDK Manager.
      * This folder is always at osBasePath/temp.
-     * <p/>
+     * <p>
      * This does not actually <em>create</em> the folder.
+     *
+     * @param osBasePath The OS base path to use.
+     * @return The temp folder.
      */
     private File getTempFolder(String osBasePath) {
         File baseTempFolder = new File(osBasePath, RepoConstants.FD_TEMP);
@@ -1079,6 +1118,10 @@ public class ArchiveInstaller {
      * Generates a source.properties in the destination folder that contains all the infos
      * relevant to this archive, this package and the source so that we can reload them
      * locally later.
+     *
+     * @param archive         The archive to generate the source.properties for.
+     * @param unzipDestFolder The destination folder where to generate the source.properties.
+     * @return True if the source.properties was successfully generated, false otherwise.
      */
     @VisibleForTesting(visibility = Visibility.PRIVATE)
     protected boolean generateSourceProperties(Archive archive, File unzipDestFolder) {

@@ -24,11 +24,12 @@ import com.android.utils.NullLogger;
 
 /**
  * A no-op implementation of the {@link ITaskMonitor} interface.
- * <p/>
+ * <p>
  * This can be passed to methods that require a monitor when the caller doesn't
  * have any UI to update or means to report tracked progress.
  * A custom {@link ILogger} is used. Clients could use {@link NullLogger} if
  * they really don't care about the logging either.
+ * </p>
  *
  * @deprecated com.android.sdklib.internal.repository has moved into Studio as
  * com.android.tools.idea.sdk.remote.internal.
@@ -41,7 +42,7 @@ public class NullTaskMonitor implements ITaskMonitor {
     /**
      * Creates a no-op {@link ITaskMonitor} that defers logging to the specified
      * logger.
-     * <p/>
+     * <p>
      * This can be passed to methods that require a monitor when the caller doesn't
      * have any UI to update or means to report tracked progress.
      *

@@ -21,29 +21,36 @@ import com.android.annotations.NonNull;
 
 /**
  * Base class for resource qualifiers.
- * <p/>The resource qualifier classes are designed as immutable.
+ * <p>The resource qualifier classes are designed as immutable.</p>
  */
 public abstract class ResourceQualifier implements Comparable<ResourceQualifier> {
 
     /**
      * Returns the human-readable name of the qualifier.
+     *
+     * @return the human-readable name of the qualifier.
      */
     public abstract String getName();
 
     /**
      * Returns a shorter human-readable name for the qualifier.
      *
+     * @return a shorter human-readable name for the qualifier.
      * @see #getName()
      */
     public abstract String getShortName();
 
     /**
      * Returns when this qualifier was added to Android.
+     *
+     * @return the API level this qualifier was added to Android.
      */
     public abstract int since();
 
     /**
      * Whether this qualifier is deprecated.
+     *
+     * @return true if the qualifier is deprecated.
      */
     public boolean deprecated() {
         return false;
@@ -51,12 +58,16 @@ public abstract class ResourceQualifier implements Comparable<ResourceQualifier>
 
     /**
      * Returns whether the qualifier has a valid filter value.
+     *
+     * @return true if the qualifier has a valid filter value.
      */
     public abstract boolean isValid();
 
     /**
      * Returns whether the qualifier has a fake value.
-     * <p/>Fake values are used internally and should not be used as real qualifier value.
+     * <p>Fake values are used internally and should not be used as real qualifier value.
+     *
+     * @return true if the qualifier has a fake value.
      */
     public abstract boolean hasFakeValue();
 
@@ -72,14 +83,16 @@ public abstract class ResourceQualifier implements Comparable<ResourceQualifier>
 
     /**
      * Returns a string formatted to be used in a folder name.
-     * <p/>This is declared as abstract to force children classes to implement it.
+     * <p>This is declared as abstract to force children classes to implement it.
+     *
+     * @return the folder name segment
      */
     public abstract String getFolderSegment();
 
     /**
      * Returns whether the given qualifier is a match for the receiver.
-     * <p/>The default implementation returns the result of {@link #equals(Object)}.
-     * <p/>Children class that re-implements this must implement
+     * <p>The default implementation returns the result of {@link #equals(Object)}.
+     * <p>Children class that re-implements this must implement
      * {@link #isBetterMatchThan(ResourceQualifier, ResourceQualifier)} too.
      *
      * @param qualifier the reference qualifier
@@ -104,6 +117,9 @@ public abstract class ResourceQualifier implements Comparable<ResourceQualifier>
         return false;
     }
 
+    /**
+     * @return a string formatted to be used in a folder name.
+     */
     @Override
     public String toString() {
         return getFolderSegment();
@@ -111,28 +127,41 @@ public abstract class ResourceQualifier implements Comparable<ResourceQualifier>
 
     /**
      * Returns a string formatted for display purpose.
+     *
+     * @return short name string
      */
     public abstract String getShortDisplayValue();
 
     /**
      * Returns a string formatted for display purpose.
+     *
+     * @return long name string
      */
     public abstract String getLongDisplayValue();
 
     /**
      * Returns <code>true</code> if both objects are equal.
-     * <p/>This is declared as abstract to force children classes to implement it.
+     * <p>This is declared as abstract to force children classes to implement it.
+     *
+     * @return True if both objects are equal
      */
     @Override
     public abstract boolean equals(Object object);
 
     /**
      * Returns a hash code value for the object.
-     * <p/>This is declared as abstract to force children classes to implement it.
+     * <p>This is declared as abstract to force children classes to implement it.
+     *
+     * @return a hash code value for the object.
      */
     @Override
     public abstract int hashCode();
 
+    /**
+     * @param o the object to be compared.
+     * @return a negative integer, zero, or a positive integer as this object is less than,
+     * equal to, or greater than the specified object.
+     */
     @Override
     public final int compareTo(@NonNull ResourceQualifier o) {
         return toString().compareTo(o.toString());

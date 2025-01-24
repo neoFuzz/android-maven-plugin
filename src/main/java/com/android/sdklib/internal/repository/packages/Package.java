@@ -45,13 +45,16 @@ import java.util.Properties;
 /**
  * A {@link Package} is the base class for "something" that can be downloaded from
  * the SDK repository.
- * <p/>
+ * <p>
  * A package has some attributes (revision, description) and a list of archives
  * which represent the downloadable bits.
- * <p/>
+ * </p>
+ * <p>
  * Packages are contained by a {@link SdkSource} (a download site).
- * <p/>
+ * </p>
+ * <p>
  * Derived classes must implement the {@link IDescription} methods.
+ * </p>
  *
  * @deprecated com.android.sdklib.internal.repository has moved into Studio as
  * com.android.tools.idea.sdk.remote.internal.
@@ -88,31 +91,39 @@ public abstract class Package implements IDescription, IListDescription, Compara
     Package(SdkSource source, Node packageNode, String nsUri, Map<String, String> licenses) {
         mSource = source;
         mListDisplay =
-                PackageParserUtils.getXmlString(packageNode, SdkRepoConstants.NODE_LIST_DISPLAY);
+                PackageParserUtils.getXmlString(packageNode, RepoConstants.NODE_LIST_DISPLAY);
         mDescription =
-                PackageParserUtils.getXmlString(packageNode, SdkRepoConstants.NODE_DESCRIPTION);
+                PackageParserUtils.getXmlString(packageNode, RepoConstants.NODE_DESCRIPTION);
         mDescUrl =
-                PackageParserUtils.getXmlString(packageNode, SdkRepoConstants.NODE_DESC_URL);
+                PackageParserUtils.getXmlString(packageNode, RepoConstants.NODE_DESC_URL);
         mReleaseNote =
-                PackageParserUtils.getXmlString(packageNode, SdkRepoConstants.NODE_RELEASE_NOTE);
+                PackageParserUtils.getXmlString(packageNode, RepoConstants.NODE_RELEASE_NOTE);
         mReleaseUrl =
-                PackageParserUtils.getXmlString(packageNode, SdkRepoConstants.NODE_RELEASE_URL);
+                PackageParserUtils.getXmlString(packageNode, RepoConstants.NODE_RELEASE_URL);
         mObsolete =
-                PackageParserUtils.getOptionalXmlString(packageNode, SdkRepoConstants.NODE_OBSOLETE);
+                PackageParserUtils.getOptionalXmlString(packageNode, RepoConstants.NODE_OBSOLETE);
 
         mLicense = parseLicense(packageNode, licenses);
         mArchives = parseArchives(
-                PackageParserUtils.findChildElement(packageNode, SdkRepoConstants.NODE_ARCHIVES));
+                PackageParserUtils.findChildElement(packageNode, RepoConstants.NODE_ARCHIVES));
     }
 
     /**
      * Manually create a new package with one archive and the given attributes.
      * This is used to create packages from local directories in which case there must be
      * one archive which URL is the actual target location.
-     * <p/>
-     * Properties from props are used first when possible, e.g. if props is non null.
-     * <p/>
+     * <p>
+     * Properties from props are used first when possible, e.g. if props is non-null.
+     * <p>
      * By design, this creates a package with one and only one archive.
+     *
+     * @param source        The {@link SdkSource} where this is loaded from.
+     * @param props         The properties to be used for the package.
+     * @param revision      The revision number of the package.
+     * @param license       The license to be used for the package.
+     * @param description   A short description for the package.
+     * @param descUrl       The optional description URL for the package.
+     * @param archiveOsPath The path of the archive file relative to the package folder.
      */
     public Package(
             SdkSource source,
@@ -143,7 +154,7 @@ public abstract class Package implements IDescription, IListDescription, Compara
         mReleaseUrl = getProperty(props, PkgProps.PKG_RELEASE_URL, "");       //$NON-NLS-1$
         mObsolete = getProperty(props, PkgProps.PKG_OBSOLETE, null);
 
-        // If source is null and we can find a source URL in the properties, generate
+        // If source is null, and we can find a source URL in the properties, generate
         // a dummy source just to store the URL. This allows us to easily remember where
         // a package comes from.
         String srcUrl = getProperty(props, PkgProps.PKG_SOURCE_URL, null);
@@ -205,7 +216,7 @@ public abstract class Package implements IDescription, IListDescription, Compara
     }
 
     /**
-     * Returns the {@link IPkgDesc} describing this package's meta data.
+     * Returns the {@link IPkgDesc} describing this package's metadata.
      *
      * @return A non-null {@link IPkgDesc}.
      */
@@ -214,12 +225,14 @@ public abstract class Package implements IDescription, IListDescription, Compara
 
     /**
      * Called by the constructor to get the initial {@link #mArchives} array.
-     * <p/>
+     * <p>
      * This is invoked by the local-package constructor and allows mock testing
      * classes to override the archives created.
      * This is an <em>implementation</em> details and clients must <em>not</em>
      * rely on this.
      *
+     * @param props         The properties to be used for the package. May be null.
+     * @param archiveOsPath The path of the archive file relative to the package folder.
      * @return Always return a non-null array. The array may be empty.
      */
     @VisibleForTesting(visibility = Visibility.PRIVATE)
@@ -235,6 +248,8 @@ public abstract class Package implements IDescription, IListDescription, Compara
     /**
      * Save the properties of the current packages in the given {@link Properties} object.
      * These properties will later be give the constructor that takes a {@link Properties} object.
+     *
+     * @param props The {@link Properties} object to be filled with the current values.
      */
     public void saveProperties(@NonNull Properties props) {
         if (mLicense != null) {
@@ -275,6 +290,8 @@ public abstract class Package implements IDescription, IListDescription, Compara
      * Parses the uses-licence node of this package, if any, and returns the license
      * definition if there's one. Returns null if there's no uses-license element or no
      * license of this name defined.
+     *
+     * @return The license object parsed from the XML, or null
      */
     @Nullable
     private License parseLicense(@NonNull Node packageNode, @NonNull Map<String, String> licenses) {
@@ -293,6 +310,8 @@ public abstract class Package implements IDescription, IListDescription, Compara
     /**
      * Parses an XML node to process the <archives> element.
      * Always return a non-null array. The array may be empty.
+     *
+     * @return an array of {@link Archive}. Never null.
      */
     @NonNull
     private Archive[] parseArchives(@NonNull Node archivesNode) {
@@ -317,6 +336,9 @@ public abstract class Package implements IDescription, IListDescription, Compara
 
     /**
      * Parses one <archive> element from an <archives> container.
+     *
+     * @param archiveNode The XML <archive> element to parse.
+     * @return The parsed {@link Archive} object.
      */
     @NonNull
     private Archive parseArchive(@NonNull Node archiveNode) {
@@ -333,6 +355,8 @@ public abstract class Package implements IDescription, IListDescription, Compara
 
     /**
      * Returns the source that created (and owns) this package. Can be null.
+     *
+     * @return The source that created this package, or null.
      */
     @Nullable
     public SdkSource getParentSource() {
@@ -342,6 +366,8 @@ public abstract class Package implements IDescription, IListDescription, Compara
     /**
      * Returns true if the package is deemed obsolete, that is it contains an
      * actual <code>&lt;obsolete&gt;</code> element.
+     *
+     * @return true if the package is obsolete.
      */
     public boolean isObsolete() {
         return mObsolete != null;
@@ -350,6 +376,8 @@ public abstract class Package implements IDescription, IListDescription, Compara
     /**
      * Returns the revision, an int > 0, for all packages (platform, add-on, tool, doc).
      * Can be 0 if this is a local package of unknown revision.
+     *
+     * @return the revision number, or 0 if this is a local package of unknown revision.
      */
     @NonNull
     public abstract FullRevision getRevision();
@@ -357,6 +385,8 @@ public abstract class Package implements IDescription, IListDescription, Compara
     /**
      * Returns the optional description for all packages (platform, add-on, tool, doc) or
      * for a lib. It is null if the element has not been specified in the repository XML.
+     *
+     * @return the description string or null
      */
     @Nullable
     public License getLicense() {
@@ -365,12 +395,14 @@ public abstract class Package implements IDescription, IListDescription, Compara
 
     /**
      * Returns the optional description for all packages (platform, add-on, tool, doc) or
-     * for a lib. This is the raw description available from the XML meta data and is typically
+     * for a lib. This is the raw description available from the XML metadata and is typically
      * only used internally.
-     * <p/>
+     * <p>
      * For actual display in the UI, use the methods from {@link IDescription} instead.
-     * <p/>
+     * <p>
      * Can be empty but not null.
+     *
+     * @return the description string
      */
     @NonNull
     public String getDescription() {
@@ -378,12 +410,14 @@ public abstract class Package implements IDescription, IListDescription, Compara
     }
 
     /**
-     * Returns the optional list-display for all packages as defined in the XML meta data
+     * Returns the optional list-display for all packages as defined in the XML metadata
      * and is typically only used internally.
-     * <p/>
+     * <p>
      * For actual display in the UI, use {@link IListDescription} instead.
-     * <p/>
+     * <p>
      * Can be empty but not null.
+     *
+     * @return the list-display string
      */
     @NonNull
     public String getListDisplay() {
@@ -393,6 +427,8 @@ public abstract class Package implements IDescription, IListDescription, Compara
     /**
      * Returns the optional description URL for all packages (platform, add-on, tool, doc).
      * Can be empty but not null.
+     *
+     * @return the description URL
      */
     @NonNull
     public String getDescUrl() {
@@ -402,6 +438,8 @@ public abstract class Package implements IDescription, IListDescription, Compara
     /**
      * Returns the optional release note for all packages (platform, add-on, tool, doc) or
      * for a lib. Can be empty but not null.
+     *
+     * @return the release note
      */
     @NonNull
     public String getReleaseNote() {
@@ -411,6 +449,8 @@ public abstract class Package implements IDescription, IListDescription, Compara
     /**
      * Returns the optional release note URL for all packages (platform, add-on, tool, doc).
      * Can be empty but not null.
+     *
+     * @return the release note URL
      */
     @NonNull
     public String getReleaseNoteUrl() {
@@ -420,6 +460,8 @@ public abstract class Package implements IDescription, IListDescription, Compara
     /**
      * Returns the archives defined in this package.
      * Can be an empty array but not null.
+     *
+     * @return An array of {@link Archive} objects.
      */
     @NonNull
     public Archive[] getArchives() {
@@ -429,6 +471,9 @@ public abstract class Package implements IDescription, IListDescription, Compara
     /**
      * Returns true if this package contains the exact given archive.
      * Important: This compares object references, not object equality.
+     *
+     * @param archive The {@link Archive} to look for. Can be null.
+     * @return if the package contains the given {@link Archive} exactly.
      */
     public boolean hasArchive(Archive archive) {
         for (Archive a : mArchives) {
@@ -442,6 +487,8 @@ public abstract class Package implements IDescription, IListDescription, Compara
     /**
      * Returns whether the {@link Package} has at least one {@link Archive} compatible with
      * the host platform.
+     *
+     * @return true if at least one archive is compatible.
      */
     public boolean hasCompatibleArchive() {
         for (Archive archive : mArchives) {
@@ -459,7 +506,7 @@ public abstract class Package implements IDescription, IListDescription, Compara
      * {@code 'android list sdk'} will show these IDs and then in turn they can
      * be provided to {@code 'android update sdk --no-ui --filter'} to select
      * some specific packages.
-     * <p/>
+     * <p>
      * The identifiers must have the following properties: <br/>
      * - They must contain only simple alphanumeric characters. <br/>
      * - Commas, whitespace and any special character that could be obviously problematic
@@ -470,21 +517,23 @@ public abstract class Package implements IDescription, IListDescription, Compara
      * - Different package types should have a clearly different name pattern. <br/>
      * - The revision number should not be included, as this would prevent updates
      * from being automated (which is the whole point.) <br/>
-     * - It must remain reasonably human readable. <br/>
+     * - It must remain reasonably human-readable. <br/>
      * - If no such id can exist (for example for a local package that cannot be installed)
      * then an empty string should be returned. Don't return null.
-     * <p/>
+     * <p>
      * Important: This is <em>not</em> a strong unique identifier for the package.
      * If you need a strong unique identifier, you should use {@link #comparisonKey()}
      * and the {@link Comparable} interface.
+     *
+     * @return A string identifier that can be used to identify this package.
      */
     @NonNull
     public abstract String installId();
 
     /**
      * Returns the short description of the source, if not null.
-     * Otherwise returns the default Object toString result.
-     * <p/>
+     * Otherwise, returns the default Object toString result.
+     * <p>
      * This is mostly helpful for debugging.
      * For UI display, use the {@link IDescription} interface.
      */
@@ -501,14 +550,14 @@ public abstract class Package implements IDescription, IListDescription, Compara
     /**
      * Returns a description of this package that is suitable for a list display.
      * Should not be empty. Can never be null.
-     * <p/>
+     * <p>
      * Derived classes should use {@link #getListDisplay()} if it's not empty.
-     * <p/>
+     * <p>
      * When it is empty, the default behavior is to recompute a string that depends
      * on the package type.
-     * <p/>
+     * <p>
      * In both cases, the string should indicate whether the package is marked as obsolete.
-     * <p/>
+     * <p>
      * Note that this is the "base" name for the package with no specific revision nor API
      * mentioned as this is likely used in a table that will already provide these details.
      * In contrast, {@link #getShortDescription()} should be used if you want more details
@@ -569,6 +618,8 @@ public abstract class Package implements IDescription, IListDescription, Compara
      * A package is local (that is 'installed locally') if it contains a single
      * archive that is local. If not local, it's a remote package, only available
      * on a remote source for download and installation.
+     *
+     * @return True if the package is local.
      */
     public boolean isLocal() {
         return mArchives.length == 1 && mArchives[0].isLocal();
@@ -577,14 +628,14 @@ public abstract class Package implements IDescription, IListDescription, Compara
     /**
      * Computes a potential installation folder if an archive of this package were
      * to be installed right away in the given SDK root.
-     * <p/>
+     * <p>
      * Some types of packages install in a fix location, for example docs and tools.
      * In this case the returned folder may already exist with a different archive installed
      * at the desired location. <br/>
      * For other packages types, such as add-on or platform, the folder name is only partially
      * relevant to determine the content and thus a real check will be done to provide an
      * existing or new folder depending on the current content of the SDK.
-     * <p/>
+     * <p>
      * Note that the installer *will* create all directories returned here just before
      * installation so this method must not attempt to create them.
      *
@@ -599,12 +650,12 @@ public abstract class Package implements IDescription, IListDescription, Compara
      * Hook called right before an archive is installed. The archive has already
      * been downloaded successfully and will be installed in the directory specified by
      * <var>installFolder</var> when this call returns.
-     * <p/>
+     * <p>
      * The hook lets the package decide if installation of this specific archive should
-     * be continue. The installer will still install the remaining packages if possible.
-     * <p/>
+     * be able to continue. The installer will still install the remaining packages if possible.
+     * <p>
      * The base implementation always return true.
-     * <p/>
+     * <p>
      * Note that the installer *will* create all directories specified by
      * {@link #getInstallFolder} just before installation, so they must not be
      * created here. This is also called before the previous install dir is removed
@@ -614,7 +665,7 @@ public abstract class Package implements IDescription, IListDescription, Compara
      * @param monitor       The {@link ITaskMonitor} to display errors.
      * @param osSdkRoot     The OS path of the SDK root folder.
      * @param installFolder The folder where the archive will be installed. Note that this
-     *                      is <em>not</em> the folder where the archive was temporary
+     *                      is <em>not</em> the folder where the archive was temporarily
      *                      unzipped. The installFolder, if it exists, contains the old
      *                      archive that will soon be replaced by the new one.
      * @return True if installing this archive shall continue, false if it should be skipped.
@@ -626,15 +677,15 @@ public abstract class Package implements IDescription, IListDescription, Compara
     }
 
     /**
-     * Hook called right after a file has been unzipped (during an install).
-     * <p/>
+     * Hook called right after a file has been unzipped (during an installation process).
+     * <p>
      * The base class implementation makes sure to properly adjust set executable
-     * permission on Linux and MacOS system if the zip entry was marked as +x.
+     * permission on Linux and macOS system if the zip entry was marked as +x.
      *
      * @param archive      The archive that is being installed.
      * @param monitor      The {@link ITaskMonitor} to display errors.
      * @param fileOp       The {@link IFileOp} used by the archive installer.
-     * @param unzippedFile The file that has just been unzipped in the install temp directory.
+     * @param unzippedFile The file that has just been unzipped in the {@code install} temp directory.
      * @param zipEntry     The {@link ZipArchiveEntry} that has just been unzipped.
      */
     public void postUnzipFileHook(
@@ -644,7 +695,7 @@ public abstract class Package implements IDescription, IListDescription, Compara
             File unzippedFile,
             ZipArchiveEntry zipEntry) {
 
-        // if needed set the permissions.
+        // if needed to be set the permissions.
         if (sUsingUnixPerm && fileOp.isFile(unzippedFile)) {
             // get the mode and test if it contains the executable bit
             int mode = zipEntry.getUnixMode();
@@ -673,7 +724,7 @@ public abstract class Package implements IDescription, IListDescription, Compara
 
     /**
      * Returns whether the give package represents the same item as the current package.
-     * <p/>
+     * <p>
      * Two packages are considered the same if they represent the same thing, except for the
      * revision number.
      *
@@ -684,7 +735,7 @@ public abstract class Package implements IDescription, IListDescription, Compara
 
     /**
      * Computes whether the given package is a suitable update for the current package.
-     * <p/>
+     * <p>
      * An update is just that: a new package that supersedes the current one. If the new
      * package does not represent the same item or if it has the same or lower revision as the
      * current one, it's not an update.
@@ -710,17 +761,17 @@ public abstract class Package implements IDescription, IListDescription, Compara
      * - Add-on based on n <br/>
      * - Add-on based on n-1 <br/>
      * - Extra packages <br/>
-     * <p/>
+     * <p>
      * Important: this must NOT be used to compare if two packages are the same thing.
      * This is achieved by {@link #sameItemAs(Package)} or {@link #canBeUpdatedBy(Package)}.
-     * <p/>
+     * <p>
      * The order done here is suitable for display, and this may not be the appropriate
      * order when comparing whether packages are equal or of greater revision -- if you need
      * to compare revisions, then use {@link #getRevision()}{@code .compareTo(rev)} directly.
-     * <p/>
+     * <p>
      * This {@link #compareTo(Package)} method is purely an implementation detail to
      * perform the right ordering of the packages in the list of available or installed packages.
-     * <p/>
+     * <p>
      * <em>Important</em>: Derived classes should consider overriding {@link #comparisonKey()}
      * instead of this method.
      */
@@ -742,16 +793,18 @@ public abstract class Package implements IDescription, IListDescription, Compara
      *      t:N|v:NNNN.P|r:NNNN|
      * </pre>
      * All fields must start by a "letter colon" prefix and end with a vertical pipe (|, ASCII 124).
-     * <p/>
+     * <p>
      * The string format <em>may</em> change between releases and clients should not
-     * store them outside of the session or expect them to be consistent between
+     * store them outside the session or expect them to be consistent between
      * different releases. They are purely an internal implementation details of the
      * {@link #compareTo(Package)} method.
-     * <p/>
+     * <p>
      * Derived classes should get the string from the super class and then append
      * or <em>insert</em> their own |-separated content.
-     * For example an extra vendor name & path can be inserted before the revision
+     * For example an extra vendor name &amp; path can be inserted before the revision
      * number, since it has more sorting weight.
+     *
+     * @return A string that can be used to compare packages.
      */
     @NonNull
     protected String comparisonKey() {
@@ -890,6 +943,7 @@ public abstract class Package implements IDescription, IListDescription, Compara
          */
         INCOMPATIBLE,
         /**
+         * <p>
          * Means that the 2 packages are the same thing but one does not upgrade the other.
          * </p>
          *  TODO: this name is confusing. We need to dig deeper.

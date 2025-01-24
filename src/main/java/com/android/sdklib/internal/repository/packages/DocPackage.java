@@ -34,10 +34,11 @@ import java.util.Properties;
 
 /**
  * Represents a doc XML node in an SDK repository.
- * <p/>
+ * <p>
  * Note that a doc package has a version and thus implements {@link IAndroidVersionProvider}.
- * However there is no mandatory dependency that limits installation so this does not
+ * However, there is no mandatory dependency that limits installation so this does not
  * implement {@link IPlatformDependency}.
+ * </p>
  *
  * @deprecated com.android.sdklib.internal.repository has moved into Studio as
  * com.android.tools.idea.sdk.remote.internal.
@@ -104,7 +105,7 @@ public class DocPackage extends MajorRevisionPackage implements IAndroidVersionP
      * Manually create a new package with one archive and the given attributes.
      * This is used to create packages from local directories in which case there must be
      * one archive which URL is the actual target location.
-     * <p/>
+     * <p>
      * By design, this creates a package with one and only one archive.
      */
     public static Package create(SdkSource source,
@@ -150,7 +151,7 @@ public class DocPackage extends MajorRevisionPackage implements IAndroidVersionP
     /**
      * Returns a string identifier to install this package from the command line.
      * For docs, we use "doc-N" where N is the API or the preview codename.
-     * <p/>
+     * <p>
      * {@inheritDoc}
      */
     @Override
@@ -160,7 +161,7 @@ public class DocPackage extends MajorRevisionPackage implements IAndroidVersionP
 
     /**
      * Returns a description of this package that is suitable for a list display.
-     * <p/>
+     * <p>
      * {@inheritDoc}
      */
     @Override
@@ -231,7 +232,7 @@ public class DocPackage extends MajorRevisionPackage implements IAndroidVersionP
     /**
      * Computes a potential installation folder if an archive of this package were
      * to be installed right away in the given SDK root.
-     * <p/>
+     * <p>
      * A "doc" package should always be located in SDK/docs.
      *
      * @param osSdkRoot  The OS path of the SDK root folder.
@@ -262,7 +263,7 @@ public class DocPackage extends MajorRevisionPackage implements IAndroidVersionP
      * <hr>
      * Doc packages are a bit different since there can only be one doc installed at
      * the same time.
-     * <p/>
+     * <p>
      * We now consider that docs for different APIs are NOT updates, e.g. doc for API N+1
      * is no longer considered an update for doc API N.
      * However docs that have the same API version (API level + codename) are considered

@@ -48,8 +48,17 @@ import java.util.Collections;
  */
 public class AndroidPublisherHelper {
 
+    /**
+     * MIME type for a binary file.
+     */
     public static final String MIME_TYPE_APK = "application/vnd.android.package-archive";
+    /**
+     * MIME type for an expanded image files.
+     */
     public static final String MIME_TYPE_IMAGE = "image/*";
+    /**
+     * Logging instance
+     */
     private static final Log LOG = LogFactory.getLog(AndroidPublisherHelper.class);
     /**
      * Path to the private key file (only used for Service Account auth).
@@ -143,6 +152,7 @@ public class AndroidPublisherHelper {
      *
      * @param applicationName the name of the application: com.example.app
      * @return the {@link AndroidPublisher} service
+     * @throws Exception if the API client could not be initialized
      */
     @NonNull
     public static AndroidPublisher init(String applicationName) throws Exception {
@@ -181,6 +191,8 @@ public class AndroidPublisherHelper {
      *
      * @param serviceAccountEmail the Service Account Email (empty if using
      *                            installed application)
+     * @param applicationName     the name of the application: com.example.app
+     * @param pk12File            the .p12 file to use for authentication
      * @return the {@link AndroidPublisher} service
      * @throws GeneralSecurityException if the API client could not be initialized
      * @throws IOException              if there's a problem reading the client_secrets.json file

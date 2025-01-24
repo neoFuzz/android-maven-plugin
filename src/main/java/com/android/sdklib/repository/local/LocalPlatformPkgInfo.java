@@ -80,7 +80,7 @@ public class LocalPlatformPkgInfo extends LocalPkgInfo {
     /**
      * Checks the given platform has all the required files, and returns true if they are all
      * present.
-     * <p/>This checks the presence of the following files: android.jar, framework.aidl, aapt(.exe),
+     * <p>This checks the presence of the following files: android.jar, framework.aidl, aapt(.exe),
      * aidl(.exe), dx(.bat), and dx.jar
      *
      * @param fileOp   File operation wrapper.

@@ -57,7 +57,7 @@ public class SdkSources {
 
     /**
      * Adds a new source to the Sources list.
-     * <p/>
+     * <p>
      * Implementation detail: {@link SdkSources} doesn't invoke {@link #notifyChangeListeners()}
      * directly. Callers who use {@code add()} are responsible for notifying the listeners once
      * they are done modifying the sources list. The intent is to notify the listeners only once
@@ -77,7 +77,7 @@ public class SdkSources {
 
     /**
      * Removes a source from the Sources list.
-     * <p/>
+     * <p>
      * Callers who remove entries are responsible for notifying the listeners using
      * {@link #notifyChangeListeners()} once they are done modifying the sources list.
      */
@@ -101,7 +101,7 @@ public class SdkSources {
 
     /**
      * Removes all the sources in the given category.
-     * <p/>
+     * <p>
      * Callers who remove entries are responsible for notifying the listeners using
      * {@link #notifyChangeListeners()} once they are done modifying the sources list.
      */
@@ -203,10 +203,10 @@ public class SdkSources {
 
     /**
      * Returns the category of a given source, or null if the source is unknown.
-     * <p/>
+     * <p>
      * Note that this method uses object identity to find a given source, and does
      * not identify sources by their URL like {@link #hasSourceUrl(SdkSource)} does.
-     * <p/>
+     * <p>
      * The search is O(N), which should be acceptable on the expectedly small source list.
      */
     public SdkSourceCategory getCategory(SdkSource source) {
@@ -225,11 +225,11 @@ public class SdkSources {
     /**
      * Returns true if there's already a similar source in the sources list
      * under any category.
-     * <p/>
+     * <p>
      * Important: The match is NOT done on object identity.
      * Instead, this searches for a <em>similar</em> source, based on
      * {@link SdkSource#equals(Object)} which compares the source URLs.
-     * <p/>
+     * <p>
      * The search is O(N), which should be acceptable on the expectedly small source list.
      */
     public boolean hasSourceUrl(SdkSource source) {
@@ -248,11 +248,11 @@ public class SdkSources {
     /**
      * Returns true if there's already a similar source in the sources list
      * under the specified category.
-     * <p/>
+     * <p>
      * Important: The match is NOT done on object identity.
      * Instead, this searches for a <em>similar</em> source, based on
      * {@link SdkSource#equals(Object)} which compares the source URLs.
-     * <p/>
+     * <p>
      * The search is O(N), which should be acceptable on the expectedly small source list.
      */
     public boolean hasSourceUrl(SdkSourceCategory category, SdkSource source) {
@@ -272,7 +272,7 @@ public class SdkSources {
     /**
      * Loads all user sources. This <em>replaces</em> all existing user sources
      * by the ones from the property file.
-     * <p/>
+     * <p>
      * This calls {@link #notifyChangeListeners()} at the end of the operation.
      */
     public void loadUserAddons(ILogger log) {
@@ -422,7 +422,7 @@ public class SdkSources {
 
     /**
      * Invoke all the registered change listeners, if any.
-     * <p/>
+     * <p>
      * This <em>may</em> be called from a worker thread, in which case the runnable
      * should take care of only updating UI from a main thread.
      */

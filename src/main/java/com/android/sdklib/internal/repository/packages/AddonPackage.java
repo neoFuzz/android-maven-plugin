@@ -151,11 +151,22 @@ public class AddonPackage extends MajorRevisionPackage
                 .create();
     }
 
+    /**
+     * @param target The {@link IAndroidTarget} this package is based on.
+     * @param props  The properties to be used for the package.
+     */
     @VisibleForTesting(visibility = Visibility.PRIVATE)
     protected AddonPackage(IAndroidTarget target, Properties props) {
         this(null /*source*/, target, props);
     }
 
+    /**
+     * Copy constructor that allows changing the source.
+     *
+     * @param source The {@link SdkSource} where this is loaded from.
+     * @param target The {@link IAndroidTarget} this package is based on.
+     * @param props  The properties to be used for the package.
+     */
     @VisibleForTesting(visibility = Visibility.PRIVATE)
     protected AddonPackage(SdkSource source, IAndroidTarget target, Properties props) {
         super(source,                     //source
@@ -250,9 +261,14 @@ public class AddonPackage extends MajorRevisionPackage
      * {@link IAndroidTarget#isPlatform()} false) from the {@link SdkManager}.
      * This is used to list local SDK folders in which case there is one archive which
      * URL is the actual target location.
-     * <p/>
+     * <p>
      * By design, this creates a package with one and only one archive.
+     *
+     * @param target The {@link IAndroidTarget} from the SDK manager. It can be either platform or add-on.
+     * @param props  The properties parsed from the addon's source.properties. Can be null.
+     * @return The created {@link AddonPackage}.
      */
+    @NonNull
     public static Package create(IAndroidTarget target, Properties props) {
         return new AddonPackage(target, props);
     }
@@ -264,7 +280,9 @@ public class AddonPackage extends MajorRevisionPackage
      * @param sourceProps   The properties parsed from the addon's source.properties. Can be null.
      * @param addonProps    The properties parsed from the addon manifest (NOT the source.properties).
      * @param error         The error indicating why this addon failed to be loaded.
+     * @return The broken {@link AddonPackage}.
      */
+    @NonNull
     public static Package createBroken(
             String archiveOsPath,
             Properties sourceProps,
@@ -345,12 +363,19 @@ public class AddonPackage extends MajorRevisionPackage
                 desc);
     }
 
+    /**
+     * @return The libraries provided by this add-on package.
+     */
     @Override
     @NonNull
     public IPkgDesc getPkgDesc() {
         return mPkgDesc;
     }
 
+    /**
+     * @return The exact API level required by this add-on package. This is the API that
+     * is guaranteed to be supported, even if the platform is not API level X.
+     */
     @Override
     public int getExactApiLevel() {
         return mVersion.getApiLevel();
@@ -359,6 +384,8 @@ public class AddonPackage extends MajorRevisionPackage
     /**
      * Save the properties of the current packages in the given {@link Properties} object.
      * These properties will later be given to a constructor that takes a {@link Properties} object.
+     *
+     * @param props The {@link Properties} object to be filled.
      */
     @Override
     public void saveProperties(Properties props) {
@@ -375,6 +402,9 @@ public class AddonPackage extends MajorRevisionPackage
 
     /**
      * Parses a <libs> element.
+     *
+     * @param libsNode The XML <libs> node.
+     * @return An array of {@link Lib} objects.
      */
     private Lib[] parseLibs(Node libsNode) {
         ArrayList<Lib> libs = new ArrayList<Lib>();
@@ -398,6 +428,8 @@ public class AddonPackage extends MajorRevisionPackage
 
     /**
      * Parses a <lib> element from a <libs> container.
+     *
+     * @return A {@link Lib} object.
      */
     private Lib parseLib(Node libNode) {
         return new Lib(PackageParserUtils.getXmlString(libNode, SdkRepoConstants.NODE_NAME),
@@ -406,6 +438,8 @@ public class AddonPackage extends MajorRevisionPackage
 
     /**
      * Returns the vendor id, a string, for add-on packages.
+     *
+     * @return The vendor id, never null.
      */
     @NonNull
     public String getVendorId() {
@@ -414,6 +448,8 @@ public class AddonPackage extends MajorRevisionPackage
 
     /**
      * Returns the vendor, a string for display purposes.
+     *
+     * @return The vendor, never null.
      */
     @NonNull
     public String getDisplayVendor() {
@@ -422,6 +458,8 @@ public class AddonPackage extends MajorRevisionPackage
 
     /**
      * Returns the name id, a string, for add-on packages or for libraries.
+     *
+     * @return The name id, never null.
      */
     @NonNull
     public String getNameId() {
@@ -430,6 +468,8 @@ public class AddonPackage extends MajorRevisionPackage
 
     /**
      * Returns the name, a string for display purposes.
+     *
+     * @return The name, never null.
      */
     @NonNull
     public String getDisplayName() {
@@ -438,8 +478,10 @@ public class AddonPackage extends MajorRevisionPackage
 
     /**
      * Returns the version of the platform dependency of this package.
-     * <p/>
+     * <p>
      * An add-on has the same {@link AndroidVersion} as the platform it depends on.
+     *
+     * @return The {@link AndroidVersion} of the platform this add-on depends on. Never null.
      */
     @Override
     @NonNull
@@ -449,6 +491,8 @@ public class AddonPackage extends MajorRevisionPackage
 
     /**
      * Returns the libs defined in this add-on. Can be an empty array but not null.
+     *
+     * @return An array of {@link Lib} objects.
      */
     @NonNull
     public Lib[] getLibs() {
@@ -457,14 +501,15 @@ public class AddonPackage extends MajorRevisionPackage
 
     /**
      * Returns the layoutlib version.
-     * <p/>
+     * <p>
      * The first integer is the API of layoublib, which should be > 0.
      * It will be equal to {@link ILayoutlibVersion#LAYOUTLIB_API_NOT_SPECIFIED} (0)
      * if the layoutlib version isn't specified.
-     * <p/>
+     * <p>
      * The second integer is the revision for that given API. It is >= 0
      * and works as a minor revision number, incremented for the same API level.
      *
+     * @return The layoutlib version, never null.
      * @since sdk-addon-2.xsd
      */
     @NonNull
@@ -476,7 +521,7 @@ public class AddonPackage extends MajorRevisionPackage
     /**
      * Returns a string identifier to install this package from the command line.
      * For add-ons, we use "addon-vendor-name-N" where N is the base platform API.
-     * <p/>
+     * <p>
      * {@inheritDoc}
      */
     @NonNull
@@ -487,7 +532,7 @@ public class AddonPackage extends MajorRevisionPackage
 
     /**
      * Returns a description of this package that is suitable for a list display.
-     * <p/>
+     * <p>
      * {@inheritDoc}
      */
     @Override
@@ -504,6 +549,8 @@ public class AddonPackage extends MajorRevisionPackage
 
     /**
      * Returns a short description for an {@link IDescription}.
+     *
+     * @return Never null nor empty.
      */
     @Override
     public String getShortDescription() {
@@ -527,6 +574,8 @@ public class AddonPackage extends MajorRevisionPackage
      * <p>
      * The long description is whatever the XML contains for the &lt;description&gt; field,
      * or the short description if the former is empty.
+     *
+     * @return The XML description, or if none, the short description. Never null nor empty.
      */
     @Override
     public String getLongDescription() {
@@ -550,7 +599,7 @@ public class AddonPackage extends MajorRevisionPackage
     /**
      * Computes a potential installation folder if an archive of this package were
      * to be installed right away in the given SDK root.
-     * <p/>
+     * <p>
      * An add-on package is typically installed in SDK/add-ons/"addon-name"-"api-level".
      * The name needs to be sanitized to be acceptable as a directory name.
      * However if we can find a different directory under SDK/add-ons that already
@@ -595,6 +644,9 @@ public class AddonPackage extends MajorRevisionPackage
         return null;
     }
 
+    /**
+     * @return The encoded name for this add-on.
+     */
     private String encodeAddonName() {
         String name = String.format("addon-%s-%s-%s",     //$NON-NLS-1$
                 getNameId(), getVendorId(), mVersion.getApiString());
@@ -604,6 +656,10 @@ public class AddonPackage extends MajorRevisionPackage
         return name;
     }
 
+    /**
+     * @param pkg the package to compare.
+     * @return true if the given package is the same as this one, false otherwise
+     */
     @Override
     public boolean sameItemAs(Package pkg) {
         if (pkg instanceof AddonPackage) {
@@ -629,6 +685,9 @@ public class AddonPackage extends MajorRevisionPackage
         return false;
     }
 
+    /**
+     * @return a hash code for this object.
+     */
     @Override
     public int hashCode() {
         final int prime = 31;
@@ -641,6 +700,10 @@ public class AddonPackage extends MajorRevisionPackage
         return result;
     }
 
+    /**
+     * @param obj the object to compare this package against
+     * @return true if the other object is equal to this one, false otherwise
+     */
     @Override
     public boolean equals(Object obj) {
         if (this == obj) {
@@ -689,8 +752,8 @@ public class AddonPackage extends MajorRevisionPackage
 
     /**
      * For addon packages, we want to add vendor|name to the sorting key
-     * <em>before<em/> the revision number.
-     * <p/>
+     * <em>before</em> the revision number.
+     * <p>
      * {@inheritDoc}
      */
     @Override
@@ -712,19 +775,33 @@ public class AddonPackage extends MajorRevisionPackage
         private final String mName;
         private final String mDescription;
 
+        /**
+         * @param name        the name for the Lib
+         * @param description Can be empty but never null.
+         */
         public Lib(String name, String description) {
             mName = name;
             mDescription = description;
         }
 
+        /**
+         * @return The name of the library. Can be empty but never null.
+         */
         public String getName() {
             return mName;
         }
 
+        /**
+         * @return The description of the library. Can be empty but never null.
+         */
         public String getDescription() {
             return mDescription;
         }
 
+        /**
+         * @return A hash code that is based on the name and description of the library.
+         * The hash code is case-sensitive.
+         */
         @Override
         public int hashCode() {
             final int prime = 31;
@@ -734,6 +811,12 @@ public class AddonPackage extends MajorRevisionPackage
             return result;
         }
 
+        /**
+         * Two Lib objects are equal if they have the same name and description.
+         *
+         * @param obj The object to compare with this one.
+         * @return true if the object is a Lib and has the same name and description as this one.
+         */
         @Override
         public boolean equals(Object obj) {
             if (this == obj) {

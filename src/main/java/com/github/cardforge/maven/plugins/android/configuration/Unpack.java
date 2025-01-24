@@ -1,6 +1,8 @@
 package com.github.cardforge.maven.plugins.android.configuration;
 
 
+import com.github.cardforge.maven.plugins.android.standalonemojos.UnpackMojo;
+
 /**
  * Embedded configuration of {@link UnpackMojo}.
  *
@@ -9,12 +11,12 @@ package com.github.cardforge.maven.plugins.android.configuration;
 public class Unpack {
 
     /**
-     * Mirror of {@link UnpackMojo#unpackMetaInf}.
+     * Mirror of {@link UnpackMojo}#unpackMetaInf.
      */
     private MetaInf metaInf;
 
     /**
-     * Mirror of {@link UnpackMojo#unpackLazy}.
+     * Mirror of {@link UnpackMojo}#unpackLazy.
      */
     private Boolean lazy;
 }

@@ -30,24 +30,54 @@ import java.util.Set;
  */
 @Immutable
 public final class ClassFieldImpl implements ClassField, Serializable {
+    /**
+     * Serializable implementation of ClassFieldImpl
+     */
     @Serial
     private static final long serialVersionUID = 1L;
 
+    /**
+     * The type of this field.
+     */
     @NonNull
     private final String type;
+    /**
+     * The name of this field.
+     */
     @NonNull
     private final String name;
+    /**
+     * The value of this field.
+     */
     @NonNull
     private final String value;
+    /**
+     * The set of annotations for this field.
+     */
     @NonNull
     private final Set<String> annotations;
+    /**
+     * The documentation for this field.
+     */
     @NonNull
     private final String documentation;
 
+    /**
+     * @param type  the type of this field.
+     * @param name  the name of this field.
+     * @param value the value of this field.
+     */
     public ClassFieldImpl(@NonNull String type, @NonNull String name, @NonNull String value) {
         this(type, name, value, ImmutableSet.of(), "");
     }
 
+    /**
+     * @param type          the type of this field.
+     * @param name          the name of this field.
+     * @param value         the value of this field.
+     * @param annotations   the set of annotations for this field.
+     * @param documentation the documentation for this field.
+     */
     public ClassFieldImpl(@NonNull String type, @NonNull String name, @NonNull String value,
                           @NonNull Set<String> annotations, @NonNull String documentation) {
         //noinspection ConstantConditions
@@ -61,36 +91,55 @@ public final class ClassFieldImpl implements ClassField, Serializable {
         this.documentation = documentation;
     }
 
+    /**
+     * @return the type of this field.
+     */
     @Override
     @NonNull
     public String getType() {
         return type;
     }
 
+    /**
+     * @return the name of this field.
+     */
     @Override
     @NonNull
     public String getName() {
         return name;
     }
 
+    /**
+     * @return the value of this field.
+     */
     @Override
     @NonNull
     public String getValue() {
         return value;
     }
 
+    /**
+     * @return the documentation for this field.
+     */
     @NonNull
     @Override
     public String getDocumentation() {
         return documentation;
     }
 
+    /**
+     * @return the set of annotations for this field.
+     */
     @NonNull
     @Override
     public Set<String> getAnnotations() {
         return annotations;
     }
 
+    /**
+     * @param o the object to compare with
+     * @return true if the objects are equal, false otherwise
+     */
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -105,6 +154,9 @@ public final class ClassFieldImpl implements ClassField, Serializable {
         return documentation.equals(that.documentation);
     }
 
+    /**
+     * @return a hash code value for the object.
+     */
     @Override
     public int hashCode() {
         int result = type.hashCode();

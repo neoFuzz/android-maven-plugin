@@ -24,11 +24,15 @@ public interface ConvertibleName {
 
     /**
      * Returns an XML lower-hyphen separated name of itself.
+     *
+     * @return name string in XML format
      */
     String toXmlName();
 
     /**
      * Returns a camel case version of itself.
+     *
+     * @return name string in Camel case
      */
     String toCamelCaseName();
 }

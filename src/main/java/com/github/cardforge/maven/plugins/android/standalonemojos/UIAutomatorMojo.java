@@ -17,7 +17,6 @@
 package com.github.cardforge.maven.plugins.android.standalonemojos;
 
 import com.android.ddmlib.AdbCommandRejectedException;
-import com.android.ddmlib.IDevice;
 import com.android.ddmlib.ShellCommandUnresponsiveException;
 import com.android.ddmlib.TimeoutException;
 import com.android.ddmlib.testrunner.UIAutomatorRemoteAndroidTestRunner;

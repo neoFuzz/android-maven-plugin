@@ -25,6 +25,8 @@ public interface ProcessOutputHandler {
 
     /**
      * Creates a ProcessOutput to be used by the process executor.
+     *
+     * @return the ProcessOutput to use
      */
     @NonNull
     ProcessOutput createOutput();

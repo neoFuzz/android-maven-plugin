@@ -141,6 +141,8 @@ public interface ProductFlavor extends BaseConfig, DimensionAware {
 
     /**
      * Returns the arguments for the test instrumentation runner.
+     *
+     * @return the arguments for the test instrumentation runner.
      */
     @NonNull
     Map<String, String> getTestInstrumentationRunnerArguments();
@@ -173,6 +175,8 @@ public interface ProductFlavor extends BaseConfig, DimensionAware {
 
     /**
      * Returns the associated signing config or null if none are set on the product flavor.
+     *
+     * @return the signing config or null
      */
     @Nullable
     SigningConfig getSigningConfig();

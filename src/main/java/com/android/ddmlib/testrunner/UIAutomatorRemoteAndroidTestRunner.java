@@ -37,7 +37,10 @@ public class UIAutomatorRemoteAndroidTestRunner {
     }
 
     /**
-     * {@inheritDoc}
+     * Sets the test class or method to be run. This method must be called before calling
+     * {@link #run(ITestRunListener...)}.
+     *
+     * @param testClassOrMethods a list of test classes or test methods.
      */
     public void setTestClassOrMethods(@NonNull String[] testClassOrMethods) {
         for (String testClassOrMethod : testClassOrMethods) {
@@ -46,7 +49,10 @@ public class UIAutomatorRemoteAndroidTestRunner {
     }
 
     /**
-     * {@inheritDoc}
+     * Adds an instrumentation argument to be passed to the test runner.
+     *
+     * @param name  the argument name
+     * @param value the argument value. May be null.
      */
     public void addInstrumentationArg(String name, String value) {
         if (name == null || value == null) {
@@ -56,14 +62,19 @@ public class UIAutomatorRemoteAndroidTestRunner {
     }
 
     /**
-     * {@inheritDoc}
+     * Adds an instrumentation boolean argument to be passed to the test runner.
+     *
+     * @param name  the argument name
+     * @param value the argument value.
      */
     public void addBooleanArg(String name, boolean value) {
         addInstrumentationArg(name, Boolean.toString(value));
     }
 
     /**
-     * {@inheritDoc}
+     * Set the {@code debug} flag. If true, the command will be run with debug.
+     *
+     * @param debug if true, the command will be run with debug.
      */
 
     public void setDebug(boolean debug) {
@@ -71,47 +82,56 @@ public class UIAutomatorRemoteAndroidTestRunner {
     }
 
     /**
-     * {@inheritDoc}
+     * Set the {@code nohup} flag. If true, the command will be run with nohup.
+     *
+     * @param noHup if true, the command will be run with nohup.
      */
-
     public void setNoHup(boolean noHup) {
         this.noHup = noHup;
     }
 
     /**
-     * {@inheritDoc}
+     * Set the dump file path.
+     *
+     * @param dumpFilePath the dump file path.
      */
-
     public void setDumpFilePath(String dumpFilePath) {
         this.dumpFilePath = dumpFilePath;
     }
 
     /**
-     * {@inheritDoc}
+     * Sets the max time the shell command will wait while receiving instrumentation results from the device.
+     *
+     * @param maxTimeToOutputResponse the max time to wait for instrumentation to handle the test output. A value of 0
+     *                                means wait forever.
      */
     public void setMaxtimeToOutputResponse(int maxTimeToOutputResponse) {
         mMaxTimeToOutputResponse = maxTimeToOutputResponse;
     }
 
     /**
-     * {@inheritDoc}
+     * Sets the Run's name.
+     *
+     * @param runName the run name to report in logs and instrumentation results. May be null.
      */
-
     public void setRunName(String runName) {
         mRunName = runName;
     }
 
     /**
-     * {@inheritDoc}
+     * Builds the command line syntax for the instrumentation arguments and executes the command.
+     *
+     * @param listeners {@link ITestRunListener}s that will receive test results. May be empty.
      */
-
     public void run(ITestRunListener... listeners) throws TimeoutException, AdbCommandRejectedException,
             ShellCommandUnresponsiveException, IOException {
         run(Arrays.asList(listeners));
     }
 
     /**
-     * {@inheritDoc}
+     * Builds the command line syntax for the instrumentation arguments and executes the command.
+     *
+     * @param listeners {@link ITestRunListener}s that will receive test results. May be empty.
      */
     public void run(Collection<ITestRunListener> listeners) throws TimeoutException, AdbCommandRejectedException,
             ShellCommandUnresponsiveException, IOException {
@@ -150,7 +170,7 @@ public class UIAutomatorRemoteAndroidTestRunner {
     }
 
     /**
-     * {@inheritDoc}
+     * Cancels the test run.
      */
     public void cancel() {
         if (mParser != null) {

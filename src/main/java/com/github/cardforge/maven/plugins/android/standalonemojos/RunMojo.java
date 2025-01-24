@@ -59,7 +59,6 @@ import static com.github.cardforge.maven.plugins.android.common.AndroidExtension
  * <li>Action type: <code>android.intent.action.MAIN</code></li>
  * <li>Category: <code>android.intent.category.LAUNCHER</code></li>
  * </ul>
- * </p>
  * <p>And are declared in <code>AndroidManifest.xml</code> as such:</p>
  * <pre>
  * &lt;activity android:name=".ExampleActivity"&gt;

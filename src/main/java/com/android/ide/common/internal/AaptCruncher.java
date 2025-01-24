@@ -33,6 +33,13 @@ public class AaptCruncher implements PngCruncher {
     @NonNull
     private final ProcessOutputHandler mProcessOutputHandler;
 
+    /**
+     * Creates a new cruncher.
+     *
+     * @param aaptLocation         the path to the aapt tool.
+     * @param processExecutor      the process executor to use to run the cruncher.
+     * @param processOutputHandler the handler to use for handling the process output.
+     */
     public AaptCruncher(
             @NonNull String aaptLocation,
             @NonNull ProcessExecutor processExecutor,
@@ -66,6 +73,11 @@ public class AaptCruncher implements PngCruncher {
         }
     }
 
+    /**
+     * Does do anything, it's all synchronous.
+     *
+     * @throws InterruptedException if the crunching was interrupted.
+     */
     @Override
     public void end() throws InterruptedException {
         // nothing to do, it's all synchronous.

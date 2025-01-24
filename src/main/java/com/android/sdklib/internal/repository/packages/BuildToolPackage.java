@@ -76,6 +76,15 @@ public class BuildToolPackage extends FullRevisionPackage {
                 .create();
     }
 
+    /**
+     * @param source        The {@link SdkSource} where this is loaded from.
+     * @param props         The properties to load from the given file
+     * @param revision      The revision of the build-tool package
+     * @param license       The license of the build-tool package
+     * @param description   The description of the build-tool package
+     * @param descUrl       The description URL. Can be null
+     * @param archiveOsPath The OS path of the archive. Can be null if the package is installed.
+     */
     @VisibleForTesting(visibility = Visibility.PRIVATE)
     protected BuildToolPackage(
             SdkSource source,
@@ -98,13 +107,13 @@ public class BuildToolPackage extends FullRevisionPackage {
 
     /**
      * Creates either a valid {@link BuildToolPackage} or a {@link BrokenPackage}.
-     * <p/>
+     * <p>
      * If the build-tool directory contains valid properties,
      * this creates a new {@link BuildToolPackage} with the reversion listed in the properties.
-     * Otherwise returns a new {@link BrokenPackage} with some explanation on what failed.
-     * <p/>
+     * Otherwise, returns a new {@link BrokenPackage} with some explanation on what failed.
+     * <p>
      * Note that the folder name is not enforced. A build-tool directory must have a
-     * a source.props with a revision property and a few expected binaries inside to be
+     * a {@code source.props} with a revision property and a few expected binaries inside to be
      * valid.
      *
      * @param buildToolDir The SDK/build-tool/revision folder
@@ -226,7 +235,7 @@ public class BuildToolPackage extends FullRevisionPackage {
      * Returns a string identifier to install this package from the command line.
      * For build-tools, we use "build-tools-" followed by the full revision string
      * where spaces are changed to underscore to be more script-friendly.
-     * <p/>
+     * <p>
      * {@inheritDoc}
      */
     @Override
@@ -236,7 +245,7 @@ public class BuildToolPackage extends FullRevisionPackage {
 
     /**
      * Returns a description of this package that is suitable for a list display.
-     * <p/>
+     * <p>
      * {@inheritDoc}
      */
     @Override
@@ -290,7 +299,7 @@ public class BuildToolPackage extends FullRevisionPackage {
     /**
      * Computes a potential installation folder if an archive of this package were
      * to be installed right away in the given SDK root.
-     * <p/>
+     * <p>
      * A build-tool package is typically installed in SDK/build-tools/revision.
      * Revision spaces are replaced by underscores for ease of use in command-line.
      *
@@ -349,7 +358,7 @@ public class BuildToolPackage extends FullRevisionPackage {
      * For build-tool package use their revision number like version numbers and
      * we want them sorted from higher to lower. To do that, insert a fake revision
      * number using 9999-value into the sorting key.
-     * <p/>
+     * <p>
      * {@inheritDoc}
      */
     @Override

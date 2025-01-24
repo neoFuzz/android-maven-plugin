@@ -1,5 +1,7 @@
 package com.github.cardforge.maven.plugins.android.configuration;
 
+import com.github.cardforge.maven.plugins.android.standalonemojos.LintMojo;
+
 /**
  * Configuration for the lint command. This class is only the definition of the parameters that are shadowed in
  * {@link LintMojo} and used there.

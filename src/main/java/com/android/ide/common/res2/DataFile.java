@@ -33,8 +33,17 @@ import java.util.Map;
  */
 public abstract class DataFile<I extends DataItem> {
 
+    /**
+     * The item list
+     */
     protected final Map<String, I> mItems = Maps.newHashMap();
+    /**
+     * The type of the DataFile
+     */
     private final FileType mType;
+    /**
+     * The file object
+     */
     protected File mFile;
 
     /**
@@ -69,21 +78,33 @@ public abstract class DataFile<I extends DataItem> {
         addItems(items);
     }
 
+    /**
+     * @return the type of the DataFile
+     */
     @NonNull
     FileType getType() {
         return mType;
     }
 
+    /**
+     * @return the file object
+     */
     @NonNull
     public File getFile() {
         return mFile;
     }
 
+    /**
+     * @return the item list
+     */
     I getItem() {
         assert mItems.size() == 1;
         return mItems.values().iterator().next();
     }
 
+    /**
+     * @return true if the DataFile has not removed items
+     */
     boolean hasNotRemovedItems() {
         for (I item : mItems.values()) {
             if (!item.isRemoved()) {
@@ -94,22 +115,34 @@ public abstract class DataFile<I extends DataItem> {
         return false;
     }
 
+    /**
+     * @return the item list
+     */
     @NonNull
     public Collection<I> getItems() {
         return mItems.values();
     }
 
+    /**
+     * @return the item map
+     */
     @NonNull
     public Map<String, I> getItemMap() {
         return mItems;
     }
 
+    /**
+     * @param item the item to add
+     */
     public void addItem(@NonNull I item) {
         //noinspection unchecked
         item.setSource(this);
         mItems.put(item.getKey(), item);
     }
 
+    /**
+     * @param items the items to add
+     */
     public void addItems(@NonNull Iterable<I> items) {
         for (I item : items) {
             //noinspection unchecked
@@ -118,6 +151,9 @@ public abstract class DataFile<I extends DataItem> {
         }
     }
 
+    /**
+     * @param items the items to remove
+     */
     public void removeItems(@NonNull Iterable<I> items) {
         for (I item : items) {
             mItems.remove(item.getKey());
@@ -126,15 +162,27 @@ public abstract class DataFile<I extends DataItem> {
         }
     }
 
+    /**
+     * @param item the item to remove
+     */
     public void removeItem(@NonNull ResourceItem item) {
         mItems.remove(item.getKey());
         item.setSource(null);
     }
 
+    /**
+     * @param document     the document to add the extra attributes
+     * @param node         the node to add the extra attributes
+     * @param namespaceUri the namespace URI to use for the extra attributes
+     */
     void addExtraAttributes(Document document, Node node, @Nullable String namespaceUri) {
         // nothing
     }
 
+    /**
+     * @param oldItem the old item to replace
+     * @param newItem the new item to replace with
+     */
     public void replace(@NonNull I oldItem, @NonNull I newItem) {
         mItems.remove(oldItem.getKey());
         //noinspection unchecked
@@ -144,6 +192,9 @@ public abstract class DataFile<I extends DataItem> {
         mItems.put(newItem.getKey(), newItem);
     }
 
+    /**
+     * @return the string representation of the DataFile
+     */
     @Override
     public String toString() {
         return "DataFile{" +
@@ -151,7 +202,17 @@ public abstract class DataFile<I extends DataItem> {
                 '}';
     }
 
+    /**
+     * The type of the DataFile
+     */
     enum FileType {
-        SINGLE, MULTI
+        /**
+         * A data file that contains a single item
+         */
+        SINGLE,
+        /**
+         * A data file that contains multiple items
+         */
+        MULTI
     }
 }

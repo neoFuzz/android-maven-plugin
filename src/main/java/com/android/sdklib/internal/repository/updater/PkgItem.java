@@ -29,9 +29,10 @@ import com.android.sdklib.repository.IDescription;
 /**
  * A {@link PkgItem} represents one main {@link Package} combined with its state
  * and an optional update package.
- * <p/>
+ * <p>
  * The main package is final and cannot change since it's what "defines" this PkgItem.
  * The state or update package can change later.
+ * </p>
  *
  * @deprecated com.android.sdklib.internal.repository has moved into Studio as
  * com.android.tools.idea.sdk.remote.internal.

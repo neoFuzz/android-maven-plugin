@@ -1,5 +1,7 @@
 package com.github.cardforge.maven.plugins.android.configuration;
 
+import com.github.cardforge.maven.plugins.android.standalonemojos.RunMojo;
+
 /**
  * Configuration for the Run goal.
  *
@@ -9,7 +11,7 @@ package com.github.cardforge.maven.plugins.android.configuration;
 public class Run {
 
     /**
-     * Mirror of {@link RunMojo#runDebug}
+     * Mirror of {@link RunMojo}#runDebug
      */
     protected String debug;
 

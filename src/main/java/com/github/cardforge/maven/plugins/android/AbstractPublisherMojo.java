@@ -13,24 +13,55 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
+ * Abstract base class for all publishing related mojos.
+ *
  * @author Joris de Groot
  * @author Benoit Billington
  */
 public abstract class AbstractPublisherMojo extends AbstractAndroidMojo {
-    // region '419' is a special case in the play store that represents latin america
+    /**
+     * region '419' is a special case in the play store that represents latin america
+     */
     protected static final String LOCALE_DIR_PATTERN = "^[a-z]{2}(-([A-Z]{2}|419))?";
+    /**
+     * Pattern to match the {@code whatsnew.txt} file.
+     */
     private static final String WHATSNEW = "whatsnew.txt";
+    /**
+     * Pattern to match the changelog.txt file.
+     */
     @Parameter(property = "android.publisher.project.name")
     protected String projectName;
+    /**
+     * Pattern to match the changelog.txt file.
+     */
     @Parameter(property = "android.publisher.listing.directory", defaultValue = "${project.basedir}/src/main/play/")
     protected File listingDirectory;
+    /**
+     * List of edits
+     */
     protected AndroidPublisher.Edits edits;
+    /**
+     * The ID of the edit to perform.
+     */
     protected String editId;
+    /**
+     * The publisher's email
+     */
     @Parameter(property = "android.publisher.google.email", required = true)
     private String publisherEmail;
+    /**
+     * The encoding of the source files.
+     */
     @Parameter(property = "android.publisher.google.p12", required = true)
     private File p12File;
 
+    /**
+     * Initializes the publisher for the given package name.
+     *
+     * @param packageName The package name of the application to publish.
+     * @throws MojoExecutionException If an error occurs during the initialization of the publisher.
+     */
     protected void initializePublisher(@NonNull String packageName) throws MojoExecutionException {
         getLog().debug("Initializing publisher");
         if (projectName == null || projectName.isEmpty()) {
@@ -48,6 +79,15 @@ public abstract class AbstractPublisherMojo extends AbstractAndroidMojo {
         }
     }
 
+    /**
+     * Reads a file and returns the contents as a string. The maximum number of characters is
+     * enforced.
+     *
+     * @param file     The file to read.
+     * @param maxChars The maximum number of characters allowed in the file.
+     * @return The contents of the file as a string.
+     * @throws IOException If an error occurs while reading the file.
+     */
     public String readFile(File file, int maxChars) throws IOException {
         String everything;
         InputStreamReader isr;
@@ -85,6 +125,11 @@ public abstract class AbstractPublisherMojo extends AbstractAndroidMojo {
         return everything;
     }
 
+    /**
+     * Gets the locale directories from the listing directory.
+     *
+     * @return Array of locale directories. Returns null if no locale directories are found.
+     */
     public File[] getLocaleDirs() {
         if (!listingDirectory.exists()) {
             getLog().warn("Play directory is missing.");
@@ -104,6 +149,16 @@ public abstract class AbstractPublisherMojo extends AbstractAndroidMojo {
         return localeDirs;
     }
 
+    /**
+     * Reads a file from the locale directory. If the file does not exist, a warning is logged.
+     *
+     * @param dir          The locale directory.
+     * @param fileName     The name of the file to read.
+     * @param maxChars     The maximum number of characters allowed in the file.
+     * @param errorMessage The error message to log if the file does not exist.
+     * @return The contents of the file as a string, or null if the file does not exist.
+     * @throws IOException If an error occurs while reading the file.
+     */
     public String readFileWithChecks(File dir, String fileName, int maxChars, String errorMessage)
             throws IOException {
         File file = new File(dir, fileName);
@@ -115,6 +170,9 @@ public abstract class AbstractPublisherMojo extends AbstractAndroidMojo {
         }
     }
 
+    /**
+     * Warns if the source encoding is not set and the platform default encoding is used.
+     */
     protected void warnPlatformDefaultEncoding() {
         if (sourceEncoding == null) {
             getLog().warn(

@@ -27,16 +27,28 @@ import com.android.annotations.NonNull;
  */
 public class CachedProcessOutputHandler extends BaseProcessOutputHandler {
 
+    /**
+     * The process output
+     */
     private BaseProcessOutput mProcessOutput = null;
 
+    /**
+     * Default constructor
+     */
     public CachedProcessOutputHandler() {
         // nothing to initialize
     }
 
+    /**
+     * @return the process output
+     */
     public BaseProcessOutput getProcessOutput() {
         return mProcessOutput;
     }
 
+    /**
+     * @return the process output
+     */
     @NonNull
     @Override
     public ProcessOutput createOutput() {
@@ -45,11 +57,14 @@ public class CachedProcessOutputHandler extends BaseProcessOutputHandler {
             throw new IllegalStateException("CachedProcessOutputHandler cannot be reused");
         }
         mProcessOutput = (BaseProcessOutput) super.createOutput();
-        return mProcessOutput ;
+        return mProcessOutput;
     }
 
+    /**
+     * @param processOutput the process output to handle
+     */
     @Override
-    public void handleOutput(@NonNull ProcessOutput processOutput){
+    public void handleOutput(@NonNull ProcessOutput processOutput) {
         // do nothing
     }
 }

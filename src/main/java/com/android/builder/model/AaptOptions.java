@@ -27,34 +27,39 @@ import java.util.List;
  */
 public interface AaptOptions {
     /**
-     * Returns the value for the --ignore-assets option, or null
+     * @return Returns the value for the --ignore-assets option, or null
      */
     @Nullable
     String getIgnoreAssets();
 
     /**
-     * Returns the list of values for the -0 (disabled compression) option, or null
+     * @return the list of values for the -0 (disabled compression) option, or null
      */
     @Nullable
     Collection<String> getNoCompress();
 
     /**
      * passes the --error-on-missing-config-entry parameter to the aapt command, by default false.
+     *
+     * @return whether to fail on missing config entries
      */
     boolean getFailOnMissingConfigEntry();
 
     /**
-     * Returns the list of additional parameters to pass.
+     * @return the list of additional parameters to pass.
      */
     @NonNull
     List<String> getAdditionalParameters();
 
     /**
-     * Returns the resource namespacing strategy for this subproject
+     * @return the resource namespacing strategy for this subproject
      */
     @NonNull
     Namespacing getNamespacing();
 
+    /**
+     * Resource namespacing strategy for this subproject.
+     */
     enum Namespacing {
         /**
          * Resources are not namespaced.

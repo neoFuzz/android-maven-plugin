@@ -1,6 +1,8 @@
 package com.github.cardforge.maven.plugins.android.configuration;
 
 
+import com.github.cardforge.maven.plugins.android.AbstractAndroidMojo;
+
 /**
  * Configuration for the Android Emulator. This class is only the definition of the parameters that are shadowed in
  * {@link AbstractAndroidMojo} and used there.

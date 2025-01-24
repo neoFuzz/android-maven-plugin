@@ -61,7 +61,7 @@ public class SdkRepoConstants extends RepoConstants {
     /**
      * The pattern name looked by {@link SdkSource} when trying to load
      * a sdk-repository XML that is specific to a given XSD revision.
-     * <p/>
+     * <p>
      * This must be used with {@link String#format(String, Object...)} with
      * one integer parameter between 1 and {@link #NS_LATEST_VERSION}.
      */

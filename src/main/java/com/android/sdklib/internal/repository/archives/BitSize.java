@@ -27,11 +27,23 @@ import com.android.annotations.Nullable;
  */
 @Deprecated
 public enum BitSize {
+    /**
+     * 32-bitness
+     */
     _32(32),
+    /**
+     * 64-bitness
+     */
     _64(64);
 
+    /**
+     * The size of the architecture.
+     */
     private final int mSize;
 
+    /**
+     * @param size The size of the architecture.
+     */
     BitSize(int size) {
         mSize = size;
     }
@@ -39,6 +51,7 @@ public enum BitSize {
     /**
      * Returns the enum value matching the given XML name.
      *
+     * @param xmlName The XML name of the bit size.
      * @return A valid {@link HostOs} constant or null if not a valid XML name.
      */
     @Nullable
@@ -55,6 +68,8 @@ public enum BitSize {
 
     /**
      * Returns the size of the architecture.
+     *
+     * @return The size of the architecture.
      */
     public int getSize() {
         return mSize;
@@ -62,6 +77,8 @@ public enum BitSize {
 
     /**
      * Returns the XML name of the bit size.
+     *
+     * @return The XML name of the bit size.
      */
     @NonNull
     public String getXmlName() {

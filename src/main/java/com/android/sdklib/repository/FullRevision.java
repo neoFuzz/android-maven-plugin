@@ -90,7 +90,7 @@ public class FullRevision extends Revision {
      * Parses a string of format "major.minor.micro rcPreview" and returns
      * a new {@link FullRevision} for it. All the fields except major are
      * optional.
-     * <p/>
+     * <p>
      * The parsing is equivalent to the pseudo-BNF/regexp:
      * <pre>
      *   Major/Minor/Micro/Preview := [0-9]+
@@ -320,7 +320,7 @@ public class FullRevision extends Revision {
     }
 
     /**
-     * Trivial comparison of a version, e.g. 17.1.2 < 18.0.0.
+     * Trivial comparison of a version, e.g. {@code 17.1.2 < 18.0.0}.
      * <p>
      * Note that preview/release candidate are released before their final version,
      * so "18.0.0 rc1" comes below "18.0.0". The best way to think of it as if the
@@ -336,7 +336,7 @@ public class FullRevision extends Revision {
     }
 
     /**
-     * Trivial comparison of a version, e.g. 17.1.2 < 18.0.0.
+     * Trivial comparison of a version, e.g. {@code 17.1.2 < 18.0.0}.
      * <p>
      * Note that preview/release candidate are released before their final version,
      * so "18.0.0 rc1" comes below "18.0.0". The best way to think of it as if the

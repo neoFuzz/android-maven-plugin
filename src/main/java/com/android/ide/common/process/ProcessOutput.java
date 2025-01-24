@@ -30,12 +30,16 @@ public interface ProcessOutput {
 
     /**
      * Returns the OutputStream to use for the standard output
+     *
+     * @return the OutputStream to use for the standard output
      */
     @NonNull
     OutputStream getStandardOutput();
 
     /**
      * Returns the OutputStream to use for the error output
+     *
+     * @return the OutputStream to use for the error output
      */
     @NonNull
     OutputStream getErrorOutput();

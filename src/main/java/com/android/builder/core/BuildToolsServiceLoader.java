@@ -24,7 +24,6 @@ import com.android.sdklib.repository.FullRevision;
 import com.android.utils.ILogger;
 import com.google.common.base.Joiner;
 import com.google.common.base.MoreObjects;
-import java.util.Optional;
 import com.google.common.collect.ImmutableList;
 
 import java.io.File;
@@ -113,22 +112,41 @@ public enum BuildToolsServiceLoader {
      */
     public static class Service<T> {
 
+        /**
+         * list of the class paths
+         */
         private final Collection<String> classpath;
+        /**
+         * the service class
+         */
         private final Class<T> serviceClass;
 
+        /**
+         * @param classpath    the classpath items to search for the service declaration.
+         * @param serviceClass the service class
+         */
         protected Service(Collection<String> classpath, Class<T> serviceClass) {
             this.classpath = classpath;
             this.serviceClass = serviceClass;
         }
 
+        /**
+         * @return the classpath items to search for the service declaration.
+         */
         public Collection<String> getClasspath() {
             return classpath;
         }
 
+        /**
+         * @return the service class
+         */
         public Class<T> getServiceClass() {
             return serviceClass;
         }
 
+        /**
+         * @return a string representation of this service
+         */
         @Override
         public String toString() {
             return MoreObjects.toStringHelper(this)
@@ -143,10 +161,19 @@ public enum BuildToolsServiceLoader {
      */
     public static final class BuildToolServiceLoader {
 
+        /**
+         * the build-tools information
+         */
         private final BuildToolInfo buildToolInfo;
+        /**
+         * cache of loaded services
+         */
         private final List<LoadedServiceLoader> loadedServicesLoaders =
                 new ArrayList<>();
 
+        /**
+         * @param buildToolInfo the build-tools information to load services for.
+         */
         private BuildToolServiceLoader(BuildToolInfo buildToolInfo) {
             this.buildToolInfo = buildToolInfo;
         }
@@ -192,7 +219,7 @@ public enum BuildToolsServiceLoader {
 
         /**
          * Return the first service instance for the requested service type or
-         * {@link Optional#absent()} if none exist.
+         * {@code Optional#absent()} if none exist.
          *
          * @param logger      to log resolution.
          * @param serviceType the requested service type encapsulation.

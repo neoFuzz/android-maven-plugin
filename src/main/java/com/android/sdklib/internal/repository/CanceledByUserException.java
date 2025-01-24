@@ -25,8 +25,14 @@ package com.android.sdklib.internal.repository;
  */
 @Deprecated
 public class CanceledByUserException extends Exception {
+    /**
+     * Serial version UID for serialization.
+     */
     private static final long serialVersionUID = -7669346110926032403L;
 
+    /**
+     * @param message The message of the exception
+     */
     public CanceledByUserException(String message) {
         super(message);
     }

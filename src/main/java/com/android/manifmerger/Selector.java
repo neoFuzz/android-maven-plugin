@@ -18,10 +18,9 @@ package com.android.manifmerger;
 
 import com.android.annotations.NonNull;
 import com.android.annotations.concurrency.Immutable;
+import com.google.common.base.Preconditions;
 
 import java.util.Optional;
-
-import com.google.common.base.Preconditions;
 
 /**
  * Represents a selector to be able to identify manifest file xml elements.

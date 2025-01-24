@@ -28,12 +28,13 @@ import java.io.File;
  * (both local or remote packages definitions.)
  * <br/>
  * Packages have different attributes depending on their type.
- * <p/>
+ * <p>
  * To create a new {@link IPkgDesc}, use one of the package-specific constructors
  * provided by {@code PkgDesc.Builder.newXxx()}.
- * <p/>
+ * </p><p>
  * To query packages capabilities, rely on {@link #getType()} and the {@code IPkgDesc.hasXxx()}
  * methods provided by {@link IPkgDesc}.
+ * </p>
  */
 public interface IPkgDesc extends Comparable<IPkgDesc>, IPkgCapabilities, IListDescription {
 
@@ -90,7 +91,7 @@ public interface IPkgDesc extends Comparable<IPkgDesc>, IPkgCapabilities, IListD
 
     /**
      * Returns the package's path string or null.
-     * <p/>
+     * <p>
      * For {@link PkgType#PKG_SYS_IMAGE}, the path is the system-image ABI. <br/>
      * For {@link PkgType#PKG_PLATFORM}, the path is the platform hash string. <br/>
      * For {@link PkgType#PKG_ADDON}, the path is the platform hash string. <br/>

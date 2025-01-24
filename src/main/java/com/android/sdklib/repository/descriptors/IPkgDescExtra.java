@@ -24,14 +24,14 @@ import com.android.sdklib.repository.NoPreviewRevision;
  * (both local or remote packages definitions.) The base {@link IPkgDesc} tries
  * to present a unified interface to package attributes and this interface
  * adds methods specific to extras.
- * <p/>
+ * <p>
  * To create a new {@link IPkgDescExtra},
  * use {@link PkgDesc.Builder#newExtra(IdDisplay, String, String, String[], NoPreviewRevision)}.
- * <p/>
+ * <p>
  * The extra's revision is a {@link NoPreviewRevision}; the attribute is however
  * accessed via {@link IPkgDesc#getFullRevision()} instead of introducing a new
  * custom method.
- * <p/>
+ * <p>
  * To query generic packages capabilities, rely on {@link #getType()} and the
  * {@code IPkgDesc.hasXxx()} methods provided by {@link IPkgDesc}.
  */

@@ -18,7 +18,13 @@ import java.util.List;
  * @author Manfred Moser
  */
 public class AaptCommandBuilder {
+    /**
+     * List of commands to be executed
+     */
     protected final List<String> commands;
+    /**
+     * Instance of {@link Log} to use for logging
+     */
     protected final Log log;
 
     /**
@@ -32,6 +38,7 @@ public class AaptCommandBuilder {
     /**
      * Package the android resources.
      *
+     * @param log instance of {@link Log} to use for logging
      * @return instance of {@link AaptPackageCommandBuilder}
      */
     @NonNull
@@ -42,6 +49,7 @@ public class AaptCommandBuilder {
     /**
      * Dump label, icon, permissions, compiled XMLs etc.
      *
+     * @param log instance of {@link Log} to use for logging
      * @return instance of {@link AaptDumpCommandBuilder}
      */
     @NonNull
@@ -70,6 +78,11 @@ public class AaptCommandBuilder {
      * Class that responsible for building aapt commands for packaging resources
      */
     public static final class AaptPackageCommandBuilder extends AaptCommandBuilder {
+        /**
+         * Construct instance of {@link AaptPackageCommandBuilder}
+         *
+         * @param log instance of {@link Log} to use for logging
+         */
         public AaptPackageCommandBuilder(Log log) {
             super(log);
             commands.add("package");
@@ -334,6 +347,7 @@ public class AaptCommandBuilder {
         /**
          * Specify the apk file to output.
          *
+         * @param outputFile {@link File} to output apk file to
          * @return current instance of {@link AaptCommandBuilder}
          */
         public AaptPackageCommandBuilder setOutputApkFile(@NonNull File outputFile) {
@@ -345,6 +359,7 @@ public class AaptCommandBuilder {
         /**
          * Output Proguard options to a File.
          *
+         * @param outputFile {@link File} to output proguard options to
          * @return current instance of {@link AaptCommandBuilder}
          */
         public AaptPackageCommandBuilder setProguardOptionsOutputFile(File outputFile) {
@@ -396,6 +411,7 @@ public class AaptCommandBuilder {
          * Inserts android:debuggable="true" into the application node of the
          * manifest, making the application debuggable even on production devices.
          *
+         * @param isDebugMode if true apk will be debuggable, otherwise - no
          * @return current instance of {@link AaptPackageCommandBuilder}
          */
         public AaptPackageCommandBuilder setDebugMode(boolean isDebugMode) {
@@ -413,6 +429,11 @@ public class AaptCommandBuilder {
      * Class that responsible for building aapt commands for dumping information from apk file
      */
     public static final class AaptDumpCommandBuilder extends AaptCommandBuilder {
+        /**
+         * Constructor for {@link AaptDumpCommandBuilder}
+         *
+         * @param log {@link Log} instance to use for logging
+         */
         public AaptDumpCommandBuilder(Log log) {
             super(log);
             commands.add("dump");

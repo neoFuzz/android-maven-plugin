@@ -498,7 +498,7 @@ public class LintMojo extends AbstractAndroidMojo {
      *
      * @throws MojoExecutionException If an error occurs
      */
-    @SuppressWarnings({"StatementWithEmptyBody","CommentedOutCode","squid:S125","UnstableApiUsage"})
+    @SuppressWarnings({"StatementWithEmptyBody", "CommentedOutCode", "squid:S125", "UnstableApiUsage"})
     private void runLint() throws MojoExecutionException {
         IssueRegistry registry = new BuiltinIssueRegistry();
         LintCliFlags flags = new LintCliFlags();

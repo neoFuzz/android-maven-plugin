@@ -103,7 +103,6 @@ public class SdkAddonSource extends SdkSource {
      *
      * @param xml The input XML stream. Can be null.
      * @return Always null.
-     * @null This implementation always return null.
      */
     @Override
     protected Document findAlternateToolsXml(@Nullable InputStream xml) {

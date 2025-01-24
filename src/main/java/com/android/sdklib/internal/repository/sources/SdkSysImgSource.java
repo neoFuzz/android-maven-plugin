@@ -103,8 +103,7 @@ public class SdkSysImgSource extends SdkSource {
      * This kind of schema does not support forward-evolution of the &lt;tool&gt; element.
      *
      * @param xml The input XML stream. Can be null.
-     * @return Always null.
-     * @null This implementation always return null.
+     * @return This implementation always return null.
      */
     @Override
     protected Document findAlternateToolsXml(@Nullable InputStream xml) {

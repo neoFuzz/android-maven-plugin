@@ -56,7 +56,7 @@ public class PreciseRevision extends FullRevision {
      * a new {@link com.android.sdklib.repository.PreciseRevision} for it.
      * <p>
      * All the fields except major are optional.
-     * <p/>
+     * <p>
      *
      * @param revision A non-null revision to parse.
      * @return A new non-null {@link com.android.sdklib.repository.PreciseRevision}.

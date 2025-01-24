@@ -382,7 +382,7 @@ public class SystemImagePackage extends MajorRevisionPackage
 
     /**
      * Returns the version of the platform dependency of this package.
-     * <p/>
+     * <p>
      * A system-image has the same {@link AndroidVersion} as the platform it depends on.
      */
     @NonNull
@@ -394,7 +394,7 @@ public class SystemImagePackage extends MajorRevisionPackage
     /**
      * Returns true if the system-image belongs to a standard Android platform.
      * In this case {@link #getAddonVendor()} returns null.
-     * <p/.
+     * <p>
      * Returns false if the system-image belongs to an add-on.
      * In this case {@link #getAndroidVersion()} returns a non-null {@link IdDisplay}.
      */
@@ -414,7 +414,7 @@ public class SystemImagePackage extends MajorRevisionPackage
     /**
      * Returns a string identifier to install this package from the command line.
      * For system images, we use "sysimg-N" where N is the API or the preview codename.
-     * <p/>
+     * <p>
      * {@inheritDoc}
      */
     @Override
@@ -439,7 +439,7 @@ public class SystemImagePackage extends MajorRevisionPackage
 
     /**
      * Returns a description of this package that is suitable for a list display.
-     * <p/>
+     * <p>
      * {@inheritDoc}
      */
     @Override
@@ -508,7 +508,7 @@ public class SystemImagePackage extends MajorRevisionPackage
     /**
      * Computes a potential installation folder if an archive of this package were
      * to be installed right away in the given SDK root.
-     * <p/>
+     * <p>
      * A system-image package is typically installed in SDK/systems/platform/tag/abi.
      * The name needs to be sanitized to be acceptable as a directory name.
      *
@@ -612,8 +612,8 @@ public class SystemImagePackage extends MajorRevisionPackage
 
     /**
      * For sys img packages, we want to add tag/abi to the sorting key
-     * <em>before<em/> the revision number.
-     * <p/>
+     * <em>before</em> the revision number.
+     * <p>
      * {@inheritDoc}
      */
     @Override

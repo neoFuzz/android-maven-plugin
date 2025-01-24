@@ -62,10 +62,18 @@ public abstract class MajorRevisionPackage extends Package {
      * Manually create a new package with one archive and the given attributes.
      * This is used to create packages from local directories in which case there must be
      * one archive which URL is the actual target location.
-     * <p/>
-     * Properties from props are used first when possible, e.g. if props is non null.
-     * <p/>
+     * <p>
+     * Properties from props are used first when possible, e.g. if props is non-null.
+     * <p>
      * By design, this creates a package with one and only one archive.
+     *
+     * @param source        The {@link SdkSource} where this is loaded from.
+     * @param props         The properties to be used for the package.
+     * @param revision      The revision number of the package.
+     * @param license       The license to be used for the package.
+     * @param description   A short description for the package.
+     * @param descUrl       The optional description URL for the package.
+     * @param archiveOsPath The path of the archive file relative to the package folder.
      */
     public MajorRevisionPackage(
             SdkSource source,

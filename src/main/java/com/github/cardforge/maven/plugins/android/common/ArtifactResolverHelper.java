@@ -32,14 +32,29 @@ public final class ArtifactResolverHelper {
     public static final List<String> EXCLUDE_NON_PACKAGED_SCOPES = Arrays.asList(
             Artifact.SCOPE_PROVIDED, Artifact.SCOPE_IMPORT
     );
+    /**
+     * Which dependency scopes should be excluded when packing dependencies into the apk.
+     */
     public static final String NOT_RESOLVE_ARTIFACT = "Could not resolve artifact ";
 
+    /**
+     * the artifact resolver to use
+     */
     private final ArtifactResolver artifactResolver;
+    /**
+     * the logger to use
+     */
     private final Logger log;
+    /**
+     * the remote repositories to resolve against
+     */
     private final List<ArtifactRepository> remoteArtifactRepositories;
 
     /**
      * Creates an ArtifactResolver that has no remote repositories to resolve against.
+     *
+     * @param artifactResolver the artifact resolver to use
+     * @param log              the logger to use
      */
     public ArtifactResolverHelper(ArtifactResolver artifactResolver, Logger log) {
         this(artifactResolver, log, Collections.emptyList());

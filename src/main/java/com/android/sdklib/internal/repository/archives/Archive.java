@@ -32,10 +32,10 @@ import java.util.Properties;
 /**
  * A {@link Archive} is the base class for "something" that can be downloaded from
  * the SDK repository.
- * <p/>
+ * <p>
  * A package has some attributes (revision, description) and a list of archives
  * which represent the downloadable bits.
- * <p/>
+ * </p>
  * Packages are offered by a {@link SdkSource} (a download site).
  * The {@link ArchiveInstaller} takes care of downloading, unpacking and installing an archive.
  *
@@ -107,6 +107,8 @@ public class Archive implements IDescription, Comparable<Archive> {
     /**
      * Save the properties of the current archive in the give {@link Properties} object.
      * These properties will later be give the constructor that takes a {@link Properties} object.
+     *
+     * @param props The {@link Properties} object to fill-in.
      */
     void saveProperties(@NonNull Properties props) {
         mArchFilter.saveProperties(props);
@@ -115,6 +117,8 @@ public class Archive implements IDescription, Comparable<Archive> {
     /**
      * Returns true if this is a locally installed archive.
      * Returns false if this is a remote archive that needs to be downloaded.
+     *
+     * @return A boolean value.
      */
     public boolean isLocal() {
         return mIsLocal;
@@ -123,6 +127,8 @@ public class Archive implements IDescription, Comparable<Archive> {
     /**
      * Returns the package that created and owns this archive.
      * It should generally not be null.
+     *
+     * @return A {@link Package} object.
      */
     @Nullable
     public Package getParentPackage() {
@@ -132,6 +138,8 @@ public class Archive implements IDescription, Comparable<Archive> {
     /**
      * Returns the archive size, an int > 0.
      * Size will be 0 if this a local installed folder of unknown size.
+     *
+     * @return The size in bytes.
      */
     public long getSize() {
         return mSize;
@@ -140,6 +148,8 @@ public class Archive implements IDescription, Comparable<Archive> {
     /**
      * Returns the SHA1 archive checksum, as a 40-char hex.
      * Can be empty but not null for local installed folders.
+     *
+     * @return A string checksum.
      */
     @NonNull
     public String getChecksum() {
@@ -148,6 +158,8 @@ public class Archive implements IDescription, Comparable<Archive> {
 
     /**
      * Returns the checksum type, always {@link ChecksumType#SHA1} right now.
+     *
+     * @return A {@link ChecksumType} enum.
      */
     @NonNull
     public ChecksumType getChecksumType() {
@@ -158,6 +170,7 @@ public class Archive implements IDescription, Comparable<Archive> {
      * Returns the download archive URL, either absolute or relative to the repository xml.
      * Always return null for a local installed folder.
      *
+     * @return A string URL.
      * @see #getLocalOsPath()
      */
     @Nullable
@@ -169,6 +182,7 @@ public class Archive implements IDescription, Comparable<Archive> {
      * Returns the local OS folder where a local archive is installed.
      * Always return null for remote archives.
      *
+     * @return A string path suitable for a {@link FileOp#mkdirs(File)}} call.
      * @see #getUrl()
      */
     @Nullable
@@ -179,6 +193,8 @@ public class Archive implements IDescription, Comparable<Archive> {
     /**
      * Returns the architecture filter.
      * This non-null filter indicates which host/jvm this archive is compatible with.
+     *
+     * @return A non-null {@link ArchFilter}.
      */
     @NonNull
     public ArchFilter getArchFilter() {
@@ -187,6 +203,8 @@ public class Archive implements IDescription, Comparable<Archive> {
 
     /**
      * Generates a description of the {@link ArchFilter} supported by this archive.
+     *
+     * @return A string of the OS suitable for a UI.
      */
     public String getOsDescription() {
         StringBuilder sb = new StringBuilder();
@@ -209,10 +227,12 @@ public class Archive implements IDescription, Comparable<Archive> {
 
     /**
      * Returns the short description of the source, if not null.
-     * Otherwise returns the default Object toString result.
-     * <p/>
+     * Otherwise, returns the default Object toString result.
+     * <p>
      * This is mostly helpful for debugging.
      * For UI display, use the {@link IDescription} interface.
+     *
+     * @return the short description of the source. Can be empty but never null.
      */
     @Override
     public String toString() {
@@ -225,6 +245,8 @@ public class Archive implements IDescription, Comparable<Archive> {
 
     /**
      * Generates a short description for this archive.
+     *
+     * @return short description suitable for a UI.
      */
     @Override
     public String getShortDescription() {
@@ -233,6 +255,8 @@ public class Archive implements IDescription, Comparable<Archive> {
 
     /**
      * Generates a longer description for this archive.
+     *
+     * @return A multi-line description suitable for a UI.
      */
     @Override
     public String getLongDescription() {
@@ -242,6 +266,9 @@ public class Archive implements IDescription, Comparable<Archive> {
                 getSha1Description());
     }
 
+    /**
+     * @return A description of the size of the archive.
+     */
     public String getSizeDescription() {
         long size = getSize();
         String sizeStr;
@@ -260,12 +287,17 @@ public class Archive implements IDescription, Comparable<Archive> {
         return String.format("Size: %1$s", sizeStr);
     }
 
+    /**
+     * @return A description of the SHA1 checksum.
+     */
     public String getSha1Description() {
         return String.format("SHA1: %1$s", getChecksum());
     }
 
     /**
      * Returns true if this archive can be installed on the current platform.
+     *
+     * @return True if the current platform is compatible with this archive.
      */
     public boolean isCompatible() {
         ArchFilter current = ArchFilter.getCurrent();
@@ -296,7 +328,7 @@ public class Archive implements IDescription, Comparable<Archive> {
 
     /**
      * Note: An {@link Archive}'s hash code does NOT depend on the parent {@link Package} hash code.
-     * <p/>
+     * <p>
      * {@inheritDoc}
      */
     @Override
@@ -315,7 +347,7 @@ public class Archive implements IDescription, Comparable<Archive> {
 
     /**
      * Note: An {@link Archive}'s equality does NOT depend on the parent {@link Package} equality.
-     * <p/>
+     * <p>
      * {@inheritDoc}
      */
     @Override

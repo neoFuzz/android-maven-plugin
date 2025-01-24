@@ -39,7 +39,7 @@ public class NoPreviewRevision extends FullRevision {
      * Parses a string of format "major.minor.micro" and returns
      * a new {@link NoPreviewRevision} for it. All the fields except major are
      * optional.
-     * <p/>
+     * <p>
      * The parsing is equivalent to the pseudo-BNF/regexp:
      * <pre>
      *   Major/Minor/Micro/Preview := [0-9]+

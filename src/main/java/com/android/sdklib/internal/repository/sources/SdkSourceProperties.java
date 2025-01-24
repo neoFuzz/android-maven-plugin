@@ -34,10 +34,11 @@ import java.util.Properties;
 
 /**
  * Properties for individual sources which are persisted by a local settings file.
- * <p/>
+ * <p>
  * All instances of {@link SdkSourceProperties} share the same singleton storage.
  * The persisted setting file is loaded as necessary, however callers must persist
  * it at some point by calling {@link #save()}.
+ * </p>
  *
  * @deprecated com.android.sdklib.internal.repository has moved into Studio as
  * com.android.tools.idea.sdk.remote.internal.
@@ -76,7 +77,7 @@ public class SdkSourceProperties {
 
     /**
      * Retrieves a property for the given source URL and the given key type.
-     * <p/>
+     * <p>
      * Implementation detail: this loads the persistent settings file as needed.
      *
      * @param key          The kind of property to retrieve for that source URL.
@@ -103,7 +104,7 @@ public class SdkSourceProperties {
 
     /**
      * Sets or remove a property for the given source URL and the given key type.
-     * <p/>
+     * <p>
      * Implementation detail: this does <em>not</em> save the persistent settings file.
      * Somehow the caller will need to call the {@link #save()} method later.
      *

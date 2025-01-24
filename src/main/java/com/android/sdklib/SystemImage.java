@@ -174,7 +174,7 @@ public class SystemImage implements ISystemImage {
     /**
      * Static helper method that returns the canonical path for a system-image that uses
      * the {@link ISystemImage.LocationType#IN_SYSTEM_IMAGE} location type.
-     * <p/>
+     * <p>
      * Such an image is located in {@code SDK/system-images/android-N/tag/abiType}.
      * For this reason this method requires the root SDK as well as the platform, tag abd ABI type.
      *
@@ -273,7 +273,7 @@ public class SystemImage implements ISystemImage {
     }
 
     /**
-     * Sort by tag & ABI name only. This is what matters from a user point of view.
+     * Sort by tag &amp; ABI name only. This is what matters from a user point of view.
      */
     @Override
     public int compareTo(@NonNull ISystemImage other) {

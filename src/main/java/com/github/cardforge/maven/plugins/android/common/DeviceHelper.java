@@ -11,10 +11,22 @@ import org.apache.commons.lang3.StringUtils;
  */
 public class DeviceHelper {
 
+    /**
+     * The property name for the manufacturer of the device.
+     */
     private static final String MANUFACTURER_PROPERTY = "ro.product.manufacturer";
+    /**
+     * The property name for the model of the device.
+     */
     private static final String MODEL_PROPERTY = "ro.product.model";
+    /**
+     * Separator for device identifiers.
+     */
     private static final String SEPARATOR = "_";
 
+    /**
+     * Private constructor to prevent instantiation.
+     */
     private DeviceHelper() {
         // no instances
     }
@@ -25,6 +37,8 @@ public class DeviceHelper {
      * Used for instrumentation test report file names so see more at
      * AbstractInstrumentationMojo#testCreateReport javadoc since
      * that is the public documentation.
+     *
+     * @return the device identifier string
      */
     @NonNull
     public static String getDescriptiveName(@NonNull IDevice device) {
@@ -46,6 +60,10 @@ public class DeviceHelper {
         return FileNameHelper.fixFileName(builder.toString());
     }
 
+    /**
+     * @param device the device to get the prefix for
+     * @return the prefix for log messages for the given device
+     */
     @NonNull
     public static String getDeviceLogLinePrefix(IDevice device) {
         return getDescriptiveName(device) + " :   ";

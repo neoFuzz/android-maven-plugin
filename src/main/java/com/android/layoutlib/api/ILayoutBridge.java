@@ -23,9 +23,9 @@ import java.util.Map;
 /**
  * Entry point of the Layout Lib. Implementations of this interface provide a method to compute
  * and render a layout.
- * <p/>
- * <p/>{@link #getApiLevel()} gives the ability to know which methods are available.
- * <p/>
+ * <p>
+ * {@link #getApiLevel()} gives the ability to know which methods are available.
+ * </p>
  * Changes in API level 5:
  * <ul>
  * <li>Bridge should extend {@link Bridge} instead of implementing {@link ILayoutBridge}.</li>
@@ -58,7 +58,7 @@ public interface ILayoutBridge {
      * Returns the API level of the layout library.
      * While no methods will ever be removed, some may become deprecated, and some new ones
      * will appear.
-     * <p/>If calling this method throws an {@link AbstractMethodError}, then the API level
+     * <p>If calling this method throws an {@link AbstractMethodError}, then the API level
      * should be considered to be 1.
      */
     int getApiLevel();
@@ -224,9 +224,9 @@ public interface ILayoutBridge {
 
     /**
      * Clears the resource cache for a specific project.
-     * <p/>This cache contains bitmaps and nine patches that are loaded from the disk and reused
+     * <p>This cache contains bitmaps and nine patches that are loaded from the disk and reused
      * until this method is called.
-     * <p/>The cache is not configuration dependent and should only be cleared when a
+     * <p>The cache is not configuration dependent and should only be cleared when a
      * resource changes (at this time only bitmaps and 9 patches go into the cache).
      *
      * @param projectKey the key for the project.

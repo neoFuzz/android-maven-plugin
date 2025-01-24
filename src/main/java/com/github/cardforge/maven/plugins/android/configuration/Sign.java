@@ -15,6 +15,7 @@
  */
 package com.github.cardforge.maven.plugins.android.configuration;
 
+import com.github.cardforge.maven.plugins.android.AndroidSigner;
 import org.apache.maven.plugins.annotations.Parameter;
 
 /**

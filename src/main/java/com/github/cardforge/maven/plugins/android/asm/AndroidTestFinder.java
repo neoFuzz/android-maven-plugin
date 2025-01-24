@@ -34,12 +34,23 @@ import java.util.List;
  * @author hugo.josefson@jayway.com
  */
 public class AndroidTestFinder {
+    /**
+     * The packages to look for in the class files.
+     */
     private static final String[] TEST_PACKAGES = {"junit/framework/", "android/test/"};
 
+    /**
+     * Private constructor to prevent instantiation.
+     */
     private AndroidTestFinder() {
         // hidden
     }
 
+    /**
+     * @param classesBaseDirectory class files base directory
+     * @return true if the directory contains Android tests, false otherwise
+     * @throws MojoExecutionException if the classesBaseDirectory is null or not a directory
+     */
     public static boolean containsAndroidTests(File classesBaseDirectory) throws MojoExecutionException {
 
         if (classesBaseDirectory == null || !classesBaseDirectory.isDirectory()) {
@@ -68,6 +79,10 @@ public class AndroidTestFinder {
         return descendantFinder.isDescendantFound() || annotationFinder.isDescendantFound();
     }
 
+    /**
+     * @param classesBaseDirectory the directory to search for class files
+     * @return a list of class files found in the directory and its subdirectories
+     */
     @Nonnull
     private static List<File> findEligibleClassFiles(File classesBaseDirectory) {
         final List<File> classFiles = new LinkedList<>();
@@ -95,6 +110,4 @@ public class AndroidTestFinder {
         walker.scan();
         return classFiles;
     }
-
-
 }

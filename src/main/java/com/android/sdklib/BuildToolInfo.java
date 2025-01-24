@@ -42,11 +42,12 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Information on a specific build-tool folder.
- * <p/>
+ * <p>
  * For unit tests, see:
  * - sdklib/src/test/.../LocalSdkTest
  * - sdklib/src/test/.../SdkManagerTest
  * - sdklib/src/test/.../BuildToolInfoTest
+ * </p>
  */
 public class BuildToolInfo {
 
@@ -73,8 +74,15 @@ public class BuildToolInfo {
      */
     @NonNull
     private final File mPath;
+    /**
+     * The path to the build-tool folder specific to this revision.
+     */
     private final Map<PathId, String> mPaths = Maps.newEnumMap(PathId.class);
 
+    /**
+     * @param revision the build-tool revision.
+     * @param path     the path to the build-tool folder specific to this revision.
+     */
     public BuildToolInfo(@NonNull FullRevision revision, @NonNull File path) {
         mRevision = revision;
         mPath = path;
@@ -97,6 +105,22 @@ public class BuildToolInfo {
         add(SPLIT_SELECT, FN_SPLIT_SELECT);
     }
 
+    /**
+     * @param revision       the build-tool revision.
+     * @param mainPath       the path to the build-tool folder specific to this revision.
+     * @param aapt           the path to the {@code aapt} tool.
+     * @param aidl           the path to the {@code aidl} tool.
+     * @param dx             the DX tool
+     * @param dxJar          the DX jar file
+     * @param llmvRsCc       the path to the {@code renderscript} tool.
+     * @param androidRs      the path to the {@code android-rs-} tool.
+     * @param androidRsClang the path to the {@code android-rs-clang} tool.
+     * @param bccCompat      the path to the {@code bcc_compat} tool.
+     * @param ldArm          the path to the {@code ld-arm} tool.
+     * @param ldX86          the path to the {@code ld-x86} tool.
+     * @param ldMips         the path to the {@code ld-mips} tool.
+     * @param zipAlign       the path to the {@code zipalign} tool.
+     */
     public BuildToolInfo(
             @NonNull FullRevision revision,
             @NonNull File mainPath,
@@ -149,6 +173,9 @@ public class BuildToolInfo {
 
     /**
      * Creates a {@link BuildToolInfo} from a {@link LocalPackage}.
+     *
+     * @param localPackage The package to create the {@link BuildToolInfo} from.
+     * @return The created {@link BuildToolInfo}.
      */
     @NonNull
     public static BuildToolInfo fromLocalPackage(@NonNull LocalPackage localPackage) {
@@ -163,6 +190,8 @@ public class BuildToolInfo {
     /**
      * Creates a {@link BuildToolInfo} from a directory which follows the standard layout
      * convention.
+     *
+     * @return The created {@link BuildToolInfo}.
      */
     @NonNull
     public static BuildToolInfo fromStandardDirectoryLayout(
@@ -172,10 +201,18 @@ public class BuildToolInfo {
         return new BuildToolInfo(fr, path);
     }
 
+    /**
+     * @param id   the path-id to add.
+     * @param leaf the path to add, relative to the build-tool folder.
+     */
     private void add(PathId id, String leaf) {
         add(id, new File(mPath, leaf));
     }
 
+    /**
+     * @param id   the path-id to add.
+     * @param path the path to add.
+     */
     private void add(PathId id, @NonNull File path) {
         String str = path.getAbsolutePath();
         if (path.isDirectory() && str.charAt(str.length() - 1) != File.separatorChar) {
@@ -186,6 +223,8 @@ public class BuildToolInfo {
 
     /**
      * Returns the revision.
+     *
+     * @return The revision of the build-tool.
      */
     @NonNull
     public FullRevision getRevision() {
@@ -194,9 +233,11 @@ public class BuildToolInfo {
 
     /**
      * Returns the build-tool revision-specific folder.
-     * <p/>
+     * <p>
      * For compatibility reasons, use {@link #getPath(PathId)} if you need the path to a
      * specific tool.
+     *
+     * @return The path to the build-tool folder.
      */
     @NonNull
     public File getLocation() {

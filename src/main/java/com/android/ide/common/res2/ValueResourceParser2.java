@@ -71,8 +71,8 @@ class ValueResourceParser2 {
         String name = getName(node);
 
         if (name != null && type != null) {
-                return new ResourceItem(name, type, node);
-            }
+            return new ResourceItem(name, type, node);
+        }
 
 
         return null;
@@ -192,10 +192,10 @@ class ValueResourceParser2 {
                 // is the attribute in the android namespace?
                 if (!resource.getName().startsWith(ANDROID_NS_NAME_PREFIX) &&
                         (hasFormatAttribute(node) || XmlUtils.hasElementChildren(node))) {
-                        checkDuplicate(resource, map);
-                        resource.setIgnoredFromDiskMerge(true);
-                        list.add(resource);
-                    }
+                    checkDuplicate(resource, map);
+                    resource.setIgnoredFromDiskMerge(true);
+                    list.add(resource);
+                }
 
             }
         }

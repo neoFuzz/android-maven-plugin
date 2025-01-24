@@ -32,31 +32,35 @@ import java.util.Properties;
  */
 @Deprecated
 public class PackageParserUtils {
+    private PackageParserUtils() {
+        // no instances
+    }
 
     /**
-     * Parse the {@link ArchFilter} of an &lt;archive&gt; element..
-     * <p/>
+     * Parse the {@link ArchFilter} of a &lt;archive&gt; element.
+     * <p>
      * Starting with repo schema 10, add-on schema 7 and sys-img schema 3, this is done using
      * specific optional elements contained within the &lt;archive&gt; element.
-     * <p/>
+     * <p>
      * If none of the new element are defined, for backward compatibility we try to find
      * the previous style XML attributes "os" and "arch" in the &lt;archive&gt; element.
      *
-     * @param archiveNode
+     * @param archiveNode The XML node to parse.
      * @return A new {@link ArchFilter}
      */
     @NonNull
     public static ArchFilter parseArchFilter(@NonNull Node archiveNode) {
-        String hos = PackageParserUtils.getOptionalXmlString(archiveNode, SdkRepoConstants.NODE_HOST_OS);
-        String hb = PackageParserUtils.getOptionalXmlString(archiveNode, SdkRepoConstants.NODE_HOST_BITS);
-        String jb = PackageParserUtils.getOptionalXmlString(archiveNode, SdkRepoConstants.NODE_JVM_BITS);
-        String mjv = PackageParserUtils.getOptionalXmlString(archiveNode, SdkRepoConstants.NODE_MIN_JVM_VERSION);
+        String hos = PackageParserUtils.getOptionalXmlString(archiveNode, RepoConstants.NODE_HOST_OS);
+        String hb = PackageParserUtils.getOptionalXmlString(archiveNode, RepoConstants.NODE_HOST_BITS);
+        String jb = PackageParserUtils.getOptionalXmlString(archiveNode, RepoConstants.NODE_JVM_BITS);
+        String mjv = PackageParserUtils.getOptionalXmlString(archiveNode, RepoConstants.NODE_MIN_JVM_VERSION);
 
         if (hos != null || hb != null || jb != null || mjv != null) {
             NoPreviewRevision rev = null;
             try {
                 rev = NoPreviewRevision.parseRevision(mjv);
-            } catch (NumberFormatException ignore) {
+            } catch (NumberFormatException ignored) {
+                // ignored
             }
 
             return new ArchFilter(
@@ -69,13 +73,13 @@ public class PackageParserUtils {
         Properties props = new Properties();
 
         LegacyOs o = (LegacyOs) PackageParserUtils.getEnumAttribute(
-                archiveNode, SdkRepoConstants.LEGACY_ATTR_OS, LegacyOs.values(), null);
+                archiveNode, RepoConstants.LEGACY_ATTR_OS, LegacyOs.values(), null);
         if (o != null) {
             props.setProperty(ArchFilter.LEGACY_PROP_OS, o.toString());
         }
 
         LegacyArch a = (LegacyArch) PackageParserUtils.getEnumAttribute(
-                archiveNode, SdkRepoConstants.LEGACY_ATTR_ARCH, LegacyArch.values(), null);
+                archiveNode, RepoConstants.LEGACY_ATTR_ARCH, LegacyArch.values(), null);
         if (a != null) {
             props.setProperty(ArchFilter.LEGACY_PROP_ARCH, a.toString());
         }
@@ -84,14 +88,15 @@ public class PackageParserUtils {
     }
 
     /**
-     * Parses a full revision element such as <revision> or <min-tools-rev>.
-     * This supports both the single-integer format as well as the full revision
+     * Parses a full revision element such as {@code <revision>} or {@code <min-tools-rev>}.
+     * This supports both the single-integer format and the full revision
      * format with major/minor/micro/preview sub-elements.
      *
      * @param revisionNode The node to parse.
      * @return A new {@link FullRevision}. If parsing failed, major is set to
      * {@link FullRevision#MISSING_MAJOR_REV}.
      */
+    @NonNull
     public static FullRevision parseFullRevisionElement(Node revisionNode) {
         // This needs to support two modes:
         // - For repository XSD >= 7, <revision> contains sub-elements such as <major> or <minor>.
@@ -118,7 +123,8 @@ public class PackageParserUtils {
                 try {
                     String majorStr = revisionNode.getTextContent().trim();
                     major = Integer.parseInt(majorStr);
-                } catch (Exception e) {
+                } catch (Exception ignored) {
+                    // ignored
                 }
             }
         }
@@ -127,22 +133,23 @@ public class PackageParserUtils {
     }
 
     /**
-     * Parses a no-preview revision element such as <revision>>.
-     * This supports both the single-integer format as well as the full revision
+     * Parses a no-preview revision element such as {@code <revision>}.
+     * This supports both the single-integer format and the full revision
      * format with major/minor/micro sub-elements.
      *
      * @param revisionNode The node to parse.
      * @return A new {@link NoPreviewRevision}. If parsing failed, major is set to
      * {@link FullRevision#MISSING_MAJOR_REV}.
      */
+    @NonNull
     public static NoPreviewRevision parseNoPreviewRevisionElement(Node revisionNode) {
         // This needs to support two modes:
         // - For addon XSD >= 6, <revision> contains sub-elements such as <major> or <minor>.
         // - Otherwise for addon XSD < 6, <revision> contains an integer.
         // The <major> element is mandatory, so it's easy to distinguish between both cases.
-        int major = FullRevision.MISSING_MAJOR_REV,
-                minor = FullRevision.IMPLICIT_MINOR_REV,
-                micro = FullRevision.IMPLICIT_MICRO_REV;
+        int major = FullRevision.MISSING_MAJOR_REV;
+        int minor = FullRevision.IMPLICIT_MINOR_REV;
+        int micro = FullRevision.IMPLICIT_MICRO_REV;
 
         if (revisionNode != null) {
             if (PackageParserUtils.findChildElement(revisionNode,
@@ -158,7 +165,8 @@ public class PackageParserUtils {
                 try {
                     String majorStr = revisionNode.getTextContent().trim();
                     major = Integer.parseInt(majorStr);
-                } catch (Exception e) {
+                } catch (Exception ignored) {
+                    // ignored
                 }
             }
         }
@@ -176,12 +184,11 @@ public class PackageParserUtils {
             for (Node child = node.getFirstChild(); child != null; child = child.getNextSibling()) {
                 if (child.getNodeType() == Node.ELEMENT_NODE) {
                     String nsUriChild = child.getNamespaceURI();
-                    if ((nsUri == null && nsUriChild == null) ||
-                            (nsUri != null && nsUri.equals(nsUriChild))) {
-                        if (xmlLocalName == null || xmlLocalName.equals(child.getLocalName())) {
-                            return child;
-                        }
+                    if (((nsUri == null && nsUriChild == null) ||
+                            (nsUri != null && nsUri.equals(nsUriChild))) && (xmlLocalName == null || xmlLocalName.equals(child.getLocalName()))) {
+                        return child;
                     }
+
                 }
             }
         }
@@ -192,7 +199,7 @@ public class PackageParserUtils {
      * Retrieves the value of that XML element as a string.
      * Returns an empty string whether the element is missing or empty,
      * so you can't tell the difference.
-     * <p/>
+     * <p>
      * Note: use {@link #getOptionalXmlString(Node, String)} if you need to know when the
      * element is missing versus empty.
      *
@@ -208,7 +215,7 @@ public class PackageParserUtils {
     /**
      * Retrieves the value of that XML element as a string.
      * Returns the defaultValue if the element is missing or empty.
-     * <p/>
+     * <p>
      * Note: use {@link #getOptionalXmlString(Node, String)} if you need to know when the
      * element is missing versus empty.
      *
@@ -228,7 +235,7 @@ public class PackageParserUtils {
      * Retrieves the value of that XML element as a string.
      * Returns null when the element is missing, so you can tell between a missing element
      * and an empty one.
-     * <p/>
+     * <p>
      * Note: use {@link #getXmlString(Node, String)} if you don't need to know when the
      * element is missing versus empty.
      *
@@ -237,6 +244,7 @@ public class PackageParserUtils {
      * @return The text content of the element. Returns null when the element is missing.
      * Returns an empty string whether the element is present but empty.
      */
+    @Nullable
     public static String getOptionalXmlString(Node node, String xmlLocalName) {
         Node child = findChildElement(node, xmlLocalName);
         return child == null ? null : child.getTextContent();  //$NON-NLS-1$
@@ -276,7 +284,7 @@ public class PackageParserUtils {
      * the given enum values.
      */
     public static Object getEnumAttribute(
-            Node archiveNode,
+            @NonNull Node archiveNode,
             String attrName,
             Object[] values,
             Object defaultValue) {
@@ -338,6 +346,7 @@ public class PackageParserUtils {
             try {
                 return Integer.parseInt(s);
             } catch (Exception ignore) {
+                // ignored
             }
         }
         return defaultValue;
@@ -349,7 +358,7 @@ public class PackageParserUtils {
      *
      * @param props   The properties to parse.
      * @param propKey The name of the property. Must not be null.
-     * @return A {@link FullRevision} or null if there is no such property or it couldn't be parsed.
+     * @return A {@link FullRevision} or null if there is no such property, or it couldn't be parsed.
      */
     @Nullable
     public static FullRevision getPropertyFull(
@@ -362,6 +371,7 @@ public class PackageParserUtils {
             try {
                 rev = FullRevision.parseRevision(revStr);
             } catch (NumberFormatException ignore) {
+                // ignored
             }
         }
 
@@ -374,7 +384,7 @@ public class PackageParserUtils {
      *
      * @param props   The properties to parse.
      * @param propKey The name of the property. Must not be null.
-     * @return A {@link MajorRevision} or null if there is no such property or it couldn't be parsed.
+     * @return A {@link MajorRevision} or null if there is no such property, or it couldn't be parsed.
      */
     @Nullable
     public static MajorRevision getPropertyMajor(
@@ -387,6 +397,7 @@ public class PackageParserUtils {
             try {
                 rev = MajorRevision.parseRevision(revStr);
             } catch (NumberFormatException ignore) {
+                // ignored
             }
         }
 
@@ -400,7 +411,7 @@ public class PackageParserUtils {
      * @param props   The properties to parse.
      * @param propKey The name of the property. Must not be null.
      * @return A {@link NoPreviewRevision} or
-     * null if there is no such property or it couldn't be parsed.
+     * null if there is no such property, or it couldn't be parsed.
      */
     @Nullable
     public static NoPreviewRevision getPropertyNoPreview(
@@ -413,6 +424,7 @@ public class PackageParserUtils {
             try {
                 rev = NoPreviewRevision.parseRevision(revStr);
             } catch (NumberFormatException ignore) {
+                // ignored
             }
         }
 

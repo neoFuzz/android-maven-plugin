@@ -360,12 +360,12 @@ public final class ResourceFolder implements Configurable {
         }
 
         if (valid && mFiles != null) {
-                for (ResourceFile f : mFiles) {
-                    if (f.hasResources(type)) {
-                        return true;
-                    }
+            for (ResourceFile f : mFiles) {
+                if (f.hasResources(type)) {
+                    return true;
                 }
             }
+        }
 
         return false;
     }

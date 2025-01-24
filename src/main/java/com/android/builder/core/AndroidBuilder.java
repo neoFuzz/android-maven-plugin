@@ -60,9 +60,6 @@ import com.android.sdklib.repository.FullRevision;
 import com.android.utils.ILogger;
 import com.android.utils.Pair;
 import com.google.common.base.Charsets;
-
-import java.util.Optional;
-
 import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
 import com.google.common.collect.*;
@@ -103,46 +100,104 @@ import static com.google.common.base.Preconditions.*;
  */
 public class AndroidBuilder {
 
+    /**
+     * Static string message for dex options null.
+     */
     public static final String DEX_OPTIONS_NOT_NULL = "dexOptions cannot be null.";
+    /**
+     * Static string for when manifest is merged
+     */
     public static final String MERGED_MANIFEST_SAVED = "Merged manifest saved to ";
+    /**
+     * Static string message for unhandled result type.
+     */
     public static final String UNHANDLED_RESULT_TYPE = "Unhandled result type : ";
+    /**
+     * Static string message for import folders.
+     */
     public static final String IMPORT_FOLDERS_NULL = "importFolders cannot be null.";
+    /**
+     * Static string message for source output.
+     */
     public static final String SOURCE_OUTPUT_NULL = "sourceOutputDir cannot be null.";
+    /**
+     * Minimum build tools revision required by this class.
+     */
     private static final FullRevision MIN_BUILD_TOOLS_REV = new FullRevision(19, 1, 0);
+    /**
+     * A no-op dependency file processor.
+     */
     private static final DependencyFileProcessor sNoOpDependencyFileProcessor = dependencyFile -> null;
+    /**
+     * The project ID.
+     */
     @NonNull
     private final String mProjectId;
+    /**
+     * The logger to use
+     */
     @NonNull
     private final ILogger mLogger;
 
+    /**
+     *
+     */
     @NonNull
     private final ProcessExecutor mProcessExecutor;
+    /**
+     * The java process executor.
+     */
     @NonNull
     private final JavaProcessExecutor mJavaProcessExecutor;
+    /**
+     * The error reporter.
+     */
     @NonNull
     private final ErrorReporter mErrorReporter;
 
+    /**
+     * Whether external tools (dx and aapt) are launched in verbose mode.
+     */
     private final boolean mVerboseExec;
 
+    /**
+     * The createdBy String for the apk manifest.
+     */
     @Nullable
     private final String mCreatedBy;
 
+    /**
+     * The SDK info for the build.
+     */
     private SdkInfo mSdkInfo;
+    /**
+     * The target info for the build.
+     */
     private TargetInfo mTargetInfo;
 
+    /**
+     * The list of boot classpath jars.
+     */
     private List<File> mBootClasspath;
+    /**
+     * The list of libraries to be included in the classpath.
+     */
     @NonNull
     private List<LibraryRequest> mLibraryRequests = ImmutableList.of();
 
     /**
      * Creates an AndroidBuilder.
-     * <p/>
+     * <p>
      * <var>verboseExec</var> is needed on top of the ILogger due to remote exec tools not being
      * able to output info and verbose messages separately.
      *
-     * @param createdBy   the createdBy String for the apk manifest.
-     * @param logger      the Logger
-     * @param verboseExec whether external tools are launched in verbose mode
+     * @param projectId           the project ID. Must not be null.
+     * @param createdBy           the createdBy String for the apk manifest.
+     * @param processExecutor     the process executor
+     * @param javaProcessExecutor the java process executor
+     * @param errorReporter       the error reporter
+     * @param logger              the Logger
+     * @param verboseExec         whether external tools are launched in verbose mode
      */
     public AndroidBuilder(
             @NonNull String projectId,
@@ -161,6 +216,12 @@ public class AndroidBuilder {
         mVerboseExec = verboseExec;
     }
 
+    /**
+     * @param name      the name of the library. Must not be null.
+     * @param libraries the list of libraries to search in. Must not be null.
+     * @return the {@link LibraryRequest} object for the given library name, or <code>null</code> if
+     * not found
+     */
     @Nullable
     private static LibraryRequest findMatchingLib(@NonNull String name, @NonNull List<LibraryRequest> libraries) {
         for (LibraryRequest library : libraries) {
@@ -172,6 +233,12 @@ public class AndroidBuilder {
         return null;
     }
 
+    /**
+     * @param type  the type of the class field. Must not be null.
+     * @param name  the name of the class field. Must not be null.
+     * @param value the value of the class field. Must not be null.
+     * @return a new {@link ClassField} instance
+     */
     @NonNull
     public static ClassField createClassField(@NonNull String type, @NonNull String name, @NonNull String value) {
         return new ClassFieldImpl(type, name, value);
@@ -256,6 +323,16 @@ public class AndroidBuilder {
         }
     }
 
+    /**
+     * @param testApplicationId     the application id to use for the test application.
+     * @param minSdkVersion         the minSdkVersion to use. Can be null.
+     * @param targetSdkVersion      the targetSdkVersion to use. Can be null.
+     * @param testedApplicationId   the application id of the application being tested.
+     * @param instrumentationRunner the instrumentation runner to use. Can be null.
+     * @param handleProfiling       whether the test handle profiling.
+     * @param functionalTest        whether this is a functional test.
+     * @param outManifestLocation   the location of the output manifest file.
+     */
     private static void generateTestManifest(
             @NonNull String testApplicationId,
             @Nullable String minSdkVersion,
@@ -281,6 +358,12 @@ public class AndroidBuilder {
         }
     }
 
+    /**
+     * @param minSdkVersion    the minSdkVersion to use.
+     * @param targetSdkVersion the targetSdkVersion to use. Can be null.
+     * @param manifestFile     the manifest file to update.
+     * @throws IOException if the manifest file cannot be written.
+     */
     public static void generateApkDataEntryInManifest(
             int minSdkVersion,
             int targetSdkVersion,
@@ -309,13 +392,14 @@ public class AndroidBuilder {
     /**
      * Converts the bytecode to Dalvik format
      *
-     * @param inputFile       the input file
-     * @param outFile         the output file or folder if multi-dex is enabled.
-     * @param multiDex        whether multidex is enabled.
-     * @param dexOptions      the dex options
-     * @param buildToolInfo   the build tools info
-     * @param verbose         verbose flag
-     * @param processExecutor the java process executor
+     * @param inputFile            the input file
+     * @param outFile              the output file or folder if multi-dex is enabled.
+     * @param multiDex             whether multidex is enabled.
+     * @param dexOptions           the dex options
+     * @param buildToolInfo        the build tools info
+     * @param verbose              verbose flag
+     * @param processExecutor      the java process executor
+     * @param processOutputHandler the process output handler
      * @return the list of generated files.
      * @throws ProcessException if dexing fails
      */
@@ -368,6 +452,9 @@ public class AndroidBuilder {
 
     /**
      * Returns true if the library (jar or folder) contains class files, false otherwise.
+     *
+     * @param input The library file (jar or folder) to check
+     * @return True if the library contains class files, false otherwise
      */
     private static boolean checkLibraryClassesJar(@NonNull File input) throws IOException {
 
@@ -392,6 +479,9 @@ public class AndroidBuilder {
 
     /**
      * Returns true if this folder or one of its subfolder contains a class file, false otherwise.
+     *
+     * @param folder The folder to check for class files
+     * @return true if a class file is found, false otherwise
      */
     private static boolean checkFolder(@NonNull File folder) {
         File[] subFolders = folder.listFiles();
@@ -409,6 +499,21 @@ public class AndroidBuilder {
         return false;
     }
 
+    /**
+     * Converts a Java library file to Jack format using the Jill API if available.
+     * If the API conversion fails or is not available, falls back to native conversion.
+     *
+     * @param inputFile            The Java library file to convert (typically a JAR or AAR file)
+     * @param outFile              The destination file for the Jack format output
+     * @param dexOptions           The dex options to be used during conversion
+     * @param buildToolInfo        Information about the Android build tools
+     * @param verbose              Whether to enable verbose output during conversion
+     * @param processExecutor      The executor for running Java processes
+     * @param processOutputHandler Handler for managing process output
+     * @param logger               Logger instance for recording conversion messages and errors
+     * @return A List containing the output file if conversion is successful
+     * @throws ProcessException If an error occurs during the conversion process
+     */
     public static List<File> convertLibaryToJackUsingApis(
             @NonNull File inputFile,
             @NonNull File outFile,
@@ -451,6 +556,18 @@ public class AndroidBuilder {
                 processExecutor, processOutputHandler, logger);
     }
 
+    /**
+     * @param inputFile            the input file
+     * @param outFile              the output file or folder if multi-dex is enabled.
+     * @param dexOptions           the dex options
+     * @param buildToolInfo        the build tools info
+     * @param verbose              verbose flag
+     * @param processExecutor      the java process executor
+     * @param processOutputHandler the process output handler
+     * @param logger               The logger instance
+     * @return the list of generated files.
+     * @throws ProcessException if dexing fails
+     */
     @NonNull
     public static List<File> convertLibraryToJack(
             @NonNull File inputFile,
@@ -500,8 +617,9 @@ public class AndroidBuilder {
      * Sets the SdkInfo and the targetInfo on the builder. This is required to actually
      * build (some of the steps).
      *
-     * @param sdkInfo    the SdkInfo
-     * @param targetInfo the TargetInfo
+     * @param sdkInfo         the SdkInfo
+     * @param targetInfo      the TargetInfo
+     * @param libraryRequests the list of library requests, as obtained from the project.
      * @see com.android.builder.sdk.SdkLoader
      */
     public void setTargetInfo(
@@ -522,6 +640,8 @@ public class AndroidBuilder {
 
     /**
      * Returns the SdkInfo, if set.
+     *
+     * @return the SdkInfo, if set.
      */
     @Nullable
     public SdkInfo getSdkInfo() {
@@ -530,17 +650,25 @@ public class AndroidBuilder {
 
     /**
      * Returns the TargetInfo, if set.
+     *
+     * @return the TargetInfo, if set.
      */
     @Nullable
     public TargetInfo getTargetInfo() {
         return mTargetInfo;
     }
 
+    /**
+     * @return the {@link ILogger} to use for logging.
+     */
     @NonNull
     public ILogger getLogger() {
         return mLogger;
     }
 
+    /**
+     * @return the {@link ErrorReporter} to use for reporting errors.
+     */
     @NonNull
     public ErrorReporter getErrorReporter() {
         return mErrorReporter;
@@ -548,6 +676,8 @@ public class AndroidBuilder {
 
     /**
      * Returns the compilation target, if set.
+     *
+     * @return the compilation target, or null if not set.
      */
     @Nullable
     public IAndroidTarget getTarget() {
@@ -558,6 +688,8 @@ public class AndroidBuilder {
 
     /**
      * Returns whether the compilation target is a preview.
+     *
+     * @return true if the target is a preview, false otherwise.
      */
     public boolean isPreviewTarget() {
         checkState(mTargetInfo != null,
@@ -565,12 +697,18 @@ public class AndroidBuilder {
         return mTargetInfo.getTarget().getVersion().isPreview();
     }
 
+    /**
+     * @return the target codename, or null if not a preview target
+     */
     public String getTargetCodename() {
         checkState(mTargetInfo != null,
                 "Cannot call getTargetCodename() before setTargetInfo() is called.");
         return mTargetInfo.getTarget().getVersion().getCodename();
     }
 
+    /**
+     * @return the Dx jar file
+     */
     @NonNull
     public File getDxJar() {
         checkState(mTargetInfo != null,
@@ -580,6 +718,8 @@ public class AndroidBuilder {
 
     /**
      * Helper method to get the boot classpath to be used during compilation.
+     *
+     * @return the boot classpath as a list of Files
      */
     @NonNull
     public List<File> getBootClasspath() {
@@ -645,6 +785,8 @@ public class AndroidBuilder {
 
     /**
      * Helper method to get the boot classpath to be used during compilation.
+     *
+     * @return the boot classpath as a list of Strings
      */
     @NonNull
     public List<String> getBootClasspathAsStrings() {
@@ -683,6 +825,7 @@ public class AndroidBuilder {
      * <p>
      * If the SDK was loaded, this may include the renderscript support jar.
      *
+     * @param variantConfiguration the VariantConfiguration to use
      * @return a non-null, but possibly empty set.
      */
     @NonNull
@@ -709,6 +852,7 @@ public class AndroidBuilder {
      * <p>
      * If the SDK was loaded, this may include the renderscript support jar.
      *
+     * @param variantConfiguration the VariantConfiguration to use
      * @return a non-null, but possibly empty list.
      */
     @NonNull
@@ -747,6 +891,7 @@ public class AndroidBuilder {
     /**
      * Returns an {@link PngCruncher} using aapt underneath
      *
+     * @param processOutputHandler an object to handle the executed process output.
      * @return an PngCruncher object
      */
     @NonNull
@@ -759,11 +904,19 @@ public class AndroidBuilder {
                 processOutputHandler);
     }
 
+    /**
+     * @return the process executor to use to execute external processes.
+     */
     @NonNull
     public ProcessExecutor getProcessExecutor() {
         return mProcessExecutor;
     }
 
+    /**
+     * @param processInfo the process to execute.
+     * @param handler     the handler for the process execution.
+     * @return the result of the execution.
+     */
     @NonNull
     public ProcessResult executeProcess(@NonNull ProcessInfo processInfo,
                                         @NonNull ProcessOutputHandler handler) {
@@ -771,7 +924,22 @@ public class AndroidBuilder {
     }
 
     /**
-     * Invoke the Manifest Merger version 2.
+     * Invoke the Manifest Merger version 2
+     *
+     * @param mainManifest                the main manifest file
+     * @param manifestOverlays            the list of manifest overlay files
+     * @param libraries                   the list of library dependencies
+     * @param packageOverride             the package name override value
+     * @param versionCode                 the version code value
+     * @param versionName                 the version name value
+     * @param minSdkVersion               the minimum SDK version
+     * @param targetSdkVersion            the target SDK version
+     * @param maxSdkVersion               the maximum SDK version
+     * @param outManifestLocation         the output location for the merged manifest
+     * @param outAaptSafeManifestLocation the output location for the aapt-safe merged manifest
+     * @param mergeType                   the merge type to use
+     * @param placeHolders                a map of placeholders to be substituted in the manifest. May be null.
+     * @param reportFile                  the file to write the XML merge blame report to. May be null.
      */
     public void mergeManifests(
             @NonNull File mainManifest,
@@ -867,6 +1035,8 @@ public class AndroidBuilder {
      * @param testManifestFile      optionally user provided AndroidManifest.xml for testing application
      * @param libraries             the library dependency graph
      * @param outManifest           the output location for the merged manifest
+     * @param manifestPlaceholders  a map of placeholders to be substituted in the manifest. May be null.
+     * @param tmpDir                a temporary directory to use for intermediate files
      * @see VariantConfiguration#getApplicationId()
      * @see VariantConfiguration#getTestedConfig()
      * @see VariantConfiguration#getMinSdkVersion()
@@ -955,6 +1125,10 @@ public class AndroidBuilder {
         }
     }
 
+    /**
+     * @param mergingReport the merging report
+     * @param outFile       the output file to save the merged manifest to
+     */
     private void handleMergingResult(@NonNull MergingReport mergingReport, @NonNull File outFile) {
         switch (mergingReport.getResult()) {
             case WARNING:
@@ -986,8 +1160,11 @@ public class AndroidBuilder {
      * @param aaptCommand              aapt command invocation parameters.
      * @param enforceUniquePackageName if true method will fail if some libraries share the same
      *                                 package name
-     * @throws IOException      if failed to write the output files
-     * @throws ProcessException if failed to execute aapt
+     * @param processOutputHandler     an object to handle the executed process output
+     * @throws IllegalStateException if {@code setTargetInfo()} was not
+     *                               called prior to this method.
+     * @throws IOException           if failed to write the output files
+     * @throws ProcessException      if failed to execute aapt
      */
     public void processResources(
             @NonNull AaptPackageProcessBuilder aaptCommand,
@@ -1090,6 +1267,14 @@ public class AndroidBuilder {
         }
     }
 
+    /**
+     * @param apkFile      the apk file to generate the data for
+     * @param outResFolder the output folder for the resources
+     * @param mainPkgName  the package name of the main app
+     * @param resName      the resource name for the apk
+     * @throws ProcessException if failed to execute aapt
+     * @throws IOException      if failed to write the output files
+     */
     public void generateApkData(
             @NonNull File apkFile,
             @NonNull File outResFolder,
@@ -1139,9 +1324,12 @@ public class AndroidBuilder {
      *
      * @param sourceFolders           all the source folders to find files to compile
      * @param sourceOutputDir         the output dir in which to generate the source code
+     * @param parcelableOutputDir     the output dir in which to generate the parcelable files
      * @param importFolders           import folders
      * @param dependencyFileProcessor the dependencyFileProcessor to record the dependencies
      *                                of the compilation.
+     * @param processOutputHandler    an object to handle the executed process output
+     * @throws ProcessException     if failed to execute the aidl compiler
      * @throws IOException          if failed to compile the files
      * @throws InterruptedException if the process is interrupted
      * @throws LoggedErrorException if the process failed
@@ -1191,14 +1379,16 @@ public class AndroidBuilder {
     /**
      * Compiles the given aidl file.
      *
+     * @param sourceFolder            the source folder containing the aidl file
      * @param aidlFile                the AIDL file to compile
      * @param sourceOutputDir         the output dir in which to generate the source code
+     * @param parcelableOutputDir     the output dir in which to generate the parcelable files
      * @param importFolders           all the import folders, including the source folders.
      * @param dependencyFileProcessor the dependencyFileProcessor to record the dependencies
      *                                of the compilation.
-     * @throws IOException          if failed to compile the files
-     * @throws InterruptedException if the process is interrupted
-     * @throws LoggedErrorException if the process failed
+     * @param processOutputHandler    an object to handle the executed process output
+     * @throws ProcessException if failed to execute the aidl compiler
+     * @throws IOException      if failed to compile the files
      */
     public void compileAidlFile(@NonNull File sourceFolder,
                                 @NonNull File aidlFile,
@@ -1207,7 +1397,7 @@ public class AndroidBuilder {
                                 @NonNull List<File> importFolders,
                                 @Nullable DependencyFileProcessor dependencyFileProcessor,
                                 @NonNull ProcessOutputHandler processOutputHandler)
-            throws IOException, InterruptedException, LoggedErrorException, ProcessException {
+            throws IOException, ProcessException {
         checkNotNull(aidlFile, "aidlFile cannot be null.");
         checkNotNull(sourceOutputDir, SOURCE_OUTPUT_NULL);
         checkNotNull(importFolders, IMPORT_FOLDERS_NULL);
@@ -1244,19 +1434,23 @@ public class AndroidBuilder {
      * <p>
      * Therefore whenever a renderscript file or header changes, all must be recompiled.
      *
-     * @param sourceFolders   all the source folders to find files to compile
-     * @param importFolders   all the import folders.
-     * @param sourceOutputDir the output dir in which to generate the source code
-     * @param resOutputDir    the output dir in which to generate the bitcode file
-     * @param targetApi       the target api
-     * @param debugBuild      whether the build is debug type
-     * @param optimLevel      the optimization level
-     * @param ndkMode         whether the build is in NDK mode
-     * @param supportMode     support mode flag to generate .so files.
-     * @param abiFilters      ABI filters in case of support mode
-     * @throws IOException          if failed to compile the files
+     * @param sourceFolders        all the source folders to find files to compile
+     * @param importFolders        all the import folders.
+     * @param sourceOutputDir      the output dir in which to generate the source code
+     * @param resOutputDir         the output dir in which to generate the bitcode file
+     * @param objOutputDir         the output dir in which to generate the obj file
+     * @param libOutputDir         the output dir in which to generate the .so file
+     * @param targetApi            the target api
+     * @param debugBuild           whether the build is debug type
+     * @param optimLevel           the optimization level
+     * @param ndkMode              whether the build is in NDK mode
+     * @param supportMode          support mode flag to generate .so files.
+     * @param abiFilters           ABI filters in case of support mode
+     * @param processOutputHandler an object to handle the executed process output
      * @throws InterruptedException if the process is interrupted
+     * @throws ProcessException     if failed to execute the renderscript compiler
      * @throws LoggedErrorException if the process failed
+     * @throws IOException          if failed to compile the files
      */
     public void compileAllRenderscriptFiles(@NonNull List<File> sourceFolders,
                                             @NonNull List<File> importFolders,
@@ -1341,14 +1535,18 @@ public class AndroidBuilder {
      * Converts the bytecode to Dalvik format
      *
      * @param inputs               the input files
-     * @param preDexedLibraries    the list of pre-dexed libraries
+     * @param preDexedLibraries    the list of pre-dex'ed libraries
      * @param outDexFolder         the location of the output folder
+     * @param multidex             whether to multi-dex
+     * @param mainDexList          the main dex list file, or null if none provided
      * @param dexOptions           dex options
      * @param additionalParameters list of additional parameters to give to dx
+     * @param tmpFolder            the temporary folder to use for dex-ing
      * @param incremental          true if it should attempt incremental dex if applicable
-     * @throws IOException
-     * @throws InterruptedException
-     * @throws ProcessException
+     * @param optimize             true if the dex should be optimized, false otherwise
+     * @param processOutputHandler an object to handle the executed process output
+     * @throws IOException      if any I/O error occurred while dex-ing
+     * @throws ProcessException if the process failed to execute
      */
     public void convertByteCode(
             @NonNull Collection<File> inputs,
@@ -1362,7 +1560,7 @@ public class AndroidBuilder {
             boolean incremental,
             boolean optimize,
             @NonNull ProcessOutputHandler processOutputHandler)
-            throws IOException, InterruptedException, ProcessException {
+            throws IOException, ProcessException {
         checkNotNull(inputs, "inputs cannot be null.");
         checkNotNull(preDexedLibraries, "preDexedLibraries cannot be null.");
         checkNotNull(outDexFolder, "outDexFolder cannot be null.");
@@ -1401,6 +1599,12 @@ public class AndroidBuilder {
         result.rethrowFailure().assertNormalExitValue();
     }
 
+    /**
+     * @param allClassesJarFile the path to the file containing the list of all classes.
+     * @param jarOfRoots        the path to the file containing the list of all roots.
+     * @return a set of classes to keep in the main dex file.
+     * @throws ProcessException if an error occurs while running dx.
+     */
     public Set<String> createMainDexList(
             @NonNull File allClassesJarFile,
             @NonNull File jarOfRoots) throws ProcessException {
@@ -1433,10 +1637,11 @@ public class AndroidBuilder {
     /**
      * Converts the bytecode to Dalvik format
      *
-     * @param inputFile  the input file
-     * @param outFile    the output file or folder if multi-dex is enabled.
-     * @param multiDex   whether multidex is enabled.
-     * @param dexOptions dex options
+     * @param inputFile            the input file
+     * @param outFile              the output file or folder if multi-dex is enabled.
+     * @param multiDex             whether multidex is enabled.
+     * @param dexOptions           dex options
+     * @param processOutputHandler an object to handle the executed process output
      * @throws IOException          if an I/O error occurs while creating the output file or folder.
      * @throws InterruptedException if the operation is interrupted
      * @throws ProcessException     if an error occurs while running dx.
@@ -1468,18 +1673,18 @@ public class AndroidBuilder {
      * Converts java source code into android byte codes using the jack integration APIs.
      * Jack will run in memory.
      *
-     * @param dexOutputFolder the output folder for the dex files
-     * @param jackOutputFile the output file for the jack files
-     * @param classpath the classpath
-     * @param packagedLibraries the packaged libraries
-     * @param sourceFiles the source files
-     * @param proguardFiles the proguard files
-     * @param mappingFile the mapping file
-     * @param jarJarRulesFiles the jar jar rules files
-     * @param incrementalDir the incremental directory
+     * @param dexOutputFolder     the output folder for the dex files
+     * @param jackOutputFile      the output file for the jack files
+     * @param classpath           the classpath
+     * @param packagedLibraries   the packaged libraries
+     * @param sourceFiles         the source files
+     * @param proguardFiles       the proguard files
+     * @param mappingFile         the mapping file
+     * @param jarJarRulesFiles    the jar jar rules files
+     * @param incrementalDir      the incremental directory
      * @param javaResourcesFolder the java resources folder
-     * @param multiDex whether multi-dex is enabled
-     * @param minSdkVersion the minimum sdk version
+     * @param multiDex            whether multi-dex is enabled
+     * @param minSdkVersion       the minimum sdk version
      * @return true if the conversion was successful, false otherwise
      */
     public boolean convertByteCodeUsingJackApis(
@@ -1591,9 +1796,10 @@ public class AndroidBuilder {
     /**
      * Converts the bytecode of a library to the jack format
      *
-     * @param inputFile  the input file
-     * @param outFile    the location of the output {@code classes.dex} file
-     * @param dexOptions dex options
+     * @param inputFile            the input file
+     * @param outFile              the location of the output {@code classes.dex} file
+     * @param dexOptions           dex options
+     * @param processOutputHandler an object to handle the executed process output
      * @throws ProcessException     if the conversion fails
      * @throws IOException          if the conversion fails
      * @throws InterruptedException if the conversion fails
@@ -1623,18 +1829,19 @@ public class AndroidBuilder {
     /**
      * Packages the apk.
      *
-     * @param androidResPkgLocation the location of the packaged resource file
-     * @param dexFolder             the folder with the dex file.
-     * @param dexedLibraries        optional collection of additional dex files to put in the apk.
-     * @param packagedJars          the jars that are packaged (libraries + jar dependencies)
-     * @param javaResourcesLocation the processed Java resource folder
-     * @param jniLibsFolders        the folders containing jni shared libraries
-     * @param mergingFolder         folder to contain files that are being merged
-     * @param abiFilters            optional ABI filter
-     * @param jniDebugBuild         whether the app should include jni debug data
-     * @param signingConfig         the signing configuration
-     * @param packagingOptions      the packaging options
-     * @param outApkLocation        location of the APK.
+     * @param androidResPkgLocation  the location of the packaged resource file
+     * @param dexFolder              the folder with the dex file.
+     * @param dexedLibraries         optional collection of additional dex files to put in the apk.
+     * @param packagedJars           the jars that are packaged (libraries + jar dependencies)
+     * @param javaResourcesLocation  the processed Java resource folder
+     * @param jniLibsFolders         the folders containing jni shared libraries
+     * @param mergingFolder          folder to contain files that are being merged
+     * @param abiFilters             optional ABI filter
+     * @param jniDebugBuild          whether the app should include jni debug data
+     * @param signingConfig          the signing configuration
+     * @param packagingOptions       the packaging options
+     * @param packagingOptionsFilter the filter to be used for the packaging options
+     * @param outApkLocation         location of the APK.
      * @throws DuplicateFileException if a duplicate file is found
      * @throws FileNotFoundException  if the store location was not found
      * @throws KeytoolException       if there is an issue with the keystore

@@ -16,6 +16,7 @@
 
 package com.android.sdklib.internal.repository;
 
+import com.android.annotations.NonNull;
 import com.android.annotations.VisibleForTesting;
 import com.android.annotations.VisibleForTesting.Visibility;
 import com.android.io.NonClosingInputStream;
@@ -48,12 +49,13 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Fetches and loads an sdk-addons-list XML.
- * <p/>
+ * Fetches and loads an {@code sdk-addons-list} XML.
+ * <p>
  * Such an XML contains a simple list of add-ons site that are to be loaded by default by the
  * SDK Manager. <br/>
  * The XML must conform to the sdk-addons-list-N.xsd. <br/>
  * Constants used in the XML are defined in {@link SdkAddonsListConstants}.
+ * </p>
  *
  * @deprecated com.android.sdklib.internal.repository has moved into Studio as
  * com.android.tools.idea.sdk.remote.internal.
@@ -71,7 +73,7 @@ public class AddonsListFetcher {
      * @param monitor A monitor to report errors. Cannot be null.
      * @return An array of {@link Site} on success (possibly empty), or null on error.
      */
-    public Site[] fetch(String url, DownloadCache cache, ITaskMonitor monitor) {
+    public Site[] fetch(String url, DownloadCache cache, @NonNull ITaskMonitor monitor) {
 
         url = url == null ? "" : url.trim();
 
@@ -218,7 +220,7 @@ public class AddonsListFetcher {
      *
      * @param urlString    The URL to load, as a string.
      * @param monitor      {@link ITaskMonitor} related to this URL.
-     * @param outException If non null, where to store any exception that
+     * @param outException If non-null, where to store any exception that
      *                     happens during the fetch.
      * @see UrlOpener UrlOpener, which handles all URL logic.
      */
@@ -246,6 +248,8 @@ public class AddonsListFetcher {
     /**
      * Closes the stream, ignore any exception from InputStream.close().
      * If the stream is a NonClosingInputStream, sets it to CloseBehavior.CLOSE first.
+     *
+     * @param is The stream to close.
      */
     private void closeStream(InputStream is) {
         if (is != null) {
@@ -264,6 +268,7 @@ public class AddonsListFetcher {
      * at the end of the xmlns:sdk="http://schemas.android.com/sdk/android/addons-list/$N"
      * declaration.
      *
+     * @param xml The XML stream to parse.
      * @return 1..{@link SdkAddonsListConstants#NS_LATEST_VERSION} for a valid schema version
      * or 0 if no schema could be found.
      */
@@ -289,16 +294,34 @@ public class AddonsListFetcher {
 
             // We don't want the default handler which prints errors to stderr.
             builder.setErrorHandler(new ErrorHandler() {
+                /**
+                 * @param e The warning information encapsulated in a
+                 *          SAX parse exception.
+                 * @throws SAXException Any SAX exception, possibly wrapping
+                 *                      <var>e</var>.
+                 */
                 @Override
                 public void warning(SAXParseException e) throws SAXException {
                     // pass
                 }
 
+                /**
+                 * @param e The error information encapsulated in a
+                 *          {@link SAXParseException}.
+                 * @throws SAXException Any SAX exception, possibly wrapping
+                 *                      <var>e</var>.
+                 */
                 @Override
                 public void fatalError(SAXParseException e) throws SAXException {
                     throw e;
                 }
 
+                /**
+                 * @param e The error information encapsulated in a
+                 *          SAX parse exception.
+                 * @throws SAXException Any SAX exception, possibly wrapping
+                 *                      <var>e</var>.
+                 */
                 @Override
                 public void error(SAXParseException e) throws SAXException {
                     throw e;
@@ -375,6 +398,14 @@ public class AddonsListFetcher {
      * If the XML was correctly validated, returns the schema that worked.
      * If it doesn't validate, returns null and stores the error in outError[0].
      * If we can't find a validator, returns null and set validatorFound[0] to false.
+     *
+     * @param xml            Input XML as an InputStream
+     * @param url            The URL of the XML, used for error reporting only.
+     * @param version        The version of the XML Schema.
+     *                       See {@link SdkAddonsListConstants#getXsdStream(int)}
+     * @param outError       If non-null, where to store any error that happens during the validation.
+     * @param validatorFound If non-null, where to store whether a validator was found or not.
+     * @return The URI of the schema that validated the XML, or null if it didn't validate.
      */
     @VisibleForTesting(visibility = Visibility.PRIVATE)
     protected String validateXml(InputStream xml, String url, int version,
@@ -449,6 +480,10 @@ public class AddonsListFetcher {
      * Takes an XML document as a string as parameter and returns a DOM for it.
      * <p>
      * On error, returns null and prints a (hopefully) useful message on the monitor.
+     *
+     * @param xml     The XML DOM to parse.
+     * @param monitor A non-null monitor to print to.
+     * @return The DOM Document or null if any error occurred.
      */
     @VisibleForTesting(visibility = Visibility.PRIVATE)
     protected Document getDocument(InputStream xml, ITaskMonitor monitor) {
@@ -483,6 +518,7 @@ public class AddonsListFetcher {
      * @param nsUri   The addons-list schema URI of the document.
      * @param baseUrl The base URL of the caller (e.g. where addons-list-N.xml was fetched from.)
      * @param monitor A non-null monitor to print to.
+     * @return An array of sites or null if any error occurred.
      */
     @VisibleForTesting(visibility = Visibility.PRIVATE)
     protected Site[] parseAddonsList(
@@ -556,6 +592,11 @@ public class AddonsListFetcher {
     /**
      * Returns the first child element with the given XML local name.
      * If xmlLocalName is null, returns the very first child element.
+     *
+     * @param node         The parent node.
+     * @param nsUri        The namespace URI of the child to return. Can be null.
+     * @param xmlLocalName The XML local name of the child to return. Can be null.
+     * @return The first child element or null if no node matched.
      */
     private Node getFirstChild(Node node, String nsUri, String xmlLocalName) {
 
@@ -571,8 +612,17 @@ public class AddonsListFetcher {
         return null;
     }
 
+    /**
+     * Returns the {@link SiteType} of a site, as a {@link SiteType} enum.
+     */
     public enum SiteType {
+        /**
+         * A site that hosts an add-on.
+         */
         ADDON_SITE,
+        /**
+         * A site that hosts a system image.
+         */
         SYS_IMG_SITE
     }
 
@@ -584,26 +634,44 @@ public class AddonsListFetcher {
         private final String mUiName;
         private final SiteType mType;
 
-        private Site(String url, String uiName, SiteType type) {
+        /**
+         * Creates a new site.
+         *
+         * @param url    The URL of the site, as a string.
+         * @param uiName The user-friendly name of the site, as a string.
+         * @param type   The type of the site, as a {@link SiteType} enum.
+         */
+        private Site(@NonNull String url, String uiName, SiteType type) {
             mType = type;
             mUrl = url.trim();
             mUiName = uiName;
         }
 
+        /**
+         * @return The URL of the site, as a string.
+         */
         public String getUrl() {
             return mUrl;
         }
 
+        /**
+         * @return The user-friendly name of the site, as a string.
+         */
         public String getUiName() {
             return mUiName;
         }
 
+        /**
+         * @return The type of the site, as a {@link SiteType} enum.
+         */
         public SiteType getType() {
             return mType;
         }
 
         /**
          * Returns a debug string representation of this object. Not for user display.
+         *
+         * @return A debug string representation of this object.
          */
         @Override
         public String toString() {

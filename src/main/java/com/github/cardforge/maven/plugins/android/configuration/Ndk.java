@@ -13,6 +13,8 @@
  */
 package com.github.cardforge.maven.plugins.android.configuration;
 
+import com.github.cardforge.maven.plugins.android.AndroidNdk;
+
 import java.io.File;
 
 /**
@@ -26,8 +28,6 @@ public class Ndk {
     /**
      * Directory of the installed Android NDK, for example
      * <code>/usr/local/android-ndk-r4</code>
-     *
-     * @see com.github.cardforge.maven.plugins.android.phase05compile.NdkBuildMojo#ndkPath
      */
     private File path;
 

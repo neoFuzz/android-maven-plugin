@@ -27,20 +27,20 @@ import java.util.regex.Pattern;
 
 /**
  * Represents the version of a target or device.
- * <p/>
+ * <p>
  * A version is defined by an API level and an optional code name.
  * <ul><li>Release versions of the Android platform are identified by their API level (integer),
  * (technically the code name for release version is "REL" but this class will return
- * <code>null<code> instead.)</li>
+ * <code>null</code> instead.)</li>
  * <li>Preview versions of the platform are identified by a code name. Their API level
- * is usually set to the value of the previous platform.</li></ul>
- * <p/>
+ * is usually set to the value of the previous platform.</li>
+ * </ul>
  * While this class contains both values, its goal is to abstract them, so that code comparing 2+
  * versions doesn't have to deal with the logic of handle both values.
- * <p/>
+ * <p>
  * There are some cases where ones may want to access the values directly. This can be done
  * with {@link #getApiLevel()} and {@link #getCodename()}.
- * <p/>
+ * </p>
  * For generic UI display of the API version, {@link #getApiString()} is to be used.
  */
 public final class AndroidVersion implements Comparable<AndroidVersion> {
@@ -55,6 +55,9 @@ public final class AndroidVersion implements Comparable<AndroidVersion> {
     /**
      * Creates an {@link AndroidVersion} with the given api level and codename.
      * Codename should be null for a release version, otherwise it's a preview codename.
+     *
+     * @param apiLevel The API level of the Android version.
+     * @param codename The codename of the Android version, or null for a release version.
      */
     public AndroidVersion(int apiLevel, @Nullable String codename) {
         mApiLevel = apiLevel;
@@ -64,8 +67,12 @@ public final class AndroidVersion implements Comparable<AndroidVersion> {
     /**
      * Creates an {@link AndroidVersion} from {@link Properties}, with default values if the
      * {@link Properties} object doesn't contain the expected values.
-     * <p/>The {@link Properties} is expected to have been filled with
+     * <p>The {@link Properties} is expected to have been filled with
      * {@link #saveProperties(Properties)}.
+     *
+     * @param properties      The {@link Properties} to read the values from.
+     * @param defaultApiLevel The default API level to use if not found in the properties.
+     * @param defaultCodeName The default codename to use if not found in the properties.
      */
     public AndroidVersion(@Nullable Properties properties,
                           int defaultApiLevel,
@@ -85,6 +92,7 @@ public final class AndroidVersion implements Comparable<AndroidVersion> {
      * Creates an {@link AndroidVersion} from {@link Properties}. The properties must contain
      * android version information, or an exception will be thrown.
      *
+     * @param properties The {@link Properties} to read the values from.
      * @throws AndroidVersionException if no Android version information have been found
      * @see #saveProperties(Properties)
      */
@@ -110,7 +118,7 @@ public final class AndroidVersion implements Comparable<AndroidVersion> {
     /**
      * Creates an {@link AndroidVersion} from a string that may be an integer API
      * level or a string codename.
-     * <p/>
+     * <p>
      * <Em>Important</em>: An important limitation of this method is that cannot possibly
      * recreate the API level integer from a pure string codename. This is only OK to use
      * if the caller can guarantee that only {@link #getApiString()} will be used later.
@@ -170,6 +178,9 @@ public final class AndroidVersion implements Comparable<AndroidVersion> {
         return codename;
     }
 
+    /**
+     * @param props The {@link Properties} to fill with the version information.
+     */
     public void saveProperties(@NonNull Properties props) {
         props.setProperty(PkgProps.VERSION_API_LEVEL, Integer.toString(mApiLevel));
         if (mCodename != null) {
@@ -179,11 +190,12 @@ public final class AndroidVersion implements Comparable<AndroidVersion> {
 
     /**
      * Returns the api level as an integer.
-     * <p/>For target that are in preview mode, this can be superseded by
+     * <p>For target that are in preview mode, this can be superseded by
      * {@link #getCodename()}.
-     * <p/>To display the API level in the UI, use {@link #getApiString()}, which will use the
+     * <p>To display the API level in the UI, use {@link #getApiString()}, which will use the
      * codename if applicable.
      *
+     * @return the API level of this version
      * @see #getCodename()
      * @see #getApiString()
      */
@@ -208,8 +220,10 @@ public final class AndroidVersion implements Comparable<AndroidVersion> {
 
     /**
      * Returns the version code name if applicable, null otherwise.
-     * <p/>If the codename is non null, then the API level should be ignored, and this should be
+     * <p>If the codename is non-null, then the API level should be ignored, and this should be
      * used as a unique identifier of the target instead.
+     *
+     * @return the code name
      */
     @Nullable
     public String getCodename() {
@@ -218,6 +232,8 @@ public final class AndroidVersion implements Comparable<AndroidVersion> {
 
     /**
      * Returns a string representing the API level and/or the code name.
+     *
+     * @return a non-null string
      */
     @NonNull
     public String getApiString() {
@@ -230,6 +246,8 @@ public final class AndroidVersion implements Comparable<AndroidVersion> {
 
     /**
      * Returns whether the version is a preview version.
+     *
+     * @return true if the version is a preview version
      */
     public boolean isPreview() {
         return mCodename != null;
@@ -238,14 +256,17 @@ public final class AndroidVersion implements Comparable<AndroidVersion> {
     /**
      * Checks whether a device running a version similar to the receiver can run a project compiled
      * for the given <var>version</var>.
-     * <p/>
+     * <p>
      * Be aware that this is not a perfect test, as other properties could break compatibility
      * despite this method returning true. For a more comprehensive test, see
      * {@link IAndroidTarget#canRunOn(IAndroidTarget)}.
-     * <p/>
+     * <p>
      * Nevertheless, when testing if an application can run on a device (where there is no
      * access to the list of optional libraries), this method can give a good indication of whether
      * there is a chance the application could run, or if there's a direct incompatibility.
+     *
+     * @param appVersion The version of the application.
+     * @return true if the device can run the given version, false otherwise
      */
     public boolean canRun(@NonNull AndroidVersion appVersion) {
         // if the application is compiled for a preview version, the device must be running exactly
@@ -262,6 +283,9 @@ public final class AndroidVersion implements Comparable<AndroidVersion> {
     /**
      * Returns <code>true</code> if the AndroidVersion is an API level equals to
      * <var>apiLevel</var>.
+     *
+     * @param apiLevel The API level to compare to.
+     * @return true if the AndroidVersion is an API level equals to <var>apiLevel</var>.
      */
     public boolean equals(int apiLevel) {
         return mCodename == null && apiLevel == mApiLevel;
@@ -270,11 +294,13 @@ public final class AndroidVersion implements Comparable<AndroidVersion> {
     /**
      * Compares the receiver with either an {@link AndroidVersion} object or a {@link String}
      * object.
-     * <p/>If <var>obj</var> is a {@link String}, then the method will first check if it's a string
+     * <p>If <var>obj</var> is a {@link String}, then the method will first check if it's a string
      * representation of a number, in which case it'll compare it to the api level. Otherwise, it'll
      * compare it against the code name.
-     * <p/>For all other type of object give as parameter, this method will return
+     * <p>For all other type of object give as parameter, this method will return
      * <code>false</code>.
+     *
+     * @return true if the receiver is equal to the given object.
      */
     @Override
     public boolean equals(Object obj) {
@@ -306,6 +332,9 @@ public final class AndroidVersion implements Comparable<AndroidVersion> {
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int hashCode() {
         if (mCodename != null) {
@@ -321,6 +350,8 @@ public final class AndroidVersion implements Comparable<AndroidVersion> {
      * Returns a string with the API Level and optional codename.
      * Useful for debugging.
      * For display purpose, please use {@link #getApiString()} instead.
+     *
+     * @return a non-null string
      */
     @Override
     public String toString() {
@@ -345,6 +376,12 @@ public final class AndroidVersion implements Comparable<AndroidVersion> {
         return compareTo(o.mApiLevel, o.mCodename);
     }
 
+    /**
+     * @param apiLevel the api level to compare to
+     * @param codename the codename to compare to. Can be null.
+     * @return a negative integer, zero, or a positive integer as this object is
+     * less than, equal to, or greater than the specified object.
+     */
     public int compareTo(int apiLevel, @Nullable String codename) {
         if (mCodename == null) {
             if (codename != null && mApiLevel == apiLevel) {
@@ -370,6 +407,10 @@ public final class AndroidVersion implements Comparable<AndroidVersion> {
      * Compares this version with the specified API and returns true if this version
      * is greater or equal than the requested API -- that is the current version is a
      * suitable min-api-level for the argument API.
+     *
+     * @param api the API to compare to
+     * @return true if this version is greater or equal than the requested API.
+     * @see #compareTo(int, String)
      */
     public boolean isGreaterOrEqualThan(int api) {
         return compareTo(api, null /*codename*/) >= 0;

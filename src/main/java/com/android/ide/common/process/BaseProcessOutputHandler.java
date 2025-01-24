@@ -32,9 +32,17 @@ import java.nio.charset.Charset;
  */
 public abstract class BaseProcessOutputHandler implements ProcessOutputHandler {
 
+    /**
+     * Constructor for BaseProcessOutputHandler.
+     */
     protected BaseProcessOutputHandler() {
     }
 
+    /**
+     * @param stream the stream to convert to a string
+     * @return the string value of the stream
+     * @throws ProcessException if the stream is not a valid string
+     */
     private static String getString(@NonNull ByteArrayOutputStream stream) throws ProcessException {
         try {
             return stream.toString(Charset.defaultCharset().name());
@@ -43,28 +51,47 @@ public abstract class BaseProcessOutputHandler implements ProcessOutputHandler {
         }
     }
 
+    /**
+     * @return a new ProcessOutput instance
+     */
     @NonNull
     @Override
     public ProcessOutput createOutput() {
         return new BaseProcessOutput();
     }
 
+    /**
+     * Implementation of ProcessOutput that caches the output in a ByteArrayOutputStream.
+     * <p>
+     * This does not do anything with it, since it does not implement
+     * {@link ProcessOutputHandler#handleOutput(ProcessOutput)}
+     */
     public static final class BaseProcessOutput implements ProcessOutput {
         private final ByteArrayOutputStream mStandardOutput = new ByteArrayOutputStream();
         private final ByteArrayOutputStream mErrorOutput = new ByteArrayOutputStream();
 
+        /**
+         * @return the standard output as a string
+         */
         @NonNull
         @Override
         public OutputStream getStandardOutput() {
             return mStandardOutput;
         }
 
+        /**
+         * @return the error output as a string
+         */
         @NonNull
         @Override
         public OutputStream getErrorOutput() {
             return mErrorOutput;
         }
 
+        /**
+         * @return the standard output as a string
+         * @throws ProcessException if the standard output is not a valid string
+         */
         @NonNull
         public String getStandardOutputAsString() throws ProcessException {
             return getString(mStandardOutput);

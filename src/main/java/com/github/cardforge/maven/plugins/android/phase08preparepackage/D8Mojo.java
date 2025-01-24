@@ -60,6 +60,9 @@ import static com.github.cardforge.maven.plugins.android.InclusionExclusionResol
         requiresDependencyResolution = ResolutionScope.COMPILE
 )
 public class D8Mojo extends AbstractAndroidMojo {
+    /**
+     * The JAR file extension.
+     */
     private static final String JAR = "jar";
 
     /**
@@ -251,6 +254,9 @@ public class D8Mojo extends AbstractAndroidMojo {
         }
     }
 
+    /**
+     * @return the dependency list
+     */
     @NonNull
     private List<File> getDependencies() {
         final List<File> libraries = new ArrayList<>();
@@ -295,6 +301,13 @@ public class D8Mojo extends AbstractAndroidMojo {
         return inputs;
     }
 
+    /**
+     * Parses the configuration settings for the D8 command execution.
+     * It prioritizes the configuration settings in the following order:
+     * 1. Configuration in the plugin configuration
+     * 2. Configuration in the pom.xml
+     * 3. Default values
+     */
     private void parseConfiguration() {
         // config in pom found
         if (d8 != null) {
@@ -343,6 +356,9 @@ public class D8Mojo extends AbstractAndroidMojo {
         }
     }
 
+    /**
+     * @return the default commands for the java process.
+     */
     @NonNull
     private List<String> javaDefaultCommands() {
         List<String> commands = new ArrayList<>();
@@ -362,6 +378,10 @@ public class D8Mojo extends AbstractAndroidMojo {
         return commands;
     }
 
+    /**
+     * @param executor the command executor to use for executing the D8 command.
+     * @throws MojoExecutionException If there is an error executing the D8 command.
+     */
     private void runD8(CommandExecutor executor) throws MojoExecutionException {
         final List<String> commands = javaDefaultCommands();
 
@@ -419,6 +439,9 @@ public class D8Mojo extends AbstractAndroidMojo {
         executeJava(commands, executor);
     }
 
+    /**
+     * @return the path to the java executable, either from the system's PATH or from the java.home system property.
+     */
     public String getJavaExecutablePath() {
         // First, check if 'java' is in the system's PATH
         String path = System.getenv("PATH");
@@ -433,6 +456,12 @@ public class D8Mojo extends AbstractAndroidMojo {
         }
     }
 
+    /**
+     * @param commands the list of commands to execute.
+     * @param executor the command executor to use for executing the Java command.
+     * @return the output of the executed command.
+     * @throws MojoExecutionException if an error occurs while executing the Java command.
+     */
     private String executeJava(@NonNull final List<String> commands, @NonNull CommandExecutor executor)
             throws MojoExecutionException {
         final String javaExecutable = getJavaExecutablePath();
@@ -512,7 +541,7 @@ public class D8Mojo extends AbstractAndroidMojo {
      * @param jarArchiver   The {@link JarArchiver} to add the resources to.
      * @param javaResources The list of Java resources to add.
      */
-    protected void addJavaResources(JarArchiver jarArchiver, List<Resource> javaResources) {
+    protected void addJavaResources(JarArchiver jarArchiver, @NonNull List<Resource> javaResources) {
         for (Resource javaResource : javaResources) {
             addJavaResource(jarArchiver, javaResource);
         }

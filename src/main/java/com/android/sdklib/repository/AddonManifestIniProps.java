@@ -18,7 +18,7 @@ package com.android.sdklib.repository;
 
 /**
  * This class describes the properties that can appear in an add-on's manifest.ini file.
- * <p/>
+ * <p>
  * These constants are public and part of the SDK Manager public API.
  * Once published we can't change them arbitrarily since various parts
  * of our build process depend on them.
@@ -37,7 +37,7 @@ public class AddonManifestIniProps {
     /**
      * The optional "name id" of the add-on. <br/>
      * In source.properties, this matches {@link PkgProps#ADDON_NAME_ID}.
-     * <p/>
+     * <p>
      * Historically the manifest used to have only a 'name' property for both internal unique id
      * and display, in which case the internal id was synthesized using the display name and
      * matching a {@code [a-zA-Z0-9_-]+} pattern (see {@code Addonpackage#sanitizeDisplayToNameId}
@@ -54,7 +54,7 @@ public class AddonManifestIniProps {
     /**
      * The optional vendor id of the add-on. <br/>
      * In source.properties, this matches {@link PkgProps#ADDON_VENDOR_ID}.
-     * <p/>
+     * <p>
      * Historically the manifest used to have only a 'vendor' property for both internal unique id
      * and display, in which case the internal id was synthesized using the display name and
      * matching a {@code [a-zA-Z0-9_-]+} pattern (see {@code Addonpackage#sanitizeDisplayToNameId}

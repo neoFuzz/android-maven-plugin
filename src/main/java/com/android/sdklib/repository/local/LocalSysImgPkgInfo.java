@@ -34,7 +34,7 @@ import java.util.Properties;
  * Local system-image package, for a given platform's {@link AndroidVersion}
  * and given ABI.
  * The package itself has a major revision.
- * There should be only one for a given android platform version & ABI.
+ * There should be only one for a given android platform version &amp; ABI.
  */
 public class LocalSysImgPkgInfo extends LocalPkgInfo {
 
@@ -53,7 +53,7 @@ public class LocalSysImgPkgInfo extends LocalPkgInfo {
     }
 
     /**
-     * Extracts the tag id & display from the properties.
+     * Extracts the tag id &amp; display from the properties.
      * If missing, uses the "default" tag id.
      */
     @NonNull

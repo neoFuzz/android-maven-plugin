@@ -1,5 +1,8 @@
 package com.github.cardforge.maven.plugins.android.configuration;
 
+import com.github.cardforge.maven.plugins.android.AbstractInstrumentationMojo;
+import com.github.cardforge.maven.plugins.android.standalonemojos.PullMojo;
+
 /**
  * Configuration for the integration test runs. This class is only the definition of the parameters that are
  * shadowed in
@@ -9,11 +12,11 @@ package com.github.cardforge.maven.plugins.android.configuration;
  */
 public class Pull {
     /**
-     * Mirror of {@link PullMojo#source}
+     * Mirror of {@link PullMojo}#source
      */
     private String source;
     /**
-     * Mirror of {@link PullMojo#destination}
+     * Mirror of {@link PullMojo}#destination
      */
     private String destination;
 

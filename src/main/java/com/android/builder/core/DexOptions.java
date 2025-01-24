@@ -18,15 +18,30 @@ package com.android.builder.core;
 
 import com.android.annotations.Nullable;
 
+/**
+ *
+ */
 public interface DexOptions {
 
+    /**
+     * @return whether to run the dex optimization step
+     */
     boolean getIncremental();
 
+    /**
+     * @return whether to pre-dex libraries
+     */
     boolean getJumboMode();
 
+    /**
+     * @return the Java maximum heap size, or null to use the default value
+     */
     @Nullable
     String getJavaMaxHeapSize();
 
+    /**
+     * @return the number of threads to use, or null to use the default value
+     */
     @Nullable
     Integer getThreadCount();
 }

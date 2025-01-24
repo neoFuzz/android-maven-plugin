@@ -23,10 +23,6 @@ import com.android.io.IAbstractFile;
 import com.android.io.StreamException;
 import com.android.utils.XmlUtils;
 import com.android.xml.AndroidXPathFactory;
-
-import java.io.InputStream;
-import java.util.Optional;
-
 import com.google.common.io.Closeables;
 import org.xml.sax.InputSource;
 
@@ -34,15 +30,40 @@ import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathExpressionException;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.util.Optional;
 
+/**
+ * Default implementation of {@link ManifestParser}
+ */
 public class DefaultManifestParser implements ManifestParser {
 
+    /**
+     * The minimum SDK version
+     */
     Optional<Object> mMinSdkVersion;
+    /**
+     * The target SDK version
+     */
     Optional<Object> mTargetSdkVersion;
+    /**
+     * The version code
+     */
     Optional<Integer> mVersionCode;
+    /**
+     * tha package
+     */
     Optional<String> mPackage;
+    /**
+     * The version name
+     */
     Optional<String> mVersionName;
 
+    /**
+     * @param file  the manifest file to parse
+     * @param xPath the xpath expression to evaluate
+     * @return the value of the xpath expression, or null if not found
+     */
     @Nullable
     private static String getStringValue(@NonNull File file, @NonNull String xPath) {
         XPath xpath = AndroidXPathFactory.newXPath();
@@ -59,6 +80,11 @@ public class DefaultManifestParser implements ManifestParser {
         return null;
     }
 
+    /**
+     * @param manifestFile the manifest file to parse
+     * @return the target SDK version, or null if not found
+     * @throws StreamException if an error occurs while reading the manifest file
+     */
     @Nullable
     public static Object getTargetSdkVersionAM(IAbstractFile manifestFile) throws StreamException {
         String result = getStringValueAM(manifestFile);
@@ -70,6 +96,11 @@ public class DefaultManifestParser implements ManifestParser {
         }
     }
 
+    /**
+     * @param file the manifest file to parse
+     * @return the target SDK version, or null if not found
+     * @throws StreamException if an error occurs while reading the manifest file
+     */
     private static String getStringValueAM(@NonNull IAbstractFile file) throws StreamException {
         String strXPath = "/manifest/uses-sdk/@android:targetSdkVersion"; // NOSONAR
         XPath xpath = AndroidXPathFactory.newXPath();
@@ -89,6 +120,10 @@ public class DefaultManifestParser implements ManifestParser {
         return e;
     }
 
+    /**
+     * @param manifestFile the manifest file to parse
+     * @return the min SDK version, or null if not found
+     */
     @Nullable
     public static Object getMinSdkVersionAM(IAbstractFile manifestFile) {
         String result = getStringValue((File) manifestFile, "/manifest/uses-sdk/@android:minSdkVersion");
@@ -100,6 +135,10 @@ public class DefaultManifestParser implements ManifestParser {
         }
     }
 
+    /**
+     * @param manifestFile the manifest file to parse
+     * @return the package name, or null if not found
+     */
     @Nullable
     @Override
     public synchronized String getPackage(@NonNull File manifestFile) {
@@ -109,6 +148,10 @@ public class DefaultManifestParser implements ManifestParser {
         return mPackage.orElse(null);
     }
 
+    /**
+     * @param manifestFile the manifest file to parse
+     * @return the version name, or null if not found
+     */
     @Nullable
     @Override
     public synchronized String getVersionName(@NonNull File manifestFile) {
@@ -119,6 +162,10 @@ public class DefaultManifestParser implements ManifestParser {
         return mVersionName.orElse(null);
     }
 
+    /**
+     * @param manifestFile the manifest file to parse
+     * @return the version code, or -1 if not found
+     */
     @Override
     public synchronized int getVersionCode(@NonNull File manifestFile) {
         if (mVersionCode == null) {
@@ -135,6 +182,10 @@ public class DefaultManifestParser implements ManifestParser {
         return mVersionCode.orElse(-1);
     }
 
+    /**
+     * @param manifestFile the manifest file to parse
+     * @return the min SDK version, or 1 if not found
+     */
     @Override
     @NonNull
     public synchronized Object getMinSdkVersion(@NonNull File manifestFile) {
@@ -149,6 +200,10 @@ public class DefaultManifestParser implements ManifestParser {
         return mMinSdkVersion.orElse(1);
     }
 
+    /**
+     * @param manifestFile the manifest file to parse
+     * @return the target SDK version, or -1 if not found
+     */
     @Override
     @NonNull
     public Object getTargetSdkVersion(@NonNull File manifestFile) {

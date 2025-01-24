@@ -42,6 +42,7 @@ public interface DependencyFileProcessor {
      *
      * @param dependencyFile the dependency file.
      * @return the dependency data that was created.
+     * @throws IOException if the dependency file cannot be read
      */
     DependencyData processFile(@NonNull File dependencyFile) throws IOException;
 }

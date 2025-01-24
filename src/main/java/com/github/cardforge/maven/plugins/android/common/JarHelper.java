@@ -34,8 +34,8 @@ public class JarHelper {
                 // Create the output directory if need be
                 if (!entryFile.getParentFile().exists() &&
                         !entryFile.getParentFile().mkdirs()) {
-                        throw new IOException("Error creating output directory: " + entryFile.getParentFile());
-                    }
+                    throw new IOException("Error creating output directory: " + entryFile.getParentFile());
+                }
 
 
                 // If the entry is an actual file, unzip that too

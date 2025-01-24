@@ -51,7 +51,10 @@ public class MonkeyTestRunner {
     }
 
     /**
-     * {@inheritDoc}
+     * Add argument with given name and value.
+     *
+     * @param name  name of the argument
+     * @param value value of the argument.
      */
     public void addArg(String name, String value) {
         if (name == null || value == null) {
@@ -61,15 +64,20 @@ public class MonkeyTestRunner {
     }
 
     /**
-     * {@inheritDoc}
+     * Add boolean argument with given name and value.
+     *
+     * @param name  name of the boolean
+     * @param value value of the boolean.
      */
-
     public void addBooleanArg(String name, boolean value) {
         addArg(name, Boolean.toString(value));
     }
 
     /**
-     * {@inheritDoc}
+     * Add long argument with given name and value.
+     *
+     * @param name  name of the Long
+     * @param value value of the Long.
      */
     public void addLongArg(String name, long value) {
         addArg(name, Long.toString(value));
@@ -156,32 +164,38 @@ public class MonkeyTestRunner {
     }
 
     /**
-     * {@inheritDoc}
+     * Set the maximum time to wait for instrumentation to send a response before assuming the test
+     * has timed out.
+     *
+     * @param maxTimeToOutputResponse the time, in ms, or 0 for no timeout
      */
-
     public void setMaxtimeToOutputResponse(int maxTimeToOutputResponse) {
         mMaxTimeToOutputResponse = maxTimeToOutputResponse;
     }
 
     /**
-     * {@inheritDoc}
+     * Sets the run name to be used when reporting test results.
+     *
+     * @param runName the test run name
      */
-
     public void setRunName(String runName) {
         mRunName = runName;
     }
 
     /**
-     * {@inheritDoc}
+     * Runs the tests from a list of instrumentation listeners.
+     *
+     * @param listeners the listeners to report test results to
      */
-
     public void run(ITestRunListener... listeners) throws TimeoutException, AdbCommandRejectedException,
             ShellCommandUnresponsiveException, IOException {
         run(Arrays.asList(listeners));
     }
 
     /**
-     * {@inheritDoc}
+     * Runs the tests from a list of instrumentation listeners.
+     *
+     * @param listeners the listeners to report test results to
      */
     public void run(Collection<ITestRunListener> listeners) throws TimeoutException, AdbCommandRejectedException,
             ShellCommandUnresponsiveException, IOException {
@@ -223,7 +237,7 @@ public class MonkeyTestRunner {
     }
 
     /**
-     * {@inheritDoc}
+     * Sets the boolean for {@code mParser}
      */
     public void cancel() {
         if (mParser != null) {

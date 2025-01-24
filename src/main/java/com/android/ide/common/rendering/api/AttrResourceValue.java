@@ -27,8 +27,16 @@ import java.util.Map;
  * get the enum/flag value associated with an attribute defined in the declare-styleable.
  */
 public class AttrResourceValue extends ResourceValue {
+    /**
+     * Map of (name, integer) values. Can be null.
+     */
     private Map<String, Integer> mValueMap;
 
+    /**
+     * @param type        the {@link ResourceType} of the resource
+     * @param name        the name of the resource
+     * @param isFramework whether the resource is a framework resource or a project resource
+     */
     public AttrResourceValue(ResourceType type, String name, boolean isFramework) {
         super(type, name, isFramework);
     }
@@ -42,6 +50,10 @@ public class AttrResourceValue extends ResourceValue {
         return mValueMap;
     }
 
+    /**
+     * @param name  the name of the enum or flag attribute
+     * @param value the integer value of the enum or flag attribute
+     */
     public void addValue(String name, Integer value) {
         if (mValueMap == null) {
             mValueMap = new HashMap<>();

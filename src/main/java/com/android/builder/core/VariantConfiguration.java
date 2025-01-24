@@ -428,6 +428,7 @@ public class VariantConfiguration<T extends BuildType, D extends ProductFlavor, 
      *
      * <p>This always uses forward slashes ('/') as separator on all platform.
      *
+     * @param splitNames the names of the splits.
      * @return the directory name for the variant
      */
     @NonNull
@@ -522,6 +523,9 @@ public class VariantConfiguration<T extends BuildType, D extends ProductFlavor, 
         return this;
     }
 
+    /**
+     * @return the variant-specific source provider or null if none has been provided.
+     */
     @Nullable
     public SourceProvider getMultiFlavorSourceProvider() {
         return mMultiFlavorSourceProvider;
@@ -587,6 +591,7 @@ public class VariantConfiguration<T extends BuildType, D extends ProductFlavor, 
      * related test variants can use it as a dependency. Returns null if this is not a library
      * variant.
      *
+     * @return the {@link LibraryDependency} for this variant.
      * @see #mOutput
      */
     @Nullable
@@ -609,21 +614,34 @@ public class VariantConfiguration<T extends BuildType, D extends ProductFlavor, 
         return this;
     }
 
+    /**
+     * @return the default config object for this variant.
+     */
     @NonNull
     public D getDefaultConfig() {
         return mDefaultConfig;
     }
 
+    /**
+     * @return the default source provider for this variant.
+     */
     @NonNull
     public SourceProvider getDefaultSourceSet() {
         return mDefaultSourceProvider;
     }
 
+    /**
+     * @return the merged flavor of all flavors. If the variant has no flavor, then
+     * the application default flavor is returned.
+     */
     @NonNull
     public ProductFlavor getMergedFlavor() {
         return mMergedFlavor;
     }
 
+    /**
+     * @return the BuildType for this variant.
+     */
     @NonNull
     public T getBuildType() {
         return mBuildType;
@@ -631,18 +649,25 @@ public class VariantConfiguration<T extends BuildType, D extends ProductFlavor, 
 
     /**
      * The SourceProvider for the BuildType. Can be null.
+     *
+     * @return the SourceProvider or null if none has been set.
      */
     @Nullable
     public SourceProvider getBuildTypeSourceSet() {
         return mBuildTypeSourceProvider;
     }
 
+    /**
+     * @return true if this variant has any flavor dimensions
+     */
     public boolean hasFlavors() {
         return !mFlavors.isEmpty();
     }
 
     /**
      * Returns the product flavors. Items earlier in the list override later items.
+     *
+     * @return the list of ProductFlavor objects. Never null.
      */
     @NonNull
     public List<F> getProductFlavors() {
@@ -663,6 +688,8 @@ public class VariantConfiguration<T extends BuildType, D extends ProductFlavor, 
 
     /**
      * Returns the direct library dependencies
+     *
+     * @return a non null collection of LibraryDependency
      */
     @NonNull
     public List<LibraryDependency> getDirectLibraries() {
@@ -671,17 +698,25 @@ public class VariantConfiguration<T extends BuildType, D extends ProductFlavor, 
 
     /**
      * Returns all the library dependencies, direct and transitive.
+     *
+     * @return a non null collection of LibraryDependency
      */
     @NonNull
     public List<LibraryDependency> getAllLibraries() {
         return mFlatLibraries;
     }
 
+    /**
+     * @return the type of variant.
+     */
     @NonNull
     public VariantType getType() {
         return mType;
     }
 
+    /**
+     * @return the tested variant configuration, or null if this is not a test variant
+     */
     @Nullable
     public VariantConfiguration getTestedConfig() {
         return mTestedConfig;
@@ -739,6 +774,9 @@ public class VariantConfiguration<T extends BuildType, D extends ProductFlavor, 
         return id;
     }
 
+    /**
+     * @return the tested application id, or null if this is not a test variant
+     */
     @Nullable
     public String getTestedApplicationId() {
         if (mType.isForTesting()) {
@@ -831,6 +869,8 @@ public class VariantConfiguration<T extends BuildType, D extends ProductFlavor, 
     /**
      * Returns the instrumentationRunner arguments to use to test this variant, or if the
      * variant is a test, the ones to use to test the tested variant
+     *
+     * @return the instrumentation test runner arguments as a map of key value pairs
      */
     @NonNull
     public Map<String, String> getInstrumentationRunnerArguments() {
@@ -878,6 +918,8 @@ public class VariantConfiguration<T extends BuildType, D extends ProductFlavor, 
 
     /**
      * Reads the package name from the manifest. This is unmodified by the build type.
+     *
+     * @return the package name from the manifest
      */
     @Nullable
     public String getPackageFromManifest() {
@@ -893,6 +935,8 @@ public class VariantConfiguration<T extends BuildType, D extends ProductFlavor, 
 
     /**
      * Reads the version name from the manifest.
+     *
+     * @return null if not found
      */
     @Nullable
     public String getVersionNameFromManifest() {
@@ -902,6 +946,8 @@ public class VariantConfiguration<T extends BuildType, D extends ProductFlavor, 
 
     /**
      * Reads the version code from the manifest.
+     *
+     * @return -1 if not found
      */
     public int getVersionCodeFromManifest() {
         File manifestLocation = mDefaultSourceProvider.getManifestFile();
@@ -954,6 +1000,9 @@ public class VariantConfiguration<T extends BuildType, D extends ProductFlavor, 
         return targetSdkVersion;
     }
 
+    /**
+     * @return the main manifest file for this variant
+     */
     @Nullable
     public File getMainManifest() {
         File defaultManifest = mDefaultSourceProvider.getManifestFile();
@@ -994,6 +1043,9 @@ public class VariantConfiguration<T extends BuildType, D extends ProductFlavor, 
         return providers;
     }
 
+    /**
+     * @return a list of manifest files that will be merged together.
+     */
     @NonNull
     public List<File> getManifestOverlays() {
         List<File> inputs = Lists.newArrayList();
@@ -1106,6 +1158,8 @@ public class VariantConfiguration<T extends BuildType, D extends ProductFlavor, 
      * overridden by the 2nd one and so on. This is meant to facilitate usage of the list in a
      * {@link com.android.ide.common.res2.AssetMerger}.
      *
+     * @param generatedResFolders a list of generated res folders
+     * @param includeDependencies whether to include in the result the resources of the dependencies
      * @return a list ResourceSet.
      */
     @NonNull
@@ -1168,6 +1222,9 @@ public class VariantConfiguration<T extends BuildType, D extends ProductFlavor, 
         return assetSets;
     }
 
+    /**
+     * @return a list of all the library folders that are outside the current project.
+     */
     @NonNull
     public List<File> getLibraryJniFolders() {
         List<File> list = Lists.newArrayListWithExpectedSize(mFlatLibraries.size());
@@ -1183,6 +1240,8 @@ public class VariantConfiguration<T extends BuildType, D extends ProductFlavor, 
 
     /**
      * Returns all the renderscript import folder that are outside the current project.
+     *
+     * @return a list of folders.
      */
     @NonNull
     public List<File> getRenderscriptImports() {
@@ -1214,6 +1273,8 @@ public class VariantConfiguration<T extends BuildType, D extends ProductFlavor, 
 
     /**
      * Returns all the aidl import folder that are outside the current project.
+     *
+     * @return a list of folders.
      */
     @NonNull
     public List<File> getAidlImports() {
@@ -1227,6 +1288,9 @@ public class VariantConfiguration<T extends BuildType, D extends ProductFlavor, 
         return list;
     }
 
+    /**
+     * @return a list of all aidl source folders
+     */
     @NonNull
     public List<File> getAidlSourceList() {
         List<SourceProvider> providers = getSortedSourceProviders();
@@ -1237,6 +1301,9 @@ public class VariantConfiguration<T extends BuildType, D extends ProductFlavor, 
         return sourceList;
     }
 
+    /**
+     * @return a list of all JNI source folders
+     */
     @NonNull
     public List<File> getJniSourceList() {
         List<SourceProvider> providers = getSortedSourceProviders();
@@ -1247,6 +1314,9 @@ public class VariantConfiguration<T extends BuildType, D extends ProductFlavor, 
         return sourceList;
     }
 
+    /**
+     * @return a list of all JNI libraries
+     */
     @NonNull
     public List<File> getJniLibsList() {
         List<SourceProvider> providers = getSortedSourceProviders();
@@ -1508,6 +1578,10 @@ public class VariantConfiguration<T extends BuildType, D extends ProductFlavor, 
         return fullList;
     }
 
+    /**
+     * @return the signing config to use for this variant. May be null if the variant is not
+     * signed.
+     */
     @Nullable
     public SigningConfig getSigningConfig() {
         if (mSigningConfigOverride != null) {
@@ -1520,6 +1594,9 @@ public class VariantConfiguration<T extends BuildType, D extends ProductFlavor, 
         return mMergedFlavor.getSigningConfig();
     }
 
+    /**
+     * @return true if the signing config is ready for signing.
+     */
     public boolean isSigningReady() {
         SigningConfig signingConfig = getSigningConfig();
         return signingConfig != null && signingConfig.isSigningReady();
@@ -1531,7 +1608,9 @@ public class VariantConfiguration<T extends BuildType, D extends ProductFlavor, 
      * Note that if the method is set to include config files coming from libraries, they will
      * only be included if the aars have already been unzipped.
      *
-     * @param includeLibraries whether to include the library dependencies.
+     * @param includeLibraries      whether to include the library dependencies.
+     * @param defaultProguardConfig the default proguard config files to use if none are defined
+     *                              in the variant.
      * @return a non-null list of proguard files.
      */
     @NonNull
@@ -1560,6 +1639,8 @@ public class VariantConfiguration<T extends BuildType, D extends ProductFlavor, 
 
     /**
      * Returns the proguard config files to be used for the test APK.
+     *
+     * @return a non-null list of proguard files.
      */
     @NonNull
     public List<File> getTestProguardFiles() {
@@ -1573,6 +1654,9 @@ public class VariantConfiguration<T extends BuildType, D extends ProductFlavor, 
         return fullList;
     }
 
+    /**
+     * @return the consumer proguard files for this variant.
+     */
     @NonNull
     public List<Object> getConsumerProguardFiles() {
         List<Object> fullList = Lists.newArrayList();
@@ -1585,6 +1669,9 @@ public class VariantConfiguration<T extends BuildType, D extends ProductFlavor, 
         return fullList;
     }
 
+    /**
+     * @return true if the variant is configured to use a test coverage provider.
+     */
     public boolean isTestCoverageEnabled() {
         return mBuildType.isTestCoverageEnabled();
     }
@@ -1603,6 +1690,9 @@ public class VariantConfiguration<T extends BuildType, D extends ProductFlavor, 
         return mergedFlavorsPlaceholders;
     }
 
+    /**
+     * @return true if the variant is configured to use a multi-dex application.
+     */
     public boolean isMultiDexEnabled() {
         Boolean value = mBuildType.getMultiDexEnabled();
         if (value != null) {
@@ -1615,6 +1705,9 @@ public class VariantConfiguration<T extends BuildType, D extends ProductFlavor, 
         return false;
     }
 
+    /**
+     * @return the file containing the main dex list for multi-dex support.
+     */
     public File getMultiDexKeepFile() {
         File value = mBuildType.getMultiDexKeepFile();
         if (value != null) {
@@ -1624,6 +1717,10 @@ public class VariantConfiguration<T extends BuildType, D extends ProductFlavor, 
         return value;
     }
 
+    /**
+     * @return the proguard files specified in the build type and its product flavors, or null if
+     * there are no proguard rules
+     */
     public File getMultiDexKeepProguard() {
         File value = mBuildType.getMultiDexKeepProguard();
         if (value != null) {
@@ -1633,12 +1730,17 @@ public class VariantConfiguration<T extends BuildType, D extends ProductFlavor, 
         return value;
     }
 
+    /**
+     * @return true if the variant is configured to use a multi-dex application.
+     */
     public boolean isLegacyMultiDexMode() {
         return isMultiDexEnabled() && getMinSdkVersion().getApiLevel() < 21;
     }
 
     /**
      * Returns the renderscript support mode.
+     *
+     * @return true if the variant explicitly enables renderscript support.
      */
     public boolean getRenderscriptSupportModeEnabled() {
         Boolean value = mMergedFlavor.getRenderscriptSupportModeEnabled();
@@ -1651,6 +1753,8 @@ public class VariantConfiguration<T extends BuildType, D extends ProductFlavor, 
 
     /**
      * Returns the renderscript NDK mode.
+     *
+     * @return true if the variant explicitly enables renderscript support.
      */
     public boolean getRenderscriptNdkModeEnabled() {
         Boolean value = mMergedFlavor.getRenderscriptNdkModeEnabled();

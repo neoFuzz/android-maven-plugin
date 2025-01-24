@@ -88,7 +88,7 @@ public final class PkgDescExtra extends PkgDesc implements IPkgDescExtra {
      * Helper to compute whether the extra path of both {@link IPkgDescExtra}s
      * are compatible with each other, which means they are either equal or are
      * matched between existing path and the potential old paths list.
-     * <p/>
+     * <p>
      * This also covers backward compatibility -- in earlier schemas the vendor id was
      * merged into the path string when reloading installed extras.
      *
@@ -137,15 +137,15 @@ public final class PkgDescExtra extends PkgDesc implements IPkgDescExtra {
         // path and the vendor attributes.
         if (otherPath != null && thisPath != null && thisVendor != null &&
                 otherPath.equals(thisVendor + '-' + thisPath) &&
-                    (otherVendor == null || otherVendor.isEmpty() || otherVendor.equals(thisVendor))) {
-                return true;
-            }
+                (otherVendor == null || otherVendor.isEmpty() || otherVendor.equals(thisVendor))) {
+            return true;
+        }
 
         if (thisPath != null && otherPath != null && otherVendor != null &&
                 thisPath.equals(otherVendor + '-' + otherPath) &&
-                    (thisVendor == null || thisVendor.isEmpty() || thisVendor.equals(otherVendor))) {
-                return true;
-            }
+                (thisVendor == null || thisVendor.isEmpty() || thisVendor.equals(otherVendor))) {
+            return true;
+        }
 
 
         return thisPath != null && thisPath.equals(otherPath) &&

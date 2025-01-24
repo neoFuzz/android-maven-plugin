@@ -37,8 +37,9 @@ import java.util.Properties;
  * Controller class to get settings values. Settings are kept in-memory.
  * Users of this class must first load the settings before changing them and save
  * them when modified.
- * <p/>
+ * <p>
  * Settings are enumerated by constants in {@link ISettingsPage}.
+ * </p>
  *
  * @deprecated com.android.sdklib.internal.repository has moved into Studio as
  * com.android.tools.idea.sdk.remote.internal.
@@ -144,10 +145,10 @@ public class SettingsController {
 
     /**
      * Associate the given {@link ISettingsPage} with this {@link SettingsController}.
-     * <p/>
+     * <p>
      * This loads the current properties into the setting page UI.
      * It then associates the SettingsChanged callback with this controller.
-     * <p/>
+     * <p>
      * If the setting page given is null, it will be unlinked from controller.
      *
      * @param settingsPage An {@link ISettingsPage} to associate with the controller.

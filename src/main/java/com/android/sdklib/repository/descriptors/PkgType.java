@@ -28,7 +28,7 @@ import java.util.EnumSet;
 
 /**
  * Package types handled by the {@link LocalSdk}.
- * <p/>
+ * <p>
  * Integer bit values are provided via {@link #getIntValue()} for backward
  * compatibility with the older {@link LocalSdkParser} class.
  * The integer bit values also indicate the natural ordering of the packages.

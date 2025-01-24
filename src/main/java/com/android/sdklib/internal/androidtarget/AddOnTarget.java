@@ -112,16 +112,27 @@ public final class AddOnTarget implements IAndroidTarget {
         }
     }
 
+    /**
+     * @return the location of the add-on
+     */
     @Override
     public String getLocation() {
         return mLocation;
     }
 
+    /**
+     * @return the name of the add-on
+     */
     @Override
     public String getName() {
         return mName;
     }
 
+    /**
+     * @param tag     A tag id-display.
+     * @param abiType An ABI type string.
+     * @return the system image, or null if not found.
+     */
     @Override
     @Nullable
     public ISystemImage getSystemImage(@NonNull IdDisplay tag, @NonNull String abiType) {
@@ -133,39 +144,60 @@ public final class AddOnTarget implements IAndroidTarget {
         return null;
     }
 
+    /**
+     * @return the system image
+     */
     @Override
     public ISystemImage[] getSystemImages() {
         return mSystemImages;
     }
 
+    /**
+     * @return the Vendor name
+     */
     @Override
     public String getVendor() {
         return mVendor;
     }
 
+    /**
+     * @return the full name
+     */
     @Override
     @NonNull
     public String getFullName() {
         return String.format("%1$s (%2$s)", mName, mVendor);
     }
 
+    /**
+     * @return the classpath name, suitable for use in the manifest.
+     */
     @Override
     @NonNull
     public String getClasspathName() {
         return String.format("%1$s [%2$s]", mName, mBasePlatform.getClasspathName());
     }
 
+    /**
+     * @return short classpath name, suitable for use in the manifest.
+     */
     @Override
     @NonNull
     public String getShortClasspathName() {
         return String.format("%1$s [%2$s]", mName, mBasePlatform.getVersionName());
     }
 
+    /**
+     * @return the description
+     */
     @Override
     public String getDescription() {
         return mDescription;
     }
 
+    /**
+     * @return The Android version in use
+     */
     @NonNull
     @Override
     public AndroidVersion getVersion() {
@@ -173,26 +205,43 @@ public final class AddOnTarget implements IAndroidTarget {
         return mBasePlatform.getVersion();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String getVersionName() {
         return mBasePlatform.getVersionName();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int getRevision() {
         return mRevision;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean isPlatform() {
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public IAndroidTarget getParent() {
         return mBasePlatform;
     }
 
+    /**
+     * @param pathId the id representing the path to return.
+     *               Any of the constants defined in the {@link IAndroidTarget} interface can be used.
+     * @return the corresponding path, or null if not found.
+     */
     @Override
     public String getPath(int pathId) {
         switch (pathId) {
@@ -238,46 +287,70 @@ public final class AddOnTarget implements IAndroidTarget {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     @NonNull
     public File getFile(int pathId) {
         return new File(getPath(pathId));
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public BuildToolInfo getBuildToolInfo() {
         return mBasePlatform.getBuildToolInfo();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     @NonNull
     public List<String> getBootClasspath() {
         return mBasePlatform.getBootClasspath();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @NonNull
     @Override
     public List<OptionalLibrary> getOptionalLibraries() {
         return mBasePlatform.getOptionalLibraries();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @NonNull
     @Override
     public List<OptionalLibrary> getAdditionalLibraries() {
         return mLibraries;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean hasRenderingLibrary() {
         return mHasRenderingLibrary || mHasRenderingResources;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @NonNull
     @Override
     public File[] getSkins() {
         return mSkins;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Nullable
     @Override
     public File getDefaultSkin() {
@@ -295,26 +368,46 @@ public final class AddOnTarget implements IAndroidTarget {
         return mBasePlatform.getPlatformLibraries();
     }
 
+    /**
+     * @param name the name of the property to return
+     * @return the property value or <code>null</code> if it was not found.
+     */
     @Override
     public String getProperty(String name) {
         return mBasePlatform.getProperty(name);
     }
 
+    /**
+     * @param name         the name of the property to return
+     * @param defaultValue the default value to return.
+     * @return the property value or <code>null</code> if it was not found.
+     */
     @Override
     public Integer getProperty(String name, Integer defaultValue) {
         return mBasePlatform.getProperty(name, defaultValue);
     }
 
+    /**
+     * @param name         the name of the property to return
+     * @param defaultValue the default value to return.
+     * @return the property value or <code>null</code> if it was not found.
+     */
     @Override
     public Boolean getProperty(String name, Boolean defaultValue) {
         return mBasePlatform.getProperty(name, defaultValue);
     }
 
+    /**
+     * @return the properties of the underlying platform.
+     */
     @Override
     public Map<String, String> getProperties() {
         return mBasePlatform.getProperties();
     }
 
+    /**
+     * @return the USB vendor id in the add-on.
+     */
     @Override
     public int getUsbVendorId() {
         return mVendorId;
@@ -322,6 +415,8 @@ public final class AddOnTarget implements IAndroidTarget {
 
     /**
      * Sets the USB vendor id in the add-on.
+     *
+     * @param vendorId the vendor id. Must be > 0
      */
     public void setUsbVendorId(int vendorId) {
         if (vendorId == 0) {
@@ -331,6 +426,10 @@ public final class AddOnTarget implements IAndroidTarget {
         mVendorId = vendorId;
     }
 
+    /**
+     * @param target the IAndroidTarget to test.
+     * @return true if the target is compatible with the receiver.
+     */
     @Override
     public boolean canRunOn(IAndroidTarget target) {
         // basic test
@@ -341,7 +440,7 @@ public final class AddOnTarget implements IAndroidTarget {
         /*
          * The method javadoc indicates:
          * Returns whether the given target is compatible with the receiver.
-         * <p/>A target is considered compatible if applications developed for the receiver can
+         * <p>A target is considered compatible if applications developed for the receiver can
          * run on the given target.
          */
 
@@ -365,6 +464,9 @@ public final class AddOnTarget implements IAndroidTarget {
 
     }
 
+    /**
+     * @return a hash string for this object.
+     */
     @Override
     @NonNull
     public String hashString() {
@@ -372,11 +474,17 @@ public final class AddOnTarget implements IAndroidTarget {
                 mBasePlatform.getVersion().getApiString());
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int hashCode() {
         return hashString().hashCode();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean equals(Object obj) {
         if (obj instanceof AddOnTarget addon) {
@@ -387,10 +495,13 @@ public final class AddOnTarget implements IAndroidTarget {
         return false;
     }
 
-    /*
+    /**
      * Order by API level (preview/n count as between n and n+1).
      * At the same API level, order as: Platform first, then add-on ordered by vendor and then name
-     * (non-Javadoc)
+     *
+     * @param target the object to be compared.
+     * @return a negative integer, zero, or a positive integer as this object is less than, equal to,
+     * or greater than the specified object.
      * @see java.lang.Comparable#compareTo(java.lang.Object)
      */
     @Override
@@ -433,6 +544,7 @@ public final class AddOnTarget implements IAndroidTarget {
      * The representation is also purposely compact. It does not describe _all_ the properties
      * of the target, only a few key ones.
      *
+     * @return a string representation of the target.
      * @see #getDescription()
      */
     @Override
@@ -444,6 +556,10 @@ public final class AddOnTarget implements IAndroidTarget {
                 getParent().toString());
     }
 
+    /**
+     * @param skins       the skins to set
+     * @param defaultSkin the default skin to set
+     */
     public void setSkins(@NonNull File[] skins, @NonNull File defaultSkin) {
         mDefaultSkin = defaultSkin;
 

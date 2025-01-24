@@ -77,7 +77,7 @@ public interface ISystemImage extends Comparable<ISystemImage> {
         /**
          * The system image is located in the legacy platform's {@link SdkConstants#FD_IMAGES}
          * folder.
-         * <p/>
+         * <p>
          * Used by both platform and add-ons.
          */
         IN_LEGACY_FOLDER,
@@ -85,14 +85,14 @@ public interface ISystemImage extends Comparable<ISystemImage> {
          * The system image is located in a subdirectory of the platform's
          * {@link SdkConstants#FD_IMAGES} folder, allowing for multiple system
          * images within the platform.
-         * <p/>
+         * <p>
          * Used by both platform and add-ons.
          */
         IN_IMAGES_SUBFOLDER,
         /**
          * The system image is located in the new SDK's {@link SdkConstants#FD_SYSTEM_IMAGES}
          * folder. Supported as of Tools R14 and Repository XSD version 5.
-         * <p/>
+         * <p>
          * Used <em>only</em> by both platform up to Tools R22.6.
          * Supported for add-ons as of Tools R22.8.
          */

@@ -204,7 +204,9 @@ public class ZipalignMojo extends AbstractAndroidMojo {
         return getFullPathWithName(parsedInputApk).equals(getFullPathWithName(parsedOutputApk));
     }
 
-    /** zipalign doesn't allow output file to be same as input */
+    /**
+     * zipalign doesn't allow output file to be same as input
+     */
     @NonNull
     private String getTemporaryOutputApkFilename() {
         return parsedOutputApk.substring(0, parsedOutputApk.lastIndexOf('.')) + "-aligned-temp.apk";

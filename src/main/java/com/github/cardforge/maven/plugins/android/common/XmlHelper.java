@@ -21,7 +21,7 @@ public class XmlHelper {
         }
     }
 
-    public static Element getOrCreateElement(Document doc,@NonNull Element manifestElement, String elementName) {
+    public static Element getOrCreateElement(Document doc, @NonNull Element manifestElement, String elementName) {
         NodeList nodeList = manifestElement.getElementsByTagName(elementName);
         Element element;
         if (nodeList.getLength() == 0) {

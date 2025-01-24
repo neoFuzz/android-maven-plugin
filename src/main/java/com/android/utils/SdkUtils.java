@@ -40,6 +40,7 @@ public class SdkUtils {
     private SdkUtils() {
         // empty
     }
+
     /**
      * Prefix in comments which mark the source locations for merge results
      */

@@ -19,19 +19,13 @@ package com.android.manifmerger;
 import com.android.SdkConstants;
 import com.android.annotations.NonNull;
 import com.google.common.base.Joiner;
-
-import java.util.Optional;
-
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
 import org.w3c.dom.Attr;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static com.android.manifmerger.ManifestModel.ATTRIBUTE_PACKAGE;
 import static com.android.manifmerger.MergingReport.Record.Severity.ERROR;

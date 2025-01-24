@@ -32,14 +32,15 @@ public interface ILayoutlibVersion {
 
     /**
      * Returns the layoutlib version. Mandatory starting with repository XSD rev 4.
-     * <p/>
+     * <p>
      * The first integer is the API of layoublib, which should be > 0.
      * It will be equal to {@link #LAYOUTLIB_API_NOT_SPECIFIED} (0) if the layoutlib
      * version isn't specified.
-     * <p/>
+     * <p>
      * The second integer is the revision for that given API. It is >= 0
      * and works as a minor revision number, incremented for the same API level.
      *
+     * @return A pair of positive integers or 0.
      * @since sdk-repository-4.xsd
      */
     Pair<Integer, Integer> getLayoutlibVersion();

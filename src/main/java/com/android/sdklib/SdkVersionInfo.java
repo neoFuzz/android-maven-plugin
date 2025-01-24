@@ -28,6 +28,7 @@ public class SdkVersionInfo {
     private SdkVersionInfo() {
         // Not instantiable
     }
+
     /**
      * The highest known API level. Note that the tools may also look at the
      * installed platforms to see if they can find more recently released

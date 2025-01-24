@@ -36,14 +36,13 @@ import static com.android.manifmerger.XmlNode.NodeKey;
  * <p>
  * Each action generates at least one {@link com.android.manifmerger.Actions.Record}
  * containing enough information to generate a machine or human-readable report.
- * <p>
+ * </p>
  * <p>
  * The records are not organized in a temporal structure as the merging tool takes such decisions
  * but are keyed by xml elements and attributes. For each node (elements or attributes), a linked
  * list of actions that happened to the node is recorded to display all decisions that were made
  * for that particular node.
- * <p>
- * <p>
+ * </p>
  * This structure will permit displaying logs with co-located decisions records for each element,
  * for instance :
  * <pre>
@@ -54,7 +53,7 @@ import static com.android.manifmerger.XmlNode.NodeKey;
  *
  * <p>
  * Each record for a node (element or attribute) will contain the following metadata :
- * <p>
+ * </p>
  *
  * <ul>
  *     <li>{@link com.android.manifmerger.Actions.ActionType} to identify whether the action

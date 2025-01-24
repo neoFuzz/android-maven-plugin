@@ -47,27 +47,64 @@ import java.util.Map;
  */
 public class DependencyDataStore {
 
+    /**
+     * the tag header
+     */
     private static final byte TAG_HEADER = 0x7F;
+    /**
+     * the tag start identifier
+     */
     private static final byte TAG_START = 0x70;
+    /**
+     * the tag 2ndary file
+     */
     private static final byte TAG_2NDARY_FILE = 0x71;
+    /**
+     * the tag output file
+     */
     private static final byte TAG_OUTPUT = 0x73;
+    /**
+     * the tag 2ndary output file
+     */
     private static final byte TAG_2NDARY_OUTPUT = 0x74;
+    /**
+     * the tag end identifier
+     */
     private static final byte TAG_END = 0x77;
 
+    /**
+     * Current version of the data format.
+     */
     private static final int CURRENT_VERSION = 1;
 
+    /**
+     * Map of main file to dependency data.
+     */
     private final Map<String, DependencyData> mMainFileMap = Maps.newHashMap();
 
+    /**
+     * Nothing for instantiation.
+     */
     public DependencyDataStore() {
         // No initialization needed.
     }
 
+    /**
+     * @param fos   the file output stream
+     * @param value the value to write
+     * @throws IOException if the data is not in the expected format.
+     */
     private static void writeInt(@NonNull FileOutputStream fos, int value) throws IOException {
         ByteBuffer b = ByteBuffer.allocate(4);
         b.putInt(value);
         fos.write(b.array());
     }
 
+    /**
+     * @param fos  the file output stream to write to.
+     * @param path the path to write to the stream.
+     * @throws IOException if the data is not in the expected format.
+     */
     private static void writePath(@NonNull FileOutputStream fos, @NonNull String path) throws IOException {
         byte[] pathBytes = path.getBytes(Charsets.UTF_8);
 
@@ -75,6 +112,12 @@ public class DependencyDataStore {
         fos.write(pathBytes);
     }
 
+    /**
+     * @param fis     the file input stream
+     * @param buffers the reusable buffer
+     * @return The byte read from the stream.
+     * @throws IOException if the data is not in the expected format.
+     */
     private static byte readByte(@NonNull FileInputStream fis, @NonNull ReusableBuffer buffers)
             throws IOException {
         int read = fis.read(buffers.intBuffer, 0, 1);
@@ -85,6 +128,14 @@ public class DependencyDataStore {
         return buffers.intBuffer[0];
     }
 
+    /**
+     * 4
+     *
+     * @param fis     the input stream to read from
+     * @param buffers the reusable buffer
+     * @return The int value read from the stream.
+     * @throws IOException if the data is not in the expected format.
+     */
     private static int readInt(@NonNull FileInputStream fis, @NonNull ReusableBuffer buffers)
             throws IOException {
         int read = fis.read(buffers.intBuffer);
@@ -99,6 +150,12 @@ public class DependencyDataStore {
         return b.getInt();
     }
 
+    /**
+     * @param fis     the input stream to read from
+     * @param buffers the reusable buffer
+     * @return The {@link DependencyData} read from the stream.
+     * @throws IOException if the data is not in the expected format.
+     */
     @NonNull
     private static String readPath(@NonNull FileInputStream fis, @NonNull ReusableBuffer buffers)
             throws IOException {
@@ -116,31 +173,50 @@ public class DependencyDataStore {
         return new String(buffers.pathBuffer, 0, length, Charsets.UTF_8);
     }
 
+    /**
+     * @param dataList a list of {@link DependencyData} objects to add.
+     */
     public void addData(@NonNull List<DependencyData> dataList) {
         for (DependencyData data : dataList) {
             mMainFileMap.put(data.getMainFile(), data);
         }
     }
 
+    /**
+     * @param data the {@link DependencyData} to add.
+     */
     public void addData(@NonNull DependencyData data) {
         mMainFileMap.put(data.getMainFile(), data);
     }
 
+    /**
+     * @param data the {@link DependencyData} to remove.
+     */
     public void remove(@NonNull DependencyData data) {
         mMainFileMap.remove(data.getMainFile());
     }
 
+    /**
+     * @param dataList a list of {@link DependencyData} objects to update.
+     */
     public void updateAll(@NonNull List<DependencyData> dataList) {
         for (DependencyData data : dataList) {
             mMainFileMap.put(data.getMainFile(), data);
         }
     }
 
+    /**
+     * @return a collection of {@link DependencyData} objects.
+     */
     @NonNull
     public Collection<DependencyData> getData() {
         return mMainFileMap.values();
     }
 
+    /**
+     * @param path path for the main file
+     * @return the {@link DependencyData} for the given main file or null if not found.
+     */
     @VisibleForTesting
     DependencyData getByMainFile(String path) {
         return mMainFileMap.get(path);
@@ -149,6 +225,7 @@ public class DependencyDataStore {
     /**
      * Returns the map of data using the main file as key.
      *
+     * @return a map of main file -> dependency data
      * @see com.android.builder.internal.incremental.DependencyData#getMainFile()
      */
     @NonNull

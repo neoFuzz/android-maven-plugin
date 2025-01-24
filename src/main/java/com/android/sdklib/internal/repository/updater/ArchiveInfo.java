@@ -28,18 +28,19 @@ import java.util.Collection;
  * Represents an archive that we want to install.
  * Note that the installer deals with archives whereas the user mostly sees packages
  * but as far as we are concerned for installation there's a 1-to-1 mapping.
- * <p/>
+ * <p>
  * A new archive is always a remote archive that needs to be downloaded and then
  * installed. It can replace an existing local one. It can also depends on another
  * (new or local) archive, which means the dependent archive needs to be successfully
- * installed first. Finally this archive can also be a dependency for another one.
- * <p/>
+ * installed first. Finally, this archive can also be a dependency for another one.
+ * </p><p>
  * The accepted and rejected flags are used by {@code SdkUpdaterChooserDialog} to follow
  * user choices. The installer should never install something that is not accepted.
- * <p/>
+ * </p><p>
  * <em>Note</em>: There is currently no logic to support more than one level of
  * dependency, either here or in the {@code SdkUpdaterChooserDialog}, since we currently
  * have no need for it.
+ * </p>
  *
  * @see ArchiveInfo#ArchiveInfo(Archive, Archive, ArchiveInfo[])
  * @deprecated com.android.sdklib.internal.repository has moved into Studio as
@@ -68,7 +69,7 @@ public class ArchiveInfo extends ArchiveReplacement implements Comparable<Archiv
      *                   <em>this</em> archive depends upon. In other words, we can only install
      *                   this archive if the dependency has been successfully installed. It also
      *                   means we need to install the dependency first. Can be null or empty.
-     *                   However it cannot contain nulls.
+     *                   However, it cannot contain nulls.
      */
     public ArchiveInfo(
             @Nullable Archive newArchive,
@@ -83,8 +84,10 @@ public class ArchiveInfo extends ArchiveReplacement implements Comparable<Archiv
      * archive depends upon. In other words, we can only install this archive if the
      * dependency has been successfully installed. It also means we need to install the
      * dependency first.
-     * <p/>
+     * <p>
      * This array can be null or empty. It can't contain nulls though.
+     *
+     * @return An array of {@link ArchiveInfo} that this archive depends on.
      */
     @Nullable
     public ArchiveInfo[] getDependsOn() {
@@ -94,6 +97,8 @@ public class ArchiveInfo extends ArchiveReplacement implements Comparable<Archiv
     /**
      * Returns true if this new archive is a dependency for <em>another</em> one that we
      * want to install.
+     *
+     * @return True if this archive is a dependency for another one.
      */
     public boolean isDependencyFor() {
         return !mDependencyFor.isEmpty();
@@ -102,6 +107,9 @@ public class ArchiveInfo extends ArchiveReplacement implements Comparable<Archiv
     /**
      * Adds an {@link ArchiveInfo} for which <em>this</em> package is a dependency.
      * This means the package added here depends on this package.
+     *
+     * @param dependencyFor The {@link ArchiveInfo} that depends on this one.
+     * @return This object, for chaining.
      */
     @NonNull
     public ArchiveInfo addDependencyFor(ArchiveInfo dependencyFor) {
@@ -115,9 +123,11 @@ public class ArchiveInfo extends ArchiveReplacement implements Comparable<Archiv
     /**
      * Returns the list of {@link ArchiveInfo} for which <em>this</em> package is a dependency.
      * This means the packages listed here depend on this package.
-     * <p/>
+     * <p>
      * Implementation detail: this is the internal mutable list. Callers should not modify it.
      * This list can be empty but is never null.
+     *
+     * @return A list of {@link ArchiveInfo} that depend on this one.
      */
     @NonNull
     public Collection<ArchiveInfo> getDependenciesFor() {
@@ -127,6 +137,8 @@ public class ArchiveInfo extends ArchiveReplacement implements Comparable<Archiv
     /**
      * Returns whether this archive was accepted (either manually by the user or
      * automatically if it doesn't have a license) for installation.
+     *
+     * @return True if the archive was accepted.
      */
     public boolean isAccepted() {
         return mAccepted;
@@ -135,6 +147,8 @@ public class ArchiveInfo extends ArchiveReplacement implements Comparable<Archiv
     /**
      * Sets whether this archive was accepted (either manually by the user or
      * automatically if it doesn't have a license) for installation.
+     *
+     * @param accepted An archive can neither accepted nor rejected.
      */
     public void setAccepted(boolean accepted) {
         mAccepted = accepted;
@@ -143,6 +157,8 @@ public class ArchiveInfo extends ArchiveReplacement implements Comparable<Archiv
     /**
      * Returns whether this archive was rejected manually by the user.
      * An archive can neither accepted nor rejected.
+     *
+     * @return True if the archive was rejected.
      */
     public boolean isRejected() {
         return mRejected;
@@ -151,6 +167,8 @@ public class ArchiveInfo extends ArchiveReplacement implements Comparable<Archiv
     /**
      * Sets whether this archive was rejected manually by the user.
      * An archive can neither accepted nor rejected.
+     *
+     * @param rejected True to reject this archive.
      */
     public void setRejected(boolean rejected) {
         mRejected = rejected;
@@ -159,6 +177,9 @@ public class ArchiveInfo extends ArchiveReplacement implements Comparable<Archiv
     /**
      * ArchiveInfos are compared using ther "new archive" ordering.
      *
+     * @param rhs The {@link ArchiveInfo} to compare to.
+     * @return A negative integer, zero, or a positive integer as this object
+     * is less than, equal to, or greater than the specified object.
      * @see Archive#compareTo(Archive)
      */
     @Override

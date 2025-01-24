@@ -59,7 +59,7 @@ public class BrokenPackage extends MajorRevisionPackage
      * Creates a new "broken" package that represents a package that we failed to load,
      * for whatever error indicated in {@code longDescription}.
      * There is also an <em>optional</em> API level dependency that can be specified.
-     * <p/>
+     * <p>
      * By design, this creates a package with one and only one archive.
      */
     BrokenPackage(@Nullable Properties props,
@@ -93,7 +93,7 @@ public class BrokenPackage extends MajorRevisionPackage
     /**
      * Save the properties of the current packages in the given {@link Properties} object.
      * These properties will later be given to a constructor that takes a {@link Properties} object.
-     * <p/>
+     * <p>
      * Base implementation override: We don't actually save properties for a broken package.
      */
     @Override
@@ -122,7 +122,7 @@ public class BrokenPackage extends MajorRevisionPackage
     /**
      * Returns a string identifier to install this package from the command line.
      * For broken packages, we return an empty string. These are not installable.
-     * <p/>
+     * <p>
      * {@inheritDoc}
      */
     @Override
@@ -132,7 +132,7 @@ public class BrokenPackage extends MajorRevisionPackage
 
     /**
      * Returns a description of this package that is suitable for a list display.
-     * <p/>
+     * <p>
      * {@inheritDoc}
      */
     @Override

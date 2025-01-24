@@ -16,7 +16,6 @@
 package com.android.utils;
 
 import com.android.annotations.NonNull;
-
 import com.google.common.base.Joiner;
 import com.google.common.hash.Hashing;
 import com.google.common.io.Files;

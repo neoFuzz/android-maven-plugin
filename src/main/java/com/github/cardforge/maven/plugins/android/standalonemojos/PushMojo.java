@@ -17,7 +17,10 @@
 package com.github.cardforge.maven.plugins.android.standalonemojos;
 
 import com.android.annotations.NonNull;
-import com.android.ddmlib.*;
+import com.android.ddmlib.AdbCommandRejectedException;
+import com.android.ddmlib.SyncException;
+import com.android.ddmlib.SyncService;
+import com.android.ddmlib.TimeoutException;
 import com.github.cardforge.maven.plugins.android.AbstractAndroidMojo;
 import com.github.cardforge.maven.plugins.android.common.DeviceHelper;
 import com.github.cardforge.maven.plugins.android.common.LogSyncProgressMonitor;

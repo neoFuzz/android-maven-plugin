@@ -27,13 +27,36 @@ import java.util.Collection;
  */
 public class ConfigHandler {
 
+    /**
+     * Logger
+     */
     private static final Logger log = LoggerFactory.getLogger(ConfigHandler.class);
+    /**
+     * The mojo to parse the configuration for
+     */
     private final Object mojo;
+    /**
+     * The expression evaluator to use to parse the configuration
+     */
     private final PluginParameterExpressionEvaluator evaluator;
+    /**
+     * The config pojo instance to use to parse the configuration
+     */
     private Object configPojoInstance;
+    /**
+     * The name of the config pojo instance to use to parse the configuration
+     */
     private String configPojoName;
+    /**
+     * The prefix to use when parsing the configuration
+     */
     private String configPojoPrefix;
 
+    /**
+     * @param mojo      the mojo to parse the configuration for
+     * @param session   current Maven session
+     * @param execution Mojo execution
+     */
     public ConfigHandler(Object mojo, MavenSession session, MojoExecution execution) {
         this.mojo = mojo;
 
@@ -64,6 +87,9 @@ public class ConfigHandler {
         return result;
     }
 
+    /**
+     * Parse the configuration of the mojo based on the annotations and the injected parameters.
+     */
     public void parseConfiguration() {
         Collection<Field> parsedFields = findPropertiesByAnnotation(PullParameter.class);
 

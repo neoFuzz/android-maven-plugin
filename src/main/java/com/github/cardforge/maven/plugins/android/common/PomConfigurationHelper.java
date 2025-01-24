@@ -18,6 +18,7 @@ public final class PomConfigurationHelper {
     private PomConfigurationHelper() {
         // private constructor
     }
+
     public static String getPluginConfigParameter(@NonNull MavenProject project, String parameter, String defaultValue) {
         String value = null;
         for (Plugin plugin : project.getBuild().getPlugins()) {

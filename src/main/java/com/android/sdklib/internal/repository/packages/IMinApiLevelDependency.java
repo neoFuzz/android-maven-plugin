@@ -21,9 +21,10 @@ import com.android.sdklib.repository.SdkRepoConstants;
 /**
  * Interface used to decorate a {@link Package} that has a dependency
  * on a minimal API level, e.g. which XML has a <code>&lt;min-api-level&gt;</code> element.
- * <p/>
+ * <p>
  * A package that has this dependency can only be installed if a platform with at least the
  * requested API level is present or installed at the same time.
+ * </p>
  *
  * @deprecated com.android.sdklib.internal.repository has moved into Studio as
  * com.android.tools.idea.sdk.remote.internal.
@@ -39,6 +40,9 @@ public interface IMinApiLevelDependency {
 
     /**
      * Returns the minimal API level required by this package, if > 0,
+     * or {@link #MIN_API_LEVEL_NOT_SPECIFIED} if there is no such requirement.
+     *
+     * @return The minimal API level required by this extra package, if > 0,
      * or {@link #MIN_API_LEVEL_NOT_SPECIFIED} if there is no such requirement.
      */
     int getMinApiLevel();

@@ -23,6 +23,8 @@ package com.android.ide.common.resources.configuration;
 public interface Configurable {
     /**
      * Returns the {@link FolderConfiguration} for this object.
+     *
+     * @return the {@link FolderConfiguration}
      */
     FolderConfiguration getConfiguration();
 }

@@ -30,11 +30,11 @@ import java.util.Properties;
 
 /**
  * Information about a locally installed package.
- * <p/>
+ * <p>
  * Local package information is retrieved via the {@link LocalSdk} object.
  * Clients should not need to create instances of {@link LocalPkgInfo} directly.
  * Instead, please use the {@link LocalSdk} methods to parse and retrieve packages.
- * <p/>
+ * <p>
  * These objects can also contain optional information about updates available
  * from remote servers. These are computed and set by the {@link RemoteSdk} object.
  */
@@ -120,7 +120,7 @@ public abstract class LocalPkgInfo
 
     /**
      * Comparison is solely done based on the {@link IPkgDesc}.
-     * <p/>
+     * <p>
      * Other local attributes (local directory, source properties, updates available)
      * are <em>not used</em> in the comparison. Consequently {@code #compareTo(LocalPkgInfo)}
      * does not match {@link #equals(Object)} and the {@link #hashCode()} properties.
@@ -211,7 +211,7 @@ public abstract class LocalPkgInfo
      * <p>
      * For example an addon that lacks its underlying platform or a tool package
      * that lacks some of its binaries or essentially files.
-     * <p/>
+     * <p>
      * Operational code should generally ignore broken packages.
      * Only the SDK Updater cares about displaying them so that they can be fixed.
      */

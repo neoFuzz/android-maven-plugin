@@ -37,9 +37,15 @@ public interface DependencyContainer {
     @NonNull
     List<? extends LibraryDependency> getAndroidDependencies();
 
+    /**
+     * @return a non-null (but possibly empty) list of artifact dependencies.
+     */
     @NonNull
     List<JarDependency> getJarDependencies();
 
+    /**
+     * @return a non-null (but possibly empty) list of local file dependencies.
+     */
     @NonNull
     List<JarDependency> getLocalDependencies();
 }

@@ -47,15 +47,39 @@ import java.util.*;
  */
 abstract class DataMerger<I extends DataItem<F>, F extends DataFile<I>, S extends DataSet<I, F>> implements DataMap<I> {
 
+    /**
+     * Name of the merger XML file.
+     */
     static final String FN_MERGER_XML = "merger.xml";
+    /**
+     * Attribute for node merger
+     */
     static final String NODE_MERGER = "merger";
+    /**
+     * Attribute for DataSet
+     */
     static final String NODE_DATA_SET = "dataSet";
+    /**
+     * Attribute for mergedItems
+     */
     static final String NODE_MERGED_ITEMS = "mergedItems";
+    /**
+     * Attribute for Node Configuration
+     */
     static final String NODE_CONFIGURATION = "configuration";
 
+    /**
+     * Attribute name for the configuration name
+     */
     static final String ATTR_VERSION = "version";
+    /**
+     * Blob version to use
+     */
     static final String MERGE_BLOB_VERSION = "3";
 
+    /**
+     * Factory to create DocumentBuilders
+     */
     @NonNull
     protected final DocumentBuilderFactory mFactory;
 
@@ -64,6 +88,9 @@ abstract class DataMerger<I extends DataItem<F>, F extends DataFile<I>, S extend
      */
     private final List<S> mDataSets = Lists.newArrayList();
 
+    /**
+     * Creates a new {@link DataMerger}.
+     */
     protected DataMerger() {
         mFactory = DocumentBuilderFactory.newInstance();
         mFactory.setNamespaceAware(true);
@@ -71,8 +98,29 @@ abstract class DataMerger<I extends DataItem<F>, F extends DataFile<I>, S extend
         mFactory.setIgnoringComments(true);
     }
 
+    /**
+     * @param content the content to write to the file
+     * @param file    The input file
+     * @throws MergingException if an error occurs
+     */
+    private static void writeContentFile(String content, File file) throws MergingException {
+        try {
+            Files.write(content, file, StandardCharsets.UTF_8);
+        } catch (IOException ioe) {
+            throw new MergingException(ioe).setFile(file);
+        }
+    }
+
+    /**
+     * @param node the node to create the item from
+     * @return a new item from the given node
+     */
     protected abstract S createFromXml(Node node);
 
+    /**
+     * @param dataItemKey the key for the items
+     * @return true if the given data item key requires merging.
+     */
     protected abstract boolean requiresMerge(@NonNull String dataItemKey);
 
     /**
@@ -343,14 +391,6 @@ abstract class DataMerger<I extends DataItem<F>, F extends DataFile<I>, S extend
         }
     }
 
-    private static void writeContentFile(String content, File file) throws MergingException {
-        try {
-            Files.write(content, file, StandardCharsets.UTF_8);
-        } catch (IOException ioe) {
-            throw new MergingException(ioe).setFile(file);
-        }
-    }
-
     /**
      * Loads the merger state from a blob file.
      * <p>
@@ -439,14 +479,27 @@ abstract class DataMerger<I extends DataItem<F>, F extends DataFile<I>, S extend
         }
     }
 
+    /**
+     * Does nothing.
+     *
+     * @param mergedItemsNode the node to read from
+     */
     protected void loadMergedItems(@NonNull Node mergedItemsNode) {
         // do nothing by default.
     }
 
+    /**
+     * @param document the document to write to
+     * @param rootNode the root node to write to
+     */
     protected void writeMergedItems(Document document, Node rootNode) {
         // do nothing by default.
     }
 
+    /**
+     * @param blobRootFolder the folder containing the blob.
+     * @see #writeBlobTo(File, MergeConsumer)
+     */
     public void cleanBlob(@NonNull File blobRootFolder) {
         File file = new File(blobRootFolder, FN_MERGER_XML);
         if (file.isFile()) {
@@ -656,12 +709,19 @@ abstract class DataMerger<I extends DataItem<F>, F extends DataFile<I>, S extend
         return fileValidity;
     }
 
+    /**
+     * @param folder the folder to create if it doesn't exist.
+     * @throws IOException if the folder cannot be created.
+     */
     protected synchronized void createDir(@NonNull File folder) throws IOException {
         if (!folder.isDirectory() && !folder.mkdirs()) {
             throw new IOException("Failed to create directory: " + folder);
         }
     }
 
+    /**
+     * @return a string representation of this DataMerger.
+     */
     @Override
     public String toString() {
         return Arrays.toString(mDataSets.toArray());

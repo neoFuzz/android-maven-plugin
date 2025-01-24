@@ -165,7 +165,7 @@ public class SdkUpdaterNoWindow {
 
     /**
      * Installs a platform package given its target hash string.
-     * <p/>
+     * <p>
      * This does not work for add-ons right now, just basic platforms.
      *
      * @param hashString The hash string of the platform to install.

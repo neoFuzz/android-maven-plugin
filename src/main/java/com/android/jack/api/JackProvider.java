@@ -40,7 +40,7 @@ public interface JackProvider {
      * Returns whether an interface representing a {@link JackConfig} API version is supported.
      *
      * @param cls the {@link JackConfig} API interface
-     * @return <code>true</true> if the config is supported
+     * @return <code>true</code> if the config is supported
      */
     <T extends JackConfig> boolean isConfigSupported(@Nonnull Class<T> cls);
 

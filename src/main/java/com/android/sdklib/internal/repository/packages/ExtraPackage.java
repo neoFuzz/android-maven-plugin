@@ -253,7 +253,7 @@ public class ExtraPackage extends NoPreviewRevisionPackage
      * Manually create a new package with one archive and the given attributes or properties.
      * This is used to create packages from local directories in which case there must be
      * one archive which URL is the actual target location.
-     * <p/>
+     * <p>
      * By design, this creates a package with one and only one archive.
      */
     public static Package create(SdkSource source,
@@ -357,7 +357,7 @@ public class ExtraPackage extends NoPreviewRevisionPackage
     /**
      * The project-files listed by this extra package.
      * The array can be empty but not null.
-     * <p/>
+     * <p>
      * IMPORTANT: directory separators are NOT translated and may not match
      * the {@link File#separatorChar} of the current platform. It's up to the
      * user to adequately interpret the paths.
@@ -374,10 +374,10 @@ public class ExtraPackage extends NoPreviewRevisionPackage
 
     /**
      * Returns the old_paths, a list of obsolete path names for the extra package.
-     * <p/>
+     * <p>
      * These can be used by the installer to migrate an extra package using one of the
      * old paths into the new path.
-     * <p/>
+     * <p>
      * These can also be used to recognize "old" renamed packages as the same as
      * the current one.
      *
@@ -389,7 +389,7 @@ public class ExtraPackage extends NoPreviewRevisionPackage
 
     /**
      * Returns the sanitized path folder name. It is a single-segment path.
-     * <p/>
+     * <p>
      * The package is installed in SDK/extras/vendor_name/path_name.
      */
     public String getPath() {
@@ -449,7 +449,7 @@ public class ExtraPackage extends NoPreviewRevisionPackage
     /**
      * Returns a string identifier to install this package from the command line.
      * For extras, we use "extra-vendor-path".
-     * <p/>
+     * <p>
      * {@inheritDoc}
      */
     @Override
@@ -461,7 +461,7 @@ public class ExtraPackage extends NoPreviewRevisionPackage
 
     /**
      * Returns a description of this package that is suitable for a list display.
-     * <p/>
+     * <p>
      * {@inheritDoc}
      */
     @Override
@@ -544,7 +544,7 @@ public class ExtraPackage extends NoPreviewRevisionPackage
     /**
      * Computes a potential installation folder if an archive of this package were
      * to be installed right away in the given SDK root.
-     * <p/>
+     * <p>
      * A "tool" package should always be located in SDK/tools.
      *
      * @param osSdkRoot  The OS path of the SDK root folder. Must NOT be null.
@@ -613,8 +613,8 @@ public class ExtraPackage extends NoPreviewRevisionPackage
 
     /**
      * For extra packages, we want to add vendor|path to the sorting key
-     * <em>before<em/> the revision number.
-     * <p/>
+     * <em>before</em> the revision number.
+     * <p>
      * {@inheritDoc}
      */
     @Override

@@ -8,7 +8,7 @@ import java.util.Properties;
 
 /**
  * Configuration for the manifest update. This class is only the definition of the parameters that are shadowed in
- * {@link } and used there.
+ * {@link com.github.cardforge.maven.plugins.android.standalonemojos.ManifestUpdateMojo} and used there.
  *
  * @author Manfred Moser - manfred@simpligility.com
  * @deprecated Use ManifestMerger {@link ManifestMerger} in
@@ -17,12 +17,12 @@ import java.util.Properties;
 @Deprecated(since = "4.8")
 public class Manifest {
     /**
-     * Mirror of {@link com.github.cardforge.maven.plugins.android.standalonemojos.ManifestUpdateMojo#manifestVersionName}.
+     * Mirror of {@link com.github.cardforge.maven.plugins.android.standalonemojos.ManifestUpdateMojo}#manifestVersionName.
      */
     protected String versionName;
 
     /**
-     * Mirror of {@link com.github.cardforge.maven.plugins.android.standalonemojos.ManifestUpdateMojo#manifestVersionCode}.
+     * Mirror of {@link com.github.cardforge.maven.plugins.android.standalonemojos.ManifestUpdateMojo}#manifestVersionCode.
      */
     protected Integer versionCode;
     /**
@@ -31,50 +31,50 @@ public class Manifest {
      */
     protected Boolean versionCodeUpdateFromVersion;
     /**
-     * Mirror of {@link com.github.cardforge.maven.plugins.android.standalonemojos.ManifestUpdateMojo#manifestApplicationIcon}.
+     * Mirror of {@link com.github.cardforge.maven.plugins.android.standalonemojos.ManifestUpdateMojo}#manifestApplicationIcon.
      */
     protected String applicationIcon;
     /**
-     * Mirror of {@link com.github.cardforge.maven.plugins.android.standalonemojos.ManifestUpdateMojo#manifestApplicationLabel}.
+     * Mirror of {@link com.github.cardforge.maven.plugins.android.standalonemojos.ManifestUpdateMojo}#manifestApplicationLabel.
      */
     protected String applicationLabel;
     /**
-     * Mirror of {@link com.github.cardforge.maven.plugins.android.standalonemojos.ManifestUpdateMojo#manifestApplicationTheme}.
+     * Mirror of {@link com.github.cardforge.maven.plugins.android.standalonemojos.ManifestUpdateMojo}#manifestApplicationTheme.
      */
     protected String applicationTheme;
     /**
-     * Mirror of {@link com.github.cardforge.maven.plugins.android.standalonemojos.ManifestUpdateMojo#manifestSharedUserId}.
+     * Mirror of {@link com.github.cardforge.maven.plugins.android.standalonemojos.ManifestUpdateMojo}#manifestSharedUserId.
      */
     protected String sharedUserId;
     /**
-     * Mirror of {@link com.github.cardforge.maven.plugins.android.standalonemojos.ManifestUpdateMojo#manifestDebuggable}.
+     * Mirror of {@link com.github.cardforge.maven.plugins.android.standalonemojos.ManifestUpdateMojo}#manifestDebuggable.
      */
     protected Boolean debuggable;
     /**
      * Mirror of
-     * {@link com.github.cardforge.maven.plugins.android.standalonemojos.ManifestUpdateMojo#manifestSupportsScreens}
+     * {@link com.github.cardforge.maven.plugins.android.standalonemojos.ManifestUpdateMojo}#manifestSupportsScreens
      * .
      */
     protected SupportsScreens supportsScreens;
     /**
      * Mirror of
-     * {@link com.github.cardforge.maven.plugins.android.standalonemojos.ManifestUpdateMojo#manifestCompatibleScreens}
+     * {@link com.github.cardforge.maven.plugins.android.standalonemojos.ManifestUpdateMojo}#manifestCompatibleScreens
      * .
      */
     protected List<CompatibleScreen> compatibleScreens;
     /**
      * Mirror of
-     * {@link com.github.cardforge.maven.plugins.android.standalonemojos.ManifestUpdateMojo#manifestProviderAuthorities}
+     * {@link com.github.cardforge.maven.plugins.android.standalonemojos.ManifestUpdateMojo}#manifestProviderAuthorities
      * .
      */
     protected Properties providerAuthorities;
     /**
      * Mirror of
-     * {@link com.github.cardforge.maven.plugins.android.standalonemojos.ManifestUpdateMojo#manifestUsesSdk}
+     * {@link com.github.cardforge.maven.plugins.android.standalonemojos.ManifestUpdateMojo}#manifestUsesSdk
      */
     protected UsesSdk usesSdk;
     /**
-     * Mirror of {@link com.github.cardforge.maven.plugins.android.standalonemojos.ManifestUpdateMojo#manifestVersionCodeAutoIncrement}.
+     * Mirror of {@link com.github.cardforge.maven.plugins.android.standalonemojos.ManifestUpdateMojo}#manifestVersionCodeAutoIncrement.
      */
     private Boolean versionCodeAutoIncrement;
 

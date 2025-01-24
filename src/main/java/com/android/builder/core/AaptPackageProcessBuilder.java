@@ -44,36 +44,90 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public class AaptPackageProcessBuilder extends ProcessEnvBuilder<AaptPackageProcessBuilder> {
 
+    /**
+     * The separator used to separate multiple values when passing lists of values to aapt.
+     */
     public static final String COMMA_SEP = "\",\"";
+    /**
+     * The manifest file to package.
+     */
     @NonNull
     private final File mManifestFile;
+    /**
+     * The options to use when invoking aapt.
+     */
     @NonNull
     private final AaptOptions mOptions;
+    /**
+     * The splits collection
+     */
     @Nullable
     Collection<String> mSplits;
+    /**
+     * The list of files to include as resources.
+     */
     @Nullable
     String mPackageForR;
+    /**
+     * The preferred density.
+     */
     @Nullable
     String mPreferredDensity;
+    /**
+     * The {@code resources} folder.
+     */
     @Nullable
     private File mResFolder;
+    /**
+     * The {@code assets} folder.
+     */
     @Nullable
     private File mAssetsFolder;
+    /**
+     * Whether to use Verbose or not.
+     */
     private boolean mVerboseExec = false;
+    /**
+     * The source directory.
+     */
     @Nullable
     private String mSourceOutputDir;
+    /**
+     * The symbol output directory
+     */
     @Nullable
     private String mSymbolOutputDir;
+    /**
+     * The symbol libraries
+     */
     @Nullable
     private List<? extends SymbolFileProvider> mLibraries;
+    /**
+     * The resource package output directory
+     */
     @Nullable
     private String mResPackageOutput;
+    /**
+     * The proguard output directory
+     */
     @Nullable
     private String mProguardOutput;
+    /**
+     * The VariantType in use.
+     */
     @Nullable
     private VariantType mType;
+    /**
+     * Debugging flag
+     */
     private boolean mDebuggable = false;
+    /**
+     * Flag for {@code pseudolocales} state.
+     */
     private boolean mPseudoLocalesEnabled = false;
+    /**
+     * The resource configurations to include. If {@code null}, all configurations are included.
+     */
     @Nullable
     private Collection<String> mResourceConfigs;
 
@@ -90,16 +144,34 @@ public class AaptPackageProcessBuilder extends ProcessEnvBuilder<AaptPackageProc
         mOptions = options;
     }
 
+    /**
+     * Check if input is null or empty.
+     *
+     * @param collection the collection to check for {@code null} or empty.
+     * @return {@code true} if the collection is {@code null} or empty.
+     */
     private static boolean isNullOrEmpty(@Nullable Collection<?> collection) {
         return collection == null || collection.isEmpty();
     }
 
+    /**
+     * Gets the Density Resource Configs from the given resource configs.
+     *
+     * @param resourceConfigs the resource configurations to include. If {@code null}, all
+     *                        configurations are included.
+     * @return a collection of resource configurations that are density values
+     */
     @NonNull
     private static Collection<String> getDensityResConfigs(Collection<String> resourceConfigs) {
         return Collections2.filter(new ArrayList<>(resourceConfigs),
                 input -> Density.getEnum(input) != null);
     }
 
+    /**
+     * Gets the manifest file.
+     *
+     * @return the ProcessInfo for the aapt package invocation
+     */
     @NonNull
     public File getManifestFile() {
         return mManifestFile;
@@ -129,6 +201,11 @@ public class AaptPackageProcessBuilder extends ProcessEnvBuilder<AaptPackageProc
         return this;
     }
 
+    /**
+     * Get the source output directory.
+     *
+     * @return the source output directory.
+     */
     @Nullable
     public String getSourceOutputDir() {
         return mSourceOutputDir;
@@ -143,20 +220,30 @@ public class AaptPackageProcessBuilder extends ProcessEnvBuilder<AaptPackageProc
         return this;
     }
 
+    /**
+     * Get the symbol output directory.
+     *
+     * @return the symbol output directory
+     */
     @Nullable
     public String getSymbolOutputDir() {
         return mSymbolOutputDir;
     }
 
     /**
-     * @param symbolOutputDir the folder to write symbols into
-     * @ itself
+     * @param symbolOutputDir the folder to write symbols into itself
+     * @return itself
      */
     public AaptPackageProcessBuilder setSymbolOutputDir(@Nullable String symbolOutputDir) {
         mSymbolOutputDir = symbolOutputDir;
         return this;
     }
 
+    /**
+     * Get the symbol libraries.
+     *
+     * @return The list of the symbol libraries.
+     */
     @NonNull
     public List<? extends SymbolFileProvider> getLibraries() {
         return mLibraries == null ? ImmutableList.of() : mLibraries;
@@ -190,6 +277,11 @@ public class AaptPackageProcessBuilder extends ProcessEnvBuilder<AaptPackageProc
         return this;
     }
 
+    /**
+     * Gets the type in use.
+     *
+     * @return the type of the variant being built
+     */
     @Nullable
     public VariantType getType() {
         return mType;
@@ -232,11 +324,18 @@ public class AaptPackageProcessBuilder extends ProcessEnvBuilder<AaptPackageProc
         return this;
     }
 
+    /**
+     * @return the verbose mode
+     */
     public AaptPackageProcessBuilder setVerbose() {
         mVerboseExec = true;
         return this;
     }
 
+    /**
+     * @param pseudoLocalesEnabled whether to generate pseudo-locale strings
+     * @return itself
+     */
     public AaptPackageProcessBuilder setPseudoLocalesEnabled(boolean pseudoLocalesEnabled) {
         mPseudoLocalesEnabled = pseudoLocalesEnabled;
         return this;
@@ -254,6 +353,9 @@ public class AaptPackageProcessBuilder extends ProcessEnvBuilder<AaptPackageProc
         return this;
     }
 
+    /**
+     * @return the package to generate the R class in.
+     */
     @Nullable
     String getPackageForR() {
         return mPackageForR;
@@ -268,6 +370,14 @@ public class AaptPackageProcessBuilder extends ProcessEnvBuilder<AaptPackageProc
         return this;
     }
 
+    /**
+     * Builds the ProcessInfo necessary for an aapt package invocation
+     *
+     * @param buildToolInfo the {@link BuildToolInfo} to use for the build.
+     * @param target        the {@link IAndroidTarget} to use for the build.
+     * @param logger        the logger to use for logging errors and warnings.
+     * @return the ProcessInfo for the aapt package invocation
+     */
     public ProcessInfo build(
             @NonNull BuildToolInfo buildToolInfo,
             @NonNull IAndroidTarget target,
@@ -344,9 +454,9 @@ public class AaptPackageProcessBuilder extends ProcessEnvBuilder<AaptPackageProc
 
         if (mType != VariantType.ANDROID_TEST &&
                 mPackageForR != null) {
-                builder.addArgs("--custom-package", mPackageForR);
-                logger.verbose("Custom package for R class: '%s'", mPackageForR);
-            }
+            builder.addArgs("--custom-package", mPackageForR);
+            logger.verbose("Custom package for R class: '%s'", mPackageForR);
+        }
 
 
         if (mPseudoLocalesEnabled) {
@@ -461,6 +571,11 @@ public class AaptPackageProcessBuilder extends ProcessEnvBuilder<AaptPackageProc
         return builder.createProcess();
     }
 
+    /**
+     * Checks that the resConfigs and split settings are coherent.
+     *
+     * @param ignored the logger to use for logging errors and warnings. Not used.
+     */
     private void checkResConfigsVersusSplitSettings(ILogger ignored) {
         if (isNullOrEmpty(mResourceConfigs) || isNullOrEmpty(mSplits)) {
             return;

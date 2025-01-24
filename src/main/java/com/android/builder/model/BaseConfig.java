@@ -27,6 +27,9 @@ import java.util.Map;
  * Base config object for Build Type and Product flavor.
  */
 public interface BaseConfig {
+    /**
+     * @return the name of this object.
+     */
     @NonNull
     String getName();
 
@@ -87,13 +90,21 @@ public interface BaseConfig {
      * Returns whether multi-dex is enabled.
      * <p>
      * This can be null if the flag is not set, in which case the default value is used.
+     *
+     * @return the value of the flag or null to use the default value.
      */
     @Nullable
     Boolean getMultiDexEnabled();
 
+    /**
+     * @return the optional file to use for configuring multidex.
+     */
     @Nullable
     File getMultiDexKeepFile();
 
+    /**
+     * @return the optional proguard file to use for configuring multidex.
+     */
     @Nullable
     File getMultiDexKeepProguard();
 

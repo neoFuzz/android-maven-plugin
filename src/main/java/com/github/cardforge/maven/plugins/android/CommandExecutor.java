@@ -32,10 +32,15 @@ import java.util.List;
 import java.util.Map;
 
 /**
- *
+ * The {@code CommandExecutor} interface defines methods for executing system commands
+ * with support for custom shells, environmental variables, error handling, and capturing
+ * standard output and error streams.
  */
 public interface CommandExecutor {
 
+    /**
+     * Static string for logging
+     */
     String RESULT = ", Result = ";
 
     /**
@@ -73,13 +78,16 @@ public interface CommandExecutor {
      * not within the environmental path, you should use this method to specify the working directory. Always use this
      * method for executables located within the local maven repository.
      *
-     * @param executable       the name of the executable (csc, xsd, etc.).
-     * @param commands         the command options for the compiler/executable
-     * @param workingDirectory the directory where the command will be executed
+     * @param executable         the name of the executable (csc, xsd, etc.).
+     * @param commands           the command options for the compiler/executable
+     * @param workingDirectory   the directory where the command will be executed
+     * @param failsOnErrorOutput if true, throws an <code>ExecutionException</code> if the compiler or
+     *                           executable writes anything to the error output stream. By default, this value is true
      * @throws ExecutionException if compiler or executable writes anything to the standard error stream (provided the
      *                            failsOnErrorOutput is not false) or if the process returns a process result != 0.
      */
-    void executeCommand(String executable, List<String> commands, File workingDirectory, boolean failsOnErrorOutput)
+    void executeCommand(String executable, List<String> commands, File workingDirectory,
+                        boolean failsOnErrorOutput)
             throws ExecutionException;
 
     /**
@@ -111,21 +119,41 @@ public interface CommandExecutor {
 
     /**
      * Adds an environment variable with the specified name and value to the executor.
+     *
+     * @param name  the name of the environment variable
+     * @param value the value of the environment variable
      */
     void addEnvironment(String name, String value);
 
+    /**
+     * @param errorListener the error listener to use for this command executor.
+     */
     void setErrorListener(ErrorListener errorListener);
 
+    /**
+     * @param s the custom shell to use for executing the command.
+     */
     void setCustomShell(Shell s);
 
+    /**
+     * @param captureStdOut if true, the command will capture the standard output stream.
+     */
     void setCaptureStdOut(boolean captureStdOut);
 
+    /**
+     * @param captureStdErr if true, the command will capture the standard error stream.
+     */
     void setCaptureStdErr(boolean captureStdErr);
 
     /**
-     *
+     * Provides a listener for error messages. If the listener returns true, the command will throw an
+     * ExecutionException when the error message is encountered.
      */
     interface ErrorListener {
+        /**
+         * @param error the error message
+         * @return true if the command should throw an ExecutionException when the error message is encountered
+         */
         boolean isError(String error);
     }
 

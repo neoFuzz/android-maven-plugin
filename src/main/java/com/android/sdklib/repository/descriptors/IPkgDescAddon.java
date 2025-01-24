@@ -23,12 +23,13 @@ import com.android.annotations.NonNull;
  * (both local or remote packages definitions.) The base {@link IPkgDesc} tries
  * to present a unified interface to package attributes and this interface
  * adds methods specific to extras.
- * <p/>
+ * <p>
  * To create a new {@link IPkgDescAddon},
  * use {@link PkgDesc.Builder#newAddon(com.android.sdklib.AndroidVersion, com.android.sdklib.repository.MajorRevision, IdDisplay, IdDisplay)}.
- * <p/>
+ * </p><p>
  * To query generic packages capabilities, rely on {@link #getType()} and the
  * {@code IPkgDesc.hasXxx()} methods provided by {@link IPkgDesc}.
+ * </p>
  */
 public interface IPkgDescAddon extends IPkgDesc {
 

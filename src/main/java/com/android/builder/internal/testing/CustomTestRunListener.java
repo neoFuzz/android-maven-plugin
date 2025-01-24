@@ -35,16 +35,37 @@ import java.util.Set;
  */
 public class CustomTestRunListener extends XmlTestRunListener {
 
+    /**
+     * Name of the device.
+     */
     @NonNull
     private final String mDeviceName;
+    /**
+     * Name of the project.
+     */
     @NonNull
     private final String mProjectName;
+    /**
+     * Name of the flavor.
+     */
     @NonNull
     private final String mFlavorName;
+    /**
+     * Logger.
+     */
     private final ILogger mLogger;
+    /**
+     * Set of failed tests.
+     */
     private final Set<TestIdentifier> mFailedTests = Sets.newHashSet();
 
 
+    /**
+     * @param deviceName  the device name. Can be null.
+     * @param projectName the project name. Can be null.
+     * @param flavorName  the flavor name. Can be null.
+     * @param logger      the logger to use. Can be null.
+     */
     public CustomTestRunListener(@NonNull String deviceName,
                                  @NonNull String projectName, @NonNull String flavorName,
                                  @Nullable ILogger logger) {
@@ -54,12 +75,19 @@ public class CustomTestRunListener extends XmlTestRunListener {
         mLogger = logger;
     }
 
+    /**
+     * @param reportDir the root directory of the report.
+     * @return the file where the report should be written.
+     */
     @Override
     protected File getResultFile(File reportDir) {
         return new File(reportDir,
                 "TEST-" + mDeviceName + "-" + mProjectName + "-" + mFlavorName + ".xml");
     }
 
+    /**
+     * @return the name of the test suite.
+     */
     @Override
     protected String getTestSuiteName() {
         // in order for the gradle report to look good we put the test suite name as one of the
@@ -74,6 +102,9 @@ public class CustomTestRunListener extends XmlTestRunListener {
         return testEntry.getKey().getClassName();
     }
 
+    /**
+     * @return the attributes to be added to the root test suite element
+     */
     @Override
     protected Map<String, String> getPropertiesAttributes() {
         Map<String, String> propertiesAttributes = Maps.newLinkedHashMap(super.getPropertiesAttributes());
@@ -83,6 +114,10 @@ public class CustomTestRunListener extends XmlTestRunListener {
         return ImmutableMap.copyOf(propertiesAttributes);
     }
 
+    /**
+     * @param runName   the test run name
+     * @param testCount total number of tests in test run
+     */
     @Override
     public void testRunStarted(String runName, int testCount) {
         if (mLogger != null) {
@@ -91,6 +126,10 @@ public class CustomTestRunListener extends XmlTestRunListener {
         super.testRunStarted(runName, testCount);
     }
 
+    /**
+     * @param test  identifies the test
+     * @param trace stack trace of failure
+     */
     @Override
     public void testFailed(TestIdentifier test, String trace) {
         if (mLogger != null) {
@@ -104,6 +143,10 @@ public class CustomTestRunListener extends XmlTestRunListener {
         super.testFailed(test, trace);
     }
 
+    /**
+     * @param test  identifies the test
+     * @param trace stack trace of failure
+     */
     @Override
     public void testAssumptionFailure(TestIdentifier test, String trace) {
         if (mLogger != null) {
@@ -113,6 +156,10 @@ public class CustomTestRunListener extends XmlTestRunListener {
         super.testAssumptionFailure(test, trace);
     }
 
+    /**
+     * @param test        identifies the test
+     * @param testMetrics a {@link Map} of the metrics emitted
+     */
     @Override
     public void testEnded(TestIdentifier test, Map<String, String> testMetrics) {
         if (!mFailedTests.remove(test) && mLogger != null) {
@@ -125,6 +172,9 @@ public class CustomTestRunListener extends XmlTestRunListener {
         super.testEnded(test, testMetrics);
     }
 
+    /**
+     * @param errorMessage {@link String} describing reason for run failure.
+     */
     @Override
     public void testRunFailed(String errorMessage) {
         if (mLogger != null) {
@@ -133,6 +183,9 @@ public class CustomTestRunListener extends XmlTestRunListener {
         super.testRunFailed(errorMessage);
     }
 
+    /**
+     * @param test identifies the test
+     */
     @Override
     public void testIgnored(TestIdentifier test) {
         if (mLogger != null) {
@@ -142,6 +195,10 @@ public class CustomTestRunListener extends XmlTestRunListener {
         super.testIgnored(test);
     }
 
+    /**
+     * @param trace the trace object
+     * @return the modified trace with the first two lines prepended with a tab
+     */
     @NonNull
     private String getModifiedTrace(@NonNull String trace) {
         // split lines

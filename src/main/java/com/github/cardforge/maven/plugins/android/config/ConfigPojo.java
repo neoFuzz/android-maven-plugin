@@ -16,5 +16,8 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ConfigPojo {
 
+    /**
+     * @return the prefix to use when parsing the configuration.
+     */
     String prefix() default "parsed";
 }

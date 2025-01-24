@@ -24,55 +24,135 @@ import com.android.ide.common.resources.configuration.Configurable;
 import com.android.ide.common.resources.configuration.FolderConfiguration;
 import com.android.resources.ResourceType;
 import com.google.common.base.Splitter;
-import com.google.common.collect.*;
+import com.google.common.collect.ListMultimap;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Multimap;
+import com.google.common.collect.Sets;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import java.util.*;
 
-import static com.android.SdkConstants.*;
+import static com.android.SdkConstants.PREFIX_RESOURCE_REF;
 import static com.android.ide.common.resources.ResourceResolver.MAX_RESOURCE_INDIRECTION;
 
+/**
+ * Base class for {@link ResourceItem} containers.
+ */
 public abstract class AbstractResourceRepository {
 
     /**
      * Lock used to protect map access
      */
     protected static final Object ITEM_MAP_LOCK = new Object();
+    /**
+     * Flag for the framework
+     */
     private final boolean mFramework;
 
+    /**
+     * Constructs a new {@link AbstractResourceRepository} with the given {@link ResourceType}.
+     * <p>
+     * This constructor is used to create a new {@link AbstractResourceRepository} with the given
+     * {@link ResourceType}.
+     * </p>
+     *
+     * @param isFramework if true, this repository is a framework repository.
+     */
     protected AbstractResourceRepository(boolean isFramework) {
         mFramework = isFramework;
     }
 
+    /**
+     * Returns true if this repository is a framework repository.
+     * <p>
+     * This is used to determine if a resource is a framework resource or not.
+     * </p>
+     *
+     * @return true if this repository is a framework repository.
+     */
     public boolean isFramework() {
         return mFramework;
     }
 
+    /**
+     * Creates a {@link MergeConsumer} that can be used to merge resources into this repository.
+     * <p>
+     * The returned {@link MergeConsumer} can be used to merge resources into this repository.
+     * </p>
+     *
+     * @return a {@link MergeConsumer} that can be used to merge resources into this repository
+     */
     @NonNull
     public MergeConsumer<ResourceItem> createMergeConsumer() {
         return new RepositoryMerger();
     }
 
+    /**
+     * Returns the map of all resources of the given {@link ResourceType}.
+     * <p>
+     * The map is a {@link Multimap} of {@link String} to {@link ResourceItem}.
+     * /<p>
+     * If the {@link ResourceType} is not found, this method returns null.
+     *
+     * @return the map of all resources of the given {@link ResourceType}.
+     */
     @NonNull
     protected abstract Map<ResourceType, ListMultimap<String, ResourceItem>> getMap();
 
+    /**
+     * Returns the map of all resources of the given {@link ResourceType}.
+     * <p>
+     * The map is a {@link Multimap} of {@link String} to {@link ResourceItem}.
+     * /<p>
+     * If the {@link ResourceType} is not found, this method returns null.
+     *
+     * @param type   the {@link ResourceType} to get the map for.
+     * @param create if true, the map will be created if it does not exist.
+     * @return a new {@link ListMultimap} for the given {@link ResourceType}.
+     */
     @Nullable
     protected abstract ListMultimap<String, ResourceItem> getMap(ResourceType type, boolean create);
 
+    /**
+     * Returns the map of all resources of the given {@link ResourceType}.
+     * <p>
+     * The map is a {@link Multimap} of {@link String} to {@link ResourceItem}.
+     *
+     * @param type the {@link ResourceType} to get the map for.
+     * @return a new {@link ListMultimap} for the given {@link ResourceType}.
+     */
     @NonNull
     protected ListMultimap<String, ResourceItem> getMap(ResourceType type) {
         //noinspection ConstantConditions
         return getMap(type, true); // Won't return null if create is false
     }
 
+    /**
+     * Returns the map of all resources.
+     * <p>
+     * The map is a {@link Multimap} of {@link ResourceType} to {@link ResourceItem}.
+     *
+     * @return the map of all resources.
+     */
     @NonNull
     public Map<ResourceType, ListMultimap<String, ResourceItem>> getItems() {
         return getMap();
     }
 
-    // TODO: Rename to getResourceItemList?
+    /**
+     * Returns the list of resources of the given {@link ResourceType} and name.
+     * <p>
+     * The list is a {@link List} of {@link ResourceItem}.
+     * </p><p>
+     * If the {@link ResourceType} is not found, this method returns null.
+     * </p>
+     *
+     * @param resourceType the type of resource to look up
+     * @param resourceName the name of the resource to look up
+     * @return the list of resources of the given {@link ResourceType} and name.
+     */
     @Nullable
-    public List<ResourceItem> getResourceItem(@NonNull ResourceType resourceType,
+    public List<ResourceItem> getResourceItem(@NonNull ResourceType resourceType, // TODO: Rename to getResourceItemList?
                                               @NonNull String resourceName) {
         synchronized (ITEM_MAP_LOCK) {
             ListMultimap<String, ResourceItem> map = getMap(resourceType, false);
@@ -85,6 +165,12 @@ public abstract class AbstractResourceRepository {
         return null;
     }
 
+    /**
+     * Returns a collection of all the names of the resources of the given type.
+     *
+     * @param type the {@link ResourceType} to get the items for.
+     * @return a collection of all the names of the resources of the given type.
+     */
     @NonNull
     public Collection<String> getItemsOfType(@NonNull ResourceType type) {
         synchronized (ITEM_MAP_LOCK) {
@@ -134,7 +220,7 @@ public abstract class AbstractResourceRepository {
     /**
      * Returns the {@link ResourceFile} matching the given name, {@link ResourceType} and
      * configuration.
-     * <p/>
+     * <p>
      * This only works with files generating one resource named after the file
      * (for instance, layouts, bitmap based drawable, xml, anims).
      *
@@ -155,13 +241,14 @@ public abstract class AbstractResourceRepository {
     /**
      * Returns a list of {@link ResourceFile} matching the given name, {@link ResourceType} and
      * configuration. This ignores the qualifiers which are missing from the configuration.
-     * <p/>
+     * <p>
      * This only works with files generating one resource named after the file (for instance,
      * layouts, bitmap based drawable, xml, anims).
      *
      * @param name   the resource name
      * @param type   the folder type search for
      * @param config the folder configuration to match for
+     * @return a list of matching files. This list is never empty.
      * @see #getMatchingFile(String, ResourceType, FolderConfiguration)
      */
     @NonNull
@@ -172,6 +259,20 @@ public abstract class AbstractResourceRepository {
         return getMatchingFiles(name, type, config, new HashSet<>(), 0);
     }
 
+    /**
+     * Returns a list of {@link ResourceFile} matching the given name, {@link ResourceType} and
+     * configuration.
+     * <p>
+     * This only works with files generating one resource named after the file (for instance,
+     * layouts, bitmap based drawable, xml, anims).
+     *
+     * @param name      the resource name
+     * @param type      the folder type search for
+     * @param config    the folder configuration to match for
+     * @param seenNames a set of names already seen. This is used to prevent infinite recursion.
+     * @param depth     the current depth of the search. This is used to prevent infinite recursion
+     * @return a list of matching files. This list is never empty.
+     */
     @NonNull
     private List<ResourceFile> getMatchingFiles(
             @NonNull String name,
@@ -243,11 +344,12 @@ public abstract class AbstractResourceRepository {
 
     /**
      * Returns a map of (resource name, resource value) for the given {@link ResourceType}.
-     * <p/>The values returned are taken from the resource files best matching a given
+     * <p>The values returned are taken from the resource files best matching a given
      * {@link FolderConfiguration}.
      *
      * @param type            the type of the resources.
      * @param referenceConfig the configuration to best match.
+     * @return a map of (resource name, resource value) for the given {@link ResourceType}.
      */
     @NonNull
     public Map<String, ResourceValue> getConfiguredResources(
@@ -256,6 +358,17 @@ public abstract class AbstractResourceRepository {
         return getConfiguredResources(getMap(), type, referenceConfig);
     }
 
+    /**
+     * Returns a map of (resource name, resource value) for the given {@link ResourceType}.
+     * <p>The values returned are taken from the resource files best matching a given
+     * {@link FolderConfiguration}.
+     *
+     * @param itemMap         the map of all resources.
+     *                        The map is a {@link Multimap} of {@link ResourceType} to {@link ResourceItem}.
+     * @param type            the type of the resources.
+     * @param referenceConfig the configuration to best match.
+     * @return a map of (resource name, resource value) for the given {@link ResourceType}.
+     */
     @NonNull
     public Map<String, ResourceValue> getConfiguredResources(
             @NonNull Map<ResourceType, ListMultimap<String, ResourceItem>> itemMap,
@@ -289,6 +402,14 @@ public abstract class AbstractResourceRepository {
         return map;
     }
 
+    /**
+     * Returns the resource value matching a given {@link FolderConfiguration}.
+     *
+     * @param type            the resource type.
+     * @param name            the resource name.
+     * @param referenceConfig the configuration to best match.
+     * @return the resource value for the given type and name, or null if not found.
+     */
     @Nullable
     public ResourceValue getConfiguredValue(
             @NonNull ResourceType type,
@@ -311,6 +432,11 @@ public abstract class AbstractResourceRepository {
         return match != null ? match.getResourceValue(mFramework) : null;
     }
 
+    /**
+     * Adds a {@link ResourceItem} to the repository.
+     *
+     * @param item the {@link ResourceItem} to add.
+     */
     private void addItem(@NonNull ResourceItem item) {
         synchronized (ITEM_MAP_LOCK) {
             ListMultimap<String, ResourceItem> map = getMap(item.getType());
@@ -320,6 +446,11 @@ public abstract class AbstractResourceRepository {
         }
     }
 
+    /**
+     * Removes a {@link ResourceItem} from the repository.
+     *
+     * @param removedItem the {@link ResourceItem} to remove.
+     */
     private void removeItem(@NonNull ResourceItem removedItem) {
         synchronized (ITEM_MAP_LOCK) {
             Multimap<String, ResourceItem> map = getMap(removedItem.getType(), false);
@@ -331,6 +462,8 @@ public abstract class AbstractResourceRepository {
 
     /**
      * Returns the sorted list of languages used in the resources.
+     *
+     * @return a sorted set of languages.
      */
     @NonNull
     public SortedSet<String> getLanguages() {
@@ -362,23 +495,46 @@ public abstract class AbstractResourceRepository {
         return set;
     }
 
+    /**
+     * Clears the repository.
+     */
     public void clear() {
         getMap().clear();
     }
 
+    /**
+     * Class for merging repositories. This is used to merge a library project with the main project.
+     */
     private class RepositoryMerger implements MergeConsumer<ResourceItem> {
 
+        /**
+         * Function does nothing.
+         *
+         * @param factory unused
+         * @throws ConsumerException if an error occurs
+         */
         @Override
         public void start(@NonNull DocumentBuilderFactory factory)
                 throws ConsumerException {
             // unused
         }
 
+        /**
+         * Function does nothing.
+         *
+         * @throws ConsumerException if an error occurs
+         */
         @Override
         public void end() throws ConsumerException {
             // unused
         }
 
+        /**
+         * Adds a new item to the repository.
+         *
+         * @param item the new item.
+         * @throws ConsumerException if an error occurs
+         */
         @Override
         public void addItem(@NonNull ResourceItem item) throws ConsumerException {
             if (item.isTouched()) {
@@ -386,12 +542,25 @@ public abstract class AbstractResourceRepository {
             }
         }
 
+        /**
+         * Removes an item from the repository.
+         *
+         * @param removedItem the removed item.
+         * @param replacedBy  the optional item that replaces the removed item.
+         * @throws ConsumerException if an error occurs
+         */
         @Override
         public void removeItem(@NonNull ResourceItem removedItem, @Nullable ResourceItem replacedBy)
                 throws ConsumerException {
             AbstractResourceRepository.this.removeItem(removedItem);
         }
 
+        /**
+         * Function returns false as it is going to never ignore items.
+         *
+         * @param item the item to be ignored for merge.
+         * @return <code>false</code> never ignoring items.
+         */
         @Override
         public boolean ignoreItemInMerge(ResourceItem item) {
             // we never ignore any item.

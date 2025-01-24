@@ -31,17 +31,33 @@ import java.util.List;
  */
 public class SourceSearcher {
 
+    /**
+     * The source folders to search in.
+     */
     @NonNull
     private final List<File> mSourceFolders;
+    /**
+     * The extensions to search for.
+     */
     private final String[] mExtensions;
+    /**
+     * Executor to use for parallel processing.
+     */
     @Nullable
     private WaitableExecutor<Void> mExecutor;
 
+    /**
+     * @param sourceFolders the source folders to search in.
+     * @param extensions    the extensions to search for.
+     */
     public SourceSearcher(@NonNull List<File> sourceFolders, String... extensions) {
         mSourceFolders = sourceFolders;
         mExtensions = extensions;
     }
 
+    /**
+     * @param useExecutor whether to use an executor or not.
+     */
     public void setUseExecutor(boolean useExecutor) {
         if (useExecutor) {
             mExecutor = new WaitableExecutor<>();
@@ -50,6 +66,13 @@ public class SourceSearcher {
         }
     }
 
+    /**
+     * @param processor the processor to use.
+     * @throws ProcessException     if the search failed.
+     * @throws LoggedErrorException if the search failed.
+     * @throws InterruptedException if the search was interrupted.
+     * @throws IOException          if the file cannot be read or written to.
+     */
     public void search(@NonNull SourceFileProcessor processor)
             throws ProcessException, LoggedErrorException, InterruptedException, IOException {
         for (File file : mSourceFolders) {
@@ -63,6 +86,13 @@ public class SourceSearcher {
         }
     }
 
+    /**
+     * @param rootFolder the root folder where the file is located.
+     * @param file       the file to process.
+     * @param processor  the processor to use.
+     * @throws ProcessException if the file cannot be processed.
+     * @throws IOException      if the file cannot be read or written to.
+     */
     private void processFile(
             @NonNull final File rootFolder,
             @NonNull final File file,
@@ -90,6 +120,10 @@ public class SourceSearcher {
         }
     }
 
+    /**
+     * @param file the file to check.
+     * @return true if the file has an extension that matches one of the extensions in the list.
+     */
     private boolean checkExtension(File file) {
         if (mExtensions.length == 0) {
             return true;
@@ -109,7 +143,18 @@ public class SourceSearcher {
         return false;
     }
 
+    /**
+     * Interface to process a file.
+     */
     public interface SourceFileProcessor {
+        /**
+         * Process a file.
+         *
+         * @param sourceFolder the root folder where the file is located.
+         * @param sourceFile   the file to process.
+         * @throws ProcessException if the file cannot be processed.
+         * @throws IOException      if the file cannot be read or written to.
+         */
         void processFile(@NonNull File sourceFolder, @NonNull File sourceFile)
                 throws ProcessException, IOException;
     }

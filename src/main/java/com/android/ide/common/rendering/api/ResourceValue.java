@@ -59,7 +59,6 @@ public class ResourceValue extends ResourceReference implements IResourceValue {
     }
 
 
-
     /**
      * Sets the value from another resource.
      *

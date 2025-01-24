@@ -72,7 +72,7 @@ public class RepoConstants {
      */
     public static final String NODE_ABI = "abi";                    //$NON-NLS-1$
     /**
-     * The optional minimal tools revision required by platform & extra packages.
+     * The optional minimal tools revision required by platform &amp; extra packages.
      */
     public static final String NODE_MIN_TOOLS_REV = "min-tools-rev";            //$NON-NLS-1$
     /**

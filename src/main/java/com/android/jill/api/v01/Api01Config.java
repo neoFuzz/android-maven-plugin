@@ -31,6 +31,7 @@ public interface Api01Config extends JillConfig {
      * Sets verbosity mode.
      *
      * @param isVerbose the desired verbosity mode
+     * @throws ConfigurationException If there is an error in the configuration
      */
     void setVerbose(boolean isVerbose) throws ConfigurationException;
 
@@ -38,6 +39,7 @@ public interface Api01Config extends JillConfig {
      * Sets jar file to apply the Jill translation onto. The file must exist.
      *
      * @param input jar file to translate
+     * @throws ConfigurationException If there is an error in the configuration
      */
     void setInputJavaBinaryFile(@Nonnull File input) throws ConfigurationException;
 
@@ -55,6 +57,7 @@ public interface Api01Config extends JillConfig {
      * Sets whether debug info should be emitted.
      *
      * @param debugInfo the desired mode for debug info emission
+     * @throws ConfigurationException If there is an error in the configuration
      */
     void setDebugInfo(boolean debugInfo) throws ConfigurationException;
 
@@ -62,6 +65,7 @@ public interface Api01Config extends JillConfig {
      * Creates an instance of the {@link Api01TranslationTask} according to this configuration.
      *
      * @return The {@link Api01TranslationTask}
+     * @throws ConfigurationException If there is an error in the configuration
      */
     @Nonnull
     Api01TranslationTask getTask() throws ConfigurationException;

@@ -43,6 +43,9 @@ import java.util.function.Predicate;
  * @author Manfred Moser - manfred@simpligility.com
  */
 public class AndroidSdk {
+    /**
+     * Static string message for cannot find.
+     */
     public static final String CANNOT_FIND_S = "Cannot find ";
     /**
      * the default API level for the SDK used as a fallback if none is supplied,
@@ -61,25 +64,67 @@ public class AndroidSdk {
      * folder name for the sdk sub folder that contains the different platform versions.
      */
     private static final String PLATFORMS_FOLDER_NAME = "platforms";
+    /**
+     * folder name for the sdk sub folder that contains the different build tools versions.
+     */
     private static final String BIN_FOLDER_NAME_IN_TOOLS = "bin";
+    /**
+     * Parameter message
+     */
     private static final String PARAMETER_MESSAGE = "Please provide a proper Android SDK directory path as "
             + "configuration parameter <sdk><path>...</path></sdk> in the plugin <configuration/>. As an alternative,"
             + " you may add the parameter to commandline: -Dandroid.sdk.path=... or set environment variable "
             + AbstractAndroidMojo.ENV_ANDROID_HOME + ".";
+    /**
+     * Logger
+     */
     private static final Logger log = LoggerFactory.getLogger(AndroidSdk.class);
+    /**
+     * The path to the Android SDK.
+     */
     private final File sdkPath;
+    /**
+     * The Android target.
+     */
     private final IAndroidTarget androidTarget;
+    /**
+     * The build tools version.
+     */
     private final String buildToolsVersion;
+    /**
+     * Progress indicator.
+     */
     private final ProgressIndicatorImpl progressIndicator;
+    /**
+     * Path to the platform tools.
+     */
     private File platformToolsPath;
+    /**
+     * Path to the tools.
+     */
     private File toolsPath;
+    /**
+     * The SDK manager.
+     */
     private AndroidSdkHandler sdkManager;
+    /**
+     * The SDK tools major version.
+     */
     private int sdkMajorVersion;
 
+    /**
+     * @param sdkPath  the SDK path to use
+     * @param apiLevel the API level to use
+     */
     public AndroidSdk(File sdkPath, String apiLevel) {
         this(sdkPath, apiLevel, null);
     }
 
+    /**
+     * @param sdkPath           SDK path containg the tools
+     * @param apiLevel          API level to use
+     * @param buildToolsVersion Build tool version to use
+     */
     public AndroidSdk(File sdkPath, String apiLevel, @Nullable String buildToolsVersion) {
         this.sdkPath = sdkPath;
         this.buildToolsVersion = buildToolsVersion;
@@ -118,6 +163,11 @@ public class AndroidSdk {
         }
     }
 
+    /**
+     * @param windowsExtension    Extension used by Windows
+     * @param nonWindowsExtension Extension used by non-Windows OSes
+     * @return the correct extension for the current platform.
+     */
     private static String ext(String windowsExtension, String nonWindowsExtension) {
         if (SdkConstants.currentPlatform() == SdkConstants.PLATFORM_WINDOWS) {
             return windowsExtension;
@@ -126,12 +176,21 @@ public class AndroidSdk {
         }
     }
 
+    /**
+     * @param sdkPath            the SDK path to use
+     * @param platformOrApiLevel the API level or platform to use
+     * @return the exception to throw
+     */
     private InvalidSdkException invalidSdkException(@NonNull File sdkPath, String platformOrApiLevel) {
         throw new InvalidSdkException("Invalid SDK: Platform/API level " + platformOrApiLevel
                 + " not available. This command should give you all you need:\n" + sdkPath.getAbsolutePath()
                 + File.separator + "tools" + File.separator + "android update sdk --no-ui --obsolete --force");
     }
 
+    /**
+     * @param apiLevel the API level to use
+     * @return the platform for the given API level
+     */
     @Nullable
     private IAndroidTarget findPlatformByApiLevel(String apiLevel) {
         // try to find by api level first
@@ -160,6 +219,9 @@ public class AndroidSdk {
         return null;
     }
 
+    /**
+     * @param path Path to check is a directory
+     */
     private void assertPathIsDirectory(final File path) {
         if (path == null) {
             throw new InvalidSdkException(PARAMETER_MESSAGE);
@@ -259,6 +321,12 @@ public class AndroidSdk {
         throw new InvalidSdkException(CANNOT_FIND_S + mainDexClassesRules);
     }
 
+    /**
+     * @param version the version to check against
+     * @param feature the feature that requires the version
+     * @throws InvalidSdkException   if the version is not met
+     * @throws NumberFormatException if the version is not a number
+     */
     public void assertThatBuildToolsVersionIsAtLeast(String version, String feature)
             throws InvalidSdkException, NumberFormatException {
         if (getBuildToolInfo().getRevision().
@@ -334,10 +402,17 @@ public class AndroidSdk {
         return toolsPath;
     }
 
+    /**
+     * @param pathId the path to retrieve
+     * @return the path to the given tool, based on this SDK.
+     */
     private String getPathForBuildTool(BuildToolInfo.PathId pathId) {
         return getBuildToolInfo().getPath(pathId);
     }
 
+    /**
+     * @return the path to the build tools directory
+     */
     @NonNull
     private BuildToolInfo getBuildToolInfo() {
         //First we use the build tools specified in the pom file
@@ -378,16 +453,28 @@ public class AndroidSdk {
         return latestBuildToolInfo;
     }
 
+    /**
+     * @param tool the name of the tool to retrieve the path for.
+     * @return the path to the given tool, based on this SDK.
+     */
     @NonNull
     private String getPathForPlatformTool(String tool) {
         return new File(platformToolsPath, tool).getAbsolutePath();
     }
 
+    /**
+     * @param tool the name of the tool to retrieve the path for.
+     * @return the path to the given tool, based on this SDK.
+     */
     @NonNull
     private String getPathForTool(String tool) {
         return new File(toolsPath, tool).getAbsolutePath();
     }
 
+    /**
+     * @param majorVersion the major version of the build tools to retrieve
+     * @return the latest build tool for the given major version
+     */
     public LocalPackage getLatestBuildToolForMajorVersion(int majorVersion) {
         // Define the prefix for build tools
         String prefix = "build-tools";
@@ -445,6 +532,8 @@ public class AndroidSdk {
     /**
      * This method returns the previously specified version. However, if none have been specified it returns the
      * "latest" version.
+     *
+     * @return the platform version as a <code>String</code>.
      */
     public File getPlatform() {
         assertPathIsDirectory(sdkPath);

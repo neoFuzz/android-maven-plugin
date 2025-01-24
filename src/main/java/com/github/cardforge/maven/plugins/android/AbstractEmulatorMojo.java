@@ -55,8 +55,17 @@ public abstract class AbstractEmulatorMojo extends AbstractAndroidMojo {
      * operating system name.
      */
     public static final String OS_NAME = System.getProperty("os.name").toLowerCase(Locale.US);
+    /**
+     * Static string for "found"
+     */
     public static final String FOUND = "Found ";
+    /**
+     * Static string for "devices" log message
+     */
     public static final String ANDROID_DEBUG_BRIDGE = " devices connected with the Android Debug Bridge";
+    /**
+     * Milliseconds to sleep between device checks
+     */
     private static final int MILLIS_TO_SLEEP_BETWEEN_DEVICE_ONLINE_CHECKS = 200;
     /**
      * Even if the device finished booting, there are usually still some things going on in the background,

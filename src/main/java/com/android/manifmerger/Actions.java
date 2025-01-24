@@ -25,7 +25,6 @@ import com.android.ide.common.blame.SourceFile;
 import com.android.ide.common.blame.SourceFilePosition;
 import com.android.utils.ILogger;
 import com.google.common.base.MoreObjects;
-import java.util.Optional;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -53,21 +52,38 @@ public class Actions {
     // iterator should be ordered by the key insertion order.
     private final Map<XmlNode.NodeKey, DecisionTreeRecord> mRecords;
 
+    /**
+     * @param records the records to serialize/deserialize
+     */
     public Actions(Map<XmlNode.NodeKey, DecisionTreeRecord> records) {
         mRecords = records;
     }
 
+    /**
+     * @param inputStream the input stream to deserialize from
+     * @return the {@link Actions} object deserialized from the input stream
+     * @throws IOException if the input stream cannot be read
+     */
     @Nullable
     public static Actions load(@NonNull InputStream inputStream) throws IOException {
 
         return getGsonParser().fromJson(new InputStreamReader(inputStream), Actions.class);
     }
 
+    /**
+     * Deserializes an {@link Actions} object from a string.
+     *
+     * @param xml the xml string to deserialize
+     * @return the {@link Actions} object deserialized from the xml string
+     */
     @Nullable
     public static Actions load(String xml) {
         return getGsonParser().fromJson(xml, Actions.class);
     }
 
+    /**
+     * @return a {@link Gson} instance that can be used to serialize and deserialize this object.
+     */
     @NonNull
     private static Gson getGsonParser() {
         GsonBuilder gsonBuilder = new GsonBuilder();
@@ -77,6 +93,12 @@ public class Actions {
         return gsonBuilder.create();
     }
 
+    /**
+     * Finds the {@link NodeRecord} for the element in question.
+     *
+     * @param decisionTreeRecord the decision tree record for the element in question
+     * @return the {@link NodeRecord} for the element in question, or {@code null} if none was found.
+     */
     @Nullable
     private static Actions.NodeRecord findNodeRecord(@NonNull DecisionTreeRecord decisionTreeRecord) {
         for (Actions.NodeRecord nodeRecord : decisionTreeRecord.getNodeRecords()) {
@@ -87,6 +109,13 @@ public class Actions {
         return null;
     }
 
+    /**
+     * Finds the {@link AttributeRecord} for the attribute in question.
+     *
+     * @param decisionTreeRecord the decision tree record for the element in question
+     * @param xmlAttribute       the attribute in question
+     * @return the attribute record for the attribute in question, or {@code null} if none was found.
+     */
     @Nullable
     private static Actions.AttributeRecord findAttributeRecord(
             @NonNull DecisionTreeRecord decisionTreeRecord,
@@ -103,6 +132,8 @@ public class Actions {
     /**
      * Returns a {@link com.google.common.collect.ImmutableSet} of all the element's keys that have
      * at least one {@link NodeRecord}.
+     *
+     * @return the set of element keys with at least one node record.
      */
     @NonNull
     public Set<XmlNode.NodeKey> getNodeKeys() {
@@ -112,6 +143,9 @@ public class Actions {
     /**
      * Returns an {@link ImmutableList} of {@link NodeRecord} for the element identified with the
      * passed key.
+     *
+     * @param key the element key
+     * @return the list of node records, or an empty list if none were found.
      */
     @NonNull
     public ImmutableList<NodeRecord> getNodeRecords(XmlNode.NodeKey key) {
@@ -123,6 +157,9 @@ public class Actions {
     /**
      * Returns a {@link ImmutableList} of all attributes names that have at least one record for
      * the element identified with the passed key.
+     *
+     * @param nodeKey the element key
+     * @return the list of attribute names, or an empty list if none were found.
      */
     @NonNull
     public ImmutableList<XmlNode.NodeName> getRecordedAttributeNames(XmlNode.NodeKey nodeKey) {
@@ -136,6 +173,10 @@ public class Actions {
     /**
      * Returns the {@link com.google.common.collect.ImmutableList} of {@link AttributeRecord} for
      * the attribute identified by attributeName of the element identified by elementKey.
+     *
+     * @param elementKey    the element key
+     * @param attributeName the attribute name
+     * @return the list of attribute records, or an empty list if none were found.
      */
     @NonNull
     public ImmutableList<AttributeRecord> getAttributeRecords(XmlNode.NodeKey elementKey,
@@ -167,6 +208,9 @@ public class Actions {
         fileWriter.append(getLogs());
     }
 
+    /**
+     * @return a string representation of all the actions taken during the merging invocation.
+     */
     @NonNull
     private String getLogs() {
         StringBuilder stringBuilder = new StringBuilder();
@@ -190,6 +234,9 @@ public class Actions {
         return stringBuilder.toString();
     }
 
+    /**
+     * @return the json representation of this object.
+     */
     @NonNull
     public String persist() {
         GsonBuilder gson = new GsonBuilder().setPrettyPrinting();
@@ -198,6 +245,13 @@ public class Actions {
         return gson.create().toJson(this);
     }
 
+    /**
+     * @param xmlDocument the xml document to process for source mapping
+     * @return the mapping from the original source to the generated source.
+     * @throws ParserConfigurationException if the xml document cannot be parsed
+     * @throws SAXException                 if the xml document cannot be parsed
+     * @throws IOException                  if the xml document cannot be parsed
+     */
     public ImmutableMultimap<Integer, Record> getResultingSourceMapping(@NonNull XmlDocument xmlDocument)
             throws ParserConfigurationException, SAXException, IOException {
 
@@ -218,6 +272,10 @@ public class Actions {
         return mappingBuilder.build();
     }
 
+    /**
+     * @param element  the element to process for source mapping
+     * @param mappings the mapping builder to add the mapping to
+     */
     private void parse(@NonNull XmlElement element,
                        @NonNull ImmutableMultimap.Builder<Integer, Record> mappings) {
         DecisionTreeRecord decisionTreeRecord = mRecords.get(element.getId());
@@ -239,6 +297,13 @@ public class Actions {
         }
     }
 
+    /**
+     * @param xmlDocument the xml document to process for source mapping
+     * @return the blame string for the xml document
+     * @throws IOException                  if the xml document cannot be parsed
+     * @throws SAXException                 if the xml document cannot be parsed
+     * @throws ParserConfigurationException if the xml document cannot be parsed
+     */
     @NonNull
     public String blame(@NonNull XmlDocument xmlDocument)
             throws IOException, SAXException, ParserConfigurationException {
@@ -297,15 +362,36 @@ public class Actions {
      */
     public abstract static class Record {
 
+        /**
+         * Defines a record for an XML element or attribute action.
+         */
         @NonNull
         protected final ActionType mActionType;
+        /**
+         * The location of the action, or {@link SourceFilePosition#UNKNOWN} if none was specified
+         */
         @NonNull
         protected final SourceFilePosition mActionLocation;
+        /**
+         * The element key for this record
+         */
         @NonNull
         protected final XmlNode.NodeKey mTargetId;
+        /**
+         * The reason for this action, or {@code null} if none was specified
+         */
         @Nullable
         protected final String mReason;
 
+        /**
+         * Creates a new record.
+         *
+         * @param actionType     the action type
+         * @param actionLocation the location of the action, or {@link SourceFilePosition#UNKNOWN} if
+         *                       none was specified
+         * @param targetId       the element key for this record
+         * @param reason         the reason for this action, or {@code null} if none was specified
+         */
         private Record(@NonNull ActionType actionType,
                        @NonNull SourceFilePosition actionLocation,
                        @NonNull XmlNode.NodeKey targetId,
@@ -316,26 +402,44 @@ public class Actions {
             mReason = reason;
         }
 
+        /**
+         * @return the action type
+         */
         @NonNull
         public ActionType getActionType() {
             return mActionType;
         }
 
+        /**
+         * @return the location of the action, or {@link SourceFilePosition#UNKNOWN} if none was
+         * specified
+         */
         @NonNull
         public SourceFilePosition getActionLocation() {
             return mActionLocation;
         }
 
+        /**
+         * @return the element key for this record
+         */
         @NonNull
         public XmlNode.NodeKey getTargetId() {
             return mTargetId;
         }
 
+        /**
+         * @return the reason for this action, or {@code null} if none was specified
+         */
         @Nullable
         public String getReason() {
             return mReason;
         }
 
+        /**
+         * Prints the record to the passed string builder.
+         *
+         * @param stringBuilder the string builder to append to
+         */
         public void print(@NonNull StringBuilder stringBuilder) {
             stringBuilder.append(mActionType)
                     .append(" from ")
@@ -352,9 +456,22 @@ public class Actions {
      */
     public static class NodeRecord extends Record {
 
+        /**
+         * The operation type for this node record.
+         */
         @NonNull
         private final NodeOperationType mNodeOperationType;
 
+        /**
+         * Creates a new node record.
+         *
+         * @param actionType        the action type
+         * @param actionLocation    the location of the action, or {@link SourceFilePosition#UNKNOWN} if
+         *                          none was specified
+         * @param targetId          the element key for this record
+         * @param reason            the reason for this action, or {@code null} if none was specified
+         * @param nodeOperationType the operation type for this node record
+         */
         NodeRecord(@NonNull ActionType actionType,
                    @NonNull SourceFilePosition actionLocation,
                    @NonNull XmlNode.NodeKey targetId,
@@ -364,6 +481,11 @@ public class Actions {
             this.mNodeOperationType = Preconditions.checkNotNull(nodeOperationType);
         }
 
+        /**
+         * Get the object as a string.
+         *
+         * @return the operation type for this node record
+         */
         @NonNull
         @Override
         public String toString() {
@@ -393,11 +515,19 @@ public class Actions {
             this.mOperationType = operationType;
         }
 
+        /**
+         * Get the OperationType.
+         *
+         * @return the operation type for this attribute record, or {@code null} if none was specified
+         */
         @Nullable
         public AttributeOperationType getOperationType() {
             return mOperationType;
         }
 
+        /**
+         * @return the object as a string
+         */
         @NonNull
         @Override
         public String toString() {
@@ -408,8 +538,21 @@ public class Actions {
         }
     }
 
+    /**
+     * Deserializer for {@link XmlNode.NodeName} that handles the case where the namespace is not
+     * present.
+     */
     private static class NodeNameDeserializer implements JsonDeserializer<XmlNode.NodeName> {
 
+        /**
+         * Deserializes a {@link XmlNode.NodeName} from a JsonElement.
+         *
+         * @param json    The Json data being deserialized
+         * @param typeOfT The type of the Object to deserialize to
+         * @param context The JsonDeserializationContext
+         * @return the deserialized {@link XmlNode.NodeName}
+         * @throws JsonParseException if the json is not a valid representation of a XmlNode.NodeName
+         */
         @Override
         public XmlNode.NodeName deserialize(@NonNull JsonElement json, Type typeOfT,
                                             @NonNull JsonDeserializationContext context) throws JsonParseException {
@@ -438,9 +581,17 @@ public class Actions {
         // all other occurrences of the nodes decisions, in order of decisions.
         private final List<NodeRecord> mNodeRecords = new ArrayList<>();
 
+        /**
+         * Creates a new decision tree record.
+         */
         DecisionTreeRecord() {
         }
 
+        /**
+         * Returns the list of all node records for this element.
+         *
+         * @return the list of all node records for this element
+         */
         @NonNull
         ImmutableList<NodeRecord> getNodeRecords() {
             return ImmutableList.copyOf(mNodeRecords);
@@ -451,10 +602,21 @@ public class Actions {
             return ImmutableMap.copyOf(mAttributeRecords);
         }
 
+        /**
+         * Adds a node record to this decision tree record.
+         *
+         * @param nodeRecord the node record to add
+         */
         void addNodeRecord(@NonNull NodeRecord nodeRecord) {
             mNodeRecords.add(Preconditions.checkNotNull(nodeRecord));
         }
 
+        /**
+         * Adds an attribute record to this decision tree record.
+         *
+         * @param attributeName the attribute name for which to add the attribute record
+         * @return the list of all attribute records for this element and attribute name.
+         */
         @NonNull
         ImmutableList<AttributeRecord> getAttributeRecords(XmlNode.NodeName attributeName) {
             List<AttributeRecord> attributeRecords = mAttributeRecords.get(attributeName);

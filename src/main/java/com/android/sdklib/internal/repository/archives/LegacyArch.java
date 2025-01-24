@@ -19,11 +19,12 @@ package com.android.sdklib.internal.repository.archives;
 
 /**
  * The legacy Architecture that this archive can be downloaded on.
- * <p/>
+ * <p>
  * This attribute was used for the &lt;archive&gt; element in repo schema 1-9.
  * add-on schema 1-6 and sys-img schema 1-2.
  * Starting with repo schema 10, add-on schema 7 and sys-img schema 3, this is replaced
  * by the &lt;host-bit&gt; and &lt;jvm-bit&gt; elements and {@link ArchFilter}.
+ * </p>
  *
  * @see HostOs
  * @deprecated com.android.sdklib.internal.repository has moved into Studio as

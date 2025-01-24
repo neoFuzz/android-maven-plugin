@@ -22,8 +22,14 @@ package com.github.cardforge.maven.plugins.android;
  */
 public class AndroidSigner {
 
+    /**
+     * @param debug the debug mode to use when signing the apk. Must be 'true', 'false', 'both' or 'auto'.
+     */
     private final Debug debug;
 
+    /**
+     * @param debug the debug mode to use when signing the apk. Must be 'true', 'false', 'both' or 'auto'.
+     */
     public AndroidSigner(String debug) {
         if (debug == null) {
             throw new IllegalArgumentException("android.sign.debug must be 'true', 'false', 'both' or 'auto'.");
@@ -35,10 +41,16 @@ public class AndroidSigner {
         }
     }
 
+    /**
+     * @param debug the debug mode to use when signing the apk.
+     */
     public AndroidSigner(Debug debug) {
         this.debug = debug;
     }
 
+    /**
+     * @return true if the apk should be signed with debug keystore.
+     */
     public boolean isSignWithDebugKeyStore() {
         if (debug == Debug.TRUE) {
             return true;
@@ -56,15 +68,33 @@ public class AndroidSigner {
         throw new IllegalStateException("Could not determine whether to sign with debug keystore.");
     }
 
+    /**
+     * @return true if the apk should be signed with both debug and release keystore.
+     */
     public boolean shouldCreateBothSignedAndUnsignedApk() {
         return debug == Debug.BOTH;
     }
 
     /**
-     *
+     * The debug mode to use when signing the apk.
      */
     public enum Debug {
-        TRUE, FALSE, BOTH, AUTO
+        /**
+         * debug is on
+         */
+        TRUE,
+        /**
+         * debug is off
+         */
+        FALSE,
+        /**
+         * both debug and release
+         */
+        BOTH,
+        /**
+         * auto-detect whether to sign with debug keystore or not
+         */
+        AUTO
     }
 
 }

@@ -1,5 +1,7 @@
 package com.github.cardforge.maven.plugins.android.configuration;
 
+import com.github.cardforge.maven.plugins.android.AbstractInstrumentationMojo;
+
 import java.util.List;
 
 /**
@@ -11,63 +13,63 @@ import java.util.List;
  */
 public class Test {
     /**
-     * Mirror of {@link AbstractInstrumentationMojo#testPackages}
+     * Mirror of {@link AbstractInstrumentationMojo}#testPackages
      */
     protected List<String> packages;
     /**
-     * Mirror of {@link AbstractInstrumentationMojo#testClasses}
+     * Mirror of {@link AbstractInstrumentationMojo}#testClasses
      */
     protected List<String> classes;
     /**
-     * Mirror of {@link AbstractInstrumentationMojo#testSkip}
+     * Mirror of {@link AbstractInstrumentationMojo}#testSkip
      */
     private String skip;
     /**
-     * Mirror of {@link AbstractInstrumentationMojo#testInstrumentationPackage}
+     * Mirror of {@link AbstractInstrumentationMojo}#testInstrumentationPackage
      */
     private String instrumentationPackage;
     /**
-     * Mirror of {@link AbstractInstrumentationMojo#testInstrumentationRunner}
+     * Mirror of {@link AbstractInstrumentationMojo}#testInstrumentationRunner
      */
     private String instrumentationRunner;
     /**
-     * Mirror of {@link AbstractInstrumentationMojo#testDebug}
+     * Mirror of {@link AbstractInstrumentationMojo}#testDebug
      */
     private Boolean debug;
     /**
-     * Mirror of {@link AbstractInstrumentationMojo#testCoverage}
+     * Mirror of {@link AbstractInstrumentationMojo}#testCoverage
      */
     private Boolean coverage;
     /**
-     * Mirror of {@link AbstractInstrumentationMojo#testCoverageFile}
+     * Mirror of {@link AbstractInstrumentationMojo}#testCoverageFile
      */
     private String coverageFile;
     /**
-     * Mirror of {@link AbstractInstrumentationMojo#testLogOnly}
+     * Mirror of {@link AbstractInstrumentationMojo}#testLogOnly
      */
     private Boolean logOnly;
     /**
-     * Mirror of {@link AbstractInstrumentationMojo#testTestSize}
+     * Mirror of {@link AbstractInstrumentationMojo}#testTestSize
      */
     private String testSize;
     /**
-     * Mirror of {@link AbstractInstrumentationMojo#testCreateReport}
+     * Mirror of {@link AbstractInstrumentationMojo}#testCreateReport
      */
     private Boolean createReport;
     /**
-     * Mirror of {@link AbstractInstrumentationMojo#testAnnotations}
+     * Mirror of {@link AbstractInstrumentationMojo}#testAnnotations
      */
     private List<String> annotations;
     /**
-     * Mirror of {@link AbstractInstrumentationMojo#testExcludeAnnotations}
+     * Mirror of {@link AbstractInstrumentationMojo}#testExcludeAnnotations
      */
     private List<String> excludeAnnotations;
     /**
-     * Mirror of {@link AbstractInstrumentationMojo#testInstrumentationArgs}
+     * Mirror of {@link AbstractInstrumentationMojo}#testInstrumentationArgs
      */
     private List<String> instrumentationArgs;
     /**
-     * Mirror of {@link AbstractInstrumentationMojo#testFailSafe}
+     * Mirror of {@link AbstractInstrumentationMojo}#testFailSafe
      */
     private Boolean failSafe;
 

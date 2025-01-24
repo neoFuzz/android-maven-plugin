@@ -22,17 +22,21 @@ package com.android.sdklib.repository;
 public interface IDescription {
     /**
      * Returns a description of the given element. Cannot be null.
-     * <p/>
+     * <p>
      * A description is a multi-line of text, typically much more
      * elaborate than what {@link Object#toString()} would provide.
+     *
+     * @return a short description of the package. Can be empty.
      */
     String getShortDescription();
 
     /**
      * Returns a description of the given element. Cannot be null.
-     * <p/>
+     * <p>
      * A description is a multi-line of text, typically much more
      * elaborate than what {@link Object#toString()} would provide.
+     *
+     * @return a long description of the package. Can be empty.
      */
     String getLongDescription();
 }
