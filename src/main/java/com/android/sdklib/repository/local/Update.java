@@ -31,6 +31,11 @@ import java.util.Set;
  */
 public abstract class Update {
 
+    /**
+     * @param localPkgs  The list of local packages to compute updates for.
+     * @param remotePkgs The list of remote packages to compute updates against.
+     * @return A {@link UpdateResult} containing the updates and new packages.
+     */
     @NonNull
     public static UpdateResult computeUpdates(@NonNull LocalPkgInfo[] localPkgs,
                                               @NonNull Multimap<PkgType, RemotePkgInfo> remotePkgs) {
@@ -69,6 +74,12 @@ public abstract class Update {
         return result;
     }
 
+    /**
+     * @param local      The local package to compute an update for.
+     * @param remotePkgs The list of remote packages to compute updates against.
+     * @param result     The {@link UpdateResult} to add the update to if found.
+     * @return The {@link RemotePkgInfo} for the update, or {@code null} if no update was found.
+     */
     private static RemotePkgInfo findUpdate(@NonNull LocalPkgInfo local,
                                             @NonNull Multimap<PkgType, RemotePkgInfo> remotePkgs,
                                             @NonNull UpdateResult result) {

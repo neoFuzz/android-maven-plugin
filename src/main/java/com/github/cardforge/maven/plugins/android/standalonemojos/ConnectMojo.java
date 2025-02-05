@@ -67,7 +67,7 @@ public class ConnectMojo extends AbstractAndroidMojo {
 
     @NonNull
     private CommandExecutor getExecutor() {
-        CommandExecutor executor = CommandExecutor.Factory.createDefaultCommmandExecutor();
+        CommandExecutor executor = CommandExecutor.Factory.createDefaultCommandExecutor();
         executor.setLogger(this.getLog());
         executor.setCaptureStdOut(true);
         return executor;

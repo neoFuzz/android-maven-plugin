@@ -6,6 +6,9 @@ package com.github.cardforge.maven.plugins.android;
  * @author Manfred Moser - manfred@simpligility.com
  */
 public class InvalidConfigurationException extends RuntimeException {
+    /**
+     * @param message The message to display to the user
+     */
     public InvalidConfigurationException(String message) {
         super(message);
     }

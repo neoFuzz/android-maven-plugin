@@ -65,6 +65,9 @@ public class DownloadCache {
      *     http://www.w3.org/Protocols/rfc2616/rfc2616-sec6.html#sec6.1.1
      */
 
+    /**
+     * Debug flag
+     */
     private static final boolean DEBUG = System.getenv("SDKMAN_DEBUG_CACHE") != null; //$NON-NLS-1$
 
     /**
@@ -133,12 +136,23 @@ public class DownloadCache {
             HttpHeaders.DATE
     };
 
+    /**
+     * The {@link IFileOp} to use for file operations.
+     */
     private final IFileOp mFileOp;
+    /**
+     * The root of the cache directory. Null if the cache is disabled.
+     */
     private final File mCacheRoot;
+    /**
+     * The {@link Strategy} to use for caching.
+     */
     private final Strategy mStrategy;
 
     /**
      * Creates a default instance of the URL cache
+     *
+     * @param strategy The {@link Strategy} to use for caching.
      */
     public DownloadCache(@NonNull Strategy strategy) {
         this(new FileOp(), strategy);
@@ -146,6 +160,9 @@ public class DownloadCache {
 
     /**
      * Creates a default instance of the URL cache
+     *
+     * @param fileOp   The {@link IFileOp} to use for file operations.
+     * @param strategy The {@link Strategy} to use for caching.\
      */
     public DownloadCache(@NonNull IFileOp fileOp, @NonNull Strategy strategy) {
         mFileOp = fileOp;
@@ -159,11 +176,17 @@ public class DownloadCache {
         mStrategy = mCacheRoot == null ? Strategy.DIRECT : strategy;
     }
 
+    /**
+     * @return The current strategy.
+     */
     @NonNull
     public Strategy getStrategy() {
         return mStrategy;
     }
 
+    /**
+     * @return The cache root directory, or null if the cache is disabled.
+     */
     @Nullable
     public File getCacheRoot() {
         return mCacheRoot;
@@ -261,6 +284,23 @@ public class DownloadCache {
      * to actually perform a download.
      * <p>
      * Isolated so that it can be overridden by unit tests.
+     *
+     * @param url                   The URL to be opened.
+     * @param needsMarkResetSupport Whether the underlying {@link UrlOpener} needs to support
+     *                              mark/reset on the input stream.
+     * @param monitor               {@link ITaskMonitor} which is related to this URL
+     *                              fetching.
+     * @param headers               An optional set of headers to pass when requesting the resource. Can be null.
+     * @return Returns a pair with a {@link InputStream} and an {@link HttpResponse}.
+     * The pair is never null.
+     * The input stream can be null in case of error, although in general the
+     * method will probably throw an exception instead.
+     * The caller should look at the response code's status and only accept the
+     * input stream if it's the desired code (e.g. 200 or 206).
+     * @throws IOException             Exception thrown when there are problems retrieving
+     *                                 the URL or its content.
+     * @throws CanceledByUserException Exception thrown if the user cancels the
+     *                                 authentication dialog.
      */
     @VisibleForTesting(visibility = Visibility.PRIVATE)
     @NonNull
@@ -830,6 +870,11 @@ public class DownloadCache {
         return cacheFilename.replaceFirst(BIN_FILE_PREFIX, INFO_FILE_PREFIX);
     }
 
+    /**
+     * Enum describing the caching strategy.
+     * <p>
+     * The strategy is only used if the URL is not in the cache.
+     */
     public enum Strategy {
         /**
          * Exclusively serves data from the cache. If files are available in the

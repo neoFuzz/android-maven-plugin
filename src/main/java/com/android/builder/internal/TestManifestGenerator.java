@@ -48,6 +48,16 @@ public class TestManifestGenerator {
     private final boolean mHandleProfiling;
     private final boolean mFunctionalTest;
 
+    /**
+     * @param outputFile        the file to write the manifest to
+     * @param packageName       the package name for the manifest
+     * @param minSdkVersion     the minimum SDK version for the manifest
+     * @param targetSdkVersion  the target SDK version for the manifest
+     * @param testedPackageName the package name of the application being tested
+     * @param testRunnerName    the fully qualified class name of the test runner
+     * @param handleProfiling   whether to enable profiling support
+     * @param functionalTest    whether this is a functional test
+     */
     public TestManifestGenerator(
             @NonNull File outputFile,
             @NonNull String packageName,
@@ -67,6 +77,9 @@ public class TestManifestGenerator {
         mFunctionalTest = functionalTest;
     }
 
+    /**
+     * @throws IOException if there is a problem generating the manifest file
+     */
     public void generate() throws IOException {
         Map<String, String> map = new HashMap<>();
         map.put(PH_PACKAGE, mPackageName);

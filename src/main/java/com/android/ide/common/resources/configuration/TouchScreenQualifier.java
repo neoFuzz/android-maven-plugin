@@ -25,18 +25,30 @@ import com.android.resources.TouchScreen;
  */
 public final class TouchScreenQualifier extends EnumBasedResourceQualifier {
 
+    /**
+     * Name constant representing the Touch Screen qualifier
+     */
     public static final String NAME = "Touch Screen";
 
     private TouchScreen mValue;
 
+    /**
+     * Default constructor. The value is {@link TouchScreen#NOTOUCH}
+     */
     public TouchScreenQualifier() {
         // pass
     }
 
+    /**
+     * @param touchValue the screen size value
+     */
     public TouchScreenQualifier(TouchScreen touchValue) {
         mValue = touchValue;
     }
 
+    /**
+     * @return the screen size value
+     */
     public TouchScreen getValue() {
         return mValue;
     }

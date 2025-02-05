@@ -16,6 +16,8 @@
 
 package com.android.sdklib.internal.repository;
 
+import com.android.annotations.NonNull;
+import com.android.annotations.Nullable;
 import com.android.annotations.VisibleForTesting;
 import com.android.annotations.VisibleForTesting.Visibility;
 import com.android.io.NonClosingInputStream;
@@ -62,13 +64,24 @@ public class SdkStats {
 
     private final SparseArray<PlatformStat> mStats = new SparseArray<SdkStats.PlatformStat>();
 
+    /**
+     * Default constructor.
+     */
     public SdkStats() {
     }
 
+    /**
+     * @return stats
+     */
     public SparseArray<PlatformStat> getStats() {
         return mStats;
     }
 
+    /**
+     * @param cache     Download Cache
+     * @param forceHttp force HTTPS flag
+     * @param monitor   Task monitor
+     */
     public void load(DownloadCache cache, boolean forceHttp, ITaskMonitor monitor) {
 
         String url = SdkStatsConstants.URL_STATS;
@@ -166,10 +179,12 @@ public class SdkStats {
      *
      * @param urlString    The URL to load, as a string.
      * @param monitor      {@link ITaskMonitor} related to this URL.
-     * @param outException If non null, where to store any exception that
+     * @param outException If non-null, where to store any exception that
      *                     happens during the fetch.
+     * @return The InputStream of the document, or null if anything wrong happens.
      * @see UrlOpener UrlOpener, which handles all URL logic.
      */
+    @Nullable
     private InputStream fetchXmlUrl(String urlString,
                                     DownloadCache cache,
                                     ITaskMonitor monitor,
@@ -194,6 +209,8 @@ public class SdkStats {
     /**
      * Closes the stream, ignore any exception from InputStream.close().
      * If the stream is a NonClosingInputStream, sets it to CloseBehavior.CLOSE first.
+     *
+     * @param is The stream to close.
      */
     private void closeStream(InputStream is) {
         if (is != null) {
@@ -212,6 +229,7 @@ public class SdkStats {
      * at the end of the xmlns:sdk="http://schemas.android.com/sdk/android/addons-list/$N"
      * declaration.
      *
+     * @param xml The XML stream to parse.
      * @return 1..{@link SdkStatsConstants#NS_LATEST_VERSION} for a valid schema version
      * or 0 if no schema could be found.
      */
@@ -321,6 +339,13 @@ public class SdkStats {
      * If the XML was correctly validated, returns the schema that worked.
      * If it doesn't validate, returns null and stores the error in outError[0].
      * If we can't find a validator, returns null and set validatorFound[0] to false.
+     *
+     * @param xml            The XML stream to validate.
+     * @param url            The URL of the XML stream.
+     * @param version        The version of the XML Schema.
+     * @param outError       Where to store any error message.
+     * @param validatorFound Where to store whether a validator was found or not.
+     * @return The URI of the schema that validated the XML, or null if it didn't validate.
      */
     @VisibleForTesting(visibility = Visibility.PRIVATE)
     protected String validateXml(InputStream xml, String url, int version,
@@ -403,9 +428,13 @@ public class SdkStats {
      * Takes an XML document as a string as parameter and returns a DOM for it.
      * <p>
      * On error, returns null and prints a (hopefully) useful message on the monitor.
+     *
+     * @param xml    The XML stream to parse.
+     * @param monitor The {@link ITaskMonitor} to use for displaying errors.
+     * @return The parsed DOM document, or null if an error occurred.
      */
     @VisibleForTesting(visibility = Visibility.PRIVATE)
-    protected Document getDocument(InputStream xml, ITaskMonitor monitor) {
+    protected Document getDocument(@NonNull InputStream xml, ITaskMonitor monitor) {
         try {
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
             factory.setIgnoringComments(true);
@@ -433,6 +462,11 @@ public class SdkStats {
      * Parses all valid platforms found in the XML.
      * Changes the stats array returned by {@link #getStats()}
      * (also returns the value directly, useful for unit tests.)
+     *
+     * @param doc  The DOM document to parse.
+     * @param nsUri The namespace URI of the document.
+     * @param monitor The {@link ITaskMonitor} to use for displaying errors.
+     * @return The array of {@link PlatformStat} objects, or null if an error occurred.
      */
     @VisibleForTesting(visibility = Visibility.PRIVATE)
     protected SparseArray<PlatformStat> parseStatsDocument(
@@ -549,12 +583,22 @@ public class SdkStats {
         return null;
     }
 
+    /**
+     * Class representing a platform as parsed from the XML stats file.
+     */
     public static class PlatformStatBase {
         private final int mApiLevel;
         private final String mVersionName;
         private final String mCodeName;
         private final float mShare;
 
+        /**
+         * @param apiLevel    An int > 0.
+         * @param versionName The official version name of this platform, for example "Android 1.5".
+         * @param codeName    The official codename for this platform, for example "Cupcake".
+         * @param share       An approximate share percentage of this platform and all the
+         *                    platforms of lower API level.
+         */
         public PlatformStatBase(int apiLevel,
                                 String versionName,
                                 String codeName,
@@ -567,6 +611,8 @@ public class SdkStats {
 
         /**
          * The Android API Level for the platform. An int > 0.
+         *
+         * @return The API level of this platform.
          */
         public int getApiLevel() {
             return mApiLevel;
@@ -574,6 +620,8 @@ public class SdkStats {
 
         /**
          * The official codename for this platform, for example "Cupcake".
+         *
+         * @return The codename of this platform.
          */
         public String getCodeName() {
             return mCodeName;
@@ -581,6 +629,8 @@ public class SdkStats {
 
         /**
          * The official version name of this platform, for example "Android 1.5".
+         *
+         * @return The version name of this platform.
          */
         public String getVersionName() {
             return mVersionName;
@@ -589,6 +639,8 @@ public class SdkStats {
         /**
          * An approximate share percentage of this platform and all the
          * platforms of lower API level.
+         *
+         * @return A float between 0 and 100.
          */
         public float getShare() {
             return mShare;
@@ -604,9 +656,21 @@ public class SdkStats {
         }
     }
 
+    /**
+     * Class representing a platform as parsed from the XML stats file, with
+     * an additional field for the accumulated share percentage.
+     */
     public static class PlatformStat extends PlatformStatBase {
         private final float mAccumShare;
 
+        /**
+         * @param apiLevel    An int > 0.
+         * @param versionName The official version name of this platform, for example "Android 1.5".
+         * @param codeName    The official codename for this platform, for example "Cupcake".
+         * @param share       An approximate share percentage of this platform and all the
+         *                    platforms of lower API level.
+         * @param accumShare  The accumulated approximate share percentage of that platform.
+         */
         public PlatformStat(int apiLevel,
                             String versionName,
                             String codeName,
@@ -616,7 +680,11 @@ public class SdkStats {
             mAccumShare = accumShare;
         }
 
-        public PlatformStat(PlatformStatBase base, float accumShare) {
+        /**
+         * @param base       The {@link PlatformStatBase} to copy data from.
+         * @param accumShare The accumulated approximate share percentage of that platform.
+         */
+        public PlatformStat(@NonNull PlatformStatBase base, float accumShare) {
             super(base.getApiLevel(),
                     base.getVersionName(),
                     base.getCodeName(),
@@ -626,13 +694,15 @@ public class SdkStats {
 
         /**
          * The accumulated approximate share percentage of that platform.
+         *
+         * @return A float between 0 and 100.
          */
         public float getAccumShare() {
             return mAccumShare;
         }
 
         /**
-         * Returns a string representation of this object, for debugging purposes.
+         * @return a string representation of this object, for debugging purposes.
          */
         @Override
         public String toString() {

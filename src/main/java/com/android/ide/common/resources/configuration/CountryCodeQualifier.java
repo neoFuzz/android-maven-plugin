@@ -26,18 +26,33 @@ import java.util.regex.Pattern;
  * Resource Qualifier for Mobile Country Code.
  */
 public final class CountryCodeQualifier extends ResourceQualifier {
+    /**
+     * Constant for the mobile country code qualifier name.
+     */
     public static final String NAME = "Mobile Country Code";
     /**
      * Default pixel density value. This means the property is not set.
      */
     private static final int DEFAULT_CODE = -1;
+    /**
+     * Pattern for matching folder segment containing the qualifier.
+     */
     private static final Pattern sCountryCodePattern = Pattern.compile("^mcc(\\d{3})$");//$NON-NLS-1$
+    /**
+     * Constant for the mobile country code qualifier.
+     */
     private final int mCode;
 
+    /**
+     * Constructor that creates a new qualifier and sets its value.
+     */
     public CountryCodeQualifier() {
         this(DEFAULT_CODE);
     }
 
+    /**
+     * @param code the value of the qualifier
+     */
     public CountryCodeQualifier(int code) {
         mCode = code;
     }

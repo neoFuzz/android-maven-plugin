@@ -17,10 +17,17 @@ public class VersionGenerator {
 
     private final VersionElementParser elementParser;
 
+    /**
+     * Default constructor for VersionGenerator.
+     * Initializes the VersionGenerator with default values.
+     */
     public VersionGenerator() {
         this("4,3,3", "");
     }
 
+    /**
+     * @param versionDigits the version digits
+     */
     public VersionGenerator(String versionDigits) {
         this(versionDigits, "");
     }

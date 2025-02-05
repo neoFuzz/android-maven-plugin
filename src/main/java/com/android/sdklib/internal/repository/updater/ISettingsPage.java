@@ -86,18 +86,24 @@ public interface ISettingsPage {
 
     /**
      * Loads settings from the given {@link Properties} container and update the page UI.
+     *
+     * @param inSettings The {@link Properties} container to load settings from.
      */
     void loadSettings(Properties inSettings);
 
     /**
      * Called by the application to retrieve settings from the UI and store them in
      * the given {@link Properties} container.
+     *
+     * @param outSettings The {@link Properties} container to store settings in.
      */
     void retrieveSettings(Properties outSettings);
 
     /**
      * Called by the application to give a callback that the page should invoke when
      * settings have changed.
+     *
+     * @param settingsChangedCallback The callback to invoke when settings have changed.
      */
     void setOnSettingsChanged(SettingsChangedCallback settingsChangedCallback);
 
@@ -110,6 +116,8 @@ public interface ISettingsPage {
          * Invoked by the settings page when settings have changed and need to be
          * applied. The application will call {@link ISettingsPage#retrieveSettings(Properties)}
          * and apply the new settings.
+         *
+         * @param page The settings page that has changed.
          */
         void onSettingsChanged(ISettingsPage page);
     }

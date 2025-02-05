@@ -52,6 +52,7 @@ public class XmlAttribute extends XmlNode {
      * {@link XmlElement}.
      *
      * @param ownerElement the xml node object owning this attribute.
+     * @param attributeModel the model associated with this attribute, if any
      * @param xml          the xml definition of the attribute.
      */
     public XmlAttribute(
@@ -91,7 +92,7 @@ public class XmlAttribute extends XmlNode {
     }
 
     /**
-     * Returns the attribute's value
+     * @return the attribute's value
      */
     @NonNull
     public String getValue() {
@@ -126,16 +127,26 @@ public class XmlAttribute extends XmlNode {
         return mXml;
     }
 
+    /**
+     * @return the model associated with this attribute, if any
+     */
     @Nullable
     public AttributeModel getModel() {
         return mAttributeModel;
     }
 
+    /**
+     * @return the element owning this attribute.
+     */
     @NonNull
     XmlElement getOwnerElement() {
         return mOwnerElement;
     }
 
+    /**
+     * @param higherPriorityElement the higher priority element to merge this attribute with.
+     * @param mergingReport         the merging report to log errors and actions.
+     */
     void mergeInHigherPriorityElement(@NonNull XmlElement higherPriorityElement,
                                       @NonNull MergingReport.Builder mergingReport) {
 

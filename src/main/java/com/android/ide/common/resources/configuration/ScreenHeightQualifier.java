@@ -26,6 +26,9 @@ import java.util.regex.Pattern;
  * Resource Qualifier for Screen Pixel Density.
  */
 public final class ScreenHeightQualifier extends ResourceQualifier {
+    /**
+     * Static string for messages
+     */
     public static final String NAME = "Screen Height";
     /**
      * Default screen size value. This means the property is not set
@@ -35,14 +38,24 @@ public final class ScreenHeightQualifier extends ResourceQualifier {
     private static final String S_PRINT_PATTERN = "h%1$ddp";
     private int mValue = DEFAULT_SIZE;
 
+    /**
+     * Default constructor
+     */
     public ScreenHeightQualifier() {
         // pass
     }
 
+    /**
+     * @param value the integer value of the screen height qualifier
+     */
     public ScreenHeightQualifier(int value) {
         mValue = value;
     }
 
+    /**
+     * @param value the string value to parse
+     * @return a new {@link ScreenHeightQualifier} or null if the given value cannot be parsed
+     */
     @Nullable
     public static ScreenHeightQualifier getQualifier(String value) {
         try {
@@ -59,6 +72,9 @@ public final class ScreenHeightQualifier extends ResourceQualifier {
         return null;
     }
 
+    /**
+     * @return the screen height value as an integer
+     */
     public int getValue() {
         return mValue;
     }

@@ -150,7 +150,12 @@ public class SamplePackage extends MinToolsPackage
      * URL is the actual samples path location.
      * <p>
      * By design, this creates a package with one and only one archive.
+     *
+     * @param target The {@link IAndroidTarget} to create the package from.
+     * @param props  The properties to parse the package's attributes from.
+     * @return a new Package
      */
+    @NonNull
     public static Package create(IAndroidTarget target, Properties props) {
         return new SamplePackage(target, props);
     }
@@ -164,9 +169,13 @@ public class SamplePackage extends MinToolsPackage
      * <p>
      * By design, this creates a package with one and only one archive.
      *
+     * @param archiveOsPath The actual location of the directory.
+     * @param props         The previously saved properties of this package.
+     * @return a new Package
      * @throws AndroidVersionException if the {@link AndroidVersion} can't be restored
      *                                 from properties.
      */
+    @NonNull
     public static Package create(String archiveOsPath, Properties props)
             throws AndroidVersionException {
         return new SamplePackage(archiveOsPath, props);

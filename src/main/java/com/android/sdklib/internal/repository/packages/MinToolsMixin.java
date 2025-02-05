@@ -56,7 +56,7 @@ class MinToolsMixin implements IMinToolsDependency {
      * This is used to create packages from local directories in which case there must be
      * one archive which URL is the actual target location.
      * <p>
-     * Properties from props are used first when possible, e.g. if props is non null.
+     * Properties from props are used first when possible, e.g. if props is non-null.
      * <p>
      * By design, this creates a package with one and only one archive.
      */

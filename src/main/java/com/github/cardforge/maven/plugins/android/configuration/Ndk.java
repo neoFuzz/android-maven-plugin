@@ -31,10 +31,18 @@ public class Ndk {
      */
     private File path;
 
+    /**
+     * @return Directory of the installed Android NDK, for example
+     * <code>/usr/local/android-ndk-r4</code>
+     */
     public File getPath() {
         return path;
     }
 
+    /**
+     * @param path Directory of the installed Android NDK, for example
+     *             <code>/usr/local/android-ndk-r4</code>
+     */
     public void setPath(File path) {
         this.path = path;
     }

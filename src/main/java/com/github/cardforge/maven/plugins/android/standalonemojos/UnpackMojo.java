@@ -49,6 +49,9 @@ import java.util.jar.JarFile;
  */
 @Mojo(name = "unpack", requiresDependencyResolution = ResolutionScope.COMPILE)
 public class UnpackMojo extends AbstractAndroidMojo {
+    /**
+     * Static string
+     */
     public static final String INTO = " into ";
     /**
      * If true, the library will be unpacked only when outputDirectory doesn't
@@ -79,7 +82,7 @@ public class UnpackMojo extends AbstractAndroidMojo {
 
     public void execute() throws MojoExecutionException, MojoFailureException {
 
-        CommandExecutor executor = CommandExecutor.Factory.createDefaultCommmandExecutor();
+        CommandExecutor executor = CommandExecutor.Factory.createDefaultCommandExecutor();
         executor.setLogger(this.getLog());
 
         if (generateApk) {

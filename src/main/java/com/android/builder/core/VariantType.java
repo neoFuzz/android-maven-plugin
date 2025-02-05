@@ -25,14 +25,26 @@ import com.google.common.collect.ImmutableList;
  * Type of variant.
  */
 public enum VariantType {
+    /**
+     * Default variant type
+     */
     DEFAULT,
+    /**
+     * Library variant type
+     */
     LIBRARY,
+    /**
+     * Feature split variant type
+     */
     ANDROID_TEST(
             "androidTest",
             "AndroidTest",
             true,
             AndroidProject.ARTIFACT_ANDROID_TEST,
             ArtifactMetaData.TYPE_ANDROID),
+    /**
+     * Feature split variant type
+     */
     UNIT_TEST(
             "test",
             "UnitTest",
@@ -60,8 +72,16 @@ public enum VariantType {
         this.isSingleBuildType = false;
     }
 
+
     /**
-     * Testing variant.
+     * @param prefix            the prefix used for naming source directories. This is an empty string in
+     *                          case of non-testing variants and a camel case string otherwise, e.g. "androidTest".
+     * @param suffix            the suffix used for naming Gradle tasks. This is an empty string in
+     *                          case of non-testing variants and a camel case string otherwise, e.g. "AndroidTest".
+     * @param isSingleBuildType whether the artifact type supports only a single build type.
+     * @param artifactName      the name used in the builder model for artifacts that correspond to this
+     *                          variant type.
+     * @param artifactType      the artifact type used in the builder model.
      */
     VariantType(
             String prefix,
@@ -77,6 +97,9 @@ public enum VariantType {
         this.isSingleBuildType = isSingleBuildType;
     }
 
+    /**
+     * @return the list of all testing types.
+     */
     @NonNull
     public static ImmutableList<VariantType> getTestingTypes() {
         ImmutableList.Builder<VariantType> result = ImmutableList.builder();
@@ -89,7 +112,7 @@ public enum VariantType {
     }
 
     /**
-     * Returns true if the variant is automatically generated for testing purposed, false
+     * @return true if the variant is automatically generated for testing purposed, false
      * otherwise.
      */
     public boolean isForTesting() {
@@ -97,7 +120,7 @@ public enum VariantType {
     }
 
     /**
-     * Returns prefix used for naming source directories. This is an empty string in
+     * @return prefix used for naming source directories. This is an empty string in
      * case of non-testing variants and a camel case string otherwise, e.g. "androidTest".
      */
     @NonNull
@@ -106,7 +129,7 @@ public enum VariantType {
     }
 
     /**
-     * Returns suffix used for naming Gradle tasks. This is an empty string in
+     * @return suffix used for naming Gradle tasks. This is an empty string in
      * case of non-testing variants and a camel case string otherwise, e.g. "AndroidTest".
      */
     @NonNull
@@ -115,7 +138,7 @@ public enum VariantType {
     }
 
     /**
-     * Returns the name used in the builder model for artifacts that correspond to this variant
+     * @return the name used in the builder model for artifacts that correspond to this variant
      * type.
      */
     @NonNull
@@ -124,7 +147,7 @@ public enum VariantType {
     }
 
     /**
-     * Returns the artifact type used in the builder model.
+     * @return the artifact type used in the builder model.
      */
     public int getArtifactType() {
         return mArtifactType;
@@ -132,6 +155,8 @@ public enum VariantType {
 
     /**
      * Whether the artifact type supports only a single build type.
+     *
+     * @return true if the artifact type supports only a single build type.
      */
     public boolean isSingleBuildType() {
         return isSingleBuildType;

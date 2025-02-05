@@ -163,6 +163,9 @@ public class XmlPrettyPrinter {
                 System.lineSeparator(), endWithNewline);
     }
 
+    /**
+     * Shows help options
+     */
     private static void printUsage() {
         System.out.println("Usage: " + XmlPrettyPrinter.class.getSimpleName() +
                 " <options>... <files or directories...>");
@@ -176,6 +179,8 @@ public class XmlPrettyPrinter {
 
     /**
      * Command line driver
+     *
+     * @param args the command line arguments
      */
     public static void main(@NonNull String[] args) {
         if (args.length == 0) {
@@ -219,6 +224,11 @@ public class XmlPrettyPrinter {
         System.exit(0);
     }
 
+    /**
+     * @param prefs  the preferences to format with
+     * @param file   the file to format
+     * @param stdout if true, print the formatted file to stdout instead of writing it back to disk
+     */
     private static void formatFile(@NonNull XmlFormatPreferences prefs, @NonNull File file,
                                    boolean stdout) {
         if (file.isDirectory()) {
@@ -297,6 +307,9 @@ public class XmlPrettyPrinter {
         mIndentationLevels = indentationLevels;
     }
 
+    /**
+     * @return the line separator to use when printing
+     */
     @NonNull
     private String getLineSeparator() {
         return mLineSeparator;
@@ -341,6 +354,9 @@ public class XmlPrettyPrinter {
 
     /**
      * Visit the given node at the given depth
+     *
+     * @param depth the depth of the node being visited
+     * @param node  the node being visited
      */
     private void visitNode(int depth, Node node) {
         if (node == mStartNode) {
@@ -370,6 +386,10 @@ public class XmlPrettyPrinter {
         }
     }
 
+    /**
+     * @param depth the depth of the node being visited
+     * @param node  the node being visited
+     */
     private void visitBeforeChildren(int depth, @NonNull Node node) {
         short type = node.getNodeType();
         switch (type) {
@@ -418,6 +438,10 @@ public class XmlPrettyPrinter {
         }
     }
 
+    /**
+     * @param depth the depth of the node being visited
+     * @param node  the node being visited
+     */
     private void visitAfterChildren(int depth, @NonNull Node node) {
         short type = node.getNodeType();
         switch (type) {
@@ -433,18 +457,28 @@ public class XmlPrettyPrinter {
         }
     }
 
+    /**
+     * @param node the node to print the processing instruction for
+     */
     private void printProcessingInstruction(@NonNull Node node) {
         mOut.append("<?xml "); //$NON-NLS-1$
         mOut.append(node.getNodeValue().trim());
         mOut.append('?').append('>').append(mLineSeparator);
     }
 
+    /**
+     * @param node the node to get the source from
+     * @return the source string, or null if not available
+     */
     @Nullable
     @SuppressWarnings("MethodMayBeStatic") // Intentionally instance method so it can be overridden
     protected String getSource(@NonNull Node node) {
         return null;
     }
 
+    /**
+     * @param node the node to print the doctype for
+     */
     private void printDocType(Node node) {
         String content = getSource(node);
         if (content != null) {
@@ -453,6 +487,9 @@ public class XmlPrettyPrinter {
         }
     }
 
+    /**
+     * @param node the node to print the character data for
+     */
     private void printCharacterData(@NonNull Node node) {
         String nodeValue = node.getNodeValue();
         boolean separateLine = nodeValue.indexOf('\n') != -1;
@@ -467,6 +504,9 @@ public class XmlPrettyPrinter {
         }
     }
 
+    /**
+     * @param node the node to print the text for
+     */
     private void printText(@NonNull Node node) {
         boolean escape = true;
         String text = node.getNodeValue();
@@ -567,6 +607,10 @@ public class XmlPrettyPrinter {
         }
     }
 
+    /**
+     * @param depth element depth
+     * @param node  the node to print the open tag for
+     */
     private void printComment(int depth, @NonNull Node node) {
         String comment = node.getNodeValue();
         boolean multiLine = comment.indexOf('\n') != -1;
@@ -847,6 +891,9 @@ public class XmlPrettyPrinter {
         }
     }
 
+    /**
+     * @return true if the element has a namespace prefix and the prefix is the XMLNS namespace
+     */
     private boolean endsWithLineSeparator() {
         int separatorLength = mLineSeparator.length();
         if (mOut.length() >= separatorLength) {
@@ -860,6 +907,9 @@ public class XmlPrettyPrinter {
         return true;
     }
 
+    /**
+     * Removes the last line separator from the output buffer.
+     */
     private void removeLastLineSeparator() {
         int newLength = mOut.length() - mLineSeparator.length();
         if (newLength >= 0) {
@@ -867,6 +917,10 @@ public class XmlPrettyPrinter {
         }
     }
 
+    /**
+     * @param depth the depth to search
+     * @param node  the node to open
+     */
     private void printOpenElementTag(int depth, Node node) {
         Element element = (Element) node;
         if (newlineBeforeElementOpen(element, depth)) {
@@ -949,6 +1003,10 @@ public class XmlPrettyPrinter {
         }
     }
 
+    /**
+     * @param depth the depth to search
+     * @param node  the node to close
+     */
     private void printCloseElementTag(int depth, Node node) {
         Element element = (Element) node;
         if (isEmptyTag(element)) {
@@ -974,6 +1032,14 @@ public class XmlPrettyPrinter {
         }
     }
 
+
+    /**
+     * Determines if a newline should be inserted before opening an element
+     *
+     * @param element the XML element to check
+     * @param depth   the nesting depth of the element in the XML tree
+     * @return true if the element should be separated from the previous element by a newline
+     */
     private boolean newlineBeforeElementOpen(Element element, int depth) {
         if (hasBlankLineAbove()) {
             return false;
@@ -1043,6 +1109,11 @@ public class XmlPrettyPrinter {
         return false;
     }
 
+    /**
+     * @param element the XML element to check
+     * @param depth   the nesting depth of the element in the XML tree
+     * @return true if the element should be separated from the previous element by a newline
+     */
     private boolean indentBeforeElementOpen(Element element, int depth) {
         if (isMarkupElement(element)) {
             return false;
@@ -1052,6 +1123,11 @@ public class XmlPrettyPrinter {
                 || !keepElementAsSingleLine(depth - 1, (Element) element.getParentNode());
     }
 
+    /**
+     * @param element the XML element to check
+     * @param depth   the nesting depth of the element in the XML tree
+     * @return true if the element should be separated from the previous element by a newline
+     */
     private boolean indentBeforeElementClose(Element element, int depth) {
         if (isMarkupElement(element)) {
             return false;
@@ -1062,6 +1138,12 @@ public class XmlPrettyPrinter {
         return lastOutChar == lastDelimiterChar;
     }
 
+    /**
+     * @param element  the XML element to check
+     * @param depth    the nesting depth of the element in the XML tree
+     * @param isClosed whether the element is closed (i.e. has no children)
+     * @return true if the element should be separated from the previous element by a newline
+     */
     private boolean newlineAfterElementOpen(Element element, int depth, boolean isClosed) {
         if (hasBlankLineAbove()) {
             return false;
@@ -1076,6 +1158,11 @@ public class XmlPrettyPrinter {
         return isClosed || !keepElementAsSingleLine(depth, element);
     }
 
+    /**
+     * @param element if the element should be kept as a single line
+     * @param depth   the nesting depth of the element in the XML tree
+     * @return true if the element should be separated from the previous element by a newline
+     */
     private boolean newlineBeforeElementClose(Element element, int depth) {
         if (hasBlankLineAbove()) {
             return false;
@@ -1088,6 +1175,9 @@ public class XmlPrettyPrinter {
         return depth == 0 && !mPrefs.removeEmptyLines;
     }
 
+    /**
+     * @return true if the last line in the output buffer is blank
+     */
     private boolean hasBlankLineAbove() {
         if (mOut.length() < 2 * mLineSeparator.length()) {
             return false;
@@ -1097,6 +1187,11 @@ public class XmlPrettyPrinter {
                 SdkUtils.endsWith(mOut, mOut.length() - mLineSeparator.length(), mLineSeparator);
     }
 
+    /**
+     * @param element the XML element to check
+     * @param depth   the nesting depth of the element in the XML tree
+     * @return true if the element should be separated from the previous element by a newline
+     */
     private boolean newlineAfterElementClose(Element element, int depth) {
         if (hasBlankLineAbove()) {
             return false;
@@ -1110,6 +1205,10 @@ public class XmlPrettyPrinter {
                 && !keepElementAsSingleLine(depth - 1, (Element) element.getParentNode());
     }
 
+    /**
+     * @param element the element to check
+     * @return true if the element is a markup element (i.e. has no children)
+     */
     private boolean isMarkupElement(Element element) {
         // The documentation suggests that the allowed tags are <u>, <b> and <i>:
         //   developer.android.com/guide/topics/resources/string-resource.html#FormattingAndStyling
@@ -1149,6 +1248,11 @@ public class XmlPrettyPrinter {
                 || tag.equals(TAG_COLOR);
     }
 
+    /**
+     * @param depth   the nesting depth of the element in the XML tree
+     * @param element the element to check
+     * @return true if the element should be kept as a single line
+     */
     private boolean keepElementAsSingleLine(int depth, Element element) {
         if (depth == 0) {
             return false;
@@ -1159,6 +1263,9 @@ public class XmlPrettyPrinter {
                 && !XmlUtils.hasElementChildren(element));
     }
 
+    /**
+     * @param depth the nesting depth of the element in the XML tree
+     */
     private void indent(int depth) {
         int i = 0;
 

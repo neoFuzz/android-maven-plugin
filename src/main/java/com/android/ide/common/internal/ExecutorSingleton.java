@@ -25,17 +25,31 @@ import java.util.concurrent.Executors;
  * Singleton executor service.
  */
 public class ExecutorSingleton {
+    /**
+     * The singleton executor service.
+     */
+    private static ExecutorService sExecutorService = create();
+
+    /**
+     * Private constructor to prevent instantiation.
+     */
     private ExecutorSingleton() {
         // no instance
     }
 
-    private static ExecutorService sExecutorService = create();
-
+    /**
+     * @return the singleton executor service
+     */
     public static synchronized ExecutorService getExecutor() {
         checkExecutor();
         return sExecutorService;
     }
 
+    /**
+     * Shutdown the executor service.
+     * <p>
+     * This method should only be called when the application is shutting down.
+     */
     public static synchronized void shutdown() {
         if (sExecutorService != null) {
             sExecutorService.shutdown();
@@ -43,17 +57,28 @@ public class ExecutorSingleton {
         }
     }
 
+    /**
+     * Restarts the executor service.
+     * <p>
+     * This is useful for example when the user changes the preferences.
+     */
     public static synchronized void restart() {
         shutdown();
         sExecutorService = create();
     }
 
+    /**
+     * Checks that the executor service is started, and throws an exception if not.
+     */
     private static void checkExecutor() {
         if (sExecutorService == null) {
             throw new RuntimeException("Executor Singleton not started");
         }
     }
 
+    /**
+     * @return a new ExecutorService
+     */
     @NonNull
     private static ExecutorService create() {
         return Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());

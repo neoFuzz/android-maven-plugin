@@ -36,8 +36,19 @@ import java.util.Properties;
  */
 public class LocalSamplePkgInfo extends LocalPkgInfo {
 
+    /**
+     * The package descriptor for this sample package
+     */
     private final @NonNull IPkgDesc mDesc;
 
+    /**
+     * @param localSdk    The {@link LocalSdk} this package belongs to
+     * @param localDir    The filesystem location
+     * @param sourceProps The source properties for this package
+     * @param version     The version of the sample package
+     * @param revision    The major revision of this sample package
+     * @param minToolsRev The minimal revision of the tools required by this sample package
+     */
     public LocalSamplePkgInfo(@NonNull LocalSdk localSdk,
                               @NonNull File localDir,
                               @NonNull Properties sourceProps,
@@ -48,12 +59,18 @@ public class LocalSamplePkgInfo extends LocalPkgInfo {
         mDesc = PkgDesc.Builder.newSample(version, revision, minToolsRev).create();
     }
 
+    /**
+     * @return The package descriptor for this sample package
+     */
     @NonNull
     @Override
     public IPkgDesc getDesc() {
         return mDesc;
     }
 
+    /**
+     * @return The package object for this local package
+     */
     @Nullable
     @Override
     public Package getPackage() {

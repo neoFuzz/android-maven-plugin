@@ -497,4 +497,10 @@ public abstract class AbstractInstrumentationMojo extends AbstractAndroidMojo {
 
     }
 
+    /**
+     * @return the parsed classes
+     */
+    protected List<String> getParsedClasses() {
+        return parsedClasses;
+    }
 }

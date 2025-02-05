@@ -26,14 +26,24 @@ import java.util.List;
  * Source Searcher processor, gathering a list of all the files found by the SourceSearcher.
  */
 public class FileGatherer implements SourceSearcher.SourceFileProcessor {
+    /**
+     * List of files found by the SourceSearcher.
+     */
     @NonNull
     private final List<File> mFiles = Lists.newArrayList();
 
+    /**
+     * @param sourceFolder the root folder where the file is located.
+     * @param sourceFile   the file to process.
+     */
     @Override
     public void processFile(@NonNull File sourceFolder, @NonNull File sourceFile) {
         mFiles.add(sourceFile);
     }
 
+    /**
+     * @return the list of files found by the SourceSearcher.
+     */
     @NonNull
     public List<File> getFiles() {
         return mFiles;

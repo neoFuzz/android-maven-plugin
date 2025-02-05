@@ -24,18 +24,31 @@ import com.android.resources.UiMode;
  */
 public final class UiModeQualifier extends EnumBasedResourceQualifier {
 
+    /**
+     * String for name
+     */
     public static final String NAME = "UI Mode";
 
     private UiMode mValue;
 
+    /**
+     * Default constructor
+     * value will be {@link UiMode#NORMAL}
+     */
     public UiModeQualifier() {
         // pass
     }
 
+    /**
+     * @param value the UI mode value
+     */
     public UiModeQualifier(UiMode value) {
         mValue = value;
     }
 
+    /**
+     * @return the UI mode value
+     */
     public UiMode getValue() {
         return mValue;
     }

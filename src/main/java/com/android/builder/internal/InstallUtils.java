@@ -22,7 +22,13 @@ import com.android.builder.testing.api.DeviceConnector;
 import com.android.sdklib.SdkVersionInfo;
 import com.android.utils.ILogger;
 
+/**
+ * Utilities for installers
+ */
 public class InstallUtils {
+    /**
+     * Private constructor to prevent instantiation of this utility class.
+     */
     private InstallUtils() {
         // hidden constructor
     }

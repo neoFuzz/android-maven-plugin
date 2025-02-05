@@ -20,5 +20,16 @@ package com.android.ide.common.sdk;
  * Enum for loading status of various SDK parts.
  */
 public enum LoadStatus {
-    LOADING, LOADED, FAILED
+    /**
+     * Loading not finished.
+     */
+    LOADING,
+    /**
+     * Load completed successfully.
+     */
+    LOADED,
+    /**
+     * Load failed.
+     */
+    FAILED
 }

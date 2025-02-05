@@ -28,12 +28,16 @@ public interface ProcessInfo {
 
     /**
      * The executable to run.
+     *
+     * @return the executable to run
      */
     @NonNull
     String getExecutable();
 
     /**
      * The command line arguments.
+     *
+     * @return the command line arguments
      */
     @NonNull
     List<String> getArgs();
@@ -42,6 +46,8 @@ public interface ProcessInfo {
      * The environment variables to set when running the process.
      * <p>
      * The objects in the map are used through their <code>toString()</code> representation.
+     *
+     * @return the environment variables to set when running the process
      */
     @NonNull
     Map<String, Object> getEnvironment();

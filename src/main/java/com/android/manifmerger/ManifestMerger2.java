@@ -351,6 +351,7 @@ public class ManifestMerger2 {
      *
      * @param mainManifestFile application main manifest file.
      * @param logger           the logger interface to use.
+     * @param mergeType        the merge type to use.
      * @return an {@link com.android.manifmerger.ManifestMerger2.Invoker} instance that will allow
      * further customization and trigger the merging tool.
      */
@@ -588,6 +589,9 @@ public class ManifestMerger2 {
 
     /**
      * Returns whether the given feature is enabled for this merger
+     *
+     * @param feature the feature to check
+     * @return true if the feature is enabled, false otherwise
      */
     public boolean hasFeature(@NonNull Invoker.Feature feature) {
         return mOptionalFeatures.contains(feature);
@@ -686,6 +690,8 @@ public class ManifestMerger2 {
     /**
      * Returns the {@link FileStreamProvider} used by this manifest merger. Use this to read files
      * if you need to access the content of a {@link XmlDocument}.
+     *
+     * @return the file stream provider.
      */
     @SuppressWarnings("unused") // Allow future library usage, if necessary
     @NonNull
@@ -1041,31 +1047,67 @@ public class ManifestMerger2 {
          */
         private static final Pattern FEATURE_NAME_PATTERN =
                 Pattern.compile("[a-zA-Z0-9][a-zA-Z0-9_]*");
+        /**
+         * The main manifest file.
+         */
         protected final File mMainManifestFile;
+        /**
+         * System properties to inject into the merged manifest.
+         */
         protected final ImmutableMap.Builder<ManifestSystemProperty, Object> mSystemProperties =
                 new ImmutableMap.Builder<>();
+        /**
+         * The logger the object uses.
+         */
         @NonNull
         protected final ILogger mLogger;
+        /**
+         * The placeholder values to use for substitution.
+         */
         @NonNull
         protected final ImmutableMap.Builder<String, Object> mPlaceholders =
                 new ImmutableMap.Builder<>();
+        /**
+         * The list of library files to merge.
+         */
         @NonNull
         private final ImmutableList.Builder<Pair<String, File>> mLibraryFilesBuilder =
                 new ImmutableList.Builder<>();
+        /**
+         * The list of build types and flavors files to merge.
+         */
         @NonNull
         private final ImmutableList.Builder<File> mFlavorsAndBuildTypeFiles =
                 new ImmutableList.Builder<>();
+        /**
+         * The list of features to add.
+         */
         @NonNull
         private final ImmutableList.Builder<Feature> mFeaturesBuilder =
                 new ImmutableList.Builder<>();
+        /**
+         * The merge type to use.
+         */
         @NonNull
         private final MergeType mMergeType;
+        /**
+         * The document type to use.
+         */
         @NonNull
         private XmlDocument.Type mDocumentType;
+        /**
+         * The report file to write the merging report into.
+         */
         @Nullable
         private File mReportFile;
+        /**
+         * The file stream provider to use to read files.
+         */
         @Nullable
         private FileStreamProvider mFileStreamProvider;
+        /**
+         * The feature name to use.
+         */
         @NonNull
         private String mFeatureName;
 
@@ -1074,6 +1116,8 @@ public class ManifestMerger2 {
          *
          * @param mainManifestFile application main manifest file.
          * @param logger           the logger interface to use.
+         * @param mergeType        the merge type to use.
+         * @param documentType     the document type to use.
          */
         private Invoker(
                 @NonNull File mainManifestFile,
@@ -1085,6 +1129,23 @@ public class ManifestMerger2 {
             this.mMergeType = mergeType;
             this.mDocumentType = documentType;
             this.mFeatureName = "";
+        }
+
+        /**
+         * Creates a new builder with the mandatory main manifest file.
+         *
+         * @param mainManifestFile application main manifest file.
+         * @param logger           the logger interface to use.
+         * @param mergeType        the merge type to use.
+         * @param documentType     the document type to use.
+         * @return a new builder with the mandatory main manifest file.
+         */
+        @NonNull
+        public static Invoker forManifest(@NonNull File mainManifestFile,
+                                          @NonNull ILogger logger,
+                                          @NonNull MergeType mergeType,
+                                          @NonNull XmlDocument.Type documentType) {
+            return new Invoker(mainManifestFile, logger, mergeType, documentType);
         }
 
         /**
@@ -1103,6 +1164,7 @@ public class ManifestMerger2 {
         /**
          * Adds placeholders names and associated values for substitution.
          *
+         * @param keyValuePairs the placeholders names and values to add.
          * @return itself.
          */
         @NonNull
@@ -1114,6 +1176,8 @@ public class ManifestMerger2 {
         /**
          * Adds a new placeholder name and value for substitution.
          *
+         * @param placeHolderName the placeholder name
+         * @param value           the value to substitute
          * @return itself.
          */
         @NonNull
@@ -1291,6 +1355,7 @@ public class ManifestMerger2 {
          * process will assume a master manifest merge. The master manifest needs to have a package
          * and some other mandatory fields like "uses-sdk", etc.
          *
+         * @param type the type of the document to merge.
          * @return itself.
          */
         @NonNull
@@ -1455,10 +1520,17 @@ public class ManifestMerger2 {
 
         private final ImmutableMap<T, Object> keyValues;
 
+        /**
+         * @param keyValues the map of key value pairs to use.
+         */
         public MapBasedKeyBasedValueResolver(@NonNull Map<T, Object> keyValues) {
             this.keyValues = ImmutableMap.copyOf(keyValues);
         }
 
+        /**
+         * @param key the placeholder key
+         * @return the value for the passed key or null if not found.
+         */
         @Nullable
         @Override
         public String getValue(@NonNull T key) {
@@ -1467,6 +1539,9 @@ public class ManifestMerger2 {
         }
     }
 
+    /**
+     * Helper class for Manifest Info.
+     */
     private static class ManifestInfo {
 
         private final String mName;
@@ -1502,6 +1577,9 @@ public class ManifestMerger2 {
         }
     }
 
+    /**
+     * Helper class for loaded manifest info.
+     */
     private static class LoadedManifestInfo extends ManifestInfo {
 
         @NonNull
@@ -1537,18 +1615,32 @@ public class ManifestMerger2 {
      */
     static class SelectorResolver implements KeyResolver<String> {
 
+        /**
+         * Map of all the selectors to resolve.
+         */
         private final Map<String, String> mSelectors = new HashMap<>();
 
+        /**
+         * @param key   the key to add
+         * @param value the value to add
+         */
         protected void addSelector(String key, String value) {
             mSelectors.put(key, value);
         }
 
+        /**
+         * @param key key to resolve.
+         * @return the resolved value or null if not found.
+         */
         @Nullable
         @Override
         public String resolve(String key) {
             return mSelectors.get(key);
         }
 
+        /**
+         * @return all the keys known by this resolver.
+         */
         @NonNull
         @Override
         public Iterable<String> getKeys() {
@@ -1556,9 +1648,14 @@ public class ManifestMerger2 {
         }
     }
 
-    // a wrapper exception to all sorts of failure exceptions that can be thrown during merging.
+    /**
+     * a wrapper exception to all sorts of failure exceptions that can be thrown during merging.
+     */
     public static class MergeFailureException extends Exception {
 
+        /**
+         * @param cause the cause of the failure.
+         */
         protected MergeFailureException(Exception cause) {
             super(cause);
         }

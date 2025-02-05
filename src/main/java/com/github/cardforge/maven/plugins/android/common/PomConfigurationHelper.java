@@ -15,10 +15,19 @@ import org.codehaus.plexus.configuration.xml.XmlPlexusConfiguration;
  * @author Manfred Moser
  */
 public final class PomConfigurationHelper {
+    /**
+     * Private constructor to prevent instantiation of this utility class.
+     */
     private PomConfigurationHelper() {
         // private constructor
     }
 
+    /**
+     * @param project      the maven project
+     * @param parameter    the name of the parameter to retrieve
+     * @param defaultValue the default value to return if the parameter is not found
+     * @return the value of the parameter, or the default value if the parameter is not found
+     */
     public static String getPluginConfigParameter(@NonNull MavenProject project, String parameter, String defaultValue) {
         String value = null;
         for (Plugin plugin : project.getBuild().getPlugins()) {
@@ -36,11 +45,21 @@ public final class PomConfigurationHelper {
         return (StringUtils.isEmpty(value)) ? defaultValue : value;
     }
 
+    /**
+     * @param project      the maven project
+     * @param parameter    the name of the parameter to retrieve
+     * @param defaultValue the default value to return if the parameter is not found
+     * @return the value of the parameter, or the default value if the parameter is not found
+     */
     public static boolean getPluginConfigParameter(MavenProject project, String parameter, boolean defaultValue) {
         String value = getPluginConfigParameter(project, parameter, Boolean.toString(defaultValue));
         return Boolean.parseBoolean(value);
     }
 
+    /**
+     * @param plugin the plugin to retrieve the configuration from
+     * @return the configuration of the plugin, or null if it cannot be retrieved
+     */
     private static PlexusConfiguration getMojoConfiguration(@NonNull Plugin plugin) {
         PlexusConfiguration configuration = null;
         // Try to retrieve the configuration from the plugin

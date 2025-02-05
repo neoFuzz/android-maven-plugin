@@ -41,22 +41,55 @@ import java.util.Map;
 @Immutable
 public class MergingReport {
 
+    /**
+     * the merged documents, keyed by their state.
+     */
     @NonNull
     private final Map<MergedManifestKind, String> mergedDocuments;
+    /**
+     * the merged xml documents, keyed by their state.
+     */
     @NonNull
     private final Map<MergedManifestKind, XmlDocument> mergedXmlDocuments;
+    /**
+     * the result of the merging process.
+     */
     @NonNull
     private final Result result;
-    // list of logging events, ordered by their recording time.
+    /**
+     * list of logging events, ordered by their recording time.
+     */
     @NonNull
     private final ImmutableList<Record> records;
+    /**
+     * the list of intermediary stages if
+     * {@link com.android.manifmerger.ManifestMerger2.Invoker.Feature#KEEP_INTERMEDIARY_STAGES}
+     * is set.
+     */
     @NonNull
     private final ImmutableList<String> intermediaryStages;
+    /**
+     * the actions that were performed during the merging process.
+     */
     @NonNull
     private final Actions actions;
+    /**
+     * the package name of the merged manifest.
+     */
     @NonNull
     private final String packageName;
 
+    /**
+     * @param mergedDocuments    the merged documents, keyed by their state.
+     * @param mergedXmlDocuments the merged xml documents, keyed by their state.
+     * @param result             the result of the merging process.
+     * @param records            the list of logging events, ordered by their recording time.
+     * @param intermediaryStages the list of intermediary stages if
+     *                           {@link com.android.manifmerger.ManifestMerger2.Invoker.Feature#KEEP_INTERMEDIARY_STAGES}
+     *                           is set.
+     * @param actions            the actions that were performed during the merging process.
+     * @param packageName        the package name of the merged manifest.
+     */
     private MergingReport(@NonNull Map<MergedManifestKind, String> mergedDocuments,
                           @NonNull Map<MergedManifestKind, XmlDocument> mergedXmlDocuments,
                           @NonNull Result result,
@@ -75,6 +108,8 @@ public class MergingReport {
 
     /**
      * dumps all logging records to a logger.
+     *
+     * @param logger the logger to dump the records to.
      */
     public void log(@NonNull ILogger logger) {
         for (Record rec : records) {
@@ -99,11 +134,19 @@ public class MergingReport {
         }
     }
 
+    /**
+     * @param state the state of the merged document
+     * @return the merged document, or null if not found
+     */
     @Nullable
     public String getMergedDocument(@NonNull MergedManifestKind state) {
         return mergedDocuments.get(state);
     }
 
+    /**
+     * @param state the state of the merged document
+     * @return the merged document, or null if not found
+     */
     @Nullable
     public XmlDocument getMergedXmlDocument(@NonNull MergedManifestKind state) {
         return mergedXmlDocuments.get(state);
@@ -113,27 +156,41 @@ public class MergingReport {
      * Returns all the merging intermediary stages if
      * {@link com.android.manifmerger.ManifestMerger2.Invoker.Feature#KEEP_INTERMEDIARY_STAGES}
      * is set.
+     *
+     * @return the list of intermediary stages
      */
     @NonNull
     public ImmutableList<String> getIntermediaryStages() {
         return intermediaryStages;
     }
 
+    /**
+     * @return the result of the merging process.
+     */
     @NonNull
     public Result getResult() {
         return result;
     }
 
+    /**
+     * @return the logging records, ordered by their recording time.
+     */
     @NonNull
     public ImmutableList<Record> getLoggingRecords() {
         return records;
     }
 
+    /**
+     * @return the actions that were performed during the merging process.
+     */
     @NonNull
     public Actions getActions() {
         return actions;
     }
 
+    /**
+     * @return a string describing the result of the merging process.
+     */
     @NonNull
     public String getReportString() {
         return switch (result) {
@@ -148,11 +205,17 @@ public class MergingReport {
         };
     }
 
+    /**
+     * @return the package name of the merged manifest.
+     */
     @NonNull
     public String getPackageName() {
         return packageName;
     }
 
+    /**
+     * Enum representing the different states of a merged manifest.
+     */
     public enum MergedManifestKind {
         /**
          * Merged manifest file
@@ -179,20 +242,36 @@ public class MergingReport {
      * Overall result of the merging process.
      */
     public enum Result {
+        /**
+         * Merging completed successfully.
+         */
         SUCCESS,
-
+        /**
+         * Merging completed with warnings.
+         */
         WARNING,
-
+        /**
+         * Merging completed with errors.
+         */
         ERROR;
 
+        /**
+         * @return true if the merging completed successfully, false otherwise.
+         */
         public boolean isSuccess() {
             return this == SUCCESS || this == WARNING;
         }
 
+        /**
+         * @return true if the merging completed with warnings, false otherwise.
+         */
         public boolean isWarning() {
             return this == WARNING;
         }
 
+        /**
+         * @return true if the merging completed with errors, false otherwise.
+         */
         public boolean isError() {
             return this == ERROR;
         }
@@ -203,15 +282,27 @@ public class MergingReport {
      * what might have gone wrong.
      */
     public static class Record {
-
-
+        /**
+         * the severity of the problem.
+         */
         @NonNull
         private final Severity mSeverity;
+        /**
+         * the log message.
+         */
         @NonNull
         private final String mLog;
+        /**
+         * the location of the log in the source file.
+         */
         @NonNull
         private final SourceFilePosition mSourceLocation;
 
+        /**
+         * @param sourceLocation the location of the log in the source file.
+         * @param severity       the severity of the problem
+         * @param mLog           the log message
+         */
         private Record(
                 @NonNull SourceFilePosition sourceLocation,
                 @NonNull Severity severity,
@@ -221,16 +312,25 @@ public class MergingReport {
             this.mLog = mLog;
         }
 
+        /**
+         * @return the severity of the log message.
+         */
         @NonNull
         public Severity getSeverity() {
             return mSeverity;
         }
 
+        /**
+         * @return the message from the log.
+         */
         @NonNull
         public String getMessage() {
             return mLog;
         }
 
+        /**
+         * @return the location of the log in the source file.
+         */
         @NonNull
         public SourceFilePosition getSourceLocation() {
             return mSourceLocation;
@@ -246,7 +346,23 @@ public class MergingReport {
                     + mLog;
         }
 
-        public enum Severity {WARNING, ERROR, INFO}
+        /**
+         * Severity of the log message.
+         */
+        public enum Severity {
+            /**
+             * Warning message, merging can continue.
+             */
+            WARNING,
+            /**
+             * Error message, merging cannot continue.
+             */
+            ERROR,
+            /**
+             * Informational message, not an error or warning.
+             */
+            INFO
+        }
     }
 
     /**
@@ -258,44 +374,101 @@ public class MergingReport {
      */
     public static class Builder {
 
+        /**
+         * Logger to use to log messages.
+         */
         @NonNull
         private final ILogger mLogger;
+        /**
+         * Manifest merger, used to retrieve the merged manifest package name.
+         */
         @Nullable
         private final ManifestMerger2 mManifestMerger;
+        /**
+         * Merged documents, keyed by their state.
+         */
         private final Map<MergedManifestKind, String> mergedDocuments =
                 new EnumMap<>(MergedManifestKind.class);
+        /**
+         * Merged xml documents, keyed by their state.
+         */
         private final Map<MergedManifestKind, XmlDocument> mergedXmlDocuments =
                 new EnumMap<>(MergedManifestKind.class);
+        /**
+         * Record builder instance
+         */
         @NonNull
         private final ImmutableList.Builder<Record> mRecordBuilder = new ImmutableList.Builder<>();
+        /**
+         * List of intermediary stages if
+         * {@link com.android.manifmerger.ManifestMerger2.Invoker.Feature#KEEP_INTERMEDIARY_STAGES}
+         * is set.
+         */
         @NonNull
         private final ImmutableList.Builder<String> mIntermediaryStages = new ImmutableList.Builder<>();
+        /**
+         * Action recorder instance
+         */
         @NonNull
         private final ActionRecorder mActionRecorder = new ActionRecorder();
+        /**
+         * Overall result of the merging process.
+         */
         private boolean mHasWarnings = false;
+        /**
+         * Overall result of the merging process.
+         */
         private boolean mHasErrors = false;
+        /**
+         * Package name of the merged manifest.
+         */
         private String packageName;
 
+        /**
+         * @param logger the logger to use to log messages.
+         */
         @VisibleForTesting
         Builder(@NonNull ILogger logger) {
             this(logger, null);
         }
 
+        /**
+         * @param logger         the logger to use to log messages.
+         * @param manifestMerger the manifest merger, used to retrieve the merged manifest package name.
+         */
         Builder(@NonNull ILogger logger, @Nullable ManifestMerger2 manifestMerger) {
             mLogger = logger;
             mManifestMerger = manifestMerger;
         }
 
+        /**
+         * @param mergedManifestKind the state of the merged document
+         * @param mergedDocument     the merged document
+         * @return the builder itself.
+         */
         Builder setMergedDocument(@NonNull MergedManifestKind mergedManifestKind, @NonNull String mergedDocument) {
             this.mergedDocuments.put(mergedManifestKind, mergedDocument);
             return this;
         }
 
+        /**
+         * @param mergedManifestKind the state of the merged document
+         * @param mergedDocument     the merged document
+         * @return the builder itself.
+         */
         Builder setMergedXmlDocument(@NonNull MergedManifestKind mergedManifestKind, @NonNull XmlDocument mergedDocument) {
             this.mergedXmlDocuments.put(mergedManifestKind, mergedDocument);
             return this;
         }
 
+        /**
+         * @param sourceFile the location of the log in the source file.
+         * @param line       the line number of the log in the source file.
+         * @param column     the column number of the log in the source file.
+         * @param severity   the severity of the problem
+         * @param message    the log message
+         * @return the builder itself.
+         */
         @NonNull
         @VisibleForTesting
         Builder addMessage(@NonNull SourceFile sourceFile,
@@ -310,6 +483,12 @@ public class MergingReport {
                     message);
         }
 
+        /**
+         * @param sourceFile the location of the log in the source file.
+         * @param severity   the severity of the problem
+         * @param message    the log message
+         * @return the builder itself.
+         */
         @NonNull
         Builder addMessage(@NonNull SourceFile sourceFile,
                            @NonNull Record.Severity severity,
@@ -320,6 +499,12 @@ public class MergingReport {
                     message);
         }
 
+        /**
+         * @param sourceFilePosition the location of the log in the source file.
+         * @param severity           the severity of the problem
+         * @param message            the log message
+         * @return the builder itself.
+         */
         @NonNull
         Builder addMessage(@NonNull SourceFilePosition sourceFilePosition,
                            @NonNull Record.Severity severity,
@@ -334,6 +519,10 @@ public class MergingReport {
             return this;
         }
 
+        /**
+         * @param xml the intermediary stage of the merging process.
+         * @return the builder itself.
+         */
         @NonNull
         Builder addMergingStage(@NonNull String xml) {
             mIntermediaryStages.add(xml);
@@ -342,16 +531,24 @@ public class MergingReport {
 
         /**
          * Returns true if some fatal errors were reported.
+         *
+         * @return true if some fatal errors were reported.
          */
         boolean hasErrors() {
             return mHasErrors;
         }
 
+        /**
+         * @return the action recorder used to record actions performed during the merging process.
+         */
         @NonNull
         ActionRecorder getActionRecorder() {
             return mActionRecorder;
         }
 
+        /**
+         * @return an immutable version of the merging report.
+         */
         @NonNull
         MergingReport build() {
             Result result = mHasErrors
@@ -370,21 +567,37 @@ public class MergingReport {
                     packageName);
         }
 
+        /**
+         * @return the manifest merger used to create the merged manifest document
+         */
         @Nullable
         public ManifestMerger2 getManifestMerger() {
             return mManifestMerger;
         }
 
+        /**
+         * @return the logger used to log messages
+         */
         @NonNull
         public ILogger getLogger() {
             return mLogger;
         }
 
+        /**
+         * @param document the merged manifest document
+         * @return the blame log for the merged manifest
+         * @throws ParserConfigurationException if a DocumentBuilder cannot be created which satisfies the configuration requested.
+         * @throws SAXException                 if any parse errors occur.
+         * @throws IOException                  if an I/O error occurs.
+         */
         public String blame(XmlDocument document)
                 throws ParserConfigurationException, SAXException, IOException {
             return mActionRecorder.build().blame(document);
         }
 
+        /**
+         * @param finalPackageName the final package name of the merged manifest.
+         */
         public void setFinalPackageName(String finalPackageName) {
             this.packageName = finalPackageName;
         }

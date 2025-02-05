@@ -179,8 +179,8 @@ public class GenerateSourcesMojo extends AbstractAndroidMojo {
                 checkForApklibDependencies();
             }
 
-            // TODO Do we really want to continue supporting APKSOURCES? How long has it been deprecated
-            extractSourceDependencies();
+            // TODO: Do we really want to continue supporting APKSOURCES? How long has it been deprecated
+            //extractSourceDependencies();
 
             // Extract the apklib and aar dependencies into unpacked-libs so that they can be referenced in the build.
             extractLibraryDependencies();
@@ -641,8 +641,8 @@ public class GenerateSourcesMojo extends AbstractAndroidMojo {
         }
 
         Map<String, Set<Artifact>> packageCompareMap = new HashMap<>();
-
         Set<Artifact> artifactSet = new HashSet<>();
+
         artifactSet.add(project.getArtifact());
         packageCompareMap.put(getAndroidManifestPackageName(), artifactSet);
 
@@ -698,7 +698,7 @@ public class GenerateSourcesMojo extends AbstractAndroidMojo {
 
         getLog().debug(getAndroidSdk().getAaptPath() + " " + commandBuilder.toString());
         try {
-            final CommandExecutor executor = CommandExecutor.Factory.createDefaultCommmandExecutor();
+            final CommandExecutor executor = CommandExecutor.Factory.createDefaultCommandExecutor();
             executor.setLogger(getLog());
             executor.setCaptureStdOut(true);
             final List<String> commands = commandBuilder.build();
@@ -836,7 +836,7 @@ public class GenerateSourcesMojo extends AbstractAndroidMojo {
         final File apkLibAssetsDir = getUnpackedLibAssetsFolder(apklibArtifact);
         copyFolder(apkLibAssetsDir, apklibCombAssets);
 
-        final CommandExecutor executor = CommandExecutor.Factory.createDefaultCommmandExecutor();
+        final CommandExecutor executor = CommandExecutor.Factory.createDefaultCommandExecutor();
         executor.setLogger(getLog());
 
         final AaptCommandBuilder commandBuilder = AaptCommandBuilder
@@ -1035,7 +1035,7 @@ public class GenerateSourcesMojo extends AbstractAndroidMojo {
                 commands.add(aidlFileInSourceDirectory.getAbsolutePath());
                 commands.add(new File(targetDirectory, shortJavaFileName).getAbsolutePath());
                 try {
-                    CommandExecutor executor = CommandExecutor.Factory.createDefaultCommmandExecutor();
+                    CommandExecutor executor = CommandExecutor.Factory.createDefaultCommandExecutor();
                     executor.setLogger(this.getLog());
                     executor.setCaptureStdOut(true);
                     executor.executeCommand(getAndroidSdk().getAidlPath(), commands, project.getBasedir(),

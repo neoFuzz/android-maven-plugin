@@ -55,6 +55,9 @@ public class XmlFormatPreferences {
      */
     protected int mTabWidth = -1; // -1: uninitialized
 
+    /**
+     * Private constructor to prevent instantiation
+     */
     @VisibleForTesting
     protected XmlFormatPreferences() {
     }
@@ -70,13 +73,16 @@ public class XmlFormatPreferences {
     }
 
     /**
-     * Returns the comparator to use when formatting, or null for no sorting
+     * @return the comparator to use when formatting, or null for no sorting
      */
     @Nullable
     public Comparator<Attr> getAttributeComparator() {
         return sortAttributes.getAttributeComparator();
     }
 
+    /**
+     * @return the string to insert for each indentation level
+     */
     public String getOneIndentUnit() {
         return mOneIndentUnit;
     }

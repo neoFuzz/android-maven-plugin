@@ -91,6 +91,8 @@ public class PostValidator {
      * necessary. It is possible that the original manifest file did not contain any attribute
      * declaration, therefore not requiring a xmlns: declaration. Yet the implicit elements handling
      * may have added attributes requiring the namespace declaration.
+     *
+     * @param xmlDocument the merged document to check.
      */
     protected static void enforceToolsNamespaceDeclaration(@NonNull XmlDocument xmlDocument) {
         XmlElement manifest = xmlDocument.getRootNode();

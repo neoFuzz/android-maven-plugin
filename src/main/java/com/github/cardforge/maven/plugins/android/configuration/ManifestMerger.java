@@ -58,34 +58,58 @@ public class ManifestMerger {
      */
     protected File mergeReportFile;
 
+    /**
+     * @return the versionName
+     */
     public String getVersionName() {
         return versionName;
     }
 
+    /**
+     * @return the versionCode
+     */
     public Integer getVersionCode() {
         return versionCode;
     }
 
+    /**
+     * @return the SDK in use
+     */
     public UsesSdk getUsesSdk() {
         return usesSdk;
     }
 
+    /**
+     * @return the versionCodeUpdateFromVersion
+     */
     public Boolean getVersionCodeUpdateFromVersion() {
         return versionCodeUpdateFromVersion;
     }
 
+    /**
+     * @return the versionNamingPattern
+     */
     public String getVersionNamingPattern() {
         return versionNamingPattern;
     }
 
+    /**
+     * @return the versionDigits
+     */
     public String getVersionDigits() {
         return versionDigits;
     }
 
+    /**
+     * @return if the libraries are merged into the manifest
+     */
     public Boolean getMergeLibraries() {
         return mergeLibraries;
     }
 
+    /**
+     * @return the mergeReportFile
+     */
     public File getMergeReportFile() {
         return mergeReportFile;
     }

@@ -43,12 +43,20 @@ public class SymbolWriter {
     private final List<SymbolLoader> mSymbols = Lists.newArrayList();
     private final SymbolLoader mValues;
 
+    /**
+     * @param outFolder   the folder to write the R.java files to
+     * @param packageName the package for the R classes
+     * @param values      the {@link SymbolLoader} for the values
+     */
     public SymbolWriter(String outFolder, String packageName, SymbolLoader values) {
         mOutFolder = outFolder;
         mPackageName = packageName;
         mValues = values;
     }
 
+    /**
+     * @param symbols the {@link SymbolLoader} to add to the list of symbols to be written
+     */
     public void addSymbolsToWrite(SymbolLoader symbols) {
         mSymbols.add(symbols);
     }
@@ -64,6 +72,9 @@ public class SymbolWriter {
         return symbols;
     }
 
+    /**
+     * @throws IOException if there is a problem writing the R.java file
+     */
     public void write() throws IOException {
         Splitter splitter = Splitter.on('.');
         Iterable<String> folders = splitter.split(mPackageName);

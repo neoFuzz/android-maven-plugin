@@ -46,15 +46,19 @@ import java.util.Properties;
 import java.util.regex.Pattern;
 
 /**
- * Represents a extra XML node in an SDK repository.
+ * Represents an extra XML node in an SDK repository.
  *
  * @deprecated com.android.sdklib.internal.repository has moved into Studio as
  * com.android.tools.idea.sdk.remote.internal.
  */
-@Deprecated
+@Deprecated(since = "4.7")
 public class ExtraPackage extends NoPreviewRevisionPackage
         implements IMinApiLevelDependency, IMinToolsDependency {
 
+    /**
+     * Static string for "obsolete"
+     */
+    public static final String OBSOLETE = " (Obsolete)";
     /**
      * Mixin handling the min-tools dependency.
      */
@@ -119,8 +123,8 @@ public class ExtraPackage extends NoPreviewRevisionPackage
         mPath = PackageParserUtils.getXmlString(packageNode, RepoConstants.NODE_PATH);
 
         // Read name-display, vendor-display and vendor-id, introduced in addon-4.xsd.
-        // These are not optional, they are mandatory in addon-4 but we still treat them
-        // as optional so that we can fallback on using <vendor> which was the only one
+        // These are not optional, they are mandatory in addon-4, but we still treat them
+        // as optional so that we can fall back on using <vendor> which was the only one
         // defined in addon-3.xsd.
         String name =
                 PackageParserUtils.getXmlString(packageNode, RepoConstants.NODE_NAME_DISPLAY);
@@ -166,9 +170,25 @@ public class ExtraPackage extends NoPreviewRevisionPackage
     }
 
     /**
-     * Constructor used to create a mock {@link ExtraPackage}.
-     * Most of the attributes here are optional.
-     * When not defined, they will be extracted from the {@code props} properties.
+     * Constructs an {@link ExtraPackage} instance, typically for testing purposes.
+     * <p>
+     * This constructor is used to create a mock {@link ExtraPackage} with optional attributes.
+     * If certain attributes are not explicitly provided, they will be extracted from the
+     * {@code props} properties.
+     * </p>
+     *
+     * @param source        The {@link SdkSource} from which this package originates.
+     * @param props         The {@link Properties} containing package metadata.
+     * @param vendorId      The unique identifier of the vendor, or null to extract from {@code props}.
+     * @param path          The package path, or null to extract from {@code props}.
+     * @param revision      The revision number of the package.
+     * @param license       The license details of the package.
+     * @param description   A textual description of the package.
+     * @param descUrl       The URL for additional package information.
+     * @param archiveOsPath The OS path of the {@link Archive} containing this package.
+     * @see IdDisplay
+     * @see PkgProps
+     * @see LocalExtraPkgInfo
      */
     @VisibleForTesting(visibility = Visibility.PRIVATE)
     protected ExtraPackage(SdkSource source,
@@ -180,22 +200,9 @@ public class ExtraPackage extends NoPreviewRevisionPackage
                            String description,
                            String descUrl,
                            String archiveOsPath) {
-        super(source,
-                props,
-                revision,
-                license,
-                description,
-                descUrl,
-                archiveOsPath);
+        super(source, props, revision, license, description, descUrl, archiveOsPath);
 
-        mMinToolsMixin = new MinToolsMixin(
-                source,
-                props,
-                revision,
-                license,
-                description,
-                descUrl,
-                archiveOsPath);
+        mMinToolsMixin = new MinToolsMixin(source, props, revision, license, description, descUrl, archiveOsPath);
 
         // The path argument comes before whatever could be in the properties
         mPath = path != null ? path : getProperty(props, PkgProps.EXTRA_PATH, path);
@@ -232,7 +239,7 @@ public class ExtraPackage extends NoPreviewRevisionPackage
                 MIN_API_LEVEL_NOT_SPECIFIED);
 
         String projectFiles = getProperty(props, PkgProps.EXTRA_PROJECT_FILES, null);
-        ArrayList<String> filePaths = new ArrayList<String>();
+        ArrayList<String> filePaths = new ArrayList<>();
         if (projectFiles != null && !projectFiles.isEmpty()) {
             for (String filePath : projectFiles.split(Pattern.quote(File.pathSeparator))) {
                 filePath = filePath.trim();
@@ -255,7 +262,19 @@ public class ExtraPackage extends NoPreviewRevisionPackage
      * one archive which URL is the actual target location.
      * <p>
      * By design, this creates a package with one and only one archive.
+     *
+     * @param source        The {@link SdkSource} where this is loaded from.
+     * @param props         The properties to be used for the package.
+     * @param vendor        The vendor id + display name.
+     * @param path          The path attribute of the package.
+     * @param revision      The revision of the package.
+     * @param license       The license of the package.
+     * @param description   A short description for the package. Can be {@code null}
+     * @param descUrl       The optional description URL.
+     * @param archiveOsPath The OS path of the archive.
+     * @return The created {@link ExtraPackage}.
      */
+    @NonNull
     public static Package create(SdkSource source,
                                  Properties props,
                                  String vendor,
@@ -265,13 +284,17 @@ public class ExtraPackage extends NoPreviewRevisionPackage
                                  String description,
                                  String descUrl,
                                  String archiveOsPath) {
-        ExtraPackage ep = new ExtraPackage(source, props, vendor, path, revision, license,
+        return new ExtraPackage(source, props, vendor, path, revision, license,
                 description, descUrl, archiveOsPath);
-        return ep;
     }
 
+    /**
+     * @param projectFilesNode The XML node containing the project files.
+     * @return An array of project file paths. Never null.
+     */
+    @NonNull
     private String[] parseProjectFiles(Node projectFilesNode) {
-        ArrayList<String> paths = new ArrayList<String>();
+        ArrayList<String> paths = new ArrayList<>();
 
         if (projectFilesNode != null) {
             String nsUri = projectFilesNode.getNamespaceURI();
@@ -296,6 +319,9 @@ public class ExtraPackage extends NoPreviewRevisionPackage
         return paths.toArray(new String[paths.size()]);
     }
 
+    /**
+     * @return The package description.
+     */
     @Override
     @NonNull
     public IPkgDescExtra getPkgDesc() {
@@ -305,6 +331,8 @@ public class ExtraPackage extends NoPreviewRevisionPackage
     /**
      * Save the properties of the current packages in the given {@link Properties} object.
      * These properties will later be give the constructor that takes a {@link Properties} object.
+     *
+     * @param props The {@link Properties} object to be filled with the current state.
      */
     @Override
     public void saveProperties(Properties props) {
@@ -339,6 +367,8 @@ public class ExtraPackage extends NoPreviewRevisionPackage
     /**
      * The minimal revision of the tools package required by this extra package, if > 0,
      * or {@link #MIN_TOOLS_REV_NOT_SPECIFIED} if there is no such requirement.
+     *
+     * @return The minimum tools revision required.
      */
     @Override
     public FullRevision getMinToolsRevision() {
@@ -348,6 +378,8 @@ public class ExtraPackage extends NoPreviewRevisionPackage
     /**
      * Returns the minimal API level required by this extra package, if > 0,
      * or {@link #MIN_API_LEVEL_NOT_SPECIFIED} if there is no such requirement.
+     *
+     * @return The minimal API level required by this extra package.
      */
     @Override
     public int getMinApiLevel() {
@@ -364,8 +396,9 @@ public class ExtraPackage extends NoPreviewRevisionPackage
      * Similarly, no guarantee is made on the validity of the paths.
      * Users are expected to apply all usual sanity checks such as removing
      * "./" and "../" and making sure these paths don't reference files outside
-     * of the installed archive.
+     * the installed archive.
      *
+     * @return An array of project file paths. Never null.
      * @since sdk-repository-4.xsd or sdk-addon-2.xsd
      */
     public String[] getProjectFiles() {
@@ -391,6 +424,8 @@ public class ExtraPackage extends NoPreviewRevisionPackage
      * Returns the sanitized path folder name. It is a single-segment path.
      * <p>
      * The package is installed in SDK/extras/vendor_name/path_name.
+     *
+     * @return The sanitized path. Never null.
      */
     public String getPath() {
         // The XSD specifies the XML vendor and path should only contain [a-zA-Z0-9]+
@@ -409,21 +444,32 @@ public class ExtraPackage extends NoPreviewRevisionPackage
 
     /**
      * Returns the vendor id.
+     *
+     * @return the vendor id. Never null.
      */
     public String getVendorId() {
         return mVendor.getId();
     }
 
+    /**
+     * @return the vendor display name. Never null.
+     */
     public String getVendorDisplay() {
         return mVendor.getDisplay();
     }
 
+    /**
+     * @return the display name
+     */
     public String getDisplayName() {
         return mDisplayName;
     }
 
     /**
      * Transforms the legacy vendor name into a usable vendor id.
+     *
+     * @param vendorDisplay The legacy vendor name.
+     * @return A sanitized vendor id. Never null nor empty.
      */
     private String sanitizeLegacyVendor(String vendorDisplay) {
         // The XSD specifies the XML vendor and path should only contain [a-zA-Z0-9]+
@@ -453,6 +499,7 @@ public class ExtraPackage extends NoPreviewRevisionPackage
      * {@inheritDoc}
      */
     @Override
+    @NonNull
     public String installId() {
         return String.format("extra-%1$s-%2$s",     //$NON-NLS-1$
                 getVendorId(),
@@ -465,38 +512,38 @@ public class ExtraPackage extends NoPreviewRevisionPackage
      * {@inheritDoc}
      */
     @Override
+    @NonNull
     public String getListDescription() {
         String ld = getListDisplay();
         if (!ld.isEmpty()) {
-            return String.format("%1$s%2$s", ld, isObsolete() ? " (Obsolete)" : "");
+            return String.format("%1$s%2$s", ld, isObsolete() ? OBSOLETE : "");
         }
 
-        String s = String.format("%1$s%2$s",
-                getDisplayName(),
-                isObsolete() ? " (Obsolete)" : "");  //$NON-NLS-2$
-
-        return s;
+        return String.format("%1$s%2$s", getDisplayName(), isObsolete() ? OBSOLETE : ""); //$NON-NLS-2$
     }
 
     /**
      * Returns a short description for an {@link IDescription}.
+     *
+     * @return A short description for an {@link IDescription}. Never null nor empty.
      */
     @Override
+    @NonNull
     public String getShortDescription() {
         String ld = getListDisplay();
         if (!ld.isEmpty()) {
             return String.format("%1$s, revision %2$s%3$s",
                     ld,
                     getRevision().toShortString(),
-                    isObsolete() ? " (Obsolete)" : "");
+                    isObsolete() ? OBSOLETE : "");
         }
 
-        String s = String.format("%1$s, revision %2$s%3$s",
+        //$NON-NLS-2$
+
+        return String.format("%1$s, revision %2$s%3$s",
                 getDisplayName(),
                 getRevision().toShortString(),
-                isObsolete() ? " (Obsolete)" : "");  //$NON-NLS-2$
-
-        return s;
+                isObsolete() ? OBSOLETE : "");
     }
 
     /**
@@ -504,13 +551,16 @@ public class ExtraPackage extends NoPreviewRevisionPackage
      * <p>
      * The long description is whatever the XML contains for the &lt;description&gt; field,
      * or the short description if the former is empty.
+     *
+     * @return A long description for an {@link IDescription}. Never null nor empty.
      */
     @Override
+    @NonNull
     public String getLongDescription() {
         String s = String.format("%1$s, revision %2$s%3$s\nBy %4$s",
                 getDisplayName(),
                 getRevision().toShortString(),
-                isObsolete() ? " (Obsolete)" : "",  //$NON-NLS-2$
+                isObsolete() ? OBSOLETE : "",  //$NON-NLS-2$
                 getVendorDisplay());
 
         String d = getDescription();
@@ -529,7 +579,7 @@ public class ExtraPackage extends NoPreviewRevisionPackage
 
         File localPath = getLocalArchivePath();
         if (localPath != null) {
-            // For a local archive, also put the install path in the long description.
+            // For a local archive, also put the 'install' path in the long description.
             // This should help users locate the extra on their drive.
             s += String.format("\nLocation: %1$s", localPath.getAbsolutePath());
         } else {
@@ -600,6 +650,10 @@ public class ExtraPackage extends NoPreviewRevisionPackage
         return path;
     }
 
+    /**
+     * @param pkg the package to compare.
+     * @return true if the given package is the same extra as this one, false otherwise.
+     */
     @Override
     public boolean sameItemAs(Package pkg) {
         // Extra packages are similar if they have the same path and vendor
@@ -632,8 +686,10 @@ public class ExtraPackage extends NoPreviewRevisionPackage
     // ---
 
     /**
-     * If this package is installed, returns the install path of the archive if valid.
+     * If this package is installed, returns the {@code install} path of the archive if valid.
      * Returns null if not installed or if the path does not exist.
+     *
+     * @return The local archive path, or null if not installed or if the path does not exist.
      */
     private File getLocalArchivePath() {
         Archive[] archives = getArchives();
@@ -647,6 +703,9 @@ public class ExtraPackage extends NoPreviewRevisionPackage
         return null;
     }
 
+    /**
+     * @return the hashcode
+     */
     @Override
     public int hashCode() {
         final int prime = 31;
@@ -658,6 +717,10 @@ public class ExtraPackage extends NoPreviewRevisionPackage
         return result;
     }
 
+    /**
+     * @param obj the object to compare with
+     * @return true if the two objects are equal, false otherwise
+     */
     @Override
     public boolean equals(Object obj) {
         if (this == obj) {

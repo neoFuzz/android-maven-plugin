@@ -28,6 +28,8 @@ public interface IStyleResourceValue extends IResourceValue {
 
     /**
      * Returns the parent style name or <code>null</code> if unknown.
+     *
+     * @return the parent style name or <code>null</code> if unknown
      */
     String getParentStyle();
 
@@ -35,6 +37,7 @@ public interface IStyleResourceValue extends IResourceValue {
      * Find an item in the list by name
      *
      * @param name the name of the resource
+     * @return the {@link IResourceValue} or <code>null</code> if not found
      * @deprecated use {@link StyleResourceValue#getItem(String, boolean)}
      */
     @Deprecated

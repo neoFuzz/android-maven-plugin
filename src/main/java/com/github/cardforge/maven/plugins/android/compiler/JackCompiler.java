@@ -25,13 +25,27 @@ import java.util.List;
 @Component(role = Compiler.class, hint = "jack")
 public class JackCompiler extends AbstractCompiler {
 
+    /**
+     * Jack compiler identifier
+     */
     public static final String JACK_COMPILER_ID = "jack";
+    /**
+     * Logger
+     */
     private static final Log LOG = LogFactory.getLog(JackCompiler.class);
 
+    /**
+     * Default constructor
+     */
     public JackCompiler() {
         super(CompilerOutputStyle.ONE_OUTPUT_FILE_FOR_ALL_INPUT_FILES, ".java", ".dex", null);
     }
 
+    /**
+     * @param bufferedReader the {@code BufferedReader} to parse
+     * @return the list of compiler messages parsed from the compiler output
+     * @throws IOException if an error occurs while parsing the compiler output
+     */
     @NonNull
     public static List<CompilerMessage> parseCompilerOutput(@NonNull BufferedReader bufferedReader)
             throws IOException {
@@ -48,6 +62,11 @@ public class JackCompiler extends AbstractCompiler {
         return messages;
     }
 
+    /**
+     * @param cc the CompilerConfiguration describing the compilation
+     * @return the command line to execute, as a String array
+     * @throws CompilerException if an error occurs while creating the command line
+     */
     @Override
     public String[] createCommandLine(@NonNull CompilerConfiguration cc) throws CompilerException {
         String androidHome = System.getenv("ANDROID_HOME");
@@ -66,12 +85,24 @@ public class JackCompiler extends AbstractCompiler {
         return trim(command.split("\\s"));
     }
 
+    /**
+     * @param configuration the configuration description of the compilation
+     *                      to perform
+     * @return true if the target can be updated, false otherwise
+     * @throws CompilerException if an error occurs while determining whether the target can be updated
+     */
     @Override
     public boolean canUpdateTarget(CompilerConfiguration configuration)
             throws CompilerException {
         return false;
     }
 
+    /**
+     * @param configuration the configuration description of the compilation
+     *                      to perform
+     * @return the result of the compilation
+     * @throws CompilerException if an error occurs while performing the compilation
+     */
     @Override
     public CompilerResult performCompile(CompilerConfiguration configuration) throws CompilerException {
         String[] commandLine = this.createCommandLine(configuration);
@@ -87,11 +118,24 @@ public class JackCompiler extends AbstractCompiler {
 
     }
 
+    /**
+     * @param configuration The configuration description of the compilation to perform
+     * @return The output file for the compilation
+     * @throws CompilerException if an error occurs while determining the output file
+     */
     @Override
     public String getOutputFile(CompilerConfiguration configuration) throws CompilerException {
         return "classes.dex";
     }
 
+    /**
+     * @param workingDirectory The working directory for the external compiler execution
+     * @param target           The target directory for the external compiler execution
+     * @param executable       The external compiler executable
+     * @param args             The arguments for the external compiler execution
+     * @return The list of compiler messages
+     * @throws CompilerException if an error occurs while executing the external compiler
+     */
     private List<CompilerMessage> compileOutOfProcess(File workingDirectory, File target, String executable,
                                                       @NonNull String[] args)
             throws CompilerException {
@@ -151,6 +195,10 @@ public class JackCompiler extends AbstractCompiler {
         return messages;
     }
 
+    /**
+     * @param split The array of strings to trim
+     * @return The trimmed array of strings
+     */
     @NonNull
     private String[] trim(String[] split) {
         Iterable<String> filtered = Iterables.filter(

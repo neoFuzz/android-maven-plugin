@@ -27,7 +27,13 @@ import com.android.utils.Pair;
 @Deprecated
 public interface ILayoutlibVersion {
 
+    /**
+     * Layoutlib API number when not specified.
+     */
     int LAYOUTLIB_API_NOT_SPECIFIED = 0;
+    /**
+     * Layoutlib revision number when not specified.
+     */
     int LAYOUTLIB_REV_NOT_SPECIFIED = 0;
 
     /**

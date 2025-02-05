@@ -479,7 +479,7 @@ public class AarMojo extends AbstractAndroidMojo {
             }
         }
 
-        final CommandExecutor executor = CommandExecutor.Factory.createDefaultCommmandExecutor();
+        final CommandExecutor executor = CommandExecutor.Factory.createDefaultCommandExecutor();
         executor.setLogger(this.getLog());
 
         File outputFile = new File(targetDirectory, finalName + ".ap_");

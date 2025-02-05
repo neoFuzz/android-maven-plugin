@@ -19,19 +19,35 @@ package com.android.ide.common.resources.configuration;
 import com.android.resources.ResourceEnum;
 import com.android.resources.ScreenRatio;
 
+/**
+ * Resource Qualifier for Screen Ratio.
+ * This qualifier is used to determine the screen ratio of a device or emulator.
+ */
 public class ScreenRatioQualifier extends EnumBasedResourceQualifier {
 
+    /**
+     * String name of this qualifier.
+     */
     public static final String NAME = "Screen Ratio";
 
     private ScreenRatio mValue = null;
 
+    /**
+     * Default constructor.
+     */
     public ScreenRatioQualifier() {
     }
 
+    /**
+     * @param value the screen ratio value as a {@link ScreenRatio} enum
+     */
     public ScreenRatioQualifier(ScreenRatio value) {
         mValue = value;
     }
 
+    /**
+     * @return the screen ratio value as a {@link ScreenRatio} enum
+     */
     public ScreenRatio getValue() {
         return mValue;
     }

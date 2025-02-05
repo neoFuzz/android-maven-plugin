@@ -26,6 +26,9 @@ import java.util.regex.Pattern;
  * Resource Qualifier for Screen Pixel Density.
  */
 public final class ScreenWidthQualifier extends ResourceQualifier {
+    /**
+     * Pattern to match screen width qualifiers.
+     */
     public static final String NAME = "Screen Width";
     /**
      * Default screen size value. This means the property is not set
@@ -35,14 +38,24 @@ public final class ScreenWidthQualifier extends ResourceQualifier {
     private static final String S_PRINT_PATTERN = "w%1$ddp"; //$NON-NLS-1$
     private int mValue = DEFAULT_SIZE;
 
+    /**
+     * Private constructor
+     */
     public ScreenWidthQualifier() {
         // pass
     }
 
+    /**
+     * @param value the integer value of the screen width
+     */
     public ScreenWidthQualifier(int value) {
         mValue = value;
     }
 
+    /**
+     * @param value the string value to parse
+     * @return a new {@link ScreenWidthQualifier} or null if the given value cannot be parsed
+     */
     @Nullable
     public static ScreenWidthQualifier getQualifier(String value) {
         try {
@@ -59,6 +72,9 @@ public final class ScreenWidthQualifier extends ResourceQualifier {
         return null;
     }
 
+    /**
+     * @return the screen width value as an integer
+     */
     public int getValue() {
         return mValue;
     }

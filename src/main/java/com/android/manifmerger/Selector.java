@@ -36,6 +36,9 @@ public class Selector {
     @NonNull
     private final String mPackageName;
 
+    /**
+     * @param packageName the package name to select for.
+     */
     public Selector(@NonNull String packageName) {
         mPackageName = Preconditions.checkNotNull(packageName);
     }
@@ -43,6 +46,8 @@ public class Selector {
     /**
      * Returns true if the passed element is "selected" by this selector. If so, any action this
      * selector decorated will be applied to the element.
+     *
+     * @return true if the element is selected by this selector.
      */
     boolean appliesTo(@NonNull XmlElement element) {
         Optional<XmlAttribute> packageName = element.getDocument().getPackage();
@@ -51,6 +56,8 @@ public class Selector {
 
     /**
      * Returns true if the passed resolver can resolve this selector, false otherwise.
+     *
+     * @return true if the resolver can resolve this selector, false otherwise.
      */
     boolean isResolvable(@NonNull KeyResolver<String> resolver) {
         return resolver.resolve(mPackageName) != null;

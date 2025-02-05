@@ -62,9 +62,17 @@ public abstract class NoPreviewRevisionPackage extends Package {
      * This is used to create packages from local directories in which case there must be
      * one archive which URL is the actual target location.
      * <p>
-     * Properties from props are used first when possible, e.g. if props is non null.
+     * Properties from props are used first when possible, e.g. if props is non-null.
      * <p>
      * By design, this creates a package with one and only one archive.
+     *
+     * @param source        The {@link SdkSource} where this is loaded from.
+     * @param props         The properties to be used to initialize the package.
+     * @param revision      The revision of the doc package.
+     * @param license       The license of the doc package.
+     * @param description   The description of the doc package.
+     * @param descUrl       The description URL.
+     * @param archiveOsPath The OS path of the doc package.
      */
     public NoPreviewRevisionPackage(
             SdkSource source,
@@ -95,6 +103,8 @@ public abstract class NoPreviewRevisionPackage extends Package {
     /**
      * Returns the revision, an int > 0, for all packages (platform, add-on, tool, doc).
      * Can be 0 if this is a local package of unknown revision.
+     *
+     * @return The {@link NoPreviewRevision} of this package.
      */
     @Override
     public NoPreviewRevision getRevision() {
@@ -102,12 +112,18 @@ public abstract class NoPreviewRevisionPackage extends Package {
     }
 
 
+    /**
+     * @param props The {@link Properties} object to be filled with the current values.
+     */
     @Override
     public void saveProperties(Properties props) {
         super.saveProperties(props);
         props.setProperty(PkgProps.PKG_REVISION, mRevision.toString());
     }
 
+    /**
+     * @return A hash code for this package based on its revision number.
+     */
     @Override
     public int hashCode() {
         final int prime = 31;
@@ -116,6 +132,10 @@ public abstract class NoPreviewRevisionPackage extends Package {
         return result;
     }
 
+    /**
+     * @param obj The object to compare against.
+     * @return true if the object is equal to this one.
+     */
     @Override
     public boolean equals(Object obj) {
         if (this == obj) {
@@ -138,6 +158,10 @@ public abstract class NoPreviewRevisionPackage extends Package {
         return true;
     }
 
+    /**
+     * @param replacementPackage The potential replacement package.
+     * @return Whether the given package replaces this package.
+     */
     @Override
     public UpdateInfo canBeUpdatedBy(Package replacementPackage) {
         if (replacementPackage == null) {

@@ -45,6 +45,9 @@ import static com.android.ide.common.res2.ResourceFile.ATTR_QUALIFIER;
  */
 public class ResourceSet extends DataSet<ResourceItem, ResourceFile> {
 
+    /**
+     * @param name the name of the resource set
+     */
     public ResourceSet(String name) {
         super(name);
     }

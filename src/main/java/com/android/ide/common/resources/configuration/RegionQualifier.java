@@ -28,15 +28,27 @@ import java.util.regex.Pattern;
  * Resource Qualifier for Region.
  */
 public final class RegionQualifier extends ResourceQualifier {
+    /**
+     * Value used to represent any region
+     */
     public static final String FAKE_REGION_VALUE = "__"; //$NON-NLS-1$
+    /**
+     * Pattern to match a region qualifier
+     */
     public static final String NAME = "Region";
     private static final Pattern sRegionPattern = Pattern.compile("^r([a-zA-Z]{2})$"); //$NON-NLS-1$
     private String mValue;
 
+    /**
+     * Default constructor, initializes the qualifier with a blank slate.
+     */
     public RegionQualifier() {
 
     }
 
+    /**
+     * @param value the region value as a string.
+     */
     public RegionQualifier(@NonNull String value) {
         mValue = value.toUpperCase(Locale.US);
     }
@@ -69,6 +81,7 @@ public final class RegionQualifier extends ResourceQualifier {
      * {@link #toString()} on a {@link RegionQualifier} object.
      *
      * @param value the value of the qualifier, as returned by {@link #getValue()}.
+     * @return the folder segment
      */
     @NonNull
     public static String getFolderSegment(String value) {
@@ -83,6 +96,9 @@ public final class RegionQualifier extends ResourceQualifier {
         return "";  //$NON-NLS-1$
     }
 
+    /**
+     * @return the region value as a string.
+     */
     public String getValue() {
         return Objects.requireNonNullElse(mValue, "");
 
@@ -114,7 +130,7 @@ public final class RegionQualifier extends ResourceQualifier {
     }
 
     @Override
-    public boolean checkAndSet(String value, FolderConfiguration config) {
+    public boolean checkAndSet(@NonNull String value, FolderConfiguration config) {
         if (value.length() != 3) {
             return false;
         }

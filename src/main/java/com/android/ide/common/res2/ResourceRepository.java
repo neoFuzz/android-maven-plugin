@@ -25,20 +25,38 @@ import com.google.common.collect.Maps;
 
 import java.util.Map;
 
+/**
+ * A resource repository. This is a collection of {@link ResourceItem} objects.
+ */
 public class ResourceRepository extends AbstractResourceRepository {
+    /**
+     * Map from type to a map of name to resource item.
+     */
     protected final Map<ResourceType, ListMultimap<String, ResourceItem>> mItems = Maps.newEnumMap(
             ResourceType.class);
 
+    /**
+     * @param isFramework whether this is a framework repository
+     */
     public ResourceRepository(boolean isFramework) {
         super(isFramework);
     }
 
+    /**
+     * @return the map of type to a map of name to resource item.
+     */
     @Override
     @NonNull
     protected Map<ResourceType, ListMultimap<String, ResourceItem>> getMap() {
         return mItems;
     }
 
+    /**
+     * @param type   the {@link ResourceType} to get the map for.
+     * @param create if true, the map will be created if it does not exist.
+     * @return the map of name to resource item for the given type, or null if it does not exist
+     * and <code>create</code> is false.
+     */
     @Override
     @Nullable
     protected ListMultimap<String, ResourceItem> getMap(ResourceType type, boolean create) {

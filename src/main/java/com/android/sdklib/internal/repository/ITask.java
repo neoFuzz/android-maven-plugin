@@ -26,5 +26,9 @@ package com.android.sdklib.internal.repository;
  */
 @Deprecated
 public interface ITask {
+    /**
+     * @param monitor The monitor to use to display the task status.
+     *                The monitor can be null if the task doesn't need to display status.
+     */
     void run(ITaskMonitor monitor);
 }

@@ -63,9 +63,15 @@ public class SdkSourceProperties {
 
     private static boolean sModified = false;
 
+    /**
+     * Default constructor
+     */
     public SdkSourceProperties() {
     }
 
+    /**
+     * Save the properties.
+     */
     public void save() {
         synchronized (sSourcesProperties) {
             if (sModified && !sSourcesProperties.isEmpty()) {
@@ -110,7 +116,7 @@ public class SdkSourceProperties {
      *
      * @param key       The kind of property to retrieve for that source URL.
      * @param sourceUrl The source URL.
-     * @param value     The new value to set (if non null) or null to remove an existing property.
+     * @param value     The new value to set (if non-null) or null to remove an existing property.
      */
     public void setProperty(String key, String sourceUrl, String value) {
         synchronized (sSourcesProperties) {

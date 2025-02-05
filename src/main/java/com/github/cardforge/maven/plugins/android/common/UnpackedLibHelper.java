@@ -39,6 +39,12 @@ public final class UnpackedLibHelper {
     // ${project.build.directory}/unpacked-libs
     private final File unpackedLibsDirectory;
 
+    /**
+     * @param artifactResolverHelper the artifact resolver
+     * @param project                the maven project
+     * @param log                    the logger to use
+     * @param unpackedLibsFolder     If null then defaults to target/unpacked-libs
+     */
     public UnpackedLibHelper(ArtifactResolverHelper artifactResolverHelper, MavenProject project, Logger log,
                              File unpackedLibsFolder) {
         this.artifactResolverHelper = artifactResolverHelper;
@@ -56,6 +62,10 @@ public final class UnpackedLibHelper {
         this.log = log;
     }
 
+    /**
+     * @param apklibArtifact the APK lib to extract
+     * @throws MojoExecutionException if there is a problem extracting the APK lib
+     */
     public void extractApklib(Artifact apklibArtifact) throws MojoExecutionException {
         final File apkLibFile = artifactResolverHelper.resolveArtifactToFile(apklibArtifact);
         if (apkLibFile.isDirectory()) {
@@ -78,6 +88,10 @@ public final class UnpackedLibHelper {
         }
     }
 
+    /**
+     * @param aarArtifact the AAR to extract
+     * @throws MojoExecutionException if there is a problem extracting the AAR
+     */
     public void extractAarLib(Artifact aarArtifact) throws MojoExecutionException {
         final File aarFile = artifactResolverHelper.resolveArtifactToFile(aarArtifact);
         if (aarFile.isDirectory()) {
@@ -119,15 +133,27 @@ public final class UnpackedLibHelper {
         }
     }
 
+    /**
+     * @param artifact the artifact to resolve
+     * @return the artifact as a file.
+     * @throws MojoExecutionException if there is a problem resolving the artifact
+     */
     @NonNull
     public File getArtifactToFile(Artifact artifact) throws MojoExecutionException {
         return artifactResolverHelper.resolveArtifactToFile(artifact);
     }
 
+    /**
+     * @return the folder where the unpacked libraries are located.
+     */
     public File getUnpackedLibsFolder() {
         return unpackedLibsDirectory;
     }
 
+    /**
+     * @param artifact Android dependency that is being referenced.
+     * @return Folder where the unpacked library is located.
+     */
     @NonNull
     public File getUnpackedLibFolder(@NonNull Artifact artifact) {
         return new File(unpackedLibsDirectory.getAbsolutePath(),
@@ -139,21 +165,37 @@ public final class UnpackedLibHelper {
         );
     }
 
+    /**
+     * @param artifact Android dependency that is being referenced.
+     * @return File where the unpacked classes.jar is located.
+     */
     @NonNull
     public File getUnpackedClassesJar(Artifact artifact) {
         return new File(getUnpackedLibFolder(artifact), SdkConstants.FN_CLASSES_JAR);
     }
 
+    /**
+     * @param artifact Android dependency that is being referenced.
+     * @return Folder where the unpacked library source is located.
+     */
     @NonNull
     public File getUnpackedApkLibSourceFolder(Artifact artifact) {
         return new File(getUnpackedLibFolder(artifact), "src");
     }
 
+    /**
+     * @param artifact Android dependency that is being referenced.
+     * @return Folder where the unpacked library resources are located.
+     */
     @NonNull
     public File getUnpackedLibResourceFolder(Artifact artifact) {
         return new File(getUnpackedLibFolder(artifact), "res");
     }
 
+    /**
+     * @param artifact Android dependency that is being referenced.
+     * @return Folder where the unpacked library assets are located.
+     */
     @NonNull
     public File getUnpackedLibAssetsFolder(Artifact artifact) {
         return new File(getUnpackedLibFolder(artifact), "assets");
@@ -173,6 +215,10 @@ public final class UnpackedLibHelper {
         }
     }
 
+    /**
+     * @param artifact Android dependency that is being referenced.
+     * @return file where the unpacked library jar is located.
+     */
     @NonNull
     public File getJarFileForApk(@NonNull Artifact artifact) {
         final String fileName = artifact.getFile().getName();
@@ -196,6 +242,7 @@ public final class UnpackedLibHelper {
     }
 
     /**
+     * @param project The maven project.
      * @return True if this project constructs an APK as opposed to an AAR or APKLIB.
      */
     public boolean isAPKBuild(@NonNull MavenProject project) {

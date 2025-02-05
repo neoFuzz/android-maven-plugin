@@ -27,6 +27,9 @@ import java.util.List;
  * so on.
  */
 public class ScanningContext {
+    /**
+     * The associated resource repository
+     */
     protected final ResourceRepository mRepository;
     private boolean mNeedsFullAapt;
     private List<String> mErrors = null;

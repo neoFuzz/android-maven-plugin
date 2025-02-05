@@ -73,6 +73,10 @@ public abstract class PreProcessCache<T extends PreProcessCache.Key> {
     @GuardedBy("this")
     private int mHits = 0;
 
+    /**
+     * @param file the file to get the hash from
+     * @return the hash of the file, or null if an error occurred
+     */
     @Nullable
     private static HashCode getHash(@NonNull File file) {
         try {
@@ -84,12 +88,17 @@ public abstract class PreProcessCache<T extends PreProcessCache.Key> {
         return null;
     }
 
+    /**
+     * @return the cache key for the given file.
+     */
     @NonNull
     protected abstract KeyFactory<T> getKeyFactory();
 
     /**
      * Loads the stored item. This can be called several times (per subproject), so only
      * the first call should do something.
+     *
+     * @param itemStorage item storage location to use
      */
     public synchronized void load(@NonNull File itemStorage) {
         if (mLoaded) {
@@ -154,6 +163,11 @@ public abstract class PreProcessCache<T extends PreProcessCache.Key> {
         return Pair.of(item, newItem);
     }
 
+    /**
+     * @param itemStorage the item storage location to use
+     * @param logger      the logger to use
+     * @throws IOException if an error occurred while saving the cache
+     */
     public synchronized void clear(@Nullable File itemStorage, @Nullable ILogger logger) throws
             IOException {
         if (!mMap.isEmpty()) {
@@ -173,6 +187,9 @@ public abstract class PreProcessCache<T extends PreProcessCache.Key> {
         mMisses = 0;
     }
 
+    /**
+     * @param itemStorage the item storage location to use
+     */
     private synchronized void loadItems(@NonNull File itemStorage) {
         if (!itemStorage.isFile()) {
             return;
@@ -240,6 +257,10 @@ public abstract class PreProcessCache<T extends PreProcessCache.Key> {
         }
     }
 
+    /**
+     * @param itemStorage the item storage location to use
+     * @throws IOException if an error occurred while saving the cache
+     */
     protected synchronized void saveItems(@NonNull File itemStorage) throws IOException {
         // write "compact" blob
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
@@ -302,6 +323,13 @@ public abstract class PreProcessCache<T extends PreProcessCache.Key> {
         }
     }
 
+    /**
+     * @param document the document to create the node in
+     * @param itemKey  the key of the item
+     * @param item     the item to create the node for
+     * @return a new node, or null if no node should be created
+     * @throws IOException if an error occurred while creating the node
+     */
     @Nullable
     protected Node createItemNode(
             @NonNull Document document,
@@ -347,39 +375,75 @@ public abstract class PreProcessCache<T extends PreProcessCache.Key> {
         return itemNode;
     }
 
+    /**
+     * Increments the misses counter.
+     */
     protected synchronized void incrementMisses() {
         mMisses++;
     }
 
+    /**
+     * Increments the hits counter.
+     */
     protected synchronized void incrementHits() {
         mHits++;
     }
 
+    /**
+     * @return the misses counter
+     */
     @VisibleForTesting
     /*package*/ synchronized int getMisses() {
         return mMisses;
     }
 
+    /**
+     * @return the hits counter
+     */
     @VisibleForTesting
     /*package*/ synchronized int getHits() {
         return mHits;
     }
 
+    /**
+     * Base interface for items representing jar/dex files that have been processed during a build.
+     */
     protected interface BaseItem {
+        /**
+         * @return the source file for this item
+         */
         @NonNull
         File getSourceFile();
 
+        /**
+         * @return the output files for this item
+         */
         @NonNull
         List<File> getOutputFiles();
 
+        /**
+         * @return the source hash for this item, or null if it is not available
+         */
         @Nullable
         HashCode getSourceHash();
 
+        /**
+         * @return true if the output files are present, false otherwise
+         */
         boolean areOutputFilesPresent();
 
     }
 
+    /**
+     * @param <T> the type of the key
+     */
     protected interface KeyFactory<T> {
+        /**
+         * @param sourceFile the source file for the item
+         * @param revision   the build tools revision
+         * @param attrMap    the attributes of the item
+         * @return the key for the item
+         */
         T of(@NonNull File sourceFile, @NonNull FullRevision revision, @NonNull NamedNodeMap attrMap);
     }
 
@@ -388,13 +452,27 @@ public abstract class PreProcessCache<T extends PreProcessCache.Key> {
      */
     @Immutable
     protected static class Item implements BaseItem {
+        /**
+         * Source file location
+         */
         @NonNull
         private final File mSourceFile;
+        /**
+         * Output files (dex files) that have been generated from the source file
+         */
         @NonNull
         private final List<File> mOutputFiles;
+        /**
+         * Latch used to wait for the dex files to be generated from the source file
+         */
         @NonNull
         private final CountDownLatch mLatch;
 
+        /**
+         * @param sourceFile  the source file for this item
+         * @param outputFiles the output files for this item
+         * @param latch       the latch used to wait for the dex files to be generated from the source file
+         */
         Item(
                 @NonNull File sourceFile,
                 @NonNull List<File> outputFiles,
@@ -404,6 +482,10 @@ public abstract class PreProcessCache<T extends PreProcessCache.Key> {
             mLatch = latch;
         }
 
+        /**
+         * @param sourceFile the source file for this item
+         * @param latch      the latch used to wait for the dex files to be generated from the source file
+         */
         Item(
                 @NonNull File sourceFile,
                 @NonNull CountDownLatch latch) {
@@ -412,29 +494,44 @@ public abstract class PreProcessCache<T extends PreProcessCache.Key> {
             mLatch = latch;
         }
 
+        /**
+         * @return the source file for this item
+         */
         @Override
         @NonNull
         public File getSourceFile() {
             return mSourceFile;
         }
 
+        /**
+         * @return the output files for this item
+         */
         @Override
         @NonNull
         public List<File> getOutputFiles() {
             return mOutputFiles;
         }
 
+        /**
+         * @return null, as the source hash is not available for this item
+         */
         @Nullable
         @Override
         public HashCode getSourceHash() {
             return null;
         }
 
+        /**
+         * @return the latch used to wait for the dex files to be generated from the source file
+         */
         @NonNull
         protected CountDownLatch getLatch() {
             return mLatch;
         }
 
+        /**
+         * @return true if the output files are present, false otherwise
+         */
         @Override
         public boolean areOutputFilesPresent() {
             boolean filesOk = !mOutputFiles.isEmpty();
@@ -444,6 +541,9 @@ public abstract class PreProcessCache<T extends PreProcessCache.Key> {
             return filesOk;
         }
 
+        /**
+         * @return String with the object properties
+         */
         @Override
         public String toString() {
             return "Item{" +
@@ -459,13 +559,27 @@ public abstract class PreProcessCache<T extends PreProcessCache.Key> {
      */
     @Immutable
     protected static class StoredItem implements BaseItem {
+        /**
+         * Source file location
+         */
         @NonNull
         private final File mSourceFile;
+        /**
+         * Output files (dex files) that have been generated from the source file
+         */
         @NonNull
         private final List<File> mOutputFiles;
+        /**
+         * Hash of the source file
+         */
         @NonNull
         private final HashCode mSourceHash;
 
+        /**
+         * @param sourceFile  the source file for this item
+         * @param outputFiles the output files for this item
+         * @param sourceHash  the hash of the source file
+         */
         StoredItem(
                 @NonNull File sourceFile,
                 @NonNull List<File> outputFiles,
@@ -475,24 +589,36 @@ public abstract class PreProcessCache<T extends PreProcessCache.Key> {
             mSourceHash = sourceHash;
         }
 
+        /**
+         * @return the source file for this item
+         */
         @Override
         @NonNull
         public File getSourceFile() {
             return mSourceFile;
         }
 
+        /**
+         * @return the output files for this item
+         */
         @Override
         @NonNull
         public List<File> getOutputFiles() {
             return mOutputFiles;
         }
 
+        /**
+         * @return the hash of the source file for this item
+         */
         @Override
         @NonNull
         public HashCode getSourceHash() {
             return mSourceHash;
         }
 
+        /**
+         * @return true if the output files are present, false otherwise
+         */
         @Override
         public boolean areOutputFilesPresent() {
             boolean filesOk = !mOutputFiles.isEmpty();
@@ -502,6 +628,9 @@ public abstract class PreProcessCache<T extends PreProcessCache.Key> {
             return filesOk;
         }
 
+        /**
+         * @return String with the object properties
+         */
         @Override
         public String toString() {
             return "StoredItem{" +
@@ -521,30 +650,55 @@ public abstract class PreProcessCache<T extends PreProcessCache.Key> {
      */
     @Immutable
     protected static class Key {
+        /**
+         * Source file location
+         */
         @NonNull
         private final File mSourceFile;
+        /**
+         * Build tools revision
+         */
         @NonNull
         private final FullRevision mBuildToolsRevision;
 
+        /**
+         * @param sourceFile         the source file for this item
+         * @param buildToolsRevision the build tools revision for this item
+         */
         protected Key(@NonNull File sourceFile, @NonNull FullRevision buildToolsRevision) {
             mSourceFile = sourceFile;
             mBuildToolsRevision = buildToolsRevision;
         }
 
+        /**
+         * @param sourceFile         the source file for this item
+         * @param buildToolsRevision the build tools revision for this item
+         * @return a new Key instance
+         */
         public static Key of(@NonNull File sourceFile, @NonNull FullRevision buildToolsRevision) {
             return new Key(sourceFile, buildToolsRevision);
         }
 
+        /**
+         * @return the build tools revision for this item
+         */
         @NonNull
         public FullRevision getBuildToolsRevision() {
             return mBuildToolsRevision;
         }
 
+        /**
+         * @return the source file for this item
+         */
         @NonNull
         public File getSourceFile() {
             return mSourceFile;
         }
 
+        /**
+         * @param o the object to compare to
+         * @return true if the objects are equal, false otherwise
+         */
         @Override
         public boolean equals(Object o) {
             if (this == o) {
@@ -562,6 +716,9 @@ public abstract class PreProcessCache<T extends PreProcessCache.Key> {
             return mSourceFile.equals(key.mSourceFile);
         }
 
+        /**
+         * @return the hash code for this object
+         */
         @Override
         public int hashCode() {
             return Objects.hashCode(mSourceFile, mBuildToolsRevision);

@@ -46,18 +46,41 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ *
+ */
 @SuppressWarnings("MethodMayBeStatic")
 public class LocalAddonPkgInfo extends LocalPlatformPkgInfo {
 
+    /**
+     * Static for the pattern of a lib file name, e.g. "samples.jar".
+     * This pattern is used to detect valid library names in the libs/ folder.
+     */
     private static final Pattern PATTERN_LIB_DATA = Pattern.compile(
             "^([a-zA-Z0-9._-]+\\.jar);(.*)$", Pattern.CASE_INSENSITIVE);    //$NON-NLS-1$
 
-    // usb ids are 16-bit hexadecimal values.
+    /**
+     * usb ids are 16-bit hexadecimal values.
+     */
     private static final Pattern PATTERN_USB_IDS = Pattern.compile(
             "^0x[a-f0-9]{4}$", Pattern.CASE_INSENSITIVE);                    //$NON-NLS-1$
 
+    /**
+     * The addon descriptor.
+     */
     private final @NonNull IPkgDescAddon mAddonDesc;
 
+    /**
+     * Constructor for LocalAddonPkgInfo.
+     *
+     * @param localSdk    The local SDK instance this package belongs to
+     * @param localDir    The local directory where this package is installed
+     * @param sourceProps The properties loaded from the package
+     * @param version     The Android version this add-on is for
+     * @param revision    The revision number of this package
+     * @param vendor      The vendor of this add-on package
+     * @param name        The display name of this add-on package
+     */
     public LocalAddonPkgInfo(@NonNull LocalSdk localSdk,
                              @NonNull File localDir,
                              @NonNull Properties sourceProps,
@@ -98,6 +121,7 @@ public class LocalAddonPkgInfo extends LocalPlatformPkgInfo {
      * This string will show up in the SdkManager UI.
      *
      * @param valueName The missing manifest value, for display.
+     * @return A warning string to be displayed to the user.
      */
     @NonNull
     private static String addonManifestWarning(@NonNull String valueName) {
@@ -107,6 +131,9 @@ public class LocalAddonPkgInfo extends LocalPlatformPkgInfo {
 
     //-----
 
+    /**
+     * @return The addon descriptor. Never null.
+     */
     @NonNull
     @Override
     public IPkgDesc getDesc() {
@@ -117,6 +144,8 @@ public class LocalAddonPkgInfo extends LocalPlatformPkgInfo {
 
     /**
      * The "path" of an add-on is its Target Hash.
+     *
+     * @return The Target Hash of this add-on. Never null.
      */
     @Override
     @NonNull
@@ -142,6 +171,8 @@ public class LocalAddonPkgInfo extends LocalPlatformPkgInfo {
 
     /**
      * Creates the AddOnTarget. Invoked by {@link #getAndroidTarget()}.
+     *
+     * @return The AddOnTarget or null if the add-on is invalid.
      */
     @Override
     @Nullable

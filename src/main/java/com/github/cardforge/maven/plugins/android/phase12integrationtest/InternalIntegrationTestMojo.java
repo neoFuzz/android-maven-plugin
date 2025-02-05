@@ -22,6 +22,8 @@ import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 
+import java.util.List;
+
 /**
  * Internal. Do not use.<br>
  * Called automatically when the lifecycle reaches phase <code>integration-test</code>. Figures out whether to
@@ -32,6 +34,12 @@ import org.apache.maven.plugins.annotations.Mojo;
 @Mojo(name = "internal-integration-test", defaultPhase = LifecyclePhase.INTEGRATION_TEST)
 public class InternalIntegrationTestMojo extends AbstractInstrumentationMojo {
 
+    /**
+     * Execute the mojo by parsing the config and actually doing the instrumentation.
+     *
+     * @throws MojoExecutionException if an error occurs
+     * @throws MojoFailureException if an error occurs
+     */
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
         if (isEnableIntegrationTest()) {
@@ -39,4 +47,13 @@ public class InternalIntegrationTestMojo extends AbstractInstrumentationMojo {
         }
     }
 
+    /**
+     * Returns the list of parsed class names.
+     * Delegates to the superclass implementation.
+     *
+     * @return a list of parsed class names.
+     */
+    public List<String> getParsedClasses() {
+        return super.getParsedClasses();
+    }
 }

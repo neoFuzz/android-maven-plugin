@@ -44,26 +44,95 @@ import java.util.Locale;
  * methods provided in the base {@link PkgDesc}.
  */
 public class PkgDesc implements IPkgDesc {
+    /**
+     * Static preview suffix regex
+     */
     public static final char[] PREVIEW_SUFFIX = {'a'};
+    /**
+     * Staric string "android" for messages.
+     */
     public static final String ANDROID = "android";
+    /**
+     * The package type
+     */
     private final PkgType mType;
+    /**
+     * The full revision number
+     */
     private final FullRevision mFullRevision;
+    /**
+     * The major revision number
+     */
     private final MajorRevision mMajorRevision;
+    /**
+     * The Android version.
+     */
     private final AndroidVersion mAndroidVersion;
+    /**
+     * Path to use.
+     */
     private final String mPath;
+    /**
+     * Tag id.
+     */
     private final IdDisplay mTag;
+    /**
+     * Vendor id.
+     */
     private final IdDisplay mVendor;
+    /**
+     * Minimum tools revision.
+     */
     private final FullRevision mMinToolsRev;
+    /**
+     * Minimum platform tools revision.
+     */
     private final FullRevision mMinPlatformToolsRev;
+    /**
+     * Custom isUpdateFor method.
+     */
     private final IIsUpdateFor mCustomIsUpdateFor;
+    /**
+     * Custom path.
+     */
     private final IGetPath mCustomPath;
 
+    /**
+     * The license
+     */
     private final License mLicense;
+    /**
+     * Display list.
+     */
     private final String mListDisplay;
     private final String mDescriptionShort;
+    /**
+     * URL to the package description.
+     */
     private final String mDescriptionUrl;
+    /**
+     * {@code true} if this package is obsolete.
+     */
     private final boolean mIsObsolete;
 
+    /**
+     * @param type                package type
+     * @param license             license type
+     * @param listDisplay         Display list
+     * @param descriptionShort    short description
+     * @param descriptionUrl      Description URL
+     * @param isObsolete          If obsolete
+     * @param fullRevision        Full revision to use
+     * @param majorRevision       Major revision to use
+     * @param androidVersion      The Android version to use
+     * @param path                Path to use
+     * @param tag                 Tag to use
+     * @param vendor              Vendor to use
+     * @param minToolsRev         Minimum tools revision to use
+     * @param minPlatformToolsRev Minimum platform tools revision to use
+     * @param customIsUpdateFor   Custom isUpdateFor
+     * @param customPath          Custom path
+     */
     protected PkgDesc(@NonNull PkgType type,
                       @Nullable License license,
                       @Nullable String listDisplay,
@@ -98,6 +167,10 @@ public class PkgDesc implements IPkgDesc {
         mCustomPath = customPath;
     }
 
+    /**
+     * @param str string to sanitize
+     * @return sanitized string
+     */
     @NonNull
     private static String sanitize(@NonNull String str) {
         str = str.toLowerCase(Locale.US).replaceAll("[^a-z0-9_.-]+", "_").replaceAll("_+", "_");
@@ -374,6 +447,9 @@ public class PkgDesc implements IPkgDesc {
         return f;
     }
 
+    /**
+     * @return The {@link PreciseRevision} of this package descriptor.
+     */
     @NonNull
     @Override
     public PreciseRevision getPreciseRevision() {
@@ -548,6 +624,10 @@ public class PkgDesc implements IPkgDesc {
         return patternReplaceImpl(getType().getListDisplayPattern());
     }
 
+    /**
+     * @param result The pattern string to use for the description.
+     * @return The description string after pattern replacement.
+     */
     @VisibleForTesting(visibility = Visibility.PRIVATE)
     protected String patternReplaceImpl(String result) {
         // Flags for list description pattern string, used in PkgType:
@@ -687,6 +767,9 @@ public class PkgDesc implements IPkgDesc {
         return builder.toString();
     }
 
+    /**
+     * @return A hash code for this descriptor.
+     */
     @Override
     @SuppressWarnings("all")  // For the hashCode() method.
     public int hashCode() {
@@ -717,6 +800,10 @@ public class PkgDesc implements IPkgDesc {
 
     // ---- Constructors -----
 
+    /**
+     * @param obj The object to compare with.
+     * @return {@code true} if the two objects are equal.
+     */
     @Override
     @SuppressWarnings("all")  // For the equals() method.
     public boolean equals(Object obj) {
@@ -771,16 +858,36 @@ public class PkgDesc implements IPkgDesc {
                 getMinPlatformToolsRev().equals(rhs.getMinPlatformToolsRev());
     }
 
+    /**
+     * Interface for the {@code PkgDesc#isUpdateFor(PkgDesc, IPkgDesc)} method.
+     * This is used to allow the update check to be customized.
+     */
     public interface IIsUpdateFor {
+        /**
+         * @param thisPkgDesc  The package descriptor to check for update.
+         * @param existingDesc The existing package descriptor to check against.
+         * @return {@code true} if {@code thisPkgDesc} is an update for {@code existingDesc}.
+         */
         boolean isUpdateFor(PkgDesc thisPkgDesc, IPkgDesc existingDesc);
     }
 
+    /**
+     * Interface for the {@link PkgDesc#getPath()} method.
+     * This is used to allow the path to be computed lazily.
+     */
     public interface IGetPath {
+        /**
+         * @param thisPkgDesc The package descriptor to get the path from.
+         * @return The path of the package descriptor.
+         */
         String getPath(@NonNull PkgDesc thisPkgDesc);
     }
 
     // ---- Helpers -----
 
+    /**
+     * Builder class
+     */
     public static class Builder {
         private final PkgType mType;
         private FullRevision mFullRevision;
@@ -863,6 +970,7 @@ public class PkgDesc implements IPkgDesc {
         /**
          * Creates a new doc package descriptor.
          *
+         * @param version  The android version of the doc package.
          * @param revision The revision of the doc package.
          * @return A {@link PkgDesc} describing this doc package.
          */
@@ -1056,6 +1164,10 @@ public class PkgDesc implements IPkgDesc {
             return p;
         }
 
+        /**
+         * @param pkg The package to copy descriptions from.
+         * @return This builder.
+         */
         public Builder setDescriptions(@NonNull Package pkg) {
             mDescriptionShort = pkg.getShortDescription();
             mDescriptionUrl = pkg.getDescUrl();
@@ -1065,31 +1177,54 @@ public class PkgDesc implements IPkgDesc {
             return this;
         }
 
+        /**
+         * @param license The license to use.
+         * @return This builder.
+         */
         public Builder setLicense(@Nullable License license) {
             mLicense = license;
             return this;
         }
 
+        /**
+         * @param text The text to display in the list.
+         * @return This builder.
+         */
         public Builder setListDisplay(@Nullable String text) {
             mListDisplay = text;
             return this;
         }
 
+        /**
+         * @param text The description short.
+         * @return This builder.
+         */
         public Builder setDescriptionShort(@Nullable String text) {
             mDescriptionShort = text;
             return this;
         }
 
+        /**
+         * @param text The description URL.
+         * @return This builder.
+         */
         public Builder setDescriptionUrl(@Nullable String text) {
             mDescriptionUrl = text;
             return this;
         }
 
+        /**
+         * @param isObsolete Whether the package is obsolete.
+         * @return This builder.
+         */
         public Builder setIsObsolete(boolean isObsolete) {
             mIsObsolete = isObsolete;
             return this;
         }
 
+        /**
+         * @return A new {@link PkgDesc} instance.
+         */
         public IPkgDesc create() {
             if (mType == PkgType.PKG_ADDON) {
                 return new PkgDescAddon(

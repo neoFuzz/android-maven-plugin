@@ -24,19 +24,36 @@ import com.android.resources.ResourceType;
 @SuppressWarnings("deprecation")
 public class ResourceValue extends ResourceReference implements IResourceValue {
     private final ResourceType mType;
+    /**
+     * The string value of this resource.
+     */
     protected String mValue = null;
 
+    /**
+     * @param type        the type of the resource
+     * @param name        the name of the resource
+     * @param isFramework whether the resource is from the framework or not
+     */
     public ResourceValue(ResourceType type, String name, boolean isFramework) {
         super(name, isFramework);
         mType = type;
     }
 
+    /**
+     * @param type        the type of the resource
+     * @param name        the name of the resource
+     * @param value       the value of the resource
+     * @param isFramework whether the resource is from the framework or not
+     */
     public ResourceValue(ResourceType type, String name, String value, boolean isFramework) {
         super(name, isFramework);
         mType = type;
         mValue = value;
     }
 
+    /**
+     * @return the type of the resource
+     */
     public ResourceType getResourceType() {
         return mType;
     }

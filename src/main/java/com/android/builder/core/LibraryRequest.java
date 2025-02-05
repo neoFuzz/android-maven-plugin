@@ -27,6 +27,10 @@ public class LibraryRequest {
     private final String mName;
     private final boolean mRequired;
 
+    /**
+     * @param name     the name of the library. This is the unique name that will show up in the manifest.
+     * @param required whether the library is required by the app or just optional.
+     */
     public LibraryRequest(@NonNull String name, boolean required) {
         mName = name;
         mRequired = required;
@@ -34,6 +38,8 @@ public class LibraryRequest {
 
     /**
      * The name of the library. This is the unique name that will show up in the manifest.
+     *
+     * @return the name of the library
      */
     @NonNull
     public String getName() {
@@ -42,6 +48,8 @@ public class LibraryRequest {
 
     /**
      * Whether the library is required by the app or just optional.
+     *
+     * @return true if the library is required, false otherwise.
      */
     public boolean isRequired() {
         return mRequired;

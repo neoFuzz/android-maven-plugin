@@ -29,21 +29,46 @@ import com.android.ide.common.blame.MessageReceiver;
  */
 public abstract class ErrorReporter implements MessageReceiver {
 
+    /**
+     * The evaluation mode for this error reporter
+     */
     @NonNull
     private final EvaluationMode mMode;
 
+    /**
+     * @param mode the evaluation mode
+     */
     protected ErrorReporter(@NonNull EvaluationMode mode) {
         mMode = mode;
     }
 
+    /**
+     * @return the evaluation mode
+     */
     @NonNull
     public EvaluationMode getMode() {
         return mMode;
     }
 
+    /**
+     * @param data the data associated with the error, e.g. a file path
+     * @param type the type of error
+     * @param msg  the error message
+     * @return a SyncIssue to be added to the SyncIssue list
+     */
     @NonNull
     public abstract SyncIssue handleSyncError(@NonNull String data, int type, @NonNull String msg);
 
+    /**
+     * Enum to indicate the evaluation mode for this error reporter.
+     * <p>
+     * The mode is used to determine whether errors should be breaking or not.
+     * When the IDE is querying the project, errors should not be breaking and
+     * should generate a SyncIssue instead.
+     * <p>
+     * When the IDE is not querying the project, errors should be breaking and
+     * should be thrown as exceptions.
+     */
     public enum EvaluationMode {
         /**
          * Standard mode, errors should be breaking

@@ -27,6 +27,8 @@ public interface SymbolFileProvider extends ManifestProvider {
 
     /**
      * Returns the location of the text symbol file
+     *
+     * @return a File for the text symbol file
      */
     @NonNull
     File getSymbolFile();
@@ -39,6 +41,8 @@ public interface SymbolFileProvider extends ManifestProvider {
      * - if the consumer is a library, it'll get skipped from resource merging and won't show up
      * in the consumer R.txt
      * - if the consumer is a separate test project, all the resources gets skipped from merging.
+     *
+     * @return true if the library is optional, false otherwise
      */
     boolean isOptional();
 }

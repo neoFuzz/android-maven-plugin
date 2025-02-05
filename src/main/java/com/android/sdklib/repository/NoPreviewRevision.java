@@ -27,10 +27,18 @@ import com.android.annotations.NonNull;
  */
 public class NoPreviewRevision extends FullRevision {
 
+    /**
+     * @param major Major revision number. Must be &gt;
+     */
     public NoPreviewRevision(int major) {
         this(major, IMPLICIT_MINOR_REV, IMPLICIT_MICRO_REV);
     }
 
+    /**
+     * @param major  Major revision number. Must be &gt;
+     * @param minor  Minor revision number. Must be &gt;
+     * @param micro  Micro revision number. Must be &gt;
+     */
     public NoPreviewRevision(int major, int minor, int micro) {
         super(major, minor, micro, NOT_A_PREVIEW);
     }

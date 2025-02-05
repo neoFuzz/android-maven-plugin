@@ -724,7 +724,7 @@ public abstract class AbstractAndroidMojo extends AbstractMojo {
      * @throws org.apache.maven.plugin.MojoExecutionException in case there is a problem
      * @throws org.apache.maven.plugin.MojoFailureException   in case there is a problem
      */
-    protected void doWithDevices(final DeviceCallback deviceCallback)
+    public void doWithDevices(final DeviceCallback deviceCallback)
             throws MojoExecutionException, MojoFailureException {
         final AndroidDebugBridge androidDebugBridge = initAndroidDebugBridge();
 
@@ -881,7 +881,7 @@ public abstract class AbstractAndroidMojo extends AbstractMojo {
      * @throws MojoExecutionException if there is a problem extracting the package name from the apk file.
      */
     public String extractPackageNameFromApk(@NonNull File apkFile) throws MojoExecutionException {
-        CommandExecutor executor = CommandExecutor.Factory.createDefaultCommmandExecutor();
+        CommandExecutor executor = CommandExecutor.Factory.createDefaultCommandExecutor();
         executor.setLogger(this.getLog());
         executor.setCaptureStdOut(true);
         executor.setCaptureStdErr(true);
@@ -936,7 +936,7 @@ public abstract class AbstractAndroidMojo extends AbstractMojo {
      *                                or appears error while parsing in {@link #extractPackageNameFromAndroidManifest(File)}
      * @see #extractPackageNameFromAndroidManifest(File)
      */
-    protected String extractPackageNameFromAndroidArtifact(Artifact artifact) throws MojoExecutionException {
+    public String extractPackageNameFromAndroidArtifact(Artifact artifact) throws MojoExecutionException {
         final File unpackedLibFolder = getUnpackedLibFolder(artifact);
         final File manifest = new File(unpackedLibFolder, "AndroidManifest.xml");
         if (!manifest.exists()) {

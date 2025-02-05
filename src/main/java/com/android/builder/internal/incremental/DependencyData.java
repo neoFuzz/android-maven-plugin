@@ -154,7 +154,7 @@ public class DependencyData {
     }
 
     /**
-     * @return
+     * @return the main input file
      */
     @NonNull
     public String getMainFile() {
@@ -162,14 +162,14 @@ public class DependencyData {
     }
 
     /**
-     * @param path
+     * @param path the main input file
      */
     void setMainFile(@NonNull String path) {
         mMainFile = path;
     }
 
     /**
-     * @return
+     * @return the list of secondary input files
      */
     @NonNull
     public List<String> getSecondaryFiles() {
@@ -177,14 +177,14 @@ public class DependencyData {
     }
 
     /**
-     * @param path
+     * @param path the secondary input file
      */
     void addSecondaryFile(@NonNull String path) {
         mSecondaryFiles.add(path);
     }
 
     /**
-     * @return
+     * @return the list of output files
      */
     @NonNull
     public List<String> getOutputFiles() {
@@ -192,21 +192,21 @@ public class DependencyData {
     }
 
     /**
-     * @param path
+     * @param path the output file
      */
     void addOutputFile(@NonNull String path) {
         mOutputFiles.add(path);
     }
 
     /**
-     * @param path
+     * @param path the secondary output file
      */
     public void addSecondaryOutputFile(@NonNull String path) {
         mSecondaryOutputFiles.add(path);
     }
 
     /**
-     * @return
+     * @return the list of secondary output files
      */
     @NonNull
     public List<String> getSecondaryOutputFiles() {
@@ -214,7 +214,7 @@ public class DependencyData {
     }
 
     /**
-     * @return
+     * @return a string representation of this object
      */
     @Override
     public String toString() {
@@ -226,23 +226,23 @@ public class DependencyData {
     }
 
     /**
-     *
+     * Enum representing the parsing mode
      */
     private enum ParseMode {
         /**
-         *
+         * Parsing output files
          */
         OUTPUT,
         /**
-         *
+         * Parsing main input file
          */
         MAIN,
         /**
-         *
+         * Parsing secondary input files
          */
         SECONDARY,
         /**
-         *
+         * Parsing is done
          */
         DONE
     }

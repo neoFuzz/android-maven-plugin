@@ -34,24 +34,63 @@ import java.util.Map;
  * An object that contain a BuildConfig configuration
  */
 public abstract class BaseConfigImpl implements Serializable, BaseConfig {
+    /**
+     * Serialization version ID
+     */
     @Serial
     private static final long serialVersionUID = 1L;
 
+    /**
+     * Map of BuildConfig fields, keyed by field name
+     */
     private final Map<String, ClassField> mBuildConfigFields = Maps.newTreeMap();
+
+    /**
+     * Map of resource values, keyed by resource name
+     */
     private final Map<String, ClassField> mResValues = Maps.newTreeMap();
+
+    /**
+     * List of ProGuard configuration files
+     */
     private final List<File> mProguardFiles = Lists.newArrayList();
+
+    /**
+     * List of ProGuard rules files to be included in published AAR
+     */
     private final List<File> mConsumerProguardFiles = Lists.newArrayList();
+
+    /**
+     * List of ProGuard rules files for testing
+     */
     private final List<File> mTestProguardFiles = Lists.newArrayList();
+
+    /**
+     * Map of manifest placeholders for manifest merger
+     */
     private final Map<String, Object> mManifestPlaceholders = Maps.newHashMap();
+
+    /**
+     * Whether Multi-Dex is enabled for this variant
+     */
     @Nullable
     private Boolean mMultiDexEnabled;
 
+    /**
+     * File containing ProGuard rules for Multi-Dex
+     */
     @Nullable
     private File mMultiDexKeepProguard;
 
+    /**
+     * File containing the Multi-Dex keep list
+     */
     @Nullable
     private File mMultiDexKeepFile;
 
+    /**
+     * List of JarJar rules files
+     */
     @NonNull
     private List<File> mJarJarRuleFiles = Lists.newArrayList();
 

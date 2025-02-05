@@ -36,7 +36,7 @@ interface DataMap<T extends DataItem> {
      * a Multi map of (key, dataItem) where key is the result of
      * {@link DataItem#getKey()}
      *
-     * @return a non null map
+     * @return a non-null map
      */
     @NonNull
     ListMultimap<String, T> getDataMap();

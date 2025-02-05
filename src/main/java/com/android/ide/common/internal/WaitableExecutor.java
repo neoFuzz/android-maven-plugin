@@ -82,6 +82,7 @@ public class WaitableExecutor<T> {
      * @param cancelRemaining if true, and a task fails, cancel all remaining tasks.
      * @return a list of all the return values from the tasks.
      * @throws InterruptedException if this thread was interrupted. Not if the tasks were interrupted.
+     * @throws LoggedErrorException if a task threw an exception. The original exception is the cause.
      */
     public List<T> waitForTasksWithQuickFail(boolean cancelRemaining) throws InterruptedException,
             LoggedErrorException {
@@ -171,14 +172,26 @@ public class WaitableExecutor<T> {
         }
     }
 
+    /**
+     * @param <T> the type of the value returned by the task.
+     */
     public static final class TaskResult<T> {
         private T value;
         private Throwable exception;
 
+        /**
+         * @param cause the exception that was thrown by the task.
+         * @param <T>   the type of the value returned by the task.
+         */
         TaskResult(Throwable cause) {
             setException(cause);
         }
 
+        /**
+         * @param value the value returned by the task.
+         * @param <T>   the type of the value returned by the task.
+         * @return a new {@link TaskResult} with the given value.
+         */
         @NonNull
         static <T> TaskResult<T> withValue(T value) {
             TaskResult<T> result = new TaskResult<>(null);
@@ -186,18 +199,30 @@ public class WaitableExecutor<T> {
             return result;
         }
 
+        /**
+         * @return  the value returned by the task.
+         */
         public T getValue() {
             return value;
         }
 
+        /**
+         * @param value the value returned by the task.
+         */
         public void setValue(T value) {
             this.value = value;
         }
 
+        /**
+         * @return the exception that was thrown by the task.
+         */
         public Throwable getException() {
             return exception;
         }
 
+        /**
+         * @param exception the exception that was thrown by the task.
+         */
         public void setException(Throwable exception) {
             this.exception = exception;
         }

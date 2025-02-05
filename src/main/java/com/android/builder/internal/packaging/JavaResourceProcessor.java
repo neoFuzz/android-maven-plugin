@@ -25,10 +25,19 @@ import com.android.ide.common.packaging.PackagingUtils;
 
 import java.io.File;
 
+/**
+ * Processes resources from a Java project's source folder.
+ */
 public class JavaResourceProcessor {
 
+    /**
+     * The builder to receive the resources
+     */
     private final IArchiveBuilder mBuilder;
 
+    /**
+     * @param builder the builder to receive the resources
+     */
     public JavaResourceProcessor(IArchiveBuilder builder) {
         mBuilder = builder;
     }
@@ -89,6 +98,15 @@ public class JavaResourceProcessor {
         }
     }
 
+    /**
+     * @param directory the directory to process
+     * @param path      the relative path of this directory to the source folder.
+     *                  Can be <code>null</code> to identify a root directory.
+     * @throws DuplicateFileException if a file conflicts with another already added to the APK
+     *                                at the same location inside the APK archive.
+     * @throws PackagerException      if an error occurred
+     * @throws SealedPackageException if the APK is already sealed.
+     */
     private void processDirectory(@NonNull File directory, String path)
             throws DuplicateFileException, PackagerException, SealedPackageException {
         // Check if the directory should be processed
@@ -102,6 +120,15 @@ public class JavaResourceProcessor {
         }
     }
 
+    /**
+     * @param file the file to process
+     * @param path the relative path of this file to the source folder.
+     *             Can be <code>null</code> to identify a root file.
+     * @throws DuplicateFileException if a file conflicts with another already added to the APK
+     *                                at the same location inside the APK archive.
+     * @throws PackagerException      if an error occurred
+     * @throws SealedPackageException if the APK is already sealed.
+     */
     private void processFile(@NonNull File file, String path)
             throws DuplicateFileException, PackagerException, SealedPackageException {
         // Check if the file should be processed
@@ -111,6 +138,9 @@ public class JavaResourceProcessor {
     }
 
 
+    /**
+     * Interface for the consumer that will receive the resources as they are processed.
+     */
     public interface IArchiveBuilder {
 
         /**

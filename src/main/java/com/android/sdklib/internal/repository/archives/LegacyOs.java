@@ -32,19 +32,39 @@ package com.android.sdklib.internal.repository.archives;
  */
 @Deprecated
 public enum LegacyOs {
+    /**
+     * Any OS
+     */
     ANY("Any"),
+    /**
+     * Linux
+     */
     LINUX("Linux"),
+    /**
+     * MacOS X
+     */
     MACOSX("MacOS X"),
+    /**
+     * Windows
+     */
     WINDOWS("Windows");
 
+    /**
+     * The UI name of the OS.
+     */
     private final String mUiName;
 
+    /**
+     * @param uiName the UI name of the OS. Must not be null nor empty.
+     */
     LegacyOs(String uiName) {
         mUiName = uiName;
     }
 
     /**
      * Returns the UI name of the OS.
+     *
+     * @return the UI name of the OS.
      */
     public String getUiName() {
         return mUiName;

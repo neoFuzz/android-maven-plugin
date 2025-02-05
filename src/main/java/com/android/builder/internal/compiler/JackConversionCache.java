@@ -51,12 +51,21 @@ import java.util.List;
  */
 public class JackConversionCache extends PreProcessCache<PreProcessCache.Key> {
 
+    /**
+     * Singleton instance of the cache.
+     */
     private static final JackConversionCache sSingleton = new JackConversionCache();
 
+    /**
+     * @return the singleton instance of the cache.
+     */
     public static JackConversionCache getCache() {
         return sSingleton;
     }
 
+    /**
+     * @return the key factory for the cache.
+     */
     @NonNull
     @Override
     protected KeyFactory<Key> getKeyFactory() {
@@ -67,13 +76,17 @@ public class JackConversionCache extends PreProcessCache<PreProcessCache.Key> {
      * Converts a given library to a given output with Jill, using a specific version of the
      * build-tools.
      *
-     * @param inputFile       the jar to pre-dex
-     * @param outFile         the output file.
-     * @param dexOptions      the dex options to run pre-dex
-     * @param buildToolInfo   the build tools info
-     * @param verbose         verbose flag
-     * @param processExecutor the java process executor.
-     * @throws ProcessException failed to run Jill
+     * @param inputFile            the jar to pre-dex
+     * @param outFile              the output file.
+     * @param dexOptions           the dex options to run pre-dex
+     * @param buildToolInfo        the build tools info
+     * @param verbose              verbose flag
+     * @param processExecutor      the java process executor.
+     * @param processOutputHandler the process output handler
+     * @param logger               the logger to use
+     * @throws ProcessException     failed to run Jill
+     * @throws InterruptedException the process was interrupted
+     * @throws IOException          failed to read or write files
      */
     public void convertLibrary(
             @NonNull File inputFile,

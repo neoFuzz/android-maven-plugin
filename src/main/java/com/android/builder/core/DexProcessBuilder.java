@@ -41,73 +41,148 @@ import static com.google.common.base.Preconditions.checkState;
  * A builder to create a dex-specific ProcessInfoBuilder
  */
 public class DexProcessBuilder extends ProcessEnvBuilder<DexProcessBuilder> {
+    /**
+     * Minimum build tools revision for dex input list.
+     */
     private static final FullRevision MIN_BUILD_TOOLS_REVISION_FOR_DEX_INPUT_LIST = new FullRevision(21, 0, 0);
+    /**
+     * Minimum build tools revision for multi-dex support.
+     */
     private static final FullRevision MIN_MULTIDEX_BUILD_TOOLS_REV = new FullRevision(21, 0, 0);
+    /**
+     * Minimum build tools revision for multi-dex support with native runtime.
+     */
     private static final FullRevision MIN_MULTI_THREADED_DEX_BUILD_TOOLS_REV = new FullRevision(22, 0, 2);
 
+    /**
+     * the output file for the dex process.
+     */
     @NonNull
     private final File mOutputFile;
+    /**
+     * the input files for the dex process.
+     */
     private final Set<File> mInputs = Sets.newHashSet();
+    /**
+     * the input files for the dex process.
+     */
     private boolean mVerbose = false;
+    /**
+     * the input files for the dex process.
+     */
     private boolean mIncremental = false;
+    /**
+     * the input files for the dex process.
+     */
     private boolean mNoOptimize = false;
+    /**
+     * the input files for the dex process.
+     */
     private boolean mMultiDex = false;
+    /**
+     * the input files for the dex process.
+     */
     private File mMainDexList = null;
+    /**
+     * the input files for the dex process.
+     */
     private File mTempInputFolder = null;
+    /**
+     * the input files for the dex process.
+     */
     private List<String> mAdditionalParams = null;
 
+    /**
+     * @param outputFile the output file for the dex process.
+     */
     public DexProcessBuilder(@NonNull File outputFile) {
         mOutputFile = outputFile;
     }
 
+    /**
+     * @param verbose if true, verbose mode is enabled.
+     * @return this builder
+     */
     @NonNull
     public DexProcessBuilder setVerbose(boolean verbose) {
         mVerbose = verbose;
         return this;
     }
 
+    /**
+     * @param incremental if true, incremental mode is enabled.
+     * @return this builder
+     */
     @NonNull
     public DexProcessBuilder setIncremental(boolean incremental) {
         mIncremental = incremental;
         return this;
     }
 
+    /**
+     * @param noOptimize if true, no optimization is done.
+     * @return this builder
+     */
     @NonNull
     public DexProcessBuilder setNoOptimize(boolean noOptimize) {
         mNoOptimize = noOptimize;
         return this;
     }
 
+    /**
+     * @param multiDex if true, multi-dex is enabled.
+     * @return this builder
+     */
     @NonNull
     public DexProcessBuilder setMultiDex(boolean multiDex) {
         mMultiDex = multiDex;
         return this;
     }
 
+    /**
+     * @param mainDexList the main dex list file.
+     * @return this builder
+     */
     @NonNull
     public DexProcessBuilder setMainDexList(File mainDexList) {
         mMainDexList = mainDexList;
         return this;
     }
 
+    /**
+     * @param input the input file to add to the dex process.
+     * @return this builder
+     */
     @NonNull
     public DexProcessBuilder addInput(File input) {
         mInputs.add(input);
         return this;
     }
 
+    /**
+     * @param inputs the input files to add to the dex process.
+     * @return this builder
+     */
     @NonNull
     public DexProcessBuilder addInputs(@NonNull Collection<File> inputs) {
         mInputs.addAll(inputs);
         return this;
     }
 
+    /**
+     * @param tempInputFolder the temp input folder to use for the dex process.
+     * @return this builder
+     */
     @NonNull
     public DexProcessBuilder setTempInputFolder(File tempInputFolder) {
         mTempInputFolder = tempInputFolder;
         return this;
     }
 
+    /**
+     * @param params the additional parameters to pass to the dex process.
+     * @return this builder
+     */
     @NonNull
     public DexProcessBuilder additionalParameters(@NonNull List<String> params) {
         if (mAdditionalParams == null) {
@@ -119,6 +194,12 @@ public class DexProcessBuilder extends ProcessEnvBuilder<DexProcessBuilder> {
         return this;
     }
 
+    /**
+     * @param buildToolInfo the build tool info to use for the dex process.
+     * @param dexOptions    the dex options to use for the dex process.
+     * @return the process info for the dex process.
+     * @throws ProcessException if the process cannot be created.
+     */
     @NonNull
     public JavaProcessInfo build(
             @NonNull BuildToolInfo buildToolInfo,
@@ -200,6 +281,11 @@ public class DexProcessBuilder extends ProcessEnvBuilder<DexProcessBuilder> {
         return builder.createJavaProcess();
     }
 
+    /**
+     * @param buildToolInfo the build tool info to use for the dex process.
+     * @return the list of files to add to the dex process.
+     * @throws ProcessException if the process cannot be created.
+     */
     @NonNull
     private List<String> getFilesToAdd(@NonNull BuildToolInfo buildToolInfo) throws
             ProcessException {

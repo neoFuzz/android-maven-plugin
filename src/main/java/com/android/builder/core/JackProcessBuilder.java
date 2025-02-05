@@ -34,62 +34,135 @@ import java.util.List;
  */
 public class JackProcessBuilder extends ProcessEnvBuilder<JackProcessBuilder> {
 
+    /**
+     * Minimum Jack revision
+     */
     static final FullRevision JACK_MIN_REV = new FullRevision(21, 1, 0);
 
+    /**
+     * Debug logging flag
+     */
     private boolean mDebugLog = false;
+    /**
+     * Verbose flag
+     */
     private boolean mVerbose = false;
+    /**
+     * Classpath to use
+     */
     private String mClasspath = null;
+    /**
+     * Output folder to use for Dex
+     */
     private File mDexOutputFolder = null;
+    /**
+     * Output file to use for Jack
+     */
     private File mJackOutputFile = null;
+    /**
+     * Import files to use
+     */
     private List<File> mImportFiles = null;
+    /**
+     * Proguard files to use
+     */
     private List<File> mProguardFiles = null;
+    /**
+     * Java max heap size to use
+     */
     private String mJavaMaxHeapSize = null;
+    /**
+     * Mapping file to use
+     */
     private File mMappingFile = null;
+    /**
+     * Multi-dex flag
+     */
     private boolean mMultiDex = false;
+    /**
+     * Min SDK version to use
+     */
     private int mMinSdkVersion = 21;
+    /**
+     * Ecj option file to use
+     */
     private File mEcjOptionFile = null;
+    /**
+     * Jar jar rule files to use
+     */
     private Collection<File> mJarJarRuleFiles = null;
 
+    /**
+     * Default constructor
+     */
     public JackProcessBuilder() {
         // nothing to do
     }
 
+    /**
+     * @param debugLog the debug log flag to use
+     * @return the {@link JavaProcessInfo} to execute Jack
+     */
     @NonNull
     public JackProcessBuilder setDebugLog(boolean debugLog) {
         mDebugLog = debugLog;
         return this;
     }
 
+    /**
+     * @param verbose the verbose flag to use
+     * @return the {@link JavaProcessInfo} to execute Jack
+     */
     @NonNull
     public JackProcessBuilder setVerbose(boolean verbose) {
         mVerbose = verbose;
         return this;
     }
 
+    /**
+     * @param javaMaxHeapSize the max heap size to use
+     * @return the {@link JavaProcessInfo} to execute Jack
+     */
     @NonNull
     public JackProcessBuilder setJavaMaxHeapSize(String javaMaxHeapSize) {
         mJavaMaxHeapSize = javaMaxHeapSize;
         return this;
     }
 
+    /**
+     * @param classpath the classpath to use
+     * @return the {@link JavaProcessInfo} to execute Jack
+     */
     @NonNull
     public JackProcessBuilder setClasspath(String classpath) {
         mClasspath = classpath;
         return this;
     }
 
+    /**
+     * @param dexOutputFolder the output folder to use
+     * @return the {@link JavaProcessInfo} to execute Jack
+     */
     @NonNull
     public JackProcessBuilder setDexOutputFolder(File dexOutputFolder) {
         mDexOutputFolder = dexOutputFolder;
         return this;
     }
 
+    /**
+     * @param jackOutputFile the output file to use
+     * @return the {@link JavaProcessInfo} to execute Jack
+     */
     @NonNull
     public JackProcessBuilder setJackOutputFile(File jackOutputFile) {
         mJackOutputFile = jackOutputFile;
         return this;
     }
 
+    /**
+     * @param importFiles the list of import files to use
+     * @return the {@link JavaProcessInfo} to execute Jack
+     */
     @NonNull
     public JackProcessBuilder addImportFiles(@NonNull Collection<File> importFiles) {
         if (mImportFiles == null) {
@@ -100,6 +173,10 @@ public class JackProcessBuilder extends ProcessEnvBuilder<JackProcessBuilder> {
         return this;
     }
 
+    /**
+     * @param proguardFiles the list of proguard files to use
+     * @return the {@link JavaProcessInfo} to execute Jack
+     */
     @NonNull
     public JackProcessBuilder addProguardFiles(@NonNull Collection<File> proguardFiles) {
         if (mProguardFiles == null) {
@@ -110,36 +187,61 @@ public class JackProcessBuilder extends ProcessEnvBuilder<JackProcessBuilder> {
         return this;
     }
 
+    /**
+     * @param mappingFile the mapping file to use
+     * @return the {@link JavaProcessInfo} to execute Jack
+     */
     @NonNull
     public JackProcessBuilder setMappingFile(File mappingFile) {
         mMappingFile = mappingFile;
         return this;
     }
 
+    /**
+     * @param multiDex the flag to enable multi-dexing
+     * @return the {@link JavaProcessInfo} to execute Jack
+     */
     @NonNull
     public JackProcessBuilder setMultiDex(boolean multiDex) {
         mMultiDex = multiDex;
         return this;
     }
 
+    /**
+     * @param minSdkVersion the minimum SDK version to use when compiling with Jack
+     * @return the {@link JavaProcessInfo} to execute Jack
+     */
     @NonNull
     public JackProcessBuilder setMinSdkVersion(int minSdkVersion) {
         mMinSdkVersion = minSdkVersion;
         return this;
     }
 
+    /**
+     * @param ecjOptionFile the ecj option file to use
+     * @return the {@link JavaProcessInfo} to execute Jack
+     */
     @NonNull
     public JackProcessBuilder setEcjOptionFile(File ecjOptionFile) {
         mEcjOptionFile = ecjOptionFile;
         return this;
     }
 
+    /**
+     * @param jarJarRuleFiles the list of jarjar rule files to use
+     * @return the {@link JavaProcessInfo} to execute Jack
+     */
     @NonNull
     public JackProcessBuilder setJarJarRuleFiles(@NonNull Collection<File> jarJarRuleFiles) {
         mJarJarRuleFiles = jarJarRuleFiles;
         return this;
     }
 
+    /**
+     * @param buildToolInfo the {@link BuildToolInfo} to use for Jack
+     * @return the {@link JavaProcessInfo} to execute Jack
+     * @throws ProcessException if Jack is not found or not compatible with the current build tools
+     */
     @NonNull
     public JavaProcessInfo build(@NonNull BuildToolInfo buildToolInfo) throws ProcessException {
 

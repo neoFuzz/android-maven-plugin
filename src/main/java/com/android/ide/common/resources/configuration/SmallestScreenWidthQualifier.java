@@ -26,6 +26,9 @@ import java.util.regex.Pattern;
  * Resource Qualifier for Screen Pixel Density.
  */
 public final class SmallestScreenWidthQualifier extends ResourceQualifier {
+    /**
+     * Static string for message
+     */
     public static final String NAME = "Smallest Screen Width";
     /**
      * Default screen size value. This means the property is not set
@@ -35,14 +38,31 @@ public final class SmallestScreenWidthQualifier extends ResourceQualifier {
     private static final String S_PRINT_PATTERN = "sw%1$ddp"; //$NON-NLS-1$
     private int mValue = DEFAULT_SIZE;
 
+    /**
+     * Returns the qualifier object to represent the given folder segment.
+     * <p>
+     * The segment must be of the form swNNNdp where NNN is a number.
+     * <p>
+     * If the segment is not valid, <code>null</code> is returned.
+     * <p>
+     * Valid values are 120, 160, 213, 240, 320, 480, 640, 720, 800, 960, 1024
+     */
     public SmallestScreenWidthQualifier() {
         // pass
     }
 
+    /**
+     * @param value the screen size value
+     */
     public SmallestScreenWidthQualifier(int value) {
         mValue = value;
     }
 
+    /**
+     * @param value the string value to parse
+     * @return a {@link SmallestScreenWidthQualifier} or <code>null</code> if the string is not a
+     * valid resource qualifier
+     */
     @Nullable
     public static SmallestScreenWidthQualifier getQualifier(String value) {
         try {
@@ -59,6 +79,9 @@ public final class SmallestScreenWidthQualifier extends ResourceQualifier {
         return null;
     }
 
+    /**
+     * @return the screen size value
+     */
     public int getValue() {
         return mValue;
     }

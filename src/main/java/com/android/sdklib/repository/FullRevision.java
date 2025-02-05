@@ -33,10 +33,25 @@ import java.util.regex.Pattern;
  */
 public class FullRevision extends Revision {
 
+    /**
+     * No major revision number
+     */
     public static final int MISSING_MAJOR_REV = 0;
+    /**
+     * No minor revision number
+     */
     public static final int IMPLICIT_MINOR_REV = 0;
+    /**
+     * No micro revision number
+     */
     public static final int IMPLICIT_MICRO_REV = 0;
+    /**
+     * No preview number
+     */
     public static final int NOT_A_PREVIEW = 0;
+    /**
+     * Only major revision specified: 1 term
+     */
     public static final FullRevision NOT_SPECIFIED = new FullRevision(MISSING_MAJOR_REV);
     /**
      * Only major revision specified: 1 term
@@ -54,28 +69,70 @@ public class FullRevision extends Revision {
      * Major, minor, micro and preview revisions specified: 4 terms (x.y.z-rcN)
      */
     protected static final int PRECISION_PREVIEW = 4;
+    /**
+     * Default separator between revision and preview number.
+     */
     protected static final String DEFAULT_SEPARATOR = " ";
+    /**
+     * Pattern to match a full revision.
+     */
     private static final Pattern FULL_REVISION_PATTERN =
             //                   1=major       2=minor       3=micro              4=preview
             Pattern.compile("\\s*([0-9]+)(?:\\.([0-9]+)(?:\\.([0-9]+))?)?([\\s-]*)?(?:rc([0-9]+))?\\s*");
+    /**
+     * The major revision number. Use {@link #MISSING_MAJOR_REV} if there is no major revision.
+     */
     private final int mMajor;
+    /**
+     * The minor revision number. Use {@link #IMPLICIT_MINOR_REV} if there is no minor revision.
+     */
     private final int mMinor;
+    /**
+     * The micro revision number. Use {@link #IMPLICIT_MICRO_REV} if there is no micro revision.
+     */
     private final int mMicro;
+    /**
+     * The preview number. Use {@link #NOT_A_PREVIEW} if there is no preview.
+     */
     private final int mPreview;
+    /**
+     * The separator between the revision and the preview number.
+     */
     private final String mPreviewSeparator;
 
+    /**
+     * @param major The major revision number.
+     */
     public FullRevision(int major) {
         this(major, IMPLICIT_MINOR_REV, IMPLICIT_MICRO_REV);
     }
 
+    /**
+     * @param major The major revision number. Use {@link #MISSING_MAJOR_REV} if there is no major revision.
+     * @param minor The minor revision number. Use {@link #IMPLICIT_MINOR_REV} if there is no minor revision.
+     * @param micro The micro revision number. Use {@link #IMPLICIT_MICRO_REV} if there is no micro revision.
+     */
     public FullRevision(int major, int minor, int micro) {
         this(major, minor, micro, NOT_A_PREVIEW);
     }
 
+    /**
+     * @param major   The major revision number. Use {@link #MISSING_MAJOR_REV} if there is no major revision.
+     * @param minor   The minor revision number. Use {@link #IMPLICIT_MINOR_REV} if there is no minor revision.
+     * @param micro   The micro revision number. Use {@link #IMPLICIT_MICRO_REV} if there is no micro revision.
+     * @param preview The preview number. Use {@link #NOT_A_PREVIEW} if there is no preview.
+     */
     public FullRevision(int major, int minor, int micro, int preview) {
         this(major, minor, micro, preview, DEFAULT_SEPARATOR);
     }
 
+    /**
+     * @param major            The major revision number. Use {@link #MISSING_MAJOR_REV} if there is no major revision.
+     * @param minor            The minor revision number. Use {@link #IMPLICIT_MINOR_REV} if there is no minor revision.
+     * @param micro            The micro revision number. Use {@link #IMPLICIT_MICRO_REV} if there is no micro revision.
+     * @param preview          The preview number. Use {@link #NOT_A_PREVIEW} if there is no preview.
+     * @param previewSeparator The separator between the revision and the preview number.
+     */
     public FullRevision(int major, int minor, int micro, int preview,
                         @NonNull String previewSeparator) {
         super(major);
@@ -108,6 +165,15 @@ public class FullRevision extends Revision {
                 false /*keepPrevision*/);
     }
 
+    /**
+     * @param revision          A non-null revision to parse.
+     * @param supportMinorMicro If false, the returned revision will never have a minor or micro number.
+     * @param supportPreview    If false, the returned revision will never have a preview number.
+     * @param keepPrecision     If true, the returned revision will be a {@link PreciseRevision} if
+     *                          possible.
+     * @return A new non-null {@link FullRevision}.
+     * @throws NumberFormatException if the parsing failed.
+     */
     @NonNull
     protected static FullRevision parseRevisionImpl(@NonNull String revision,
                                                     boolean supportMinorMicro,
@@ -185,32 +251,50 @@ public class FullRevision extends Revision {
         throw n;
     }
 
+    /**
+     * @return The major revision number.
+     */
     @Override
     public int getMajor() {
         return mMajor;
     }
 
+    /**
+     * @return The minor revision number.
+     */
     @Override
     public int getMinor() {
         return mMinor;
     }
 
+    /**
+     * @return The micro revision number.
+     */
     @Override
     public int getMicro() {
         return mMicro;
     }
 
+    /**
+     * @return The separator to use when converting to a string.
+     */
     @Override
     @NonNull
     protected String getSeparator() {
         return mPreviewSeparator;
     }
 
+    /**
+     * @return True if this is a preview package.
+     */
     @Override
     public boolean isPreview() {
         return mPreview > NOT_A_PREVIEW;
     }
 
+    /**
+     * @return The preview number or 0 if this is not a preview package.
+     */
     @Override
     public int getPreview() {
         return mPreview;
@@ -220,6 +304,8 @@ public class FullRevision extends Revision {
      * Returns the version in a fixed format major.minor.micro
      * with an optional "rc preview#". For example, it would
      * return "18.0.0", "18.1.0" or "18.1.2 rc5".
+     *
+     * @return A non-null string.
      */
     @Override
     public String toString() {
@@ -241,6 +327,8 @@ public class FullRevision extends Revision {
      * or preview versions when they are zero.
      * For example, it would return "18 rc1" instead of "18.0.0 rc1",
      * or "18.1 rc2" instead of "18.1.0 rc2".
+     *
+     * @return A non-null string.
      */
     @Override
     public String toShortString() {
@@ -285,6 +373,9 @@ public class FullRevision extends Revision {
         return result;
     }
 
+    /**
+     * @return A hash code for this {@link FullRevision}.
+     */
     @Override
     public int hashCode() {
         final int prime = 31;
@@ -296,6 +387,10 @@ public class FullRevision extends Revision {
         return result;
     }
 
+    /**
+     * @param rhs The right-hand side {@link FullRevision} to compare with.
+     * @return true if lhs &lt;
+     */
     @Override
     public boolean equals(Object rhs) {
         if (this == rhs) {

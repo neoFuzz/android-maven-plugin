@@ -27,6 +27,8 @@ public interface ManifestProvider {
 
     /**
      * Returns the location of the manifest.
+     *
+     * @return a File for the manifest
      */
     @NonNull
     File getManifest();

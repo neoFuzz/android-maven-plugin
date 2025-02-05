@@ -44,6 +44,10 @@ public class MonkeyTestRunner {
     private boolean killProcessAfterError;
     private boolean monitorNativeCrashes;
 
+    /**
+     * @param eventCount   number of events to inject
+     * @param remoteDevice device to run instrumentation on
+     */
     public MonkeyTestRunner(int eventCount, IDevice remoteDevice) {
         this.eventCount = eventCount;
         mRemoteDevice = remoteDevice;
@@ -83,82 +87,139 @@ public class MonkeyTestRunner {
         addArg(name, Long.toString(value));
     }
 
+    /**
+     * @param seed the seed to use for the monkey test
+     */
     public void setSeed(long seed) {
         addLongArg(SEED_ARG_NAME, seed);
     }
 
+    /**
+     * @param throttle the throttle to use for the monkey test
+     */
     public void setThrottle(long throttle) {
         addLongArg(THROTTLE_ARG_NAME, throttle);
     }
 
+    /**
+     * @param percent the percent of touch events to send
+     */
     public void setPercentTouch(long percent) {
         addLongArg(PERCENT_TOUCH_ARG_NAME, percent);
     }
 
+    /**
+     * @param percent the percent of motion events to send
+     */
     public void setPercentMotion(long percent) {
         addLongArg(PERCENT_MOTION_ARG_NAME, percent);
     }
 
+    /**
+     * @param percent the percent of trackball events to send
+     */
     public void setPercentTrackball(long percent) {
         addLongArg(PERCENT_TRACKBALL_ARG_NAME, percent);
     }
 
+    /**
+     * @param percent the percent of navigation events to send
+     */
     public void setPercentNav(long percent) {
         addLongArg(PERCENT_NAV_ARG_NAME, percent);
     }
 
+    /**
+     * @param percent the percent of major navigation events to send
+     */
     public void setPercentMajorNav(long percent) {
         addLongArg(PERCENT_MAJORNAV_ARG_NAME, percent);
     }
 
+    /**
+     * @param percent the percent of system key events to send
+     */
     public void setPercentSyskeys(long percent) {
         addLongArg(PERCENT_SYSKEYS_ARG_NAME, percent);
     }
 
+    /**
+     * @param percent the percent of app switching events to send
+     */
     public void setPercentAppswitch(long percent) {
         addLongArg(PERCENT_APPSWITCH_ARG_NAME, percent);
     }
 
+    /**
+     * @param percent the percent of any events to send
+     */
     public void setPercentAnyEvent(int percent) {
         addLongArg(PERCENT_ANYEVENT_ARG_NAME, percent);
     }
 
+    /**
+     * @param packages the packages to run the monkey test against
+     */
     public void setPackages(@NonNull String[] packages) {
         for (String packageName : packages) {
             addArg(PACKAGE_ARG_NAME, packageName);
         }
     }
 
+    /**
+     * @param categories the categories to run the monkey test against
+     */
     public void setCategories(@NonNull String[] categories) {
         for (String category : categories) {
             addArg(CATEGORY_ARG_NAME, category);
         }
     }
 
+    /**
+     * @param debugNoEvents if true, do not send any events to the system
+     */
     public void setDebugNoEvents(boolean debugNoEvents) {
         this.debugNoEvents = debugNoEvents;
     }
 
+    /**
+     * @param hprof if true, generate a hprof file
+     */
     public void setHprof(boolean hprof) {
         this.hprof = hprof;
     }
 
+    /**
+     * @param ignoreCrashes if true, do not report crashes
+     */
     public void setIgnoreCrashes(boolean ignoreCrashes) {
         this.ignoreCrashes = ignoreCrashes;
     }
 
+    /**
+     * @param ignoreTimeouts if true, do not report timeouts
+     */
     public void setIgnoreTimeouts(boolean ignoreTimeouts) {
         this.ignoreTimeouts = ignoreTimeouts;
     }
 
+    /**
+     * @param ignoreSecurityExceptions if true, do not report security exceptions
+     */
     public void setIgnoreSecurityExceptions(boolean ignoreSecurityExceptions) {
         this.ignoreSecurityExceptions = ignoreSecurityExceptions;
     }
 
+    /**
+     * @param killProcessAfterError if true, kill the process after an error occurs
+     */
     public void setKillProcessAfterError(boolean killProcessAfterError) {
         this.killProcessAfterError = killProcessAfterError;
     }
 
+    /**
+     * @param monitorNativeCrashes if true, monitor native crashes
+     */
     public void setMonitorNativeCrash(boolean monitorNativeCrashes) {
         this.monitorNativeCrashes = monitorNativeCrashes;
     }
@@ -186,6 +247,10 @@ public class MonkeyTestRunner {
      * Runs the tests from a list of instrumentation listeners.
      *
      * @param listeners the listeners to report test results to
+     * @throws TimeoutException                  if the test run has timed out
+     * @throws AdbCommandRejectedException       if adb rejects the shell command
+     * @throws ShellCommandUnresponsiveException if the shell command is unresponsive
+     * @throws IOException                       if an I/O error occurs
      */
     public void run(ITestRunListener... listeners) throws TimeoutException, AdbCommandRejectedException,
             ShellCommandUnresponsiveException, IOException {
@@ -196,6 +261,10 @@ public class MonkeyTestRunner {
      * Runs the tests from a list of instrumentation listeners.
      *
      * @param listeners the listeners to report test results to
+     * @throws TimeoutException                  if the test run has timed out
+     * @throws AdbCommandRejectedException       if adb rejects the shell command
+     * @throws ShellCommandUnresponsiveException if the shell command is unresponsive
+     * @throws IOException                       if an I/O error occurs
      */
     public void run(Collection<ITestRunListener> listeners) throws TimeoutException, AdbCommandRejectedException,
             ShellCommandUnresponsiveException, IOException {
@@ -281,6 +350,9 @@ public class MonkeyTestRunner {
         return commandBuilder.toString();
     }
 
+    /**
+     * Parses the output of the monkey test run and notifies listeners of the results.
+     */
     private class MonkeyResultParser extends MultiLineReceiver {
 
         private static final String CRASH_KEY = "// CRASH:";
@@ -302,20 +374,33 @@ public class MonkeyTestRunner {
         private TestIdentifier mCurrentTestIndentifier;
         private long elapsedTime;
 
+        /**
+         * @param runName   the test run name
+         * @param listeners the listeners to notify of test results
+         */
         private MonkeyResultParser(String runName, Collection<ITestRunListener> listeners) {
             this.runName = runName;
             mTestListeners = new ArrayList<>(listeners);
         }
 
+        /**
+         * Cancels the test run.
+         */
         public void cancel() {
             canceled = true;
         }
 
+        /**
+         * @return true if the test run has been canceled, false otherwise
+         */
         @Override
         public boolean isCancelled() {
             return canceled;
         }
 
+        /**
+         * Called when the test run is complete. Notifies listeners of the test run ending.
+         */
         @Override
         public void done() {
             handleTestEnd();
@@ -323,6 +408,9 @@ public class MonkeyTestRunner {
             super.done();
         }
 
+        /**
+         * @param lines The array containing the new lines.
+         */
         @Override
         public void processNewLines(@NonNull String[] lines) {
             for (int indexLine = 0; indexLine < lines.length; indexLine++) {
@@ -361,6 +449,9 @@ public class MonkeyTestRunner {
             }
         }
 
+        /**
+         * Notifies listeners of the start of the test run.
+         */
         private void handleTestRunStarted() {
             elapsedTime = System.currentTimeMillis();
             for (ITestRunListener listener : mTestListeners) {
@@ -368,12 +459,18 @@ public class MonkeyTestRunner {
             }
         }
 
+        /**
+         * @param error the error message to notify listeners of
+         */
         public void handleTestRunFailed(String error) {
             for (ITestRunListener listener : mTestListeners) {
                 listener.testRunFailed(error);
             }
         }
 
+        /**
+         * Notifies listeners of the end of the test run.
+         */
         private void handleTestRunEnded() {
             elapsedTime = System.currentTimeMillis() - elapsedTime;
 
@@ -382,6 +479,9 @@ public class MonkeyTestRunner {
             }
         }
 
+        /**
+         * @param line the line containing the test identifier
+         */
         private void handleTestStarted(String line) {
             mCurrentTestIndentifier = new TestIdentifier("MonkeyTest", line);
             for (ITestRunListener listener : mTestListeners) {
@@ -389,6 +489,9 @@ public class MonkeyTestRunner {
             }
         }
 
+        /**
+         * Notifies listeners of the end of the current test.
+         */
         private void handleTestEnd() {
             if (mCurrentTestIndentifier != null) {
                 for (ITestRunListener listener : mTestListeners) {
@@ -398,6 +501,11 @@ public class MonkeyTestRunner {
             }
         }
 
+        /**
+         * @param lines     The array containing the new lines.
+         * @param indexLine The index of the line containing the crash
+         * @return the index of the line after the crash
+         */
         private int handleCrash(@NonNull String[] lines, int indexLine) {
             StringBuilder errorBuilder = new StringBuilder();
             boolean errorEnd = false;

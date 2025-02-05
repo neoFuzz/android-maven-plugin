@@ -26,12 +26,29 @@ import java.io.Serial;
  * An exception thrown during packaging of an APK file.
  */
 public final class DuplicateFileException extends ZipAbortException {
+    /**
+     * Serial version UID for serialization
+     */
     @Serial
     private static final long serialVersionUID = 1L;
+    /**
+     * The path to the archive that contains the duplicate files
+     */
     private final String mArchivePath;
+    /**
+     * The first file that was detected as a duplicate
+     */
     private final File mFile1;
+    /**
+     * The second file that was detected as a duplicate
+     */
     private final File mFile2;
 
+    /**
+     * @param archivePath the path to the archive that contains the duplicate files
+     * @param file1       the first file that was detected as a duplicate
+     * @param file2       the second file that was detected as a duplicate
+     */
     public DuplicateFileException(@NonNull String archivePath, @NonNull File file1,
                                   @NonNull File file2) {
         super();
@@ -40,18 +57,30 @@ public final class DuplicateFileException extends ZipAbortException {
         mFile2 = file2;
     }
 
+    /**
+     * @return the path to the archive that contains the duplicate files
+     */
     public String getArchivePath() {
         return mArchivePath;
     }
 
+    /**
+     * @return the first file that was detected as a duplicate
+     */
     public File getFile1() {
         return mFile1;
     }
 
+    /**
+     * @return the second file that was detected as a duplicate
+     */
     public File getFile2() {
         return mFile2;
     }
 
+    /**
+     * @return a user friendly error message
+     */
     @Override
     @NonNull
     public String getMessage() {

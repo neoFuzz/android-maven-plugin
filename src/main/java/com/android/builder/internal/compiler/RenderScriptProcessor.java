@@ -42,6 +42,9 @@ import static com.android.SdkConstants.FN_RENDERSCRIPT_V8_JAR;
  */
 public class RenderScriptProcessor {
 
+    /**
+     * Static message
+     */
     public static final String RS_DEPS = "rsDeps";
     private static final Abi[] ABIS = {
             new Abi("armeabi-v7a", "armv7-none-linux-gnueabi", BuildToolInfo.PathId.LD_ARM,
@@ -70,6 +73,21 @@ public class RenderScriptProcessor {
     private final File mRsLib;
     private final Map<String, File> mLibClCore = Maps.newHashMap();
 
+    /**
+     * @param sourceFolders     source folders to search for source files
+     * @param importFolders     folders to search for includes.
+     * @param sourceOutputDir   src output directory
+     * @param resOutputDir      resource output directory
+     * @param objOutputDir      object output directory
+     * @param libOutputDir      library output directory
+     * @param buildToolInfo     the build tools info
+     * @param targetApi         the target API level
+     * @param debugBuild        whether to compile in debug mode or not
+     * @param optimizationLevel 0 for none, 1 for fast, 2 for full
+     * @param ndkMode           whether to compile the native library or not
+     * @param supportMode       whether to compile the support library or not
+     * @param abiFilters        abi filters to use, or null if none.
+     */
     public RenderScriptProcessor(
             @NonNull List<File> sourceFolders,
             @NonNull List<File> importFolders,
@@ -110,11 +128,19 @@ public class RenderScriptProcessor {
         }
     }
 
+    /**
+     * @param buildToolsFolder the build tools folder containing the support library
+     * @return the support library jar file
+     */
     @NonNull
     public static File getSupportJar(String buildToolsFolder) {
         return new File(buildToolsFolder, "renderscript/lib/" + FN_RENDERSCRIPT_V8_JAR);
     }
 
+    /**
+     * @param buildToolsFolder the build tools folder containing the support library
+     * @return the folder containing the support native libraries
+     */
     @NonNull
     public static File getSupportNativeLibFolder(String buildToolsFolder) {
         File rs = new File(buildToolsFolder, "renderscript");
@@ -122,6 +148,14 @@ public class RenderScriptProcessor {
         return new File(lib, "packaged");
     }
 
+    /**
+     * @param processExecutor      the executor to use to launch the process.
+     * @param processOutputHandler the handler to use to handle the output of the process.
+     * @throws InterruptedException if the process was interrupted
+     * @throws ProcessException     If the process doesn't finish
+     * @throws LoggedErrorException If a log error occurs
+     * @throws IOException          If an I/O error occurs
+     */
     public void build(
             @NonNull ProcessExecutor processExecutor,
             @NonNull ProcessOutputHandler processOutputHandler)
@@ -154,6 +188,13 @@ public class RenderScriptProcessor {
         }
     }
 
+    /**
+     * @param inputFiles           the list of files to compile
+     * @param processExecutor      the executor to use to launch the process.
+     * @param processOutputHandler the handler to use to handle the output of the process.
+     * @param env                  the environment variables to use when launching the process
+     * @throws ProcessException if an error occurred while compiling the files
+     */
     private void doMainCompilation(
             @NonNull List<File> inputFiles,
             @NonNull ProcessExecutor processExecutor,
@@ -230,6 +271,15 @@ public class RenderScriptProcessor {
         result.rethrowFailure().assertNormalExitValue();
     }
 
+    /**
+     * @param processExecutor      the executor to use when launching the process.
+     * @param processOutputHandler the handler to use when launching the process.
+     * @param env                  the env to use when launching the process.
+     * @throws IOException          If an I/O error occurs
+     * @throws InterruptedException If the execution is interrupted
+     * @throws LoggedErrorException If the execution fails with an error
+     * @throws ProcessException     If the execution fails with an error
+     */
     private void createSupportFiles(
             @NonNull final ProcessExecutor processExecutor,
             @NonNull final ProcessOutputHandler processOutputHandler,
@@ -294,6 +344,18 @@ public class RenderScriptProcessor {
         mExecutor.waitForTasksWithQuickFail(true /*cancelRemaining*/);
     }
 
+    /**
+     * @param bcFile               The input .bc file to be compiled
+     * @param abi                  The target ABI information containing device, toolchain and linker details
+     * @param objName              The name of the output .o file to be created
+     * @param objAbiFolder         The output folder where the .o file will be created
+     * @param processExecutor      The executor used to run the compiler process
+     * @param processOutputHandler Handler for the process output
+     * @param env                  Environment variables for the compiler process
+     * @return The created object file
+     * @throws ProcessException If there is an error during the compilation process
+     */
+    @NonNull
     private File createSupportObjFile(
             @NonNull File bcFile,
             @NonNull Abi abi,
@@ -328,6 +390,18 @@ public class RenderScriptProcessor {
         return outFile;
     }
 
+    /**
+     * Creates a support library file (.so) from the provided object file.
+     *
+     * @param objFile              The input object file to be linked
+     * @param abi                  The target ABI information containing device, toolchain and linker details
+     * @param soName               The name of the output .so file to be created
+     * @param libAbiFolder         The output folder where the .so file will be created
+     * @param processExecutor      The executor used to run the linker process
+     * @param processOutputHandler Handler for the process output
+     * @param env                  Environment variables for the linker process
+     * @throws ProcessException If there is an error during the linking process
+     */
     private void createSupportLibFile(
             @NonNull File objFile,
             @NonNull Abi abi,
@@ -369,18 +443,38 @@ public class RenderScriptProcessor {
                 .rethrowFailure().assertNormalExitValue();
     }
 
-    // ABI list, as pairs of (android-ABI, toolchain-ABI)
+    /**
+     * ABI list, as pairs of (android-ABI, toolchain-ABI)
+     */
     private static final class Abi {
 
+        /**
+         * Device ABI.
+         */
         @NonNull
         private final String mDevice;
+        /**
+         * Toolchain ABI.
+         */
         @NonNull
         private final String mToolchain;
+        /**
+         * Linker path id.
+         */
         @NonNull
         private final BuildToolInfo.PathId mLinker;
+        /**
+         * Linker arguments.
+         */
         @NonNull
         private final String[] mLinkerArgs;
 
+        /**
+         * @param device     the device ABI
+         * @param toolchain  the toolchain ABI
+         * @param linker     the linker path id
+         * @param linkerArgs the linker arguments
+         */
         Abi(@NonNull String device,
             @NonNull String toolchain,
             @NonNull BuildToolInfo.PathId linker,

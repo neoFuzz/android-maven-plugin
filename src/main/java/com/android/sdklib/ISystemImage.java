@@ -30,24 +30,32 @@ import java.io.File;
 public interface ISystemImage extends Comparable<ISystemImage> {
     /**
      * Returns the actual location of an installed system image.
+     *
+     * @return the location, never null.
      */
     @NonNull
     File getLocation();
 
     /**
      * Indicates the location strategy for this system image in the SDK.
+     *
+     * @return the location type, never null.
      */
     @NonNull
     LocationType getLocationType();
 
     /**
      * Returns the tag of the system image.
+     *
+     * @return the tag, never null.
      */
     @NonNull
     IdDisplay getTag();
 
     /**
      * Returns the vendor for an addon's system image, or null for a platform system-image.
+     *
+     * @return the vendor, or null
      */
     @Nullable
     IdDisplay getAddonVendor();
@@ -56,6 +64,8 @@ public interface ISystemImage extends Comparable<ISystemImage> {
      * Returns the ABI type.
      * See {@link Abi} for a full list.
      * Cannot be null nor empty.
+     *
+     * @return a non-null and non-empty ABI type.
      */
     @NonNull
     String getAbiType();

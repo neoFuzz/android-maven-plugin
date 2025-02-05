@@ -48,8 +48,9 @@ public class ToolsInstructionsCleaner {
     /**
      * Cleans all attributes belonging to the {@link com.android.SdkConstants#TOOLS_URI} namespace.
      *
-     * @param document the document to clean
-     * @param logger   logger to use in case of errors and warnings.
+     * @param mergeType the merge type
+     * @param document  the document to clean
+     * @param logger    logger to use in case of errors and warnings.
      * @return the cleaned document or null if an error occurred.
      */
     public static Optional<Document> cleanToolsReferences(

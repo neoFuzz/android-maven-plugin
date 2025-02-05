@@ -46,6 +46,11 @@ public class RemotePkgInfo
      */
     private final long mDownloadSize;
 
+    /**
+     * @param pkgDesc      Information on the package provided by the remote server.
+     * @param sourceUri    Source identifier of the package
+     * @param downloadSize Size of the archives that make up this package
+     */
     public RemotePkgInfo(@NonNull IPkgDesc pkgDesc, @NonNull IDescription sourceUri, long downloadSize) {
         mPkgDesc = pkgDesc;
         mSourceUri = sourceUri;
@@ -54,6 +59,8 @@ public class RemotePkgInfo
 
     /**
      * Information on the package provided by the remote server.
+     *
+     * @return An {@link IPkgDesc} object.
      */
     @NonNull
     public IPkgDesc getDesc() {
@@ -63,6 +70,8 @@ public class RemotePkgInfo
     /**
      * Returns the source identifier of the remote package.
      * This is an opaque object that can return its own description.
+     *
+     * @return An {@link IDescription} object.
      */
     @NonNull
     public IDescription getSourceUri() {
@@ -71,6 +80,8 @@ public class RemotePkgInfo
 
     /**
      * Returns the size (in bytes) of all the archives that make up this package.
+     *
+     * @return The size of the package in bytes.
      */
     public long getDownloadSize() {
         return mDownloadSize;
@@ -81,6 +92,8 @@ public class RemotePkgInfo
     /**
      * Compares 2 packages by comparing their {@link IPkgDesc}.
      * The source is not used in the comparison.
+     *
+     * @return -1, 0 or 1 as per {@link Comparable} contract
      */
     @Override
     public int compareTo(@NonNull RemotePkgInfo o) {
@@ -90,6 +103,8 @@ public class RemotePkgInfo
     /**
      * The remote package hash code is based on the underlying {@link IPkgDesc}.
      * The source is not used in the hash code.
+     *
+     * @return The hash code of the package.
      */
     @Override
     public int hashCode() {
@@ -102,6 +117,8 @@ public class RemotePkgInfo
     /**
      * Compares 2 packages by comparing their {@link IPkgDesc}.
      * The source is not used in the comparison.
+     *
+     * @return {@code true} if the two packages are equal, {@code false} otherwise.
      */
     @Override
     public boolean equals(Object obj) {
@@ -110,6 +127,8 @@ public class RemotePkgInfo
 
     /**
      * String representation for debugging purposes.
+     *
+     * @return A user-readable description of the package.
      */
     @Override
     public String toString() {

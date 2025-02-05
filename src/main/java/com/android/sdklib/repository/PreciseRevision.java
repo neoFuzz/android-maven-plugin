@@ -26,25 +26,60 @@ import com.android.annotations.NonNull;
  * since versions x.y.0 and version x.y are not the same.
  */
 public class PreciseRevision extends FullRevision {
+    /**
+     * The precision of the revision. This is the number of non-zero components in the revision.
+     * <p>
+     * For example, if the revision is "0000000", the precision is 3. If the revision is "1.2.0",
+     * the precision is 2. If the revision is "1.0.0", the precision is 1. If the revision is "1.0",
+     * the precision is 1. If the revision is "1", the precision is 1. If the revision is "0000000",
+     * the precision is 4.
+     */
     private final int mPrecision;
 
+    /**
+     * @param major The major revision number.
+     */
     public PreciseRevision(int major) {
         this(major, IMPLICIT_MINOR_REV, IMPLICIT_MICRO_REV, NOT_A_PREVIEW, PRECISION_MAJOR,
                 DEFAULT_SEPARATOR);
     }
 
+    /**
+     * @param major The major revision number.
+     * @param minor The minor revision number.
+     */
     public PreciseRevision(int major, int minor) {
         this(major, minor, IMPLICIT_MICRO_REV, NOT_A_PREVIEW, PRECISION_MINOR, DEFAULT_SEPARATOR);
     }
 
+    /**
+     * @param major The major revision number.
+     * @param minor The minor revision number.
+     * @param micro The micro revision number.
+     */
     public PreciseRevision(int major, int minor, int micro) {
         this(major, minor, micro, NOT_A_PREVIEW, PRECISION_MICRO, DEFAULT_SEPARATOR);
     }
 
+    /**
+     * @param major   The major revision number.
+     * @param minor   The minor revision number.
+     * @param micro   The micro revision number.
+     * @param preview The preview number. Use {@link #NOT_A_PREVIEW} if there is no preview.
+     *                Preview numbers are always ignored when comparing versions.
+     */
     public PreciseRevision(int major, int minor, int micro, int preview) {
         this(major, minor, micro, preview, PRECISION_PREVIEW, DEFAULT_SEPARATOR);
     }
 
+    /**
+     * @param major     The major revision number.
+     * @param minor     The minor revision number.
+     * @param micro     The micro revision number.
+     * @param preview   The preview number.
+     * @param precision The precision of the revision. Must be one of the PRECISION_* constants.
+     * @param separator The separator to use between the numbers.
+     */
     PreciseRevision(int major, int minor, int micro, int preview, int precision,
                     String separator) {
         super(major, minor, micro, preview, separator);
@@ -56,7 +91,6 @@ public class PreciseRevision extends FullRevision {
      * a new {@link com.android.sdklib.repository.PreciseRevision} for it.
      * <p>
      * All the fields except major are optional.
-     * <p>
      *
      * @param revision A non-null revision to parse.
      * @return A new non-null {@link com.android.sdklib.repository.PreciseRevision}.
@@ -92,11 +126,20 @@ public class PreciseRevision extends FullRevision {
         return sb.toString();
     }
 
+    /**
+     * @return The short string representation of this {@link PreciseRevision}.
+     */
     @Override
     public String toShortString() {
         return toString();
     }
 
+    /**
+     * @param includePreview If true the output will contain 4 fields
+     *                       to include the preview number (even if 0.) If false the output
+     *                       will contain only 3 fields (major, minor and micro.)
+     * @return An array of 3 or 4 integers.
+     */
     @Override
     public int[] toIntArray(boolean includePreview) {
         int[] result;
@@ -121,11 +164,18 @@ public class PreciseRevision extends FullRevision {
         return result;
     }
 
+    /**
+     * @return The hash code for this {@link PreciseRevision}.
+     */
     @Override
     public int hashCode() {
         return 31 * super.hashCode() + mPrecision;
     }
 
+    /**
+     * @param rhs The right-hand side {@link FullRevision} to compare with.
+     * @return {@code true} if {@code this} and {@code rhs} are equal.
+     */
     @Override
     public boolean equals(Object rhs) {
         boolean equals = super.equals(rhs);
@@ -138,6 +188,13 @@ public class PreciseRevision extends FullRevision {
         return false;
     }
 
+    /**
+     * @param rhs            The revision to compare against.
+     * @param comparePreview Whether to compare preview numbers.
+     * @return {@code 0} if {@code this} and {@code rhs} are equal, a negative number if
+     * {@code this} is less than {@code rhs}, or a positive number if {@code this} is greater
+     * than {@code rhs}.
+     */
     public int compareTo(PreciseRevision rhs, PreviewComparison comparePreview) {
         int delta = super.compareTo(rhs, comparePreview);
         if (delta == 0) {

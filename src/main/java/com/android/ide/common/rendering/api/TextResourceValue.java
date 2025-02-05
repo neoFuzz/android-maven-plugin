@@ -24,10 +24,18 @@ import com.android.resources.ResourceType;
 public class TextResourceValue extends ResourceValue {
     private String mRawXmlValue;
 
+    /**
+     * @param type        the {@link ResourceType} of this resource
+     * @param name        the name of this resource
+     * @param isFramework whether this resource is a framework resource
+     */
     public TextResourceValue(ResourceType type, String name, boolean isFramework) {
         super(type, name, isFramework);
     }
 
+    /**
+     * @param value the raw XML value to set
+     */
     public void setRawXmlValue(String value) {
         mRawXmlValue = value;
     }

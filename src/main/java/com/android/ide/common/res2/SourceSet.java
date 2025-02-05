@@ -29,7 +29,7 @@ public interface SourceSet {
     /**
      * Returns a list of Source files or folders.
      *
-     * @return a non null list.
+     * @return a non-null list.
      */
     @NonNull
     List<File> getSourceFiles();

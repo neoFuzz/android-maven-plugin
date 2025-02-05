@@ -24,42 +24,74 @@ import com.android.resources.ResourceEnum;
  */
 public final class NavigationStateQualifier extends EnumBasedResourceQualifier {
 
+    /**
+     * The qualifier name for navigation state
+     */
     public static final String NAME = "Navigation State";
 
+    /**
+     * The navigation state value
+     */
     private NavigationState mValue = null;
 
+    /**
+     * Default constructor
+     */
     public NavigationStateQualifier() {
         // pass
     }
 
+    /**
+     * @param value the value to set
+     */
     public NavigationStateQualifier(NavigationState value) {
         mValue = value;
     }
 
+    /**
+     * @return the navigation state value
+     */
     public NavigationState getValue() {
         return mValue;
     }
 
+    /**
+     * @return the navigation state enum value@return
+     */
     @Override
     ResourceEnum getEnumValue() {
         return mValue;
     }
 
+    /**
+     * @return the folder name for the navigation state
+     */
     @Override
     public String getName() {
         return NAME;
     }
 
+    /**
+     * @return the folder name for the navigation state
+     */
     @Override
     public String getShortName() {
         return NAME;
     }
 
+    /**
+     * @return only 1
+     */
     @Override
     public int since() {
         return 1;
     }
 
+    /**
+     * @param value  The value to check and set. Must not be null.
+     * @param config The folder configuration to receive the value. Must not be null.
+     * @return true if the value was set
+     */
     @Override
     public boolean checkAndSet(String value, FolderConfiguration config) {
         NavigationState state = NavigationState.getEnum(value);
@@ -73,6 +105,10 @@ public final class NavigationStateQualifier extends EnumBasedResourceQualifier {
         return false;
     }
 
+    /**
+     * @param qualifier The qualifier to compare. Must not be null.
+     * @return true if the qualifier is compatible with this object
+     */
     @Override
     public boolean equals(Object qualifier) {
         if (qualifier instanceof NavigationStateQualifier q) {
@@ -82,6 +118,9 @@ public final class NavigationStateQualifier extends EnumBasedResourceQualifier {
         return false;
     }
 
+    /**
+     * @return the hash code for the navigation state value
+     */
     @Override
     public int hashCode() {
         return mValue.hashCode();

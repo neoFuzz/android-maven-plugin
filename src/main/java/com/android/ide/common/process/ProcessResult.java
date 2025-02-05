@@ -31,6 +31,8 @@ public interface ProcessResult {
 
     /**
      * Returns the exit value of the process.
+     *
+     * @return the exit value of the process.
      */
     int getExitValue();
 

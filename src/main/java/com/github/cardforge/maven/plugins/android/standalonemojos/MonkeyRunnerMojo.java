@@ -246,14 +246,14 @@ public class MonkeyRunnerMojo extends AbstractAndroidMojo {
      * @throws MojoExecutionException if exercising app threw an exception and isIgnoreTestFailures is false.
      * @throws MojoFailureException   if exercising app failed and isIgnoreTestFailures is false.
      */
-    protected void run(IDevice device, ITestRunListener... iTestRunListeners) throws MojoExecutionException,
+    public void run(IDevice device, ITestRunListener... iTestRunListeners) throws MojoExecutionException,
             MojoFailureException {
 
         this.mTestListeners = iTestRunListeners;
 
         getLog().debug("Parsed values for Android Monkey Runner invocation: ");
 
-        CommandExecutor executor = CommandExecutor.Factory.createDefaultCommmandExecutor();
+        CommandExecutor executor = CommandExecutor.Factory.createDefaultCommandExecutor();
         if (!Os.isFamily(Os.FAMILY_WINDOWS)) {
             executor.setCustomShell(new CustomBourneShell());
         }
@@ -384,12 +384,21 @@ public class MonkeyRunnerMojo extends AbstractAndroidMojo {
         return parsedPlugins;
     }
 
+    /**
+     * @return default programs.
+     */
     public List<Program> getPrograms() {
         // return null if not set
         return parsedPrograms;
     }
 
+    /**
+     * Custom Bourne Shell that executes with "-x". Reduces verbosity when running monkeyrunner scripts.
+     */
     private static final class CustomBourneShell extends BourneShell {
+        /**
+         * @return always returns <code>true</code>.
+         */
         @Override
         @NonNull
         public List<String> getShellArgsList() {
@@ -403,6 +412,9 @@ public class MonkeyRunnerMojo extends AbstractAndroidMojo {
             return shellArgs;
         }
 
+        /**
+         * @return always returns <code>null</code>.
+         */
         @Override
         @NonNull
         public String[] getShellArgs() {
@@ -416,10 +428,18 @@ public class MonkeyRunnerMojo extends AbstractAndroidMojo {
 
     }
 
+    /**
+     * Monkey runner error listener.
+     * This listener is used to capture the stack trace of the monkey runner script.
+     */
     private final class MonkeyRunnerErrorListener implements CommandExecutor.ErrorListener {
         private StringBuilder stackTraceBuilder = new StringBuilder();
         private boolean hasError = false;
 
+        /**
+         * @param error the error message
+         * @return true if the error is an error, false otherwise
+         */
         @Override
         public boolean isError(String error) {
 
@@ -447,6 +467,9 @@ public class MonkeyRunnerMojo extends AbstractAndroidMojo {
             return false;
         }
 
+        /**
+         * @return the stack trace of the monkey runner script
+         */
         @NonNull
         public String getStackTrace() {
             if (hasError) {
@@ -456,6 +479,9 @@ public class MonkeyRunnerMojo extends AbstractAndroidMojo {
             }
         }
 
+        /**
+         * @return true if the monkey runner script produced an error, false otherwise
+         */
         public boolean hasError() {
             return hasError;
         }

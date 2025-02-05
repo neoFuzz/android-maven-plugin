@@ -14,11 +14,18 @@ public class MavenILogger implements ILogger {
     private final Log log;
     private final boolean verboseInfo;
 
+    /**
+     * @param log          the maven logger to use
+     * @param verboseInfo  whether to log verbose information
+     */
     public MavenILogger(Log log, boolean verboseInfo) {
         this.log = log;
         this.verboseInfo = verboseInfo;
     }
 
+    /**
+     * @param log the maven logger to use
+     */
     public MavenILogger(Log log) {
         this.log = log;
         this.verboseInfo = false;

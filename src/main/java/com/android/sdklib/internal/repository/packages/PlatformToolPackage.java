@@ -74,6 +74,15 @@ public class PlatformToolPackage extends FullRevisionPackage {
         mPkgDesc = setDescriptions(PkgDesc.Builder.newPlatformTool(getRevision())).create();
     }
 
+    /**
+     * @param source        The {@link SdkSource} where this is loaded from.
+     * @param props         The properties to parse the package's attributes from.
+     * @param revision      The revision number of the package.
+     * @param license       The license to be used for the package.
+     * @param description   A short description for the package.
+     * @param descUrl       The optional description URL for the package.
+     * @param archiveOsPath The path of the archive file relative to the package folder.
+     */
     @VisibleForTesting(visibility = Visibility.PRIVATE)
     protected PlatformToolPackage(
             SdkSource source,
@@ -100,7 +109,17 @@ public class PlatformToolPackage extends FullRevisionPackage {
      * one archive which URL is the actual target location.
      * <p>
      * By design, this creates a package with one and only one archive.
+     *
+     * @param source        The {@link SdkSource} where this is loaded from.
+     * @param props         The properties to parse the package's attributes from.
+     * @param revision      The revision number of the package.
+     * @param license       The license to be used for the package.
+     * @param description   A short description for the package.
+     * @param descUrl       The optional description URL for the package.
+     * @param archiveOsPath The path of the archive file relative to the package folder.
+     * @return The created {@link PlatformToolPackage}.
      */
+    @NonNull
     public static Package create(
             SdkSource source,
             Properties props,
@@ -174,6 +193,11 @@ public class PlatformToolPackage extends FullRevisionPackage {
         return ptp;
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @return The {@link IPkgDesc} for this package.
+     */
     @Override
     @NonNull
     public IPkgDesc getPkgDesc() {

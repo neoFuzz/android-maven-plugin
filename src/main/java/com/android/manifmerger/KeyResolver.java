@@ -32,5 +32,8 @@ public interface KeyResolver<T> {
     @Nullable
     T resolve(String key);
 
+    /**
+     * @return all the keys this resolver can resolve.
+     */
     Iterable<String> getKeys();
 }

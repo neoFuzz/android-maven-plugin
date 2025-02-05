@@ -234,7 +234,7 @@ public class D8Mojo extends AbstractAndroidMojo {
             return;
         }
 
-        CommandExecutor executor = CommandExecutor.Factory.createDefaultCommmandExecutor();
+        CommandExecutor executor = CommandExecutor.Factory.createDefaultCommandExecutor();
         executor.setLogger(getLog());
 
         if (generateApk) {

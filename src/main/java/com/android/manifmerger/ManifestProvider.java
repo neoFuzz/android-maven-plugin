@@ -27,12 +27,16 @@ public interface ManifestProvider {
 
     /**
      * Returns the location of the manifest.
+     *
+     * @return the location of the manifest.
      */
     @NonNull
     File getManifest();
 
     /**
      * Returns a user friendly name.
+     *
+     * @return a user-friendly name or null if not applicable.
      */
     @Nullable
     String getName();

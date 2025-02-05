@@ -70,21 +70,29 @@ public class SdkRepoConstants extends RepoConstants {
      * The root sdk-repository element
      */
     public static final String NODE_SDK_REPOSITORY = "sdk-repository";        //$NON-NLS-1$
-    /* The major revision for tool and platform-tool package
+    /**
+     * The major revision for tool and platform-tool package
      * (the full revision number is revision.minor.micro + preview#.)
      * Mandatory int > 0. 0 when missing, which should not happen in
-     * a valid document. */
+     * a valid document.
+     */
     public static final String NODE_MAJOR_REV = "major";                //$NON-NLS-1$
-    /* The minor revision for tool and platform-tool package
+    /**
+     * The minor revision for tool and platform-tool package
      * (the full revision number is revision.minor.micro + preview#.)
-     * Optional int >= 0. Implied to be 0 when missing. */
+     * Optional int >= 0. Implied to be 0 when missing.
+     */
     public static final String NODE_MINOR_REV = "minor";                //$NON-NLS-1$
-    /* The micro revision for tool and platform-tool package
+    /**
+     * The micro revision for tool and platform-tool package
      * (the full revision number is revision.minor.micro + preview#.)
-     * Optional int >= 0. Implied to be 0 when missing. */
+     * Optional int >= 0. Implied to be 0 when missing.
+     */
     public static final String NODE_MICRO_REV = "micro";                //$NON-NLS-1$
-    /* The preview revision for tool and platform-tool package.
-     * Int > 0, only present for "preview / release candidate" packages. */
+    /**
+     * The preview revision for tool and platform-tool package.
+     * Int > 0, only present for "preview / release candidate" packages.
+     */
     public static final String NODE_PREVIEW = "preview";              //$NON-NLS-1$
     /**
      * A platform package.
@@ -142,6 +150,9 @@ public class SdkRepoConstants extends RepoConstants {
      */
     public static final String NS_URI = getSchemaUri(NS_LATEST_VERSION);
 
+    /**
+     * Private constructor to prevent instantiation.
+     */
     private SdkRepoConstants() {
         // Not instantiable
     }
@@ -161,6 +172,7 @@ public class SdkRepoConstants extends RepoConstants {
      * Returns the URI of the SDK Repository schema for the given version number.
      *
      * @param version Between 1 and {@link #NS_LATEST_VERSION} included.
+     * @return The URI of the schema.
      */
     @NonNull
     public static String getSchemaUri(int version) {

@@ -29,11 +29,27 @@ import java.nio.charset.StandardCharsets;
  * License text, with an optional license XML reference.
  */
 public class License {
+    /**
+     * Directory where licenses are stored.
+     */
     private static final String LICENSE_DIR = "licenses";
+    /**
+     * License text
+     */
     private final String mLicense;
+    /**
+     * License XML reference, or null.
+     */
     private final String mLicenseRef;
+    /**
+     * Hash of the license text. Never null.
+     */
     private final String mLicenseHash;
 
+    /**
+     * @param license    The license text.
+     * @param licenseRef The license XML reference, or null.
+     */
     public License(@NonNull String license, @Nullable String licenseRef) {
         mLicense = license;
         mLicenseRef = licenseRef;
@@ -42,6 +58,8 @@ public class License {
 
     /**
      * Returns the license text. Never null.
+     *
+     * @return the license text
      */
     @NonNull
     public String getLicense() {
@@ -50,6 +68,8 @@ public class License {
 
     /**
      * Returns the hash of the license text. Never null.
+     *
+     * @return the license hash
      */
     @NonNull
     public String getLicenseHash() {
@@ -60,6 +80,8 @@ public class License {
      * Returns the license XML reference.
      * Could be null, e.g. in tests or synthetic packages
      * recreated from local source.properties.
+     *
+     * @return the license XML reference, or null
      */
     @Nullable
     public String getLicenseRef() {
@@ -69,12 +91,17 @@ public class License {
     /**
      * Returns a string representation of the license, useful for debugging.
      * This is not designed to be shown to the user.
+     *
+     * @return a string representation of the license
      */
     @Override
     public String toString() {
         return "<License ref:" + mLicenseRef + ", text:" + mLicense + ">";
     }
 
+    /**
+     * @return the hash code for this license
+     */
     @Override
     public int hashCode() {
         final int prime = 31;
@@ -86,6 +113,10 @@ public class License {
         return result;
     }
 
+    /**
+     * @param obj The object to compare with this license
+     * @return true if the given object is equal to this license, false otherwise
+     */
     @Override
     public boolean equals(Object obj) {
         if (this == obj) {

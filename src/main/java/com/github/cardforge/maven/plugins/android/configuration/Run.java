@@ -15,6 +15,9 @@ public class Run {
      */
     protected String debug;
 
+    /**
+     * @return Mirror of {@link RunMojo}#runDebug
+     */
     public String isDebug() {
         return debug;
     }

@@ -23,6 +23,9 @@ import com.android.annotations.Nullable;
  */
 public class RenderSecurityException extends SecurityException {
 
+    /**
+     * The message to display for the exception
+     */
     private final String myMessage;
 
     /**

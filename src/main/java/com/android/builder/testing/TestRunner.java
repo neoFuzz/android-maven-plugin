@@ -29,7 +29,6 @@ import java.util.List;
 /**
  * A test runner able to run tests on a list of {@link DeviceConnector}
  */
-@Beta
 public interface TestRunner {
 
     /**
@@ -47,8 +46,9 @@ public interface TestRunner {
      * @param coverageDir    the directory to store coverage reports in.
      * @param logger         the logger
      * @return true if the test succeed
-     * @throws TestException        if an unexpected error occurred
-     * @throws InterruptedException if the test is interrupted
+     * @throws TestException                    if an unexpected error occurred
+     * @throws InterruptedException             if the test is interrupted
+     * @throws NoAuthorizedDeviceFoundException if no device is authorized to run the tests
      */
     boolean runTests(
             @NonNull String projectName,
@@ -64,8 +64,14 @@ public interface TestRunner {
             @NonNull ILogger logger)
             throws TestException, NoAuthorizedDeviceFoundException, InterruptedException;
 
+    /**
+     * Exception thrown when no device is authorized to run the tests.
+     */
     class NoAuthorizedDeviceFoundException extends Exception {
 
+        /**
+         * Creates a new {@link NoAuthorizedDeviceFoundException} instance.
+         */
         public NoAuthorizedDeviceFoundException() {
             super("No suitable device connected");
         }

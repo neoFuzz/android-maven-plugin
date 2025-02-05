@@ -342,15 +342,13 @@ public abstract class Package implements IDescription, IListDescription, Compara
      */
     @NonNull
     private Archive parseArchive(@NonNull Node archiveNode) {
-        Archive a = new Archive(
+        return new Archive(
                 this,
                 PackageParserUtils.parseArchFilter(archiveNode),
                 PackageParserUtils.getXmlString(archiveNode, SdkRepoConstants.NODE_URL),
                 PackageParserUtils.getXmlLong(archiveNode, SdkRepoConstants.NODE_SIZE, 0),
                 PackageParserUtils.getXmlString(archiveNode, SdkRepoConstants.NODE_CHECKSUM)
         );
-
-        return a;
     }
 
     /**
@@ -776,7 +774,7 @@ public abstract class Package implements IDescription, IListDescription, Compara
      * instead of this method.
      */
     @Override
-    public int compareTo(Package other) {
+    public int compareTo(@NonNull Package other) {
         String s1 = this.comparisonKey();
         String s2 = other.comparisonKey();
 
@@ -919,9 +917,13 @@ public abstract class Package implements IDescription, IListDescription, Compara
         return true;
     }
 
+    /**
+     * @param builder The {@link PkgDesc.Builder} to set the values from this package into.
+     * @return The same {@link PkgDesc.Builder} but after setting the values from this package.
+     */
     // TODO(jbakermalone): This is moved here from the more logical location in PkgDesc.Builder since Package will soon be forked into
     //                     studio and this version deprecated, whereas PkgDesc will not.
-    protected PkgDesc.Builder setDescriptions(PkgDesc.Builder builder) {
+    protected PkgDesc.Builder setDescriptions(@NonNull PkgDesc.Builder builder) {
         builder.setDescriptionShort(getShortDescription());
         builder.setDescriptionUrl(getDescUrl());
         builder.setListDisplay(getListDisplay());

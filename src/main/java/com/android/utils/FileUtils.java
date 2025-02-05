@@ -26,13 +26,26 @@ import java.util.function.Function;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
+/**
+ * Utilities for file operations.
+ */
 public class FileUtils {
+    /**
+     * A function that returns the name of a file.
+     */
     private static final Function<File, String> GET_NAME = File::getName;
 
+    /**
+     * This is a utility class, so it should not be instantiated.
+     */
     private FileUtils() {
         // empty
     }
 
+    /**
+     * @param folder The folder to delete. Must exist and be a directory.
+     * @throws IOException If an error occurs while deleting the folder.
+     */
     public static void deleteFolder(@NonNull final File folder) throws IOException {
         if (!folder.exists()) {
             return;
@@ -48,6 +61,10 @@ public class FileUtils {
         }
     }
 
+    /**
+     * @param folder The folder to empty. Must exist and be a directory.
+     * @throws IOException If an error occurs while emptying the folder.
+     */
     public static void emptyFolder(final File folder) throws IOException {
         deleteFolder(folder);
         if (!folder.mkdirs()) {
@@ -55,6 +72,12 @@ public class FileUtils {
         }
     }
 
+    /**
+     * @param from The file to copy.
+     * @param to   The destination to copy to. If the file is a directory, the file's name will be
+     *             appended to the destination.
+     * @throws IOException If an error occurs while copying the file.
+     */
     public static void copyFile(@NonNull File from, File to) throws IOException {
         to = new File(to, from.getName());
         if (from.isDirectory()) {
@@ -73,17 +96,32 @@ public class FileUtils {
         }
     }
 
+    /**
+     * @param dir   The directory to join to.
+     * @param paths The paths to join.
+     * @return A new file that is the result of joining the paths to the directory.
+     */
     @NonNull
     public static File join(File dir, String... paths) {
         return new File(dir, Joiner.on(File.separatorChar).join(paths));
     }
 
+    /**
+     * @param file The file to get the relative path for.
+     * @param dir  The directory to get the relative path relative to.
+     * @return The relative path of the file with respect to the directory.
+     */
     public static String relativePath(@NonNull File file, @NonNull File dir) {
         checkArgument(file.isFile(), "%s is not a file.", file.getPath());
         checkArgument(dir.isDirectory(), "%s is not a directory.", dir.getPath());
         return dir.toURI().relativize(file.toURI()).getPath();
     }
 
+    /**
+     * @param file The file to hash.
+     * @return The SHA-1 of the file's content.
+     * @throws IOException If an error occurs while reading the file.
+     */
     @NonNull
     public static String sha1(@NonNull File file) throws IOException {
         return Hashing.sha1().hashBytes(Files.toByteArray(file)).toString();

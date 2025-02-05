@@ -34,7 +34,13 @@ import java.util.regex.Pattern;
  * on what type of ordering you need.
  */
 public class GradleCoordinate {
+    /**
+     * the preview id
+     */
     public static final String PREVIEW_ID = "rc";
+    /**
+     * the Plus Revision ID
+     */
     public static final int PLUS_REV_VALUE = -1;
 
     /**
@@ -65,8 +71,12 @@ public class GradleCoordinate {
     private final ArtifactType mArtifactType;
     private final List<RevisionComponent> mRevisions = new ArrayList<>(3);
 
+
     /**
-     * Constructor
+     * @param groupId    the group ID
+     * @param artifactId The artifact ID
+     * @param revisions  the revision components of the coordinate
+     * @param type       the type of artifact, or null if not specified
      */
     public GradleCoordinate(@NonNull String groupId, @NonNull String artifactId,
                             @NonNull List<RevisionComponent> revisions, @Nullable ArtifactType type) {
@@ -106,6 +116,10 @@ public class GradleCoordinate {
         return new GradleCoordinate(groupId, artifactId, revisions, type);
     }
 
+    /**
+     * @param revision Revision number to parse
+     * @return a list of revision components
+     */
     @NonNull
     public static List<RevisionComponent> parseRevisionNumber(@NonNull String revision) {
         List<RevisionComponent> components = new ArrayList<>();
@@ -138,6 +152,11 @@ public class GradleCoordinate {
         return components;
     }
 
+    /**
+     * @param components the list of components to convert to a string
+     * @param buffer     the string buffer to use
+     * @param closeList  if true, close the list component if it exists
+     */
     private static void flushBuffer(@NonNull List<RevisionComponent> components, StringBuilder buffer,
                                     boolean closeList) {
         RevisionComponent newComponent = getRevisionComponent(buffer);
@@ -155,6 +174,10 @@ public class GradleCoordinate {
         components.add(newComponent);
     }
 
+    /**
+     * @param buffer the string buffer to use
+     * @return a revision component based on the given string buffer
+     */
     @NonNull
     private static RevisionComponent getRevisionComponent(@NonNull StringBuilder buffer) {
         RevisionComponent newComponent;
@@ -176,6 +199,9 @@ public class GradleCoordinate {
         return newComponent;
     }
 
+    /**
+     * @return the string representation of this coordinate
+     */
     @Override
     public String toString() {
         String s = String.format(Locale.US, "%s:%s:%s", mGroupId, mArtifactId, getFullRevision());
@@ -185,16 +211,28 @@ public class GradleCoordinate {
         return s;
     }
 
+    /**
+     * @return the string representation of this coordinate, with the revision number
+     * (i.e. without the plus sign)
+     */
     @Nullable
     public String getGroupId() {
         return mGroupId;
     }
 
+    /**
+     * @return the string representation of this coordinate, with the revision number
+     * (i.e. without the plus sign)
+     */
     @Nullable
     public String getArtifactId() {
         return mArtifactId;
     }
 
+    /**
+     * @return the string representation of this coordinate, with the revision number
+     * (i.e. without the plus sign)
+     */
     @Nullable
     public String getId() {
         if (mGroupId == null || mArtifactId == null) {
@@ -204,11 +242,17 @@ public class GradleCoordinate {
         return String.format("%s:%s", mGroupId, mArtifactId);
     }
 
+    /**
+     * @return the artifact type, or null if not specified
+     */
     @Nullable
     public ArtifactType getType() {
         return mArtifactType;
     }
 
+    /**
+     * @return the full revision string, including any plus sign
+     */
     public String getFullRevision() {
         StringBuilder revision = new StringBuilder();
         for (RevisionComponent component : mRevisions) {
@@ -221,6 +265,9 @@ public class GradleCoordinate {
         return revision.toString();
     }
 
+    /**
+     * @return if the coordinate is a preview coordinate
+     */
     public boolean isPreview() {
         return !mRevisions.isEmpty() && mRevisions.get(mRevisions.size() - 1).isPreview();
     }
@@ -236,6 +283,11 @@ public class GradleCoordinate {
         return o.mGroupId.equals(mGroupId) && o.mArtifactId.equals(mArtifactId);
     }
 
+    /**
+     * @param o the object to compare with
+     * @return true iff the other object is a GradleCoordinate and refers to the same artifact
+     * as this coordinate.
+     */
     @Override
     public boolean equals(@NonNull Object o) {
         if (this == o) {
@@ -262,6 +314,9 @@ public class GradleCoordinate {
         return mArtifactType == null || mArtifactType.equals(that.mArtifactType);
     }
 
+    /**
+     * @return the hash code for this coordinate
+     */
     @Override
     public int hashCode() {
         int result = mGroupId.hashCode();
@@ -279,22 +334,59 @@ public class GradleCoordinate {
      * List taken from <a href="http://maven.apache.org/pom.html#Maven_Coordinates">http://maven.apache.org/pom.html#Maven_Coordinates</a>
      */
     public enum ArtifactType {
+        /**
+         * The artifact type for a POM file.
+         */
         POM("pom"),
+        /**
+         * The artifact type for a JAR file.
+         */
         JAR("jar"),
+        /**
+         * The artifact type for a {@code maven-plugin}.
+         */
         MAVEN_PLUGIN("maven-plugin"),
+        /**
+         * The artifact type for a EJB file.
+         */
         EJB("ejb"),
+        /**
+         * The artifact type for a WAR file.
+         */
         WAR("war"),
+        /**
+         * The artifact type for an EAR file.
+         */
         EAR("ear"),
+        /**
+         * The artifact type for a RAR file.
+         */
         RAR("rar"),
+        /**
+         * The artifact type for a PAR file.
+         */
         PAR("par"),
+        /**
+         * The artifact type for an AAR file.
+         */
         AAR("aar");
 
+        /**
+         * The artifact type as it appears in the string representation of the coordinate
+         */
         private final String mId;
 
+        /**
+         * @param id the artifact type as it appears in the string representation of the coordinate
+         */
         ArtifactType(String id) {
             mId = id;
         }
 
+        /**
+         * @param name the artifact type as it appears in the string representation of the coordinate
+         * @return the artifact type, or null if not found
+         */
         @Nullable
         public static ArtifactType getArtifactType(@Nullable String name) {
             if (name != null) {
@@ -307,6 +399,9 @@ public class GradleCoordinate {
             return null;
         }
 
+        /**
+         * @return the artifact type as it appears in the string representation of the coordinate
+         */
         @Override
         public String toString() {
             return mId;
@@ -318,43 +413,79 @@ public class GradleCoordinate {
      * components separated by dashes.
      */
     public abstract static class RevisionComponent implements Comparable<RevisionComponent> {
+        /**
+         * @return the integer value of this component, or 0 if this component is not a number
+         */
         public abstract int asInteger();
 
+        /**
+         * @return true if this component is a preview component, false otherwise
+         */
         public abstract boolean isPreview();
     }
 
+    /**
+     * A component that represents a list of components separated by dashes.
+     */
     public static class NumberComponent extends RevisionComponent {
+        /**
+         * The number value of this component
+         */
         private final int mNumber;
 
+        /**
+         * @param number the number value of this component
+         */
         public NumberComponent(int number) {
             mNumber = number;
         }
 
+        /**
+         * @return the string representation of this component
+         */
         @Override
         public String toString() {
             return Integer.toString(mNumber);
         }
 
+        /**
+         * @return the integer value of this component
+         */
         @Override
         public int asInteger() {
             return mNumber;
         }
 
+        /**
+         * @return false, since this component is not a preview component
+         */
         @Override
         public boolean isPreview() {
             return false;
         }
 
+        /**
+         * @param o the object to compare with
+         * @return true if the other object is a NumberComponent with the same number value
+         */
         @Override
         public boolean equals(Object o) {
             return o instanceof NumberComponent nc && nc.mNumber == mNumber;
         }
 
+        /**
+         * @return the hash code of this component, based on the number value
+         */
         @Override
         public int hashCode() {
             return mNumber;
         }
 
+        /**
+         * @param o the object to be compared.
+         * @return a negative integer, zero, or a positive integer as this object is less than,
+         * equal to, or greater than the specified object.
+         */
         @Override
         public int compareTo(@NonNull RevisionComponent o) {
             if (o instanceof NumberComponent nc) {
@@ -375,62 +506,109 @@ public class GradleCoordinate {
      * we must preserve
      */
     public static class PaddedNumberComponent extends NumberComponent {
+        /**
+         * The string representation of this component
+         */
         private final String mString;
 
+        /**
+         * @param number the number value of this component
+         * @param string the string representation of this component
+         */
         public PaddedNumberComponent(int number, String string) {
             super(number);
             mString = string;
         }
 
+        /**
+         * @return the string representation of this component
+         */
         @Override
         public String toString() {
             return mString;
         }
 
+        /**
+         * @param o the object to compare with
+         * @return true if the other object is a PaddedNumberComponent with the same string value
+         */
         @Override
         public boolean equals(Object o) {
             return o instanceof PaddedNumberComponent pnc &&
                     pnc.mString.equals(mString);
         }
 
+        /**
+         * @return the hash code of this component, based on the string value
+         */
         @Override
         public int hashCode() {
             return mString.hashCode();
         }
     }
 
+    /**
+     * A component that represents a string.
+     */
     public static class StringComponent extends RevisionComponent {
+        /**
+         * The string representation of this component
+         */
         private final String mString;
 
+        /**
+         * @param string the string representation of this component
+         */
         public StringComponent(String string) {
             this.mString = string;
         }
 
+        /**
+         * @return the string representation of this component
+         */
         @Override
         public String toString() {
             return mString;
         }
 
+        /**
+         * @return 0, since this component is not a number component
+         */
         @Override
         public int asInteger() {
             return 0;
         }
 
+        /**
+         * @return true if this component is a preview component, false otherwise
+         */
         @Override
         public boolean isPreview() {
             return mString.startsWith(PREVIEW_ID);
         }
 
+        /**
+         * @param o the object to compare with
+         * @return true if the other object is a StringComponent with the same string value
+         */
         @Override
         public boolean equals(Object o) {
             return o instanceof StringComponent sc && sc.mString.equals(mString);
         }
 
+        /**
+         * @return the hash code of this component, based on the string value
+         */
         @Override
         public int hashCode() {
             return mString.hashCode();
         }
 
+        /**
+         * @param o the object to be compared.
+         * @return a negative integer, zero, or a positive integer as this object is less than,
+         * equal to, or greater than the specified object.
+         */
         @Override
         public int compareTo(@NonNull RevisionComponent o) {
             if (o instanceof NumberComponent) {
@@ -446,22 +624,39 @@ public class GradleCoordinate {
         }
     }
 
+    /**
+     * A component that represents the "+" symbol.
+     */
     static class PlusComponent extends RevisionComponent {
+        /**
+         * @return the string representation of this component
+         */
         @Override
         public String toString() {
             return "+";
         }
 
+        /**
+         * @return the integer value of this component, which is the constant PLUS_REV_VALUE
+         */
         @Override
         public int asInteger() {
             return PLUS_REV_VALUE;
         }
 
+        /**
+         * @return false, since this component is not a preview component
+         */
         @Override
         public boolean isPreview() {
             return false;
         }
 
+        /**
+         * @param o the object to be compared.
+         * @return a negative integer, zero, or a positive integer as this object is less than,
+         * equal to, or greater than the specified object.
+         */
         @Override
         public int compareTo(@NonNull RevisionComponent o) {
             throw new UnsupportedOperationException(
@@ -473,9 +668,19 @@ public class GradleCoordinate {
      * A list of components separated by dashes.
      */
     public static class ListComponent extends RevisionComponent {
+        /**
+         * The list of components
+         */
         private final List<RevisionComponent> mItems = new ArrayList<>();
+        /**
+         * Whether this list is closed or not. A closed list cannot be modified anymore.
+         */
         private boolean mClosed = false;
 
+        /**
+         * @param components the components to add to this list
+         * @return a new ListComponent with the given components
+         */
         @NonNull
         public static ListComponent of(@NonNull RevisionComponent... components) {
             ListComponent result = new ListComponent();
@@ -485,20 +690,34 @@ public class GradleCoordinate {
             return result;
         }
 
+        /**
+         * @param component the component to add to this list
+         */
         public void add(RevisionComponent component) {
             mItems.add(component);
         }
 
+        /**
+         * @return 0
+         */
         @Override
         public int asInteger() {
             return 0;
         }
 
+        /**
+         * @return true if this list is a preview list, false otherwise
+         */
         @Override
         public boolean isPreview() {
             return !mItems.isEmpty() && mItems.get(mItems.size() - 1).isPreview();
         }
 
+        /**
+         * @param o the object to be compared.
+         * @return a negative integer, zero, or a positive integer as this object is less than,
+         * equal to, or greater than the specified object.
+         */
         @Override
         public int compareTo(@NonNull RevisionComponent o) {
             if (o instanceof NumberComponent) {
@@ -517,25 +736,47 @@ public class GradleCoordinate {
             return 0;
         }
 
+        /**
+         * @param o the object to compare with
+         * @return true if the other object is a ListComponent with the same list of components
+         */
         @Override
         public boolean equals(Object o) {
             return o instanceof ListComponent lc && lc.mItems.equals(mItems);
         }
 
+        /**
+         * @return the hash code of this component, based on the list of components
+         */
         @Override
         public int hashCode() {
             return mItems.hashCode();
         }
 
+        /**
+         * @return the string representation of this list component, joined by dashes
+         */
         @Override
         public String toString() {
             return Joiner.on("-").join(mItems);
         }
     }
 
+    /**
+     * Comparator for Gradle coordinates. The comparison is based on the groupId, artifactId
+     * and revision number. The revision number is compared component by component, with
+     * the last component being a special case: if it is a plus component, it is considered
+     * higher than any specific number.
+     */
     private static class GradleCoordinateComparator implements Comparator<GradleCoordinate> {
+        /**
+         * The plus result
+         */
         private final int mPlusResult;
 
+        /**
+         * @param plusResult the plus result to use for comparison
+         */
         private GradleCoordinateComparator(int plusResult) {
             mPlusResult = plusResult;
         }
@@ -589,6 +830,12 @@ public class GradleCoordinate {
             return 0;
         }
 
+        /**
+         * @param revisionList         the revision list to get the integer from
+         * @param i                    the index to get the integer from
+         * @param returnValueIfNonZero the return value if the integer is not zero
+         * @return the integer value of the revision component, or the return value if the integer is not zero
+         */
         @Nullable
         private Integer getInteger2(@NonNull List<RevisionComponent> revisionList, int i, int returnValueIfNonZero) {
             RevisionComponent revision = revisionList.get(i);
@@ -602,6 +849,12 @@ public class GradleCoordinate {
             return null;
         }
 
+        /**
+         * @param a the Gradle coordinates to compare
+         * @param b the Gradle coordinates to compare
+         * @param i the index to get the integer from
+         * @return the integer value of the revision component, or null if the component is not an integer
+         */
         @Nullable
         private Integer getInteger(@NonNull GradleCoordinate a, @NonNull GradleCoordinate b, int i) {
             RevisionComponent revision1 = a.mRevisions.get(i);

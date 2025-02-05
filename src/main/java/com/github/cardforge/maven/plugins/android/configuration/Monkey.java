@@ -100,86 +100,149 @@ public class Monkey {
      */
     private Boolean createReport;
 
+    /**
+     * @return the value of skip
+     */
     public Boolean isSkip() {
         return skip;
     }
 
+    /**
+     * @return the value of eventCount
+     */
     public Integer getEventCount() {
         return eventCount;
     }
 
+    /**
+     * @return the value of seed
+     */
     public Long getSeed() {
         return seed;
     }
 
+    /**
+     * @return the value of throttle
+     */
     public Long isThrottle() {
         return throttle;
     }
 
+    /**
+     * @return the value of percentTouch
+     */
     public Integer getPercentTouch() {
         return percentTouch;
     }
 
+    /**
+     * @return the value of percentMotion
+     */
     public Integer getPercentMotion() {
         return percentMotion;
     }
 
+    /**
+     * @return the value of percentTrackball
+     */
     public Integer getPercentTrackball() {
         return percentTrackball;
     }
 
+    /**
+     * @return the value of percentNav
+     */
     public Integer getPercentNav() {
         return percentNav;
     }
 
+    /**
+     * @return the value of percentMajorNav
+     */
     public Integer getPercentMajorNav() {
         return percentMajorNav;
     }
 
+    /**
+     * @return the value of percentSyskeys
+     */
     public Integer getPercentSyskeys() {
         return percentSyskeys;
     }
 
+    /**
+     * @return the value of percentAppswitch
+     */
     public Integer getPercentAppswitch() {
         return percentAppswitch;
     }
 
+    /**
+     * @return the value of percentAnyevent
+     */
     public Integer getPercentAnyevent() {
         return percentAnyevent;
     }
 
+    /**
+     * @return the value of packages
+     */
     public String[] getPackages() {
         return packages;
     }
 
+    /**
+     * @return the value of categories
+     */
     public String[] getCategories() {
         return categories;
     }
 
+    /**
+     * @return the value of debugNoEvents
+     */
     public Boolean isDebugNoEvents() {
         return skip;
     }
 
+    /**
+     * @return the value of hprof
+     */
     public Boolean hProf() {
         return skip;
     }
 
+    /**
+     * @return if timeout is ignored.
+     */
     public Boolean isIgnoreTimeouts() {
         return ignoreTimeouts;
     }
 
+    /**
+     * @return if security exceptions are ignored
+     */
     public Boolean isIgnoreSecurityExceptions() {
         return ignoreSecurityExceptions;
     }
 
+    /**
+     * @return if process should be killed after an error
+     */
     public Boolean isKillProcessAfterError() {
         return killProcessAfterError;
     }
 
+    /**
+     * @return if native crashes should be monitored
+     */
     public Boolean isMonitorNativeErrors() {
         return monitorNativeCrashes;
     }
 
+    /**
+     * @return if crashes should be ignored
+     */
     public Boolean isCreateReport() {
         return createReport;
     }

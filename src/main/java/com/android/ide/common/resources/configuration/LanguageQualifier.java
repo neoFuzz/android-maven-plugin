@@ -27,11 +27,26 @@ import java.util.regex.Pattern;
  * Resource Qualifier for Language.
  */
 public final class LanguageQualifier extends ResourceQualifier {
+    /**
+     * Constant for the fake language value
+     */
     public static final String FAKE_LANG_VALUE = "__"; //$NON-NLS-1$
+    /**
+     * Name of the qualifier
+     */
     public static final String NAME = "Language";
+    /**
+     * Pattern for language validation
+     */
     private static final Pattern sLanguagePattern = Pattern.compile("^[a-zA-Z]{2}$"); //$NON-NLS-1$
+    /**
+     * Value of the language qualifier
+     */
     private String mValue;
 
+    /**
+     * Constructor
+     */
     public LanguageQualifier() {
         // Nothing to do.
     }
@@ -59,6 +74,7 @@ public final class LanguageQualifier extends ResourceQualifier {
      * {@link #toString()} on a {@link LanguageQualifier} object.
      *
      * @param value the value of the qualifier, as returned by {@link #getValue()}.
+     * @return the string for the folder segment
      */
     @Nullable
     public static String getFolderSegment(@NonNull String value) {
@@ -70,35 +86,58 @@ public final class LanguageQualifier extends ResourceQualifier {
         return null;
     }
 
+    /**
+     * @return the language value
+     */
     public String getValue() {
         return Objects.requireNonNullElse(mValue, "");
     }
 
+    /**
+     * @return the language value
+     */
     @Override
     public String getName() {
         return NAME;
     }
 
+    /**
+     * @return the language value
+     */
     @Override
     public String getShortName() {
         return NAME;
     }
 
+    /**
+     * @return 1
+     */
     @Override
     public int since() {
         return 1;
     }
 
+    /**
+     * @return true if the qualifier has been correctly set
+     */
     @Override
     public boolean isValid() {
         return mValue != null;
     }
 
+    /**
+     * @return true if the qualifier has a fake value
+     */
     @Override
     public boolean hasFakeValue() {
         return FAKE_LANG_VALUE.equals(mValue);
     }
 
+    /**
+     * @param value  The value to check and set. Must not be null.
+     * @param config The folder configuration to receive the value. Must not be null.
+     * @return true if the value was accepted
+     */
     @Override
     public boolean checkAndSet(String value, FolderConfiguration config) {
         LanguageQualifier qualifier = getQualifier(value);
@@ -110,6 +149,10 @@ public final class LanguageQualifier extends ResourceQualifier {
         return false;
     }
 
+    /**
+     * @param qualifier The qualifier to compare. Must not be null.
+     * @return true if the qualifier is compatible with this object
+     */
     @Override
     public boolean equals(Object qualifier) {
         if (qualifier instanceof LanguageQualifier lq) {
@@ -122,6 +165,9 @@ public final class LanguageQualifier extends ResourceQualifier {
         return false;
     }
 
+    /**
+     * @return the hash code for the language value
+     */
     @Override
     public int hashCode() {
         if (mValue != null) {
@@ -133,6 +179,8 @@ public final class LanguageQualifier extends ResourceQualifier {
 
     /**
      * Returns the string used to represent this qualifier in the folder name.
+     *
+     * @return the string used to represent this qualifier in the folder name.
      */
     @Override
     public String getFolderSegment() {
@@ -143,12 +191,18 @@ public final class LanguageQualifier extends ResourceQualifier {
         return ""; //$NON-NLS-1$
     }
 
+    /**
+     * @return the string to display to the user
+     */
     @Override
     public String getShortDisplayValue() {
         return Objects.requireNonNullElse(mValue, "");
 
     }
 
+    /**
+     * @return the string to display to the user
+     */
     @Override
     @NonNull
     public String getLongDisplayValue() {

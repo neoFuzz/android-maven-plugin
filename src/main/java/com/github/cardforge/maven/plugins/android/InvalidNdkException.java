@@ -21,6 +21,9 @@ package com.github.cardforge.maven.plugins.android;
  * @author hugo.josefson@jayway.com
  */
 public class InvalidNdkException extends RuntimeException {
+    /**
+     * @param message The message to display to the user
+     */
     public InvalidNdkException(String message) {
         super(message);
     }

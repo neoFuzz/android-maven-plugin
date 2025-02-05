@@ -422,8 +422,8 @@ public class LintMojo extends AbstractAndroidMojo {
         }
     }
 
-    private void executeWhenConfigured() throws MojoExecutionException {
-        CommandExecutor executor = CommandExecutor.Factory.createDefaultCommmandExecutor();
+    void executeWhenConfigured() throws MojoExecutionException {
+        CommandExecutor executor = CommandExecutor.Factory.createDefaultCommandExecutor();
         executor.setLogger(this.getLog());
 
         String command = getAndroidSdk().getLintPath();

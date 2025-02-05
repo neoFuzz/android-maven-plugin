@@ -77,6 +77,10 @@ public class XmlElement extends OrphanXmlElement {
     private final List<Selector> mOverrideUsesSdkLibrarySelectors;
 
 
+    /**
+     * @param xml      the xml element to wrap.
+     * @param document the document this element belongs to.
+     */
     public XmlElement(@NonNull Element xml, @NonNull XmlDocument document) {
         super(xml);
 
@@ -258,7 +262,7 @@ public class XmlElement extends OrphanXmlElement {
     }
 
     /**
-     * Returns the owning {@link com.android.manifmerger.XmlDocument}
+     * @return the owning {@link com.android.manifmerger.XmlDocument}
      */
     @NonNull
     public XmlDocument getDocument() {
@@ -266,7 +270,7 @@ public class XmlElement extends OrphanXmlElement {
     }
 
     /**
-     * Returns the list of attributes for this xml element.
+     * @return the list of attributes for this xml element.
      */
     public List<XmlAttribute> getAttributes() {
         return mAttributes;
@@ -277,6 +281,7 @@ public class XmlElement extends OrphanXmlElement {
      * xml element, or {@link java.util.Optional#empty} if not present.
      *
      * @param attributeName the attribute name.
+     * @return the attribute if present, or {@link java.util.Optional#empty} if not present.
      */
     public Optional<XmlAttribute> getAttribute(NodeName attributeName) {
         for (XmlAttribute xmlAttribute : mAttributes) {
@@ -291,6 +296,8 @@ public class XmlElement extends OrphanXmlElement {
      * Get the node operation type as optionally specified by the user. If the user did not
      * explicitly specify how conflicting elements should be handled, a
      * {@link com.android.manifmerger.NodeOperationType#MERGE} will be returned.
+     *
+     * @return the node operation type
      */
     @NonNull
     public NodeOperationType getOperationType() {
@@ -303,6 +310,9 @@ public class XmlElement extends OrphanXmlElement {
      * Get the attribute operation type as optionally specified by the user. If the user did not
      * explicitly specify how conflicting attributes should be handled, a
      * {@link AttributeOperationType#STRICT} will be returned.
+     *
+     * @param attributeName the attribute name
+     * @return the attribute operation type
      */
     @NonNull
     public AttributeOperationType getAttributeOperationType(NodeName attributeName) {
@@ -311,11 +321,18 @@ public class XmlElement extends OrphanXmlElement {
                 : AttributeOperationType.STRICT;
     }
 
+    /**
+     * @return the list of attribute operation types for this xml element.
+     */
     @NonNull
     public Collection<Map.Entry<NodeName, AttributeOperationType>> getAttributeOperations() {
         return mAttributesOperationTypes.entrySet();
     }
 
+    /**
+     * @return the list of selectors for this xml element. Empty if the element does not support
+     * selectors.
+     */
     @NonNull
     public List<Selector> getOverrideUsesSdkLibrarySelectors() {
         return mOverrideUsesSdkLibrarySelectors;
@@ -417,6 +434,9 @@ public class XmlElement extends OrphanXmlElement {
         }
     }
 
+    /**
+     * @return the list of merge-able children of this node.
+     */
     @NonNull
     public ImmutableList<XmlElement> getMergeableElements() {
         return mMergeableChildren;
@@ -462,7 +482,12 @@ public class XmlElement extends OrphanXmlElement {
         return listBuilder.build();
     }
 
-    // merge this higher priority node with a lower priority node.
+    /**
+     * Merge this higher priority node with a lower priority node.
+     *
+     * @param lowerPriorityNode the low priority node
+     * @param mergingReport     merging report
+     */
     public void mergeChildren(@NonNull XmlElement lowerPriorityNode,
                               @NonNull MergingReport.Builder mergingReport) {
 
@@ -479,7 +504,7 @@ public class XmlElement extends OrphanXmlElement {
     }
 
     /**
-     * Returns true if this element supports having a tools:selector decoration, false otherwise.
+     * @return true if this element supports having a tools:selector decoration, false otherwise.
      */
     public boolean supportsSelector() {
         return getOperationType().isSelectable();
@@ -734,12 +759,16 @@ public class XmlElement extends OrphanXmlElement {
         mergingReport.getLogger().verbose("Adopted " + node);
     }
 
+    /**
+     * @param otherNode the other element to compare against.
+     * @return true if this element is equals to the other element, false otherwise.
+     */
     public boolean isEquals(XmlElement otherNode) {
         return !compareTo(otherNode).isPresent();
     }
 
     /**
-     * Returns a potentially null (if not present) selector decoration on this element.
+     * @return a potentially null (if not present) selector decoration on this element.
      */
     @Nullable
     public Selector getSelector() {

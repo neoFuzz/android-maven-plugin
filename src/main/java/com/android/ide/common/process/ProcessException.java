@@ -21,14 +21,24 @@ package com.android.ide.common.process;
  */
 public class ProcessException extends Exception {
 
+    /**
+     * @param throwable the cause of the exception
+     */
     public ProcessException(Throwable throwable) {
         super(throwable);
     }
 
+    /**
+     * @param message   the message for the exception
+     * @param throwable the cause of the exception
+     */
     public ProcessException(String message, Throwable throwable) {
         super(message, throwable);
     }
 
+    /**
+     * @param message the message for the exception
+     */
     public ProcessException(String message) {
         super(message);
     }

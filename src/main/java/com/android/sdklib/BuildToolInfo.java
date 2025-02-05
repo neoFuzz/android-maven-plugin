@@ -191,6 +191,8 @@ public class BuildToolInfo {
      * Creates a {@link BuildToolInfo} from a directory which follows the standard layout
      * convention.
      *
+     * @param revision The revision of the build-tool.
+     * @param path     The path to the build-tool folder specific to this revision.
      * @return The created {@link BuildToolInfo}.
      */
     @NonNull
@@ -320,6 +322,10 @@ public class BuildToolInfo {
         }
     }
 
+    /**
+     * @return The current JVM version.
+     * @throws NumberFormatException If the current JVM version cannot be parsed.
+     */
     @VisibleForTesting(visibility = Visibility.PRIVATE)
     @Nullable
     protected NoPreviewRevision getCurrentJvmVersion() throws NumberFormatException {
@@ -364,6 +370,9 @@ public class BuildToolInfo {
         return sb.toString();
     }
 
+    /**
+     * Enum representing the paths to the build-tools components.
+     */
     public enum PathId {
         /**
          * OS Path to the target's version of the aapt tool.
@@ -394,6 +403,9 @@ public class BuildToolInfo {
          */
         ANDROID_RS_CLANG(Constants.V1_0_0),
 
+        /**
+         * OS Path to the zipalign tool.
+         */
         DEXDUMP(Constants.V1_0_0),
 
         // --- NEW IN 18.1.0 ---
@@ -415,13 +427,25 @@ public class BuildToolInfo {
          */
         LD_MIPS(Constants.V18_1_0),
 
+        /**
+         * OS Path to the zipalign tool.
+         */
         // --- NEW IN 19.1.0 ---
         ZIP_ALIGN("19.1.0"),
 
+        /**
+         * OS Path to the jack.jar file.
+         */
         // --- NEW IN 21.x.y ---
         JACK("21.1.0"),
+        /**
+         * OS Path to the jill.jar file.
+         */
         JILL("21.1.0"),
 
+        /**
+         * OS Path to the split-select tool.
+         */
         SPLIT_SELECT("22.0.0");
 
         /**

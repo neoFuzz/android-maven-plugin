@@ -16,6 +16,8 @@
 
 package com.android.sdklib.internal.repository.updater;
 
+import com.android.annotations.NonNull;
+import com.android.annotations.Nullable;
 import com.android.sdklib.AndroidVersion;
 import com.android.sdklib.internal.repository.ITask;
 import com.android.sdklib.internal.repository.ITaskMonitor;
@@ -46,6 +48,9 @@ public class SdkUpdaterLogic {
 
     private final IUpdaterData mUpdaterData;
 
+    /**
+     * @param updaterData The {@link IUpdaterData} to use for the logic.
+     */
     public SdkUpdaterLogic(IUpdaterData updaterData) {
         mUpdaterData = updaterData;
     }
@@ -53,17 +58,22 @@ public class SdkUpdaterLogic {
     /**
      * Retrieves an unfiltered list of all remote archives.
      * The archives are guaranteed to be compatible with the current platform.
+     *
+     * @param sources    The sources to look at.
+     * @param localPkgs  The local packages to look at.
+     * @param includeAll Whether to include obsolete packages.
+     * @return A list of {@link ArchiveInfo} objects.
      */
     public List<ArchiveInfo> getAllRemoteArchives(
-            SdkSources sources,
+            @NonNull SdkSources sources,
             Package[] localPkgs,
             boolean includeAll) {
 
-        List<Package> remotePkgs = new ArrayList<Package>();
+        List<Package> remotePkgs = new ArrayList<>();
         SdkSource[] remoteSources = sources.getAllSources();
         fetchRemotePackages(remotePkgs, remoteSources);
 
-        ArrayList<Archive> archives = new ArrayList<Archive>();
+        ArrayList<Archive> archives = new ArrayList<>();
         for (Package remotePkg : remotePkgs) {
             // Only look for non-obsolete updates unless requested to include them
             if (includeAll || !remotePkg.isObsolete()) {
@@ -96,7 +106,7 @@ public class SdkUpdaterLogic {
             }
         }
 
-        ArrayList<ArchiveInfo> result = new ArrayList<ArchiveInfo>();
+        ArrayList<ArchiveInfo> result = new ArrayList<>();
 
         ArchiveInfo[] localArchives = createLocalArchives(localPkgs);
 
@@ -119,6 +129,13 @@ public class SdkUpdaterLogic {
      * <p>
      * When the user doesn't provide a selection, looks at local packages to find
      * those that can be updated and compute dependencies too.
+     *
+     * @param selectedArchives The user's selection, or null if the user didn't
+     *                         provide a selection.
+     * @param sources          The sources to look for packages in.
+     * @param localPkgs        The local packages.
+     * @param includeAll       Whether to include obsolete packages in the list.
+     * @return A list of {@link ArchiveInfo} objects.
      */
     public List<ArchiveInfo> computeUpdates(
             Collection<Archive> selectedArchives,
@@ -126,8 +143,8 @@ public class SdkUpdaterLogic {
             Package[] localPkgs,
             boolean includeAll) {
 
-        List<ArchiveInfo> archives = new ArrayList<ArchiveInfo>();
-        List<Package> remotePkgs = new ArrayList<Package>();
+        List<ArchiveInfo> archives = new ArrayList<>();
+        List<Package> remotePkgs = new ArrayList<>();
         SdkSource[] remoteSources = sources.getAllSources();
 
         // Create ArchiveInfos out of local (installed) packages.
@@ -218,7 +235,7 @@ public class SdkUpdaterLogic {
         double currentSampleScore = 0;
         double currentAddonScore = 0;
         double currentDocScore = 0;
-        HashMap<String, Double> currentExtraScore = new HashMap<String, Double>();
+        HashMap<String, Double> currentExtraScore = new HashMap<>();
         if (!includeAll) {
             if (localPkgs != null) {
                 for (Package p : localPkgs) {
@@ -254,7 +271,7 @@ public class SdkUpdaterLogic {
         }
 
         SdkSource[] remoteSources = sources.getAllSources();
-        ArrayList<Package> remotePkgs = new ArrayList<Package>();
+        ArrayList<Package> remotePkgs = new ArrayList<>();
         fetchRemotePackages(remotePkgs, remoteSources);
 
         Package suggestedDoc = null;
@@ -386,11 +403,14 @@ public class SdkUpdaterLogic {
      * <p>
      * The local {@link ArchiveInfo} are guaranteed to have one non-null archive
      * that you can retrieve using {@link ArchiveInfo#getNewArchive()}.
+     *
+     * @param localPkgs The list of local packages. Can be null.
+     * @return An array of {@link ArchiveInfo}.
      */
     public ArchiveInfo[] createLocalArchives(Package[] localPkgs) {
 
         if (localPkgs != null) {
-            ArrayList<ArchiveInfo> list = new ArrayList<ArchiveInfo>();
+            ArrayList<ArchiveInfo> list = new ArrayList<>();
             for (Package p : localPkgs) {
                 // Only accept packages that have one compatible archive.
                 // Local package should have 1 and only 1 compatible archive anyway.
@@ -424,7 +444,7 @@ public class SdkUpdaterLogic {
             Collection<Package> remotePkgs,
             SdkSource[] remoteSources,
             boolean includeAll) {
-        ArrayList<Archive> updates = new ArrayList<Archive>();
+        ArrayList<Archive> updates = new ArrayList<>();
 
         fetchRemotePackages(remotePkgs, remoteSources);
 
@@ -586,9 +606,10 @@ public class SdkUpdaterLogic {
      * Resolves dependencies for a given package.
      * <p>
      * Returns null if no dependencies were found.
-     * Otherwise return an array of {@link ArchiveInfo}, which is guaranteed to have
+     * Otherwise, return an array of {@link ArchiveInfo}, which is guaranteed to have
      * at least size 1 and contain no null elements.
      */
+    @Nullable
     private ArchiveInfo[] findDependency(Package pkg,
                                          Collection<ArchiveInfo> outArchives,
                                          Collection<Archive> selectedArchives,
@@ -601,7 +622,7 @@ public class SdkUpdaterLogic {
         // - platform: *might* depends on tools of rev >= min-tools-rev
         // - extra: *might* depends on platform with api >= min-api-level
 
-        Set<ArchiveInfo> aiFound = new HashSet<ArchiveInfo>();
+        Set<ArchiveInfo> aiFound = new HashSet<>();
 
         if (pkg instanceof IPlatformDependency) {
             ArchiveInfo ai = findPlatformDependency(
@@ -692,10 +713,17 @@ public class SdkUpdaterLogic {
      * A platform or an extra package can both have a min-tools-rev, in which case it
      * depends on having a tools package of the requested revision.
      * Finds the tools dependency. If found, add it to the list of things to install.
-     * Returns the archive info dependency, if any.
+     *
+     * @param pkg              The package that has a dependency on tools.
+     * @param outArchives      The list of archives to install. This is modified by this method.
+     * @param selectedArchives The list of selected archives. This is modified by this method.
+     * @param remotePkgs       The list of remote packages. This is modified by this method.
+     * @param remoteSources    The list of remote sources. This is modified by this method.
+     * @param localArchives    The list of local archives. This is modified by this method.
+     * @return the archive info dependency, if any.
      */
     public ArchiveInfo findToolsDependency(
-            IMinToolsDependency pkg,
+            @NonNull IMinToolsDependency pkg,
             Collection<ArchiveInfo> outArchives,
             Collection<Archive> selectedArchives,
             Collection<Package> remotePkgs,
@@ -799,10 +827,17 @@ public class SdkUpdaterLogic {
      * A tool package can have a min-platform-tools-rev, in which case it depends on
      * having a platform-tool package of the requested revision.
      * Finds the platform-tool dependency. If found, add it to the list of things to install.
-     * Returns the archive info dependency, if any.
+     *
+     * @param pkg              the package to resolve dependencies for.
+     * @param outArchives      the list of archives to install. This is modified by this method.
+     * @param selectedArchives the list of selected archives. This is modified by this method.
+     * @param remotePkgs       the list of remote packages. This is modified by this method.
+     * @param remoteSources    the list of remote sources. This is modified by this method.
+     * @param localArchives    the list of local archives. This is modified by this method.
+     * @return the archive info dependency, if any.
      */
     public ArchiveInfo findPlatformToolsDependency(
-            IMinPlatformToolsDependency pkg,
+            @NonNull IMinPlatformToolsDependency pkg,
             Collection<ArchiveInfo> outArchives,
             Collection<Archive> selectedArchives,
             Collection<Package> remotePkgs,
@@ -988,10 +1023,17 @@ public class SdkUpdaterLogic {
      * An add-on depends on having a platform with the same API level.
      * <p>
      * Finds the platform dependency. If found, add it to the list of things to install.
-     * Returns the archive info dependency, if any.
+     *
+     * @param pkg              The add-on package to resolve dependencies for.
+     * @param outArchives      The list of archives to install.
+     * @param selectedArchives The list of selected archives to install.
+     * @param remotePkgs       The list of remote packages.
+     * @param remoteSources    The list of remote sources.
+     * @param localArchives    The list of locally installed archives.
+     * @return the archive info dependency, if any.
      */
     public ArchiveInfo findPlatformDependency(
-            IPlatformDependency pkg,
+            @NonNull IPlatformDependency pkg,
             Collection<ArchiveInfo> outArchives,
             Collection<Archive> selectedArchives,
             Collection<Package> remotePkgs,
@@ -1123,10 +1165,17 @@ public class SdkUpdaterLogic {
      * not installed yet.
      * <p>
      * Finds the platform dependency. If found, add it to the list of things to install.
-     * Returns the archive info dependency, if any.
+     *
+     * @param pkg              The package requiring a platform.
+     * @param outArchives      The list of archives to install.
+     * @param selectedArchives The list of selected archives. Can be null.
+     * @param remotePkgs       The list of remote packages. Can be null.
+     * @param remoteSources    The list of remote sources. Can be null.
+     * @param localArchives    The list of locally installed packages. Can be null.
+     * @return the archive info dependency, if any.
      */
     protected ArchiveInfo findMinApiLevelDependency(
-            IMinApiLevelDependency pkg,
+            @NonNull IMinApiLevelDependency pkg,
             Collection<ArchiveInfo> outArchives,
             Collection<Archive> selectedArchives,
             Collection<Package> remotePkgs,
@@ -1238,7 +1287,14 @@ public class SdkUpdaterLogic {
      * An add-ons depends on having a platform with an exact specific API level.
      * <p>
      * Finds the platform dependency. If found, add it to the list of things to install.
-     * Returns the archive info dependency, if any.
+     *
+     * @param pkg              The add-on dependency.
+     * @param outArchives      The list of archives to install. Modified by this method.
+     * @param selectedArchives The list of selected archives. Modified by this method.
+     * @param remotePkgs       The list of remote packages. Modified by this method.
+     * @param remoteSources    The list of remote sources. Modified by this method.
+     * @param localArchives    The list of locally installed archives.
+     * @return the archive info dependency, if any.
      */
     public ArchiveInfo findExactApiLevelDependency(
             IExactApiLevelDependency pkg,
@@ -1428,7 +1484,7 @@ public class SdkUpdaterLogic {
      * A {@link LocalArchiveInfo} is an {@link ArchiveInfo} that wraps an already installed
      * "local" package/archive.
      * <p>
-     * In this case, the "new Archive" is still expected to be non null and the
+     * In this case, the "new Archive" is still expected to be non-null and the
      * "replaced Archive" is null. Installed archives are always accepted and never
      * rejected.
      * <p>

@@ -148,7 +148,7 @@ public class ZipalignMojo extends AbstractAndroidMojo {
         } else {
             boolean outputToSameFile = sameOutputAsInput();
 
-            CommandExecutor executor = CommandExecutor.Factory.createDefaultCommmandExecutor();
+            CommandExecutor executor = CommandExecutor.Factory.createDefaultCommandExecutor();
             executor.setLogger(this.getLog());
 
             String command = getAndroidSdk().getZipalignPath();

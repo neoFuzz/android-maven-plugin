@@ -33,16 +33,34 @@ import com.android.utils.ILogger;
 @Deprecated
 public interface IUpdaterData {
 
+    /**
+     * @return The {@link ITaskFactory} to use to create tasks.
+     */
     ITaskFactory getTaskFactory();
 
+    /**
+     * @return The {@link ILogger} to use to log messages.
+     */
     ILogger getSdkLog();
 
+    /**
+     * @return The {@link DownloadCache} to use to download files.
+     */
     DownloadCache getDownloadCache();
 
+    /**
+     * @return The {@link SdkManager} to use to create the SDK manager.
+     */
     SdkManager getSdkManager();
 
+    /**
+     * @return The {@link AvdManager} to use to create the AVD manager.
+     */
     AvdManager getAvdManager();
 
+    /**
+     * @return The {@link SettingsController} to use to create the settings controller.
+     */
     SettingsController getSettingsController();
 
 }

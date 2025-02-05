@@ -25,14 +25,28 @@ public final class SealedPackageException extends Exception {
     @Serial
     private static final long serialVersionUID = 1L;
 
+    /**
+     * @param format the format string
+     * @param args   the arguments for the format string. Arguments are converted to strings using
+     *               {@link String#valueOf(Object)}
+     */
     public SealedPackageException(String format, Object... args) {
         super(String.format(format, args));
     }
 
+    /**
+     * @param cause  the cause of this exception
+     * @param format the format string
+     * @param args   the arguments for the format string. Arguments are converted to strings using
+     *               {@link String#valueOf(Object)}
+     */
     public SealedPackageException(Throwable cause, String format, Object... args) {
         super(String.format(format, args), cause);
     }
 
+    /**
+     * @param cause the cause of this exception
+     */
     public SealedPackageException(Throwable cause) {
         super(cause);
     }

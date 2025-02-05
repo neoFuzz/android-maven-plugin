@@ -41,9 +41,17 @@ public final class XmlLoader {
     /**
      * Loads an XML file without doing xml validation and return a {@link XmlDocument}
      *
-     * @param displayName the xml file display name.
-     * @param xmlFile     the xml file.
+     * @param displayName             the xml file display name.
+     * @param xmlFile                 the xml file.
+     * @param selectors               the key resolver to use to resolve selectors.
+     * @param systemPropertyResolver  the key resolver to use to resolve system properties.
+     * @param type                    the file type.
+     * @param mainManifestPackageName the package name of the main manifest, if any.
+     * @param inputStream             the input stream to read the xml file from.
      * @return the initialized {@link com.android.manifmerger.XmlDocument}
+     * @throws IOException                  if the file cannot be read.
+     * @throws SAXException                 if the xml is incorrect
+     * @throws ParserConfigurationException if the xml engine cannot be configured.
      */
     @NonNull
     public static XmlDocument load(
@@ -69,8 +77,12 @@ public final class XmlLoader {
      * Loads an XML document from its {@link String} representation without doing xml validation and
      * return a {@link com.android.manifmerger.XmlDocument}
      *
-     * @param sourceFile the source location to use for logging and record collection.
-     * @param xml        the persisted xml.
+     * @param sourceFile              the source location to use for logging and record collection.
+     * @param xml                     the persisted xml.
+     * @param type                    the file type.
+     * @param mainManifestPackageName the package name of the main manifest, if any.
+     * @param selectors               the key resolver to use to resolve selectors.
+     * @param systemPropertyResolver  the key resolver to use to resolve system properties.
      * @return the initialized {@link com.android.manifmerger.XmlDocument}
      * @throws IOException                  this should never be thrown.
      * @throws SAXException                 if the xml is incorrect

@@ -40,20 +40,40 @@ import java.util.*;
  */
 public final class MultiResourceFile extends ResourceFile implements IValueResourceRepository {
 
+    /**
+     * Factory for creating SAXParser instances
+     */
     private static final SAXParserFactory sParserFactory = SAXParserFactory.newInstance();
 
+    /**
+     * Map of {@link ResourceType} to {@link Map} of String to {@link ResourceValue}.
+     * This is the actual content of the file.
+     */
     private final Map<ResourceType, Map<String, ResourceValue>> mResourceItems =
             new EnumMap<>(ResourceType.class);
 
+    /**
+     * List of {@link ResourceType} declared in this file. This is computed from the
+     * {@link #mResourceItems} map.
+     */
     private Collection<ResourceType> mResourceTypeList = null;
-    // Boolean flag to track whether a named element has been added or removed, thus requiring
-    // a new ID table to be generated
+    /**
+     * Boolean flag to track whether a named element has been added or removed, thus requiring
+     * a new ID table to be generated
+     */
     private boolean mNeedIdRefresh;
 
+    /**
+     * @param file   the {@link IAbstractFile} object
+     * @param folder the {@link ResourceFolder} this file belongs to
+     */
     public MultiResourceFile(IAbstractFile file, ResourceFolder folder) {
         super(file, folder);
     }
 
+    /**
+     * @param context the {@link ScanningContext} to use
+     */
     @Override
     protected void load(ScanningContext context) {
         // need to parse the file and find the content.
@@ -69,6 +89,9 @@ public final class MultiResourceFile extends ResourceFile implements IValueResou
         updateResourceItems(context);
     }
 
+    /**
+     * @param context the {@link ScanningContext} to use
+     */
     @Override
     protected void update(ScanningContext context) {
         // Reset the ID generation flag
@@ -106,6 +129,9 @@ public final class MultiResourceFile extends ResourceFile implements IValueResou
         updateResourceItems(context);
     }
 
+    /**
+     * @param context the {@link ScanningContext} to use
+     */
     @Override
     protected void dispose(@NonNull ScanningContext context) {
         ResourceRepository repository = getRepository();
@@ -120,17 +146,27 @@ public final class MultiResourceFile extends ResourceFile implements IValueResou
         // In the meantime, other objects may need to access it.
     }
 
+    /**
+     * @return the list of {@link ResourceType} declared in this file.
+     */
     @Override
     public Collection<ResourceType> getResourceTypes() {
         return mResourceTypeList;
     }
 
+    /**
+     * @param type The {@link ResourceType}
+     * @return true if this file has resources of the given type, false otherwise
+     */
     @Override
     public boolean hasResources(ResourceType type) {
         Map<String, ResourceValue> list = mResourceItems.get(type);
         return (list != null && !list.isEmpty());
     }
 
+    /**
+     * @param context the {@link ScanningContext} to use
+     */
     private void updateResourceItems(ScanningContext context) {
         ResourceRepository repository = getRepository();
 
@@ -198,12 +234,22 @@ public final class MultiResourceFile extends ResourceFile implements IValueResou
         list.put(value.getName(), value);
     }
 
+    /**
+     * @param type the type of the resource to look for
+     * @param name the name of the resource to look for
+     * @return  true if the resource is found, false otherwise
+     */
     @Override
     public boolean hasResourceValue(ResourceType type, String name) {
         Map<String, ResourceValue> map = mResourceItems.get(type);
         return map != null && map.containsKey(name);
     }
 
+    /**
+     * @param type the type of the resource.
+     * @param name the name of the resource.
+     * @return the {@link ResourceValue} or null if not found
+     */
     @Override
     @Nullable
     public ResourceValue getValue(ResourceType type, String name) {

@@ -74,62 +74,107 @@ public class Test {
     private Boolean failSafe;
 
 
+    /**
+     * @return the skip
+     */
     public String getSkip() {
         return skip;
     }
 
+    /**
+     * @return the instrumentationPackage
+     */
     public String getInstrumentationPackage() {
         return instrumentationPackage;
     }
 
+    /**
+     * @return the instrumentationRunner
+     */
     public String getInstrumentationRunner() {
         return instrumentationRunner;
     }
 
+    /**
+     * @return the debug
+     */
     public Boolean isDebug() {
         return debug;
     }
 
+    /**
+     * @return the coverage
+     */
     public Boolean isCoverage() {
         return coverage;
     }
 
+    /**
+     * @return the coverageFile
+     */
     public String getCoverageFile() {
         return coverageFile;
     }
 
+    /**
+     * @return the logOnly
+     */
     public Boolean isLogOnly() {
         return logOnly;
     }
 
+    /**
+     * @return the testSize
+     */
     public String getTestSize() {
         return testSize;
     }
 
+    /**
+     * @return the createReport
+     */
     public Boolean isCreateReport() {
         return createReport;
     }
 
+    /**
+     * @return the packages
+     */
     public List<String> getPackages() {
         return packages;
     }
 
+    /**
+     * @return the classes
+     */
     public List<String> getClasses() {
         return classes;
     }
 
+    /**
+     * @return the annotations
+     */
     public List<String> getAnnotations() {
         return annotations;
     }
 
+    /**
+     * @return the excludeAnnotations
+     */
     public List<String> getExcludeAnnotations() {
         return excludeAnnotations;
     }
 
+    /**
+     * @return the instrumentationArgs
+     */
     public List<String> getInstrumentationArgs() {
         return instrumentationArgs;
     }
 
+    /**
+     * @return the failSafe
+     */
     public Boolean isFailSafe() {
         return failSafe;
     }

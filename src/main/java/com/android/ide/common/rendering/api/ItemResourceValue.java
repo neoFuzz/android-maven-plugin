@@ -15,6 +15,8 @@
  */
 package com.android.ide.common.rendering.api;
 
+import com.android.annotations.NonNull;
+
 /**
  * Represents each item in the android style resource.
  */
@@ -22,6 +24,9 @@ public class ItemResourceValue extends ResourceValue {
     private final boolean mIsFrameworkAttr;
 
     /**
+     * @param name             the name of the resource.
+     * @param isFrameworkAttr  if the attribute is in framework namespace.
+     * @param isFrameworkStyle if the style is a framework file or project file.
      * @see #ItemResourceValue(String, boolean, String, boolean)
      */
     public ItemResourceValue(String name, boolean isFrameworkAttr, boolean isFrameworkStyle) {
@@ -53,35 +58,68 @@ public class ItemResourceValue extends ResourceValue {
         mIsFrameworkAttr = isFrameworkAttr;
     }
 
-    static ItemResourceValue fromResourceValue(ResourceValue res, boolean isFrameworkAttr) {
+    /**
+     * @param res             the resource value
+     * @param isFrameworkAttr is it in the framework namespace
+     * @return the item resource value
+     */
+    @NonNull
+    static ItemResourceValue fromResourceValue(@NonNull ResourceValue res, boolean isFrameworkAttr) {
         assert res.getResourceType() == null : res.getResourceType() + " is not null";
         return new ItemResourceValue(res.getName(), isFrameworkAttr, res.getValue(),
                 res.isFramework());
     }
 
+    /**
+     * @return if the attribute is in framework namespace.
+     */
     public boolean isFrameworkAttr() {
         return mIsFrameworkAttr;
     }
 
+    /**
+     * @return the attribute name and if it is in framework namespace
+     */
     Attribute getAttribute() {
         return new Attribute(getName(), mIsFrameworkAttr);
     }
 
+    /**
+     * Represents an attribute name and if it is in framework namespace.
+     */
     static final class Attribute {
+        /**
+         * The name of the attribute. This is the same as the name in the XML file.
+         */
         String mName;
+        /**
+         * If the attribute is in framework namespace.
+         */
         boolean mIsFrameworkAttr;
 
+        /**
+         * @param name            the name of the attribute. This is the same as the name in the XML file.
+         * @param isFrameworkAttr if the attribute is in framework namespace.
+         * @see #Attribute(String, boolean)
+         */
         Attribute(String name, boolean isFrameworkAttr) {
             mName = name;
             mIsFrameworkAttr = isFrameworkAttr;
         }
 
+        /**
+         * @return a hash code for this object
+         */
         @Override
         public int hashCode() {
             int booleanHash = mIsFrameworkAttr ? 1231 : 1237;  // see java.lang.Boolean#hashCode()
             return 31 * booleanHash + mName.hashCode();
         }
 
+        /**
+         * @param obj the object to compare with
+         * @return true if the objects are equal, false otherwise
+         */
         @Override
         public boolean equals(Object obj) {
             if (obj instanceof Attribute) {
@@ -91,7 +129,11 @@ public class ItemResourceValue extends ResourceValue {
             return false;
         }
 
+        /**
+         * @return a string representation of this object
+         */
         @Override
+        @NonNull
         public String toString() {
             return mName + " (framework:" + mIsFrameworkAttr + ")";
         }

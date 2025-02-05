@@ -26,6 +26,9 @@ import java.util.Map;
  */
 public abstract class ProcessEnvBuilder<T extends ProcessEnvBuilder> {
 
+    /**
+     * The environment variables to use when running the process.
+     */
     protected final Map<String, Object> mEnvironment = Maps.newHashMap();
 
     /**

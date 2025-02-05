@@ -23,7 +23,7 @@ import com.android.sdklib.SdkManager;
 import com.android.sdklib.internal.repository.sources.SdkSource;
 import com.android.sdklib.repository.IDescription;
 import com.android.sdklib.repository.MajorRevision;
-import com.android.sdklib.repository.SdkRepoConstants;
+import com.android.sdklib.repository.RepoConstants;
 import com.android.sdklib.repository.descriptors.IPkgDesc;
 import com.android.sdklib.repository.descriptors.PkgDesc;
 import org.w3c.dom.Node;
@@ -43,10 +43,20 @@ import java.util.Properties;
  * @deprecated com.android.sdklib.internal.repository has moved into Studio as
  * com.android.tools.idea.sdk.remote.internal.
  */
-@Deprecated
+@Deprecated(since = "4.7")
 public class DocPackage extends MajorRevisionPackage implements IAndroidVersionProvider {
 
+    /**
+     * Static string for "(Obsolete)"
+     */
+    public static final String OBSOLETE = " (Obsolete)";
+    /**
+     * The minimal doc version required by this given package.
+     */
     private final AndroidVersion mVersion;
+    /**
+     * The package description.
+     */
     private final IPkgDesc mPkgDesc;
 
     /**
@@ -66,9 +76,9 @@ public class DocPackage extends MajorRevisionPackage implements IAndroidVersionP
         super(source, packageNode, nsUri, licenses);
 
         int apiLevel =
-                PackageParserUtils.getXmlInt(packageNode, SdkRepoConstants.NODE_API_LEVEL, 0);
+                PackageParserUtils.getXmlInt(packageNode, RepoConstants.NODE_API_LEVEL, 0);
         String codeName =
-                PackageParserUtils.getXmlString(packageNode, SdkRepoConstants.NODE_CODENAME);
+                PackageParserUtils.getXmlString(packageNode, RepoConstants.NODE_CODENAME);
         if (codeName.isEmpty()) {
             codeName = null;
         }
@@ -79,6 +89,17 @@ public class DocPackage extends MajorRevisionPackage implements IAndroidVersionP
                 .create();
     }
 
+    /**
+     * @param source        The {@link SdkSource} where this is loaded from.
+     * @param props         The properties to be used to initialize the package.
+     * @param apiLevel      The API level of the doc package.
+     * @param codename      The codename of the doc package, can be null.
+     * @param revision      The revision of the doc package.
+     * @param license       The license of the doc package.
+     * @param description   The description of the doc package.
+     * @param descUrl       The description URL.
+     * @param archiveOsPath The OS path of the doc package.
+     */
     private DocPackage(SdkSource source,
                        Properties props,
                        int apiLevel,
@@ -107,7 +128,19 @@ public class DocPackage extends MajorRevisionPackage implements IAndroidVersionP
      * one archive which URL is the actual target location.
      * <p>
      * By design, this creates a package with one and only one archive.
+     *
+     * @param source        The {@link SdkSource} where this is loaded from.
+     * @param props         The properties to be used to initialize the package.
+     * @param apiLevel      The API level of the doc package.
+     * @param codename      The codename of the doc package, can be null.
+     * @param revision      The revision of the doc package.
+     * @param license       The license of the doc package.
+     * @param description   The description of the doc package.
+     * @param descUrl       The description URL.
+     * @param archiveOsPath The OS path of the doc package.
+     * @return The created {@link DocPackage}.
      */
+    @NonNull
     public static Package create(SdkSource source,
                                  Properties props,
                                  int apiLevel,
@@ -121,6 +154,9 @@ public class DocPackage extends MajorRevisionPackage implements IAndroidVersionP
                 descUrl, archiveOsPath);
     }
 
+    /**
+     * @return The {@link AndroidVersion} of this package.
+     */
     @Override
     @NonNull
     public IPkgDesc getPkgDesc() {
@@ -130,6 +166,8 @@ public class DocPackage extends MajorRevisionPackage implements IAndroidVersionP
     /**
      * Save the properties of the current packages in the given {@link Properties} object.
      * These properties will later be give the constructor that takes a {@link Properties} object.
+     *
+     * @param props The {@link Properties} object to fill.
      */
     @Override
     public void saveProperties(Properties props) {
@@ -141,6 +179,8 @@ public class DocPackage extends MajorRevisionPackage implements IAndroidVersionP
     /**
      * Returns the version, for platform, add-on and doc packages.
      * Can be 0 if this is a local package of unknown api-level.
+     *
+     * @return The {@link AndroidVersion} of this package.
      */
     @Override
     @NonNull
@@ -155,6 +195,7 @@ public class DocPackage extends MajorRevisionPackage implements IAndroidVersionP
      * {@inheritDoc}
      */
     @Override
+    @NonNull
     public String installId() {
         return "doc-" + mVersion.getApiString();    //$NON-NLS-1$
     }
@@ -165,45 +206,49 @@ public class DocPackage extends MajorRevisionPackage implements IAndroidVersionP
      * {@inheritDoc}
      */
     @Override
+    @NonNull
     public String getListDescription() {
         String ld = getListDisplay();
         if (!ld.isEmpty()) {
-            return String.format("%1$s%2$s", ld, isObsolete() ? " (Obsolete)" : "");
+            return String.format("%1$s%2$s", ld, isObsolete() ? OBSOLETE : "");
         }
         if (mVersion.isPreview()) {
             return String.format("Documentation for Android '%1$s' Preview SDK%2$s",
                     mVersion.getCodename(),
-                    isObsolete() ? " (Obsolete)" : "");
+                    isObsolete() ? OBSOLETE : "");
         } else {
             return String.format("Documentation for Android SDK%2$s",
                     mVersion.getApiLevel(),
-                    isObsolete() ? " (Obsolete)" : "");
+                    isObsolete() ? OBSOLETE : "");
         }
     }
 
     /**
      * Returns a short description for an {@link IDescription}.
+     *
+     * @return A short description for an {@link IDescription}.
      */
     @Override
+    @NonNull
     public String getShortDescription() {
         String ld = getListDisplay();
         if (!ld.isEmpty()) {
             return String.format("%1$s, revision %2$s%3$s",
                     ld,
                     getRevision().toShortString(),
-                    isObsolete() ? " (Obsolete)" : "");
+                    isObsolete() ? OBSOLETE : "");
         }
 
         if (mVersion.isPreview()) {
             return String.format("Documentation for Android '%1$s' Preview SDK, revision %2$s%3$s",
                     mVersion.getCodename(),
                     getRevision().toShortString(),
-                    isObsolete() ? " (Obsolete)" : "");
+                    isObsolete() ? OBSOLETE : "");
         } else {
             return String.format("Documentation for Android SDK, API %1$d, revision %2$s%3$s",
                     mVersion.getApiLevel(),
                     getRevision().toShortString(),
-                    isObsolete() ? " (Obsolete)" : "");
+                    isObsolete() ? OBSOLETE : "");
         }
     }
 
@@ -212,8 +257,11 @@ public class DocPackage extends MajorRevisionPackage implements IAndroidVersionP
      * <p>
      * The long description is whatever the XML contains for the &lt;description&gt; field,
      * or the short description if the former is empty.
+     *
+     * @return The long description, or the short description if {@link #getDescription()} is empty.
      */
     @Override
+    @NonNull
     public String getLongDescription() {
         String s = getDescription();
         if (s == null || s.isEmpty()) {
@@ -223,7 +271,7 @@ public class DocPackage extends MajorRevisionPackage implements IAndroidVersionP
         if (s.indexOf("revision") == -1) {
             s += String.format("\nRevision %1$s%2$s",
                     getRevision().toShortString(),
-                    isObsolete() ? " (Obsolete)" : "");
+                    isObsolete() ? OBSOLETE : "");
         }
 
         return s;
@@ -240,6 +288,7 @@ public class DocPackage extends MajorRevisionPackage implements IAndroidVersionP
      * @return A new {@link File} corresponding to the directory to use to install this package.
      */
     @Override
+    @NonNull
     public File getInstallFolder(String osSdkRoot, SdkManager sdkManager) {
         return new File(osSdkRoot, SdkConstants.FD_DOCS);
     }
@@ -247,11 +296,13 @@ public class DocPackage extends MajorRevisionPackage implements IAndroidVersionP
     /**
      * Consider doc packages to be the same if they cover the same API level,
      * regardless of their revision number.
+     *
+     * @return true if the packages are considered the same.
      */
     @Override
     public boolean sameItemAs(Package pkg) {
-        if (pkg instanceof DocPackage) {
-            AndroidVersion rev2 = ((DocPackage) pkg).getAndroidVersion();
+        if (pkg instanceof DocPackage dp) {
+            AndroidVersion rev2 = dp.getAndroidVersion();
             return this.getAndroidVersion().equals(rev2);
         }
 
@@ -269,15 +320,18 @@ public class DocPackage extends MajorRevisionPackage implements IAndroidVersionP
      * However docs that have the same API version (API level + codename) are considered
      * updates if they have a higher revision number (so 15 rev 2 is an update for 15 rev 1,
      * but is not an update for 14 rev 1.)
+     *
+     * @param replacementPackage The package that would replace this one if installed.
+     * @return {@link UpdateInfo#UPDATE} if strictly greater revision number, or
+     * {@link UpdateInfo#NOT_UPDATE} if the same revision or lower revision number.
      */
     @Override
+    @NonNull
     public UpdateInfo canBeUpdatedBy(Package replacementPackage) {
         // check they are the same kind of object
-        if (!(replacementPackage instanceof DocPackage)) {
+        if (!(replacementPackage instanceof DocPackage replacementDoc)) {
             return UpdateInfo.INCOMPATIBLE;
         }
-
-        DocPackage replacementDoc = (DocPackage) replacementPackage;
 
         AndroidVersion replacementVersion = replacementDoc.getAndroidVersion();
 
@@ -301,6 +355,9 @@ public class DocPackage extends MajorRevisionPackage implements IAndroidVersionP
         return UpdateInfo.NOT_UPDATE;
     }
 
+    /**
+     * @return The hash code of the {@link AndroidVersion}.
+     */
     @Override
     public int hashCode() {
         final int prime = 31;
@@ -309,6 +366,10 @@ public class DocPackage extends MajorRevisionPackage implements IAndroidVersionP
         return result;
     }
 
+    /**
+     * @param obj The object to compare against.
+     * @return true if the object is equal to this one.
+     */
     @Override
     public boolean equals(Object obj) {
         if (this == obj) {
@@ -317,17 +378,11 @@ public class DocPackage extends MajorRevisionPackage implements IAndroidVersionP
         if (!super.equals(obj)) {
             return false;
         }
-        if (!(obj instanceof DocPackage)) {
+        if (!(obj instanceof DocPackage other)) {
             return false;
         }
-        DocPackage other = (DocPackage) obj;
         if (mVersion == null) {
-            if (other.mVersion != null) {
-                return false;
-            }
-        } else if (!mVersion.equals(other.mVersion)) {
-            return false;
-        }
-        return true;
+            return other.mVersion == null;
+        } else return mVersion.equals(other.mVersion);
     }
 }

@@ -39,6 +39,9 @@ public class Sign {
     @Parameter(property = "android.sign.debug", defaultValue = "auto")
     private String debug;
 
+    /**
+     * @return the debug keystore setting
+     */
     public String getDebug() {
         return debug;
     }

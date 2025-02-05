@@ -64,6 +64,10 @@ public class SignedJarBuilder {
      * @param key         the {@link PrivateKey} used to sign the archive, or <code>null</code>.
      * @param certificate the {@link X509Certificate} used to sign the archive, or
      *                    <code>null</code>.
+     * @param builtBy     the value of the <code>Built-By</code> manifest attribute, or
+     *                    <code>null</code>.
+     * @param createdBy   the value of the <code>Created-By</code> manifest attribute, or
+     *                    <code>null</code>.
      * @throws IOException              if an I/O error occurs.
      * @throws NoSuchAlgorithmException if the algorithm used for the digest cannot be found.
      */
@@ -93,6 +97,10 @@ public class SignedJarBuilder {
         }
     }
 
+    /**
+     * @param print the {@link PrintStream} to write the manifest digest to.
+     * @param entry the {@link Map.Entry} to write.
+     */
     public static void digestManifest(@NonNull PrintStream print, @NonNull Map.Entry<String, Attributes> entry) {
         print.print("Name: " + entry.getKey() + "\r\n");
         for (Map.Entry<Object, Object> att : entry.getValue().entrySet()) {
@@ -141,6 +149,7 @@ public class SignedJarBuilder {
      *
      * @param input  the {@link InputStream} for the Jar/Zip to copy.
      * @param filter the filter or <code>null</code>
+     * @param extractor the extractor or <code>null</code>
      * @throws IOException       if an I/O error occurs.
      * @throws ZipAbortException if the {@link IZipEntryFilter} filter indicated that to write
      *                           must be aborted.
@@ -298,6 +307,10 @@ public class SignedJarBuilder {
 
     /**
      * Writes a .SF file with a digest to the manifest.
+     *
+     * @param out the stream to write the .SF file to
+     * @throws IOException              if an I/O error occurs
+     * @throws GeneralSecurityException if a security error occurs
      */
     private void writeSignatureFile(OutputStream out)
             throws IOException, GeneralSecurityException {
@@ -339,6 +352,14 @@ public class SignedJarBuilder {
 
     /**
      * Write the certificate file with a digital signature.
+     *
+     * @param data       the data to sign
+     * @param publicKey  the public key to use for signing
+     * @param privateKey the private key to use for signing
+     * @throws IOException                  if an I/O error occurs
+     * @throws CertificateEncodingException if an encoding error occurs
+     * @throws OperatorCreationException    if an error occurs during the creation of the operator
+     * @throws CMSException                 if an error occurs during the CMS processing
      */
     private void writeSignatureBlock(CMSTypedData data, X509Certificate publicKey, @NonNull PrivateKey privateKey)
             throws IOException, CertificateEncodingException, OperatorCreationException, CMSException {
@@ -392,18 +413,33 @@ public class SignedJarBuilder {
             @Serial
             private static final long serialVersionUID = 1L;
 
+            /**
+             * Constructs a new ZipAbortException with no detail message.
+             */
             public ZipAbortException() {
                 super();
             }
 
+            /**
+             * @param format the format string
+             * @param args   the arguments for the formated string
+             */
             public ZipAbortException(String format, Object... args) {
                 super(String.format(format, args));
             }
 
+            /**
+             * @param cause  the cause of the exception
+             * @param format the format string
+             * @param args   the arguments for the formated string
+             */
             public ZipAbortException(Throwable cause, String format, Object... args) {
                 super(String.format(format, args), cause);
             }
 
+            /**
+             * @param cause the cause of the exception
+             */
             public ZipAbortException(Throwable cause) {
                 super(cause);
             }
@@ -416,8 +452,17 @@ public class SignedJarBuilder {
      */
     public interface ZipEntryExtractor {
 
+        /**
+         * @param archivePath the archive file path of the entry
+         * @return <code>true</code> if the file should be extracted.
+         */
         boolean checkEntry(String archivePath);
 
+        /**
+         * @param archivePath the archive file path of the entry
+         * @param zis         the input stream to read the content of the entry
+         * @throws IOException if an I/O error occurs.
+         */
         void extract(String archivePath, InputStream zis) throws IOException;
     }
 
@@ -428,6 +473,9 @@ public class SignedJarBuilder {
     private static class CountOutputStream extends FilterOutputStream {
         private int mCount;
 
+        /**
+         * @param out the underlying output stream to be written to and counted.
+         */
         public CountOutputStream(OutputStream out) {
             super(out);
             mCount = 0;
@@ -445,6 +493,9 @@ public class SignedJarBuilder {
             mCount += len;
         }
 
+        /**
+         * @return the number of bytes written to this stream so far
+         */
         public int size() {
             return mCount;
         }

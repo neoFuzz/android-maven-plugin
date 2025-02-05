@@ -375,19 +375,32 @@ public class SdkManager {
      * Helper class to represent a Layoutlib version.
      */
     public static class LayoutlibVersion implements Comparable<LayoutlibVersion> {
+        /**
+         * A version with both API and revision not specified.
+         */
         public static final int NOT_SPECIFIED = 0;
         private final int mApi;
         private final int mRevision;
 
+        /**
+         * @param api      API level or 0 if not specified
+         * @param revision Revision or 0 if not specified
+         */
         public LayoutlibVersion(int api, int revision) {
             mApi = api;
             mRevision = revision;
         }
 
+        /**
+         * @return the API level or 0 if not specified
+         */
         public int getApi() {
             return mApi;
         }
 
+        /**
+         * @return the revision or 0 if not specified
+         */
         public int getRevision() {
             return mRevision;
         }

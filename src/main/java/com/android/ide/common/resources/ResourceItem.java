@@ -61,6 +61,8 @@ public class ResourceItem implements Comparable<ResourceItem> {
 
     /**
      * Returns the name of the resource.
+     *
+     * @return the name of the resource.
      */
     public final String getName() {
         return mName;
@@ -81,6 +83,8 @@ public class ResourceItem implements Comparable<ResourceItem> {
      * <p>
      * This is typically the case for resources that don't have alternate versions, or resources
      * of type {@link ResourceType#ID} that aren't declared inline.
+     *
+     * @return {@code true} if the resource is editable directly, {@code false} otherwise.
      */
     public boolean isEditableDirectly() {
         return !hasAlternates();
@@ -89,6 +93,8 @@ public class ResourceItem implements Comparable<ResourceItem> {
     /**
      * Returns whether the ID resource has been declared inline inside another resource XML file.
      * If the resource type is not {@link ResourceType#ID}, this will always return {@code false}.
+     *
+     * @return {@code true} if the resource has been declared inline, {@code false} otherwise.
      */
     public boolean isDeclaredInline() {
         return false;
@@ -154,6 +160,8 @@ public class ResourceItem implements Comparable<ResourceItem> {
 
     /**
      * Returns the sorted list of {@link ResourceItem} objects for this resource item.
+     *
+     * @return an array of {@link ResourceFile} objects.
      */
     public ResourceFile[] getSourceFileArray() {
         ArrayList<ResourceFile> list = new ArrayList<>(mFiles);
@@ -165,6 +173,8 @@ public class ResourceItem implements Comparable<ResourceItem> {
 
     /**
      * Returns the list of source file for this resource.
+     *
+     * @return a list of {@link ResourceFile} objects.
      */
     public List<ResourceFile> getSourceFileList() {
         return Collections.unmodifiableList(mFiles);
@@ -173,6 +183,7 @@ public class ResourceItem implements Comparable<ResourceItem> {
     /**
      * Returns if the resource has at least one non-default version.
      *
+     * @return true if the resource has at least one non-default version.
      * @see ResourceFile#getConfiguration()
      * @see FolderConfiguration#isDefault()
      */
@@ -189,6 +200,7 @@ public class ResourceItem implements Comparable<ResourceItem> {
     /**
      * Returns whether the resource has a default version, with no qualifier.
      *
+     * @return true if the resource has a default version
      * @see ResourceFile#getConfiguration()
      * @see FolderConfiguration#isDefault()
      */
@@ -206,6 +218,7 @@ public class ResourceItem implements Comparable<ResourceItem> {
     /**
      * Returns the number of alternate versions for this resource.
      *
+     * @return the number of alternate versions.
      * @see ResourceFile#getConfiguration()
      * @see FolderConfiguration#isDefault()
      */
@@ -223,6 +236,7 @@ public class ResourceItem implements Comparable<ResourceItem> {
     /**
      * Returns a formatted string usable in an XML to use for the {@link ResourceItem}.
      *
+     * @param type   The type of the resource.
      * @param system Whether this is a system resource or a project resource.
      * @return a string in the format @[type]/[name]
      */

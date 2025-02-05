@@ -18,6 +18,9 @@ package com.android.ide.common.rendering.api;
 import com.android.layoutlib.api.IDensityBasedResourceValue;
 import com.android.resources.ResourceType;
 
+/**
+ * {@link ResourceValue} with a density value.
+ */
 @SuppressWarnings("deprecation")
 public class DensityBasedResourceValue extends ResourceValue implements IDensityBasedResourceValue {
     /**
@@ -50,6 +53,7 @@ public class DensityBasedResourceValue extends ResourceValue implements IDensity
     /**
      * Legacy method, do not call
      *
+     * @return the density as an enum
      * @deprecated use {@link #getResourceDensity()} instead.
      */
     @Override

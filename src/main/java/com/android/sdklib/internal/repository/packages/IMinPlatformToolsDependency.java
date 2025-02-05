@@ -49,6 +49,8 @@ public interface IMinPlatformToolsDependency {
      * <p>
      * This attribute is mandatory and should not be normally missing.
      * It can only happen when dealing with an invalid repository XML.
+     *
+     * @return A {@link FullRevision} object or {@link #MIN_PLATFORM_TOOLS_REV_INVALID}
      */
     FullRevision getMinPlatformToolsRevision();
 

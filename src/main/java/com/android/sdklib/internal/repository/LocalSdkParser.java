@@ -18,6 +18,7 @@ package com.android.sdklib.internal.repository;
 
 import com.android.SdkConstants;
 import com.android.annotations.NonNull;
+import com.android.annotations.Nullable;
 import com.android.io.FileWrapper;
 import com.android.sdklib.IAndroidTarget;
 import com.android.sdklib.ISystemImage;
@@ -45,7 +46,7 @@ import java.util.*;
  * @deprecated com.android.sdklib.internal.repository has moved into Studio as
  * com.android.tools.idea.sdk.remote.internal.
  */
-@Deprecated
+@Deprecated(since = "4.7")
 public class LocalSdkParser {
 
     /**
@@ -92,8 +93,14 @@ public class LocalSdkParser {
      * Parse the SDK/build-tools folder.
      */
     public static final int PARSE_BUILD_TOOLS = PkgType.PKG_BUILD_TOOLS.getIntValue();
+    /**
+     * Package list
+     */
     private Package[] mPackages;
 
+    /**
+     * This creates a new parser for a given SDK folder.
+     */
     public LocalSdkParser() {
         // pass
     }
@@ -223,6 +230,8 @@ public class LocalSdkParser {
      * <p>
      * This returns initially returns null.
      * Once the parseSdk() method has been called, this returns a possibly empty but non-null array.
+     *
+     * @return The packages found by the last call to {@link #parseSdk}.
      */
     public Package[] getPackages() {
         return mPackages;
@@ -276,12 +285,12 @@ public class LocalSdkParser {
             @NonNull SdkManager sdkManager,
             int parseFilter,
             @NonNull ITaskMonitor monitor) {
-        ArrayList<Package> packages = new ArrayList<Package>();
-        HashSet<File> visited = new HashSet<File>();
+        ArrayList<Package> packages = new ArrayList<>();
+        HashSet<File> visited = new HashSet<>();
 
         monitor.setProgressMax(11);
 
-        File dir = null;
+        File dir;
         Package pkg = null;
 
         if ((parseFilter & PARSE_DOCS) != 0) {
@@ -418,8 +427,13 @@ public class LocalSdkParser {
     /**
      * Find any directory in the /extras/vendors/path folders for extra packages.
      * This isn't a recursive search.
+     *
+     * @param sdkManager The SDK manager to use to list the extras.
+     * @param visited    The set of visited folders.
+     * @param packages   The list of packages to fill-in.
+     * @param log        The logger.
      */
-    private void scanExtras(SdkManager sdkManager,
+    private void scanExtras(@NonNull SdkManager sdkManager,
                             HashSet<File> visited,
                             ArrayList<Package> packages,
                             ILogger log) {
@@ -435,6 +449,11 @@ public class LocalSdkParser {
     /**
      * Find any other directory in the given "root" directory that hasn't been visited yet
      * and assume they contain extra packages. This is <em>not</em> a recursive search.
+     *
+     * @param extrasRoot The root directory to scan.
+     * @param visited    The set of visited folders.
+     * @param packages   The list of packages to fill-in.
+     * @param log        The logger.
      */
     private void scanExtrasDirectory(String extrasRoot,
                                      HashSet<File> visited,
@@ -470,12 +489,17 @@ public class LocalSdkParser {
     }
 
     /**
-     * Find any other sub-directories under the /samples root that hasn't been visited yet
+     * Find any other subdirectories under the /samples root that hasn't been visited yet
      * and assume they contain sample packages. This is <em>not</em> a recursive search.
      * <p>
      * The use case is to find samples dirs under /samples when their target isn't loaded.
+     *
+     * @param sdkManager The SDK manager to use to list the samples.
+     * @param visited    The set of visited folders.
+     * @param packages   The list of packages to fill-in.
+     * @param log        The logger.
      */
-    private void scanMissingSamples(SdkManager sdkManager,
+    private void scanMissingSamples(@NonNull SdkManager sdkManager,
                                     HashSet<File> visited,
                                     ArrayList<Package> packages,
                                     ILogger log) {
@@ -502,10 +526,15 @@ public class LocalSdkParser {
      * The sdk manager only lists valid addons. However here we also want to find "broken"
      * addons, i.e. addons that failed to load for some reason.
      * <p>
-     * Find any other sub-directories under the /add-ons root that hasn't been visited yet
+     * Find any other subdirectories under the /add-ons root that hasn't been visited yet
      * and assume they contain broken addons.
+     *
+     * @param sdkManager The SDK manager to use to list the addons.
+     * @param visited    The set of visited folders.
+     * @param packages   The list of packages to fill-in.
+     * @param log        The logger.
      */
-    private void scanMissingAddons(SdkManager sdkManager,
+    private void scanMissingAddons(@NonNull SdkManager sdkManager,
                                    HashSet<File> visited,
                                    ArrayList<Package> packages,
                                    ILogger log) {
@@ -538,8 +567,13 @@ public class LocalSdkParser {
      * The sdk manager only lists valid system image via its addons or platform targets.
      * However here we also want to find "broken" system images, that is system images
      * that are located in the sdk/system-images folder but somehow not loaded properly.
+     *
+     * @param sdkManager The SDK manager to use to list the system images.
+     * @param visited    The set of visited folders.
+     * @param packages   The list of packages to fill-in.
+     * @param log        The logger.
      */
-    private void scanMissingSystemImages(SdkManager sdkManager,
+    private void scanMissingSystemImages(@NonNull SdkManager sdkManager,
                                          HashSet<File> visited,
                                          ArrayList<Package> packages,
                                          ILogger log) {
@@ -591,8 +625,13 @@ public class LocalSdkParser {
 
     /**
      * Scan the sources/folders and register valid as well as broken source packages.
+     *
+     * @param sdkManager The SDK manager to use to list the sources.
+     * @param visited    The set of visited folders.
+     * @param packages   The list of packages to fill-in.
+     * @param log        The logger.
      */
-    private void scanSources(SdkManager sdkManager,
+    private void scanSources(@NonNull SdkManager sdkManager,
                              HashSet<File> visited,
                              ArrayList<Package> packages,
                              ILogger log) {
@@ -623,7 +662,12 @@ public class LocalSdkParser {
     /**
      * Try to find a tools package at the given location.
      * Returns null if not found.
+     *
+     * @param toolFolder The folder to scan.
+     * @param log        The logger.
+     * @return The package, or null if not found.
      */
+    @Nullable
     private Package scanTools(File toolFolder, ILogger log) {
         // Can we find some properties?
         Properties props = parseProperties(new File(toolFolder, SdkConstants.FN_SOURCE_PROP));
@@ -650,8 +694,8 @@ public class LocalSdkParser {
 
         // Create our package. use the properties if we found any.
         try {
-            Package pkg = ToolPackage.create(
-                    null,                       //source
+            return ToolPackage.create(
+                    null,                //source
                     props,                      //properties
                     0,                          //revision
                     null,                       //license
@@ -659,8 +703,6 @@ public class LocalSdkParser {
                     null,                       //descUrl
                     toolFolder.getPath()        //archiveOsPath
             );
-
-            return pkg;
         } catch (Exception e) {
             log.error(e, null);
         }
@@ -670,7 +712,12 @@ public class LocalSdkParser {
     /**
      * Try to find a platform-tools package at the given location.
      * Returns null if not found.
+     *
+     * @param platformToolsFolder The folder to scan.
+     * @param log                 The logger.
+     * @return The package, or null if not found.
      */
+    @Nullable
     private Package scanPlatformTools(File platformToolsFolder, ILogger log) {
         // Can we find some properties?
         Properties props = parseProperties(new File(platformToolsFolder,
@@ -687,7 +734,7 @@ public class LocalSdkParser {
 
         // Create our package. use the properties if we found any.
         try {
-            Package pkg = PlatformToolPackage.create(
+            return PlatformToolPackage.create(
                     null,                           //source
                     props,                          //properties
                     0,                              //revision
@@ -696,8 +743,6 @@ public class LocalSdkParser {
                     null,                           //descUrl
                     platformToolsFolder.getPath()   //archiveOsPath
             );
-
-            return pkg;
         } catch (Exception e) {
             log.error(e, null);
         }
@@ -706,9 +751,14 @@ public class LocalSdkParser {
 
     /**
      * Scan the build-tool/folders and register valid as well as broken build tool packages.
+     *
+     * @param sdkManager The {@link SdkManager} instance.
+     * @param visited    The set of visited folders.
+     * @param packages   The list of packages to fill.
+     * @param log        The logger.
      */
     private void scanBuildTools(
-            SdkManager sdkManager,
+            @NonNull SdkManager sdkManager,
             HashSet<File> visited,
             ArrayList<Package> packages,
             ILogger log) {
@@ -739,7 +789,12 @@ public class LocalSdkParser {
     /**
      * Try to find a docs package at the given location.
      * Returns null if not found.
+     *
+     * @param docFolder The folder to be scanned.
+     * @param log       The logger.
+     * @return null if not found.
      */
+    @Nullable
     private Package scanDoc(File docFolder, ILogger log) {
         // Can we find some properties?
         Properties props = parseProperties(new File(docFolder, SdkConstants.FN_SOURCE_PROP));
@@ -748,8 +803,8 @@ public class LocalSdkParser {
         // We don't actually check the content of the file.
         if (new File(docFolder, "index.html").isFile()) {
             try {
-                Package pkg = DocPackage.create(
-                        null,                       //source
+                return DocPackage.create(
+                        null,                //source
                         props,                      //properties
                         0,                          //apiLevel
                         null,                       //codename
@@ -759,8 +814,6 @@ public class LocalSdkParser {
                         null,                       //descUrl
                         docFolder.getPath()         //archiveOsPath
                 );
-
-                return pkg;
             } catch (Exception e) {
                 log.error(e, null);
             }
@@ -772,8 +825,12 @@ public class LocalSdkParser {
     /**
      * Parses the given file as properties file if it exists.
      * Returns null if the file does not exist, cannot be parsed or has no properties.
+     *
+     * @param propsFile The file to be parsed.
+     * @return null if the file does not exist, cannot be parsed or has no properties.
      */
-    private Properties parseProperties(File propsFile) {
+    @Nullable
+    private Properties parseProperties(@NonNull File propsFile) {
         FileInputStream fis = null;
         try {
             if (propsFile.exists()) {
@@ -795,6 +852,7 @@ public class LocalSdkParser {
                 try {
                     fis.close();
                 } catch (IOException e) {
+                    // do nothing
                 }
             }
         }

@@ -55,7 +55,7 @@ public final class KeystoreHelper {
      */
     @NonNull
     public static String defaultDebugKeystoreLocation() throws AndroidLocationException {
-        //this is guaranteed to either return a non null value (terminated with a platform
+        //this is guaranteed to either return a non-null value (terminated with a platform
         // specific separator), or throw.
         String folder = AndroidLocation.getFolder();
         return folder + "debug.keystore";

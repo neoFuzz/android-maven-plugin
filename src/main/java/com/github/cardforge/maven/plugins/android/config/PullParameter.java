@@ -18,9 +18,18 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface PullParameter {
 
+    /**
+     * @return defaults to empty {@code String} array
+     */
     String[] defaultValue() default {};
 
+    /**
+     * @return defaults to empty {@code String}
+     */
     String defaultValueGetterMethod() default "";
 
+    /**
+     * @return defaults to false
+     */
     boolean required() default false;
 }

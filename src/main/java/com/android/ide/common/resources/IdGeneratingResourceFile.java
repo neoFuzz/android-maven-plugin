@@ -49,6 +49,11 @@ public final class IdGeneratingResourceFile extends ResourceFile
 
     private final ResourceValue mFileValue;
 
+    /**
+     * @param file   the {@link IAbstractFile} object
+     * @param folder the {@link ResourceFolder} this file belongs to
+     * @param type   the {@link ResourceType} of this file
+     */
     public IdGeneratingResourceFile(IAbstractFile file, ResourceFolder folder, ResourceType type) {
         super(file, folder);
 

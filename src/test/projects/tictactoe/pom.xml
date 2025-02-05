@@ -82,7 +82,7 @@
                     <artifactId>android-maven-plugin</artifactId>
                     <versionRange>[3.2.0,)</versionRange>
                     <goals>
-                      <goal>manifest-update</goal>
+                      <goal>manifest-merger</goal>
                     </goals>
                   </pluginExecutionFilter>
                   <action>

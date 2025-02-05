@@ -26,18 +26,33 @@ import java.util.regex.Pattern;
  * Resource Qualifier for Mobile Network Code Pixel Density.
  */
 public final class NetworkCodeQualifier extends ResourceQualifier {
+    /**
+     * Pattern for matching folder segment of the form mncNNN.
+     */
     public static final String NAME = "Mobile Network Code";
     /**
      * Default pixel density value. This means the property is not set.
      */
     private static final int DEFAULT_CODE = -1;
+    /**
+     * Pattern for matching folder segment of the form mncNNN.
+     */
     private static final Pattern sNetworkCodePattern = Pattern.compile("^mnc(\\d{1,3})$"); //$NON-NLS-1$
+    /**
+     * The value of the qualifier.
+     */
     private final int mCode;
 
+    /**
+     * Constructor
+     */
     public NetworkCodeQualifier() {
         this(DEFAULT_CODE);
     }
 
+    /**
+     * @param code the code value for the qualifier
+     */
     public NetworkCodeQualifier(int code) {
         mCode = code;
     }
@@ -74,6 +89,7 @@ public final class NetworkCodeQualifier extends ResourceQualifier {
      * {@link #toString()} on a {@link NetworkCodeQualifier} object.
      *
      * @param code the value of the qualifier, as returned by {@link #getCode()}.
+     * @return the folder segment for the given value
      */
     @NonNull
     public static String getFolderSegment(int code) {
@@ -84,36 +100,59 @@ public final class NetworkCodeQualifier extends ResourceQualifier {
         return ""; //$NON-NLS-1$
     }
 
+    /**
+     * @return the code value of the qualifier
+     */
     public int getCode() {
         return mCode;
     }
 
+    /**
+     * @return the name of the qualifier
+     */
     @Override
     public String getName() {
         return NAME;
     }
 
+    /**
+     * @return the name of the qualifier
+     */
     @Override
     @NonNull
     public String getShortName() {
         return "Network Code";
     }
 
+    /**
+     * @return the lowest possible API level in which this qualifier can be used
+     */
     @Override
     public int since() {
         return 1;
     }
 
+    /**
+     * @return true if the qualifier has been correctly set
+     */
     @Override
     public boolean isValid() {
         return mCode != DEFAULT_CODE;
     }
 
+    /**
+     * @return true if the qualifier has a fake value
+     */
     @Override
     public boolean hasFakeValue() {
         return false;
     }
 
+    /**
+     * @param value  The value to check and set. Must not be null.
+     * @param config The folder configuration to receive the value. Must not be null.
+     * @return true if the value was accepted and set
+     */
     @Override
     public boolean checkAndSet(String value, FolderConfiguration config) {
         Matcher m = sNetworkCodePattern.matcher(value);
@@ -136,6 +175,10 @@ public final class NetworkCodeQualifier extends ResourceQualifier {
         return false;
     }
 
+    /**
+     * @param qualifier The qualifier to compare. Must not be null.
+     * @return true if the qualifier is compatible with this object
+     */
     @Override
     public boolean equals(Object qualifier) {
         if (qualifier instanceof NetworkCodeQualifier nc) {
@@ -145,6 +188,9 @@ public final class NetworkCodeQualifier extends ResourceQualifier {
         return false;
     }
 
+    /**
+     * @return the hash code for the qualifier's value
+     */
     @Override
     public int hashCode() {
         return mCode;
@@ -159,6 +205,9 @@ public final class NetworkCodeQualifier extends ResourceQualifier {
         return getFolderSegment(mCode);
     }
 
+    /**
+     * @return a string representation of the qualifier
+     */
     @Override
     @NonNull
     public String getShortDisplayValue() {
@@ -169,6 +218,9 @@ public final class NetworkCodeQualifier extends ResourceQualifier {
         return ""; //$NON-NLS-1$
     }
 
+    /**
+     * @return a string representation of the qualifier
+     */
     @Override
     @NonNull
     public String getLongDisplayValue() {

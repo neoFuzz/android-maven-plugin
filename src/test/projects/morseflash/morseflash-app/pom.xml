@@ -177,7 +177,7 @@
                 <id>manifestUpdate</id>
                 <phase>process-resources</phase>
                 <goals>
-                  <goal>manifest-update</goal>
+                  <goal>manifest-merger</goal>
                 </goals>
               </execution>
               <execution>

@@ -174,7 +174,7 @@ public interface CommandExecutor {
          * @return a default instance of the command executor
          */
         @NonNull
-        public static CommandExecutor createDefaultCommmandExecutor() {
+        public static CommandExecutor createDefaultCommandExecutor() {
             return new DefaultCommandExecutor();
 
         }

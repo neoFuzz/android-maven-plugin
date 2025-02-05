@@ -185,6 +185,8 @@ public enum PkgType implements IPkgCapabilities {
 
     /**
      * Returns the integer value matching the type, compatible with the old LocalSdkParer.
+     *
+     * @return integer value
      */
     public int getIntValue() {
         return mIntValue;
@@ -192,6 +194,8 @@ public enum PkgType implements IPkgCapabilities {
 
     /**
      * Returns the name of SDK top-folder where this type of package is stored.
+     *
+     * @return folder name
      */
     @NonNull
     public String getFolderName() {
@@ -238,9 +242,11 @@ public enum PkgType implements IPkgCapabilities {
         return mHasMinPlatformToolsRev;
     }
 
-    /*
+    /**
      * Returns a pattern string used by {@link PkgDesc#getListDescription()} to
      * compute a default list-display representation string for this package.
+     *
+     * @return pattern string for {@link PkgDesc#getListDescription()}
      */
     public String getListDisplayPattern() {
         return mListDisplayPattern;

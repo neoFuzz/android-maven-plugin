@@ -32,6 +32,9 @@ public abstract class MergeWriter<I extends DataItem> implements MergeConsumer<I
     @NonNull
     private final WaitableExecutor<Void> mExecutor;
 
+    /**
+     * @param rootFolder the root folder where the merge will be performed
+     */
     protected MergeWriter(@NonNull File rootFolder) {
         mRootFolder = rootFolder;
         mExecutor = new WaitableExecutor<>();
@@ -41,6 +44,9 @@ public abstract class MergeWriter<I extends DataItem> implements MergeConsumer<I
     public void start(@NonNull DocumentBuilderFactory factory) throws ConsumerException {
     }
 
+    /**
+     * @throws ConsumerException if an error occurred.
+     */
     @Override
     public void end() throws ConsumerException {
         try {
@@ -62,11 +68,17 @@ public abstract class MergeWriter<I extends DataItem> implements MergeConsumer<I
     protected void postWriteAction() throws ConsumerException {
     }
 
+    /**
+     * @return the executor to use to perform the merge.
+     */
     @NonNull
     protected WaitableExecutor<Void> getExecutor() {
         return mExecutor;
     }
 
+    /**
+     * @return the root folder where the merge will be performed
+     */
     @NonNull
     protected File getRootFolder() {
         return mRootFolder;

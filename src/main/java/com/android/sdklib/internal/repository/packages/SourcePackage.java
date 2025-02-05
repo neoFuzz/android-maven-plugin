@@ -89,6 +89,13 @@ public class SourcePackage extends MajorRevisionPackage implements IAndroidVersi
         mPkgDesc = setDescriptions(PkgDesc.Builder.newSource(mVersion, (MajorRevision) getRevision())).create();
     }
 
+    /**
+     * @param platformVersion The {@link AndroidVersion} of the {@link SourcePackage}.
+     * @param revision        The revision of the {@link SourcePackage} or {@code 0} if this is a
+     *                        local package with no revision.
+     * @param props           The properties to parse the package's attributes from.
+     * @param localOsPath     The actual location of the directory.
+     */
     @VisibleForTesting(visibility = Visibility.PRIVATE)
     protected SourcePackage(
             AndroidVersion platformVersion,
@@ -98,6 +105,14 @@ public class SourcePackage extends MajorRevisionPackage implements IAndroidVersi
         this(null /*source*/, platformVersion, revision, props, localOsPath);
     }
 
+    /**
+     * @param source          The {@link SdkSource} where this is loaded from.
+     * @param platformVersion The {@link AndroidVersion} of the {@link SourcePackage}.
+     * @param revision        The revision of the {@link SourcePackage} or {@code 0} if this is a
+     *                        local package with no revision.
+     * @param props           The properties to parse the package's attributes from.
+     * @param localOsPath     The actual location of the directory.
+     */
     @VisibleForTesting(visibility = Visibility.PRIVATE)
     protected SourcePackage(
             SdkSource source,

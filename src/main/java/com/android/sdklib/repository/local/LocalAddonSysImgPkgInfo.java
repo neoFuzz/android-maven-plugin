@@ -34,10 +34,21 @@ import java.util.Properties;
  * There should be only one for a given android platform version &amp; ABI.
  */
 public class LocalAddonSysImgPkgInfo extends LocalPkgInfo {
-
-
+    /**
+     * The package descriptor for this system image
+     */
     private final @NonNull IPkgDesc mDesc;
 
+    /**
+     * @param localSdk    The {@link LocalSdk} this package is related to.
+     * @param localDir    The folder where this package is located
+     * @param sourceProps The source properties of this package
+     * @param version     The {@link AndroidVersion} of this system image.
+     * @param addonVendor The vendor of the add-on this system image belongs to.
+     * @param addonName   The name of the add-on this system image belongs to.
+     * @param abi         The ABI of this system image.
+     * @param revision    The major revision of this system image.
+     */
     public LocalAddonSysImgPkgInfo(@NonNull LocalSdk localSdk,
                                    @NonNull File localDir,
                                    @NonNull Properties sourceProps,
@@ -57,6 +68,9 @@ public class LocalAddonSysImgPkgInfo extends LocalPkgInfo {
                 .create();
     }
 
+    /**
+     * @return The package descriptor for this system image
+     */
     @NonNull
     @Override
     public IPkgDesc getDesc() {

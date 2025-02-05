@@ -31,22 +31,37 @@ public class MonkeyRunner {
      */
     private Boolean injectDeviceSerialNumberIntoScript;
 
+    /**
+     * @return true if the monkey runner goal is configured to be skipped
+     */
     public boolean isSkip() {
         return skip;
     }
 
+    /**
+     * @return the list of programs to execute
+     */
     public List<Program> getPrograms() {
         return programs;
     }
 
+    /**
+     * @return the list of plugins to execute
+     */
     public String[] getPlugins() {
         return plugins;
     }
 
+    /**
+     * @return true if the monkey runner goal is configured to create a report
+     */
     public Boolean isCreateReport() {
         return createReport;
     }
 
+    /**
+     * @return true if the monkey runner goal is configured to inject the device serial number into the script
+     */
     public Boolean isInjectDeviceSerialNumberIntoScript() {
         return injectDeviceSerialNumberIntoScript;
     }

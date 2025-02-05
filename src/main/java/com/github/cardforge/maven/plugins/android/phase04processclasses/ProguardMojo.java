@@ -309,7 +309,7 @@ public class ProguardMojo extends AbstractAndroidMojo {
         }
 
         getLog().info("Proguarding output...");
-        CommandExecutor executor = CommandExecutor.Factory.createDefaultCommmandExecutor();
+        CommandExecutor executor = CommandExecutor.Factory.createDefaultCommandExecutor();
         executor.setLogger(this.getLog());
         List<String> commands = new ArrayList<>();
 

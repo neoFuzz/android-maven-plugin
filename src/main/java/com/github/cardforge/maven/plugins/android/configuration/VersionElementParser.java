@@ -8,5 +8,10 @@ import org.apache.maven.plugin.MojoExecutionException;
  * @author Wang Xuerui  - idontknw.wang@gmail.com
  */
 public interface VersionElementParser {
+    /**
+     * @param versionName the version name to parse
+     * @return an array of version elements
+     * @throws MojoExecutionException if the version name is invalid
+     */
     int[] parseVersionElements(final String versionName) throws MojoExecutionException;
 }

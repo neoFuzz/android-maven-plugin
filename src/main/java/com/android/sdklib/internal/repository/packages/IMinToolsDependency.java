@@ -43,6 +43,8 @@ public interface IMinToolsDependency {
     /**
      * The minimal revision of the tools package required by this extra package if > 0,
      * or {@link #MIN_TOOLS_REV_NOT_SPECIFIED} if there is no such requirement.
+     *
+     * @return A {@link FullRevision} object or {@link #MIN_TOOLS_REV_NOT_SPECIFIED}
      */
     FullRevision getMinToolsRevision();
 }

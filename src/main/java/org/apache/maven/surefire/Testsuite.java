@@ -8,8 +8,9 @@
 
 package org.apache.maven.surefire;
 
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.annotation.*;
+import jakarta.xml.bind.JAXBElement;
+import jakarta.xml.bind.annotation.*;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -146,20 +147,55 @@ import java.util.List;
 @XmlRootElement(name = "testsuite")
 public class Testsuite {
 
+    /**
+     * List of properties associated with this test suite
+     */
     protected List<Testsuite.Properties> properties;
+
+    /**
+     * List of test cases in this test suite
+     */
     protected List<Testsuite.Testcase> testcase;
+
+    /**
+     * Name of the test suite
+     */
     @XmlAttribute(name = "name", required = true)
     protected String name;
+
+    /**
+     * Total time taken by the test suite execution
+     */
     @XmlAttribute(name = "time")
     protected String time;
+
+    /**
+     * Total number of tests in this suite
+     */
     @XmlAttribute(name = "tests", required = true)
     protected String tests;
+
+    /**
+     * Number of tests that resulted in errors
+     */
     @XmlAttribute(name = "errors", required = true)
     protected String errors;
+
+    /**
+     * Number of tests that were skipped
+     */
     @XmlAttribute(name = "skipped", required = true)
     protected String skipped;
+
+    /**
+     * Number of tests that failed
+     */
     @XmlAttribute(name = "failures", required = true)
     protected String failures;
+
+    /**
+     * Group identifier for the test suite
+     */
     @XmlAttribute(name = "group")
     protected String group;
 
@@ -182,6 +218,8 @@ public class Testsuite {
      * <p>
      * Objects of the following type(s) are allowed in the list
      * {@link Testsuite.Properties }
+     *
+     * @return List of properties associated with this test suite
      */
     public List<Testsuite.Properties> getProperties() {
         if (properties == null) {
@@ -209,6 +247,8 @@ public class Testsuite {
      * <p>
      * Objects of the following type(s) are allowed in the list
      * {@link Testsuite.Testcase }
+     *
+     * @return List of test cases in this test suite
      */
     public List<Testsuite.Testcase> getTestcase() {
         if (testcase == null) {
@@ -390,6 +430,9 @@ public class Testsuite {
     })
     public static class Properties {
 
+        /**
+         * List of properties for this testsuite
+         */
         protected List<Testsuite.Properties.Property> property;
 
         /**
@@ -411,6 +454,8 @@ public class Testsuite {
          * <p>
          * Objects of the following type(s) are allowed in the list
          * {@link Testsuite.Properties.Property }
+         *
+         * @return list of properties for this testsuite
          */
         public List<Testsuite.Properties.Property> getProperty() {
             if (property == null) {
@@ -440,8 +485,15 @@ public class Testsuite {
         @XmlType(name = "")
         public static class Property {
 
+            /**
+             * The name attribute for this property
+             */
             @XmlAttribute(name = "name", required = true)
             protected String name;
+
+            /**
+             * The value attribute for this property
+             */
             @XmlAttribute(name = "value", required = true)
             protected String value;
 
@@ -582,20 +634,65 @@ public class Testsuite {
     })
     public static class Testcase {
 
+        /**
+         * Element for failure
+         */
         @XmlElement(nillable = true)
         protected List<Testsuite.Testcase.Failure> failure;
+
+        /**
+         * Element for skipped
+         */
         @XmlElementRef(name = "skipped", type = JAXBElement.class, required = false)
         protected JAXBElement<Testsuite.Testcase.Skipped> skipped;
+
+        /**
+         * Element for error
+         */
         @XmlElementRef(name = "error", type = JAXBElement.class, required = false)
         protected JAXBElement<Testsuite.Testcase.Error> error;
+
+        /**
+         * Element for name
+         */
         @XmlAttribute(name = "name", required = true)
         protected String name;
+
+        /**
+         * Element for classname
+         */
         @XmlAttribute(name = "classname")
         protected String classname;
+
+        /**
+         * Element for group
+         */
         @XmlAttribute(name = "group")
         protected String group;
+
+        /**
+         * Element for time
+         */
         @XmlAttribute(name = "time", required = true)
         protected String time;
+
+        /**
+         * Element for system-out
+         */
+        @XmlElement(nillable = true, name = "system-out")
+        protected String systemOut;
+
+        /**
+         * Element for system-err
+         */
+        @XmlElement(nillable = true, name = "system-err")
+        protected String systemErr;
+
+        /**
+         * Element for re-run failure
+         */
+        @XmlElementRef(name = "rerunFailure", type = JAXBElement.class, required = false)
+        protected JAXBElement<Testsuite.Testcase.RerunFailure> rerunFailure;
 
         /**
          * Gets the value of the failure property.
@@ -616,6 +713,8 @@ public class Testsuite {
          * <p>
          * Objects of the following type(s) are allowed in the list
          * {@link Testsuite.Testcase.Failure }
+         *
+         * @return list of failures
          */
         public List<Testsuite.Testcase.Failure> getFailure() {
             if (failure == null) {
@@ -744,6 +843,49 @@ public class Testsuite {
             this.time = value;
         }
 
+        /**
+         * @return the value of the rerunFailure property.
+         */
+        public JAXBElement<RerunFailure> getRerunFailure() {
+            return rerunFailure;
+        }
+
+        /**
+         * @param rerunFailure the value of the rerunFailure property.
+         * @see RerunFailure
+         */
+        public void setRerunFailure(JAXBElement<RerunFailure> rerunFailure) {
+            this.rerunFailure = rerunFailure;
+        }
+
+        /**
+         * @return the value of the systemOut property.
+         */
+        public String getSystemOut() {
+            return systemOut;
+        }
+
+        /**
+         * @param systemOut the value of the systemOut property.
+         */
+        public void setSystemOut(String systemOut) {
+            this.systemOut = systemOut;
+        }
+
+        /**
+         * @return the value of the systemErr property.
+         */
+        public String getSystemErr() {
+            return systemErr;
+        }
+
+        /**
+         * @param systemErr the value of the systemErr property.
+         */
+        public void setSystemErr(String systemErr) {
+            this.systemErr = systemErr;
+        }
+
 
         /**
          * <p>Java class for anonymous complex type.
@@ -767,10 +909,19 @@ public class Testsuite {
         })
         public static class Error {
 
+            /**
+             * The value of the test case.
+             */
             @XmlValue
             protected String value;
+            /**
+             * The message of the test case.
+             */
             @XmlAttribute(name = "message")
             protected String message;
+            /**
+             * The type of test case.
+             */
             @XmlAttribute(name = "type", required = true)
             protected String type;
 
@@ -866,12 +1017,28 @@ public class Testsuite {
         })
         public static class Failure {
 
+            /**
+             * The value of the test case.
+             */
             @XmlValue
             protected String value;
+
+            /**
+             * The message associated with the test case result.
+             */
             @XmlAttribute(name = "message")
             protected String message;
+
+            /**
+             * The type of the test case result. This is a required attribute.
+             */
             @XmlAttribute(name = "type", required = true)
             protected String type;
+
+            /**
+             * The execution time of the test case.
+             * Format: (([0-9]{0,3},)*[0-9]{3}|[0-9]{0,3})*(\.[0-9]{0,3})?
+             */
             @XmlAttribute(name = "time")
             protected String time;
 
@@ -987,12 +1154,28 @@ public class Testsuite {
         })
         public static class RerunFailure {
 
+            /**
+             * The value of the test case result.
+             */
             @XmlValue
             protected String value;
+
+            /**
+             * The message associated with the test case result.
+             */
             @XmlAttribute(name = "message")
             protected String message;
+
+            /**
+             * The type of the test case result. This is a required attribute.
+             */
             @XmlAttribute(name = "type", required = true)
             protected String type;
+
+            /**
+             * The execution time of the test case.
+             * Format: (([0-9]{0,3},)*[0-9]{3}|[0-9]{0,3})*(\.[0-9]{0,3})?
+             */
             @XmlAttribute(name = "time")
             protected String time;
 
@@ -1100,16 +1283,21 @@ public class Testsuite {
         })
         public static class Skipped {
 
+            /**
+             * The value attribute is required and can be used to provide the name of the skipped test case.
+             */
             @XmlValue
             protected String value;
+            /**
+             * The message attribute is optional and can be used to provide additional information about the skipped test case.
+             */
             @XmlAttribute(name = "message")
             protected String message;
 
             /**
              * Gets the value of the value property.
              *
-             * @return possible object is
-             * {@link String }
+             * @return possible object is {@link String }
              */
             public String getValue() {
                 return value;
@@ -1118,8 +1306,7 @@ public class Testsuite {
             /**
              * Sets the value of the value property.
              *
-             * @param value allowed object is
-             *              {@link String }
+             * @param value allowed object is {@link String }
              */
             public void setValue(String value) {
                 this.value = value;
@@ -1128,8 +1315,7 @@ public class Testsuite {
             /**
              * Gets the value of the message property.
              *
-             * @return possible object is
-             * {@link String }
+             * @return possible object is {@link String }
              */
             public String getMessage() {
                 return message;
@@ -1138,8 +1324,7 @@ public class Testsuite {
             /**
              * Sets the value of the message property.
              *
-             * @param value allowed object is
-             *              {@link String }
+             * @param value allowed object is {@link String }
              */
             public void setMessage(String value) {
                 this.message = value;

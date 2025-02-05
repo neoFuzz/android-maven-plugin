@@ -32,6 +32,9 @@ import java.util.Properties;
  */
 @Deprecated
 public class PackageParserUtils {
+    /**
+     * Utility class. No constructor.
+     */
     private PackageParserUtils() {
         // no instances
     }
@@ -177,6 +180,11 @@ public class PackageParserUtils {
     /**
      * Returns the first child element with the given XML local name and the same NS URI.
      * If xmlLocalName is null, returns the very first child element.
+     *
+     * @param node         The XML <em>parent</em> node to parse.
+     * @param xmlLocalName The XML local name to find in the parent node.
+     * @return The first child element with the given XML local name and the same NS URI.
+     * Returns null if no matching element is found.
      */
     public static Node findChildElement(Node node, String xmlLocalName) {
         if (node != null) {
@@ -253,6 +261,12 @@ public class PackageParserUtils {
     /**
      * Retrieves the value of that XML element as an integer.
      * Returns the default value when the element is missing or is not an integer.
+     *
+     * @param node         The XML <em>parent</em> node to parse.
+     * @param xmlLocalName The XML local name to find in the parent node.
+     * @param defaultValue A default value to return if the element is missing.
+     * @return The integer value of the element, or defaultValue if the element is missing
+     * or is not an integer.
      */
     public static int getXmlInt(Node node, String xmlLocalName, int defaultValue) {
         String s = getXmlString(node, xmlLocalName);
@@ -266,6 +280,12 @@ public class PackageParserUtils {
     /**
      * Retrieves the value of that XML element as a long.
      * Returns the default value when the element is missing or is not an integer.
+     *
+     * @param node         The XML <em>parent</em> node to parse.
+     * @param xmlLocalName The XML local name to find in the parent node.
+     * @param defaultValue A default value to return if the element is missing.
+     * @return The long value of the element, or defaultValue if the element is missing
+     * or is not an integer.
      */
     public static long getXmlLong(Node node, String xmlLocalName, long defaultValue) {
         String s = getXmlString(node, xmlLocalName);
@@ -282,6 +302,14 @@ public class PackageParserUtils {
      * <p>
      * Returns defaultValue if the attribute does not exist or its value does not match
      * the given enum values.
+     *
+     * @param archiveNode  The XML <em>node</em> to parse.
+     * @param attrName     The XML attribute name to find in the node.
+     * @param values       The enum values to match against.
+     * @param defaultValue The default value to return if the attribute does not exist
+     *                     or its value does not match the given enum values.
+     * @return The enum value of the attribute, or defaultValue if the attribute does not exist
+     * or its value does not match the given enum values.
      */
     public static Object getEnumAttribute(
             @NonNull Node archiveNode,

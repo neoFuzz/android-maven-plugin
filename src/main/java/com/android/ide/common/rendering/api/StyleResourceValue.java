@@ -15,6 +15,7 @@
  */
 package com.android.ide.common.rendering.api;
 
+import com.android.annotations.NonNull;
 import com.android.ide.common.rendering.api.ItemResourceValue.Attribute;
 import com.android.layoutlib.api.IResourceValue;
 import com.android.layoutlib.api.IStyleResourceValue;
@@ -27,13 +28,30 @@ import java.util.*;
  */
 @SuppressWarnings("deprecation")
 public final class StyleResourceValue extends ResourceValue implements IStyleResourceValue {
+    /**
+     * Map of {@link Attribute} to {@link ItemResourceValue} for this style.
+     */
     private final Map<Attribute, ItemResourceValue> mItems = new HashMap<>();
+    /**
+     * The parent style name or <code>null</code> if unknown
+     */
     private String mParentStyle = null;
 
+    /**
+     * @param type        the type of the resource
+     * @param name        the name of the resource
+     * @param isFramework is it in the framework namespace
+     */
     public StyleResourceValue(ResourceType type, String name, boolean isFramework) {
         super(type, name, isFramework);
     }
 
+    /**
+     * @param type        the type of the resource
+     * @param name        the name of the resource
+     * @param parentStyle the parent style name or <code>null</code> if unknown
+     * @param isFramework is it in the framework namespace
+     */
     public StyleResourceValue(ResourceType type, String name, String parentStyle,
                               boolean isFramework) {
         super(type, name, isFramework);
@@ -42,6 +60,8 @@ public final class StyleResourceValue extends ResourceValue implements IStyleRes
 
     /**
      * Returns the parent style name or <code>null</code> if unknown.
+     *
+     * @return the parent style name or <code>null</code> if unknown
      */
     @Override
     public String getParentStyle() {
@@ -52,6 +72,7 @@ public final class StyleResourceValue extends ResourceValue implements IStyleRes
      * Finds a value in the list by name
      *
      * @param name the name of the resource
+     * @return the {@link IResourceValue} or <code>null</code> if not found
      * @deprecated use {@link #getItem(String, boolean)}
      */
     @Deprecated
@@ -62,7 +83,9 @@ public final class StyleResourceValue extends ResourceValue implements IStyleRes
     /**
      * Finds a value in the list by name
      *
-     * @param name the name of the resource
+     * @param name            the name of the resource
+     * @param isFrameworkAttr is it in the framework namespace
+     * @return the {@link IResourceValue} or <code>null</code> if not found
      * @deprecated use {@link #getItem(String, boolean)}
      */
     @Deprecated
@@ -75,12 +98,15 @@ public final class StyleResourceValue extends ResourceValue implements IStyleRes
      *
      * @param name            the name of the resource
      * @param isFrameworkAttr is it in the framework namespace
+     * @return the {@link ItemResourceValue} or <code>null</code> if not found
      */
     public ItemResourceValue getItem(String name, boolean isFrameworkAttr) {
         return mItems.get(new Attribute(name, isFrameworkAttr));
     }
 
     /**
+     * @param value           the value to add
+     * @param isFrameworkAttr is it in the framework namespace
      * @deprecated use {@link #addItem(ItemResourceValue)}
      */
     @Deprecated
@@ -88,12 +114,18 @@ public final class StyleResourceValue extends ResourceValue implements IStyleRes
         addItem(ItemResourceValue.fromResourceValue(value, isFrameworkAttr));
     }
 
+    /**
+     * @param value the value to add
+     */
     public void addItem(ItemResourceValue value) {
         mItems.put(value.getAttribute(), value);
     }
 
+    /**
+     * @param value the resource value
+     */
     @Override
-    public void replaceWith(ResourceValue value) {
+    public void replaceWith(@NonNull ResourceValue value) {
         assert value instanceof StyleResourceValue :
                 value.getClass() + " is not StyleResourceValue";
         super.replaceWith(value);
@@ -117,7 +149,10 @@ public final class StyleResourceValue extends ResourceValue implements IStyleRes
 
     /**
      * Returns the names available in this style, intended for diagnostic purposes
+     *
+     * @return the names available in this style
      */
+    @NonNull
     public List<String> getNames() {
         List<String> names = new ArrayList<>();
         for (Attribute item : mItems.keySet()) {
@@ -133,7 +168,10 @@ public final class StyleResourceValue extends ResourceValue implements IStyleRes
     /**
      * Returns a list of all values defined in this Style. This doesn't return the values
      * inherited from the parent.
+     *
+     * @return a list of values
      */
+    @NonNull
     public Collection<ItemResourceValue> getValues() {
         return mItems.values();
     }

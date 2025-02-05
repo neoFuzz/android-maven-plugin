@@ -50,23 +50,36 @@ public interface TestData {
     @Nullable
     String getTestedApplicationId();
 
+    /**
+     * @return the instrumentation runner class name.
+     */
     @NonNull
     String getInstrumentationRunner();
 
+    /**
+     * @return the instrumentation runner arguments.
+     */
     @NonNull
     Map<String, String> getInstrumentationRunnerArguments();
 
     /**
      * Returns whether the tested app is enabled for code coverage
+     *
+     * @return true if coverage is enabled
      */
     boolean isTestCoverageEnabled();
 
     /**
      * The min SDK version of the app
+     *
+     * @return the min SDK version
      */
     @NonNull
     ApiVersion getMinSdkVersion();
 
+    /**
+     * @return if this is a library
+     */
     boolean isLibrary();
 
     /**
@@ -75,7 +88,9 @@ public interface TestData {
      * @param processExecutor      an executor for slave processes.
      * @param splitSelectExe       path to the split-select native tool.
      * @param deviceConfigProvider provider for the test device characteristics.
+     * @param logger               a logger to receive the log.
      * @return the file to install or null if non is compatible.
+     * @throws ProcessException if the process execution fails.
      */
     @NonNull
     ImmutableList<File> getTestedApks(

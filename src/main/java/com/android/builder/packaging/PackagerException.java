@@ -22,17 +22,32 @@ import java.io.Serial;
  * An exception thrown during packaging of an APK file.
  */
 public final class PackagerException extends Exception {
+    /**
+     * Default serial number
+     */
     @Serial
     private static final long serialVersionUID = 1L;
 
+    /**
+     * @param format the format string
+     * @param args   the arguments
+     */
     public PackagerException(String format, Object... args) {
         super(String.format(format, args));
     }
 
+    /**
+     * @param cause  the cause of the exception
+     * @param format the format string
+     * @param args   the arguments
+     */
     public PackagerException(Throwable cause, String format, Object... args) {
         super(String.format(format, args), cause);
     }
 
+    /**
+     * @param cause the cause of the exception
+     */
     public PackagerException(Throwable cause) {
         super(cause);
     }

@@ -23,9 +23,19 @@ import com.android.annotations.NonNull;
  */
 public class DuplicateDataException extends MergingException {
 
+    /**
+     * DataItem one.
+     */
     private final transient DataItem mOne;
+    /**
+     * DataItem two.
+     */
     private final transient DataItem mTwo;
 
+    /**
+     * @param one The first {@link DataItem} that caused the exception.
+     * @param two The second {@link DataItem} that caused the exception.
+     */
     DuplicateDataException(@NonNull DataItem one, @NonNull DataItem two) {
         super(String.format("Duplicate resources: %1s:%2s, %3s:%4s",
                 one.getSource().getFile().getAbsolutePath(), one.getKey(),
@@ -35,10 +45,16 @@ public class DuplicateDataException extends MergingException {
         setFile(one.getSource().getFile());
     }
 
+    /**
+     * @return the first {@link DataItem} that caused the exception.
+     */
     public DataItem getOne() {
         return mOne;
     }
 
+    /**
+     * @return the second {@link DataItem} that caused the exception.
+     */
     public DataItem getTwo() {
         return mTwo;
     }

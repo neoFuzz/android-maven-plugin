@@ -60,14 +60,16 @@ public final class PlatformTarget implements IAndroidTarget {
     /**
      * Creates a Platform target.
      *
-     * @param sdkOsPath        the root folder of the SDK
-     * @param platformOSPath   the root folder of the platform component
-     * @param apiVersion       the API Level + codename.
-     * @param versionName      the version name of the platform.
-     * @param revision         the revision of the platform component.
-     * @param layoutlibVersion The {@link LayoutlibVersion}. May be null.
-     * @param systemImages     list of supported system images
-     * @param properties       the platform properties
+     * @param sdkOsPath         the root folder of the SDK
+     * @param platformOSPath    the root folder of the platform component
+     * @param apiVersion        the API Level + codename.
+     * @param versionName       the version name of the platform.
+     * @param revision          the revision of the platform component.
+     * @param layoutlibVersion  The {@link LayoutlibVersion}. May be null.
+     * @param systemImages      list of supported system images
+     * @param properties        the platform properties
+     * @param optionalLibraries list of optional libraries
+     * @param buildToolInfo     the {@link BuildToolInfo} for this platform.
      */
     public PlatformTarget(
             String sdkOsPath,
@@ -131,6 +133,8 @@ public final class PlatformTarget implements IAndroidTarget {
 
     /**
      * Returns the {@link LayoutlibVersion}. May be null.
+     *
+     * @return The {@link LayoutlibVersion}.
      */
     public LayoutlibVersion getLayoutlibVersion() {
         return mLayoutlibVersion;
@@ -284,6 +288,9 @@ public final class PlatformTarget implements IAndroidTarget {
         return mSkins;
     }
 
+    /**
+     * @param skins the skins to set
+     */
     public void setSkins(@NonNull File[] skins) {
         mSkins = skins;
         Arrays.sort(mSkins);
@@ -433,6 +440,12 @@ public final class PlatformTarget implements IAndroidTarget {
         return defaultValue;
     }
 
+    /**
+     * @param name         the name of the property to return
+     * @param defaultValue the default value to return.
+     * @return the value of the property, or defaultValue if the property is not defined or
+     * cannot be parsed as a boolean.
+     */
     @Override
     public Boolean getProperty(String name, Boolean defaultValue) {
         String value = getProperty(name);
@@ -445,15 +458,24 @@ public final class PlatformTarget implements IAndroidTarget {
 
     // ---- platform only methods.
 
+    /**
+     * @return the path to the samples folder.
+     */
     @Override
     public Map<String, String> getProperties() {
         return mProperties; // mProperties is unmodifiable.
     }
 
+    /**
+     * @param osLocation the path to the samples folder.
+     */
     public void setSamplesPath(String osLocation) {
         mPaths.put(SAMPLES, osLocation);
     }
 
+    /**
+     * @param osLocation the path to the sources folder.
+     */
     public void setSourcesPath(String osLocation) {
         mPaths.put(SOURCES, osLocation);
     }

@@ -31,11 +31,23 @@ import java.io.File;
  */
 public class JarDependency {
 
+    /**
+     * The jar file for this dependency
+     */
     @NonNull
     private final File mJarFile;
 
+    /**
+     * whether the dependency is compiled or not
+     */
     private final boolean mCompiled;
+    /**
+     * whether the dependency is packaged or not
+     */
     private final boolean mPackaged;
+    /**
+     * whether the dependency is proguarded or not
+     */
     private final boolean mProguarded;
 
     /**
@@ -44,9 +56,20 @@ public class JarDependency {
     @Nullable
     private final String mProjectPath;
 
+    /**
+     * the resolved maven coordinates for this dependency
+     */
     @Nullable
     private final MavenCoordinates mResolvedCoordinates;
 
+    /**
+     * @param jarFile             the jar file for this dependency
+     * @param compiled            whether the dependency is compiled
+     * @param packaged            whether the dependency is packaged
+     * @param proguarded          whether the dependency is proguarded
+     * @param resolvedCoordinates the resolved maven coordinates for this dependency
+     * @param projectPath         the project path for this dependency, if any
+     */
     public JarDependency(
             @NonNull File jarFile,
             boolean compiled,
@@ -63,6 +86,13 @@ public class JarDependency {
         mProjectPath = projectPath;
     }
 
+    /**
+     * @param jarFile             the jar file for this dependency
+     * @param compiled            whether the dependency is compiled
+     * @param packaged            whether the dependency is packaged
+     * @param resolvedCoordinates the resolved maven coordinates for this dependency
+     * @param projectPath         the project path for this dependency, if any
+     */
     public JarDependency(
             @NonNull File jarFile,
             boolean compiled,
@@ -72,19 +102,31 @@ public class JarDependency {
         this(jarFile, compiled, packaged, true, resolvedCoordinates, projectPath);
     }
 
+    /**
+     * @return the jar file for this dependency
+     */
     @NonNull
     public File getJarFile() {
         return mJarFile;
     }
 
+    /**
+     * @return the compiled status of this dependency
+     */
     public boolean isCompiled() {
         return mCompiled;
     }
 
+    /**
+     * @return the packaged status of this dependency
+     */
     public boolean isPackaged() {
         return mPackaged;
     }
 
+    /**
+     * @return a string representation of this dependency
+     */
     @Override
     public String toString() {
         return "JarDependency{" +

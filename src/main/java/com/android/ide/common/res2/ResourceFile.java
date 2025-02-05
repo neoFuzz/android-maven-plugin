@@ -34,8 +34,14 @@ import java.util.List;
  */
 public class ResourceFile extends DataFile<ResourceItem> {
 
+    /**
+     * Attribute name for the qualifiers of a resource file.
+     */
     static final String ATTR_QUALIFIER = "qualifiers";
 
+    /**
+     * The qualifiers of the resource file.
+     */
     private String mQualifiers;
 
     /**
@@ -74,12 +80,20 @@ public class ResourceFile extends DataFile<ResourceItem> {
         init(items);
     }
 
+    /**
+     * @return the qualifiers of the resource file
+     */
     @NonNull
     public String getQualifiers() {
         return mQualifiers;
     }
 
-    // Used in Studio
+    /**
+     * Used in Studio
+     *
+     * @param qualifiers the qualifiers to set
+     */
+
     public void setQualifiers(@NonNull String qualifiers) {
         mQualifiers = qualifiers;
     }

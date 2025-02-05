@@ -10,10 +10,16 @@ import org.w3c.dom.NodeList;
  * Yet another helper class for dealing with XML.
  */
 public class XmlHelper {
+    /**
+     * Singleton instance of XmlHelper
+     */
     private XmlHelper() {
         // private constructor
     }
 
+    /**
+     * @param parent the parent node to remove all direct children from
+     */
     public static void removeDirectChildren(@NonNull Node parent) {
         NodeList childNodes = parent.getChildNodes();
         while (childNodes.getLength() > 0) {
@@ -21,6 +27,12 @@ public class XmlHelper {
         }
     }
 
+    /**
+     * @param doc             the document to create the element in
+     * @param manifestElement the manifest element to create the element in
+     * @param elementName     the name of the element to create
+     * @return the created element
+     */
     public static Element getOrCreateElement(Document doc, @NonNull Element manifestElement, String elementName) {
         NodeList nodeList = manifestElement.getElementsByTagName(elementName);
         Element element;

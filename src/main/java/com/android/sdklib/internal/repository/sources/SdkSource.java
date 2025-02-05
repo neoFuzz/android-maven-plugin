@@ -16,6 +16,7 @@
 
 package com.android.sdklib.internal.repository.sources;
 
+import com.android.annotations.NonNull;
 import com.android.annotations.Nullable;
 import com.android.annotations.VisibleForTesting;
 import com.android.annotations.VisibleForTesting.Visibility;
@@ -59,7 +60,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * An sdk-addon or sdk-repository source, i.e. a download site.
+ * A sdk-addon or sdk-repository source, i.e. a download site.
  * It may be a full repository or an add-on only repository.
  * A repository describes one or {@link Package}s available for download.
  *
@@ -93,7 +94,7 @@ public abstract class SdkSource implements IDescription, Comparable<SdkSource> {
 
         // if the URL ends with a /, it must be "directory" resource,
         // in which case we automatically add the default file that will
-        // looked for. This way it will be obvious to the user which
+        // look for. This way it will be obvious to the user which
         // resource we are actually trying to fetch.
         if (url.endsWith("/")) {  //$NON-NLS-1$
             String[] names = getDefaultXmlFileUrls();
@@ -116,12 +117,16 @@ public abstract class SdkSource implements IDescription, Comparable<SdkSource> {
     /**
      * Returns true if this is an addon source.
      * We only load addons and extras from these sources.
+     *
+     * @return True if this is an addon source.
      */
     public abstract boolean isAddonSource();
 
     /**
      * Returns true if this is a system-image source.
      * We only load system-images from these sources.
+     *
+     * @return True if this is a system-image source.
      */
     public abstract boolean isSysImgSource();
 
@@ -131,34 +136,52 @@ public abstract class SdkSource implements IDescription, Comparable<SdkSource> {
      * XML manifest.
      * E.g. this is typically SdkRepoConstants.URL_DEFAULT_XML_FILE
      * or SdkAddonConstants.URL_DEFAULT_XML_FILE
+     *
+     * @return An array of one or more strings.
      */
     protected abstract String[] getDefaultXmlFileUrls();
 
     /**
      * Returns SdkRepoConstants.NS_LATEST_VERSION or SdkAddonConstants.NS_LATEST_VERSION.
+     *
+     * @return The latest known schema version for this source.
      */
     protected abstract int getNsLatestVersion();
 
     /**
      * Returns SdkRepoConstants.NS_URI or SdkAddonConstants.NS_URI.
+     *
+     * @return The namespace URI for this source.
      */
     protected abstract String getNsUri();
 
     /**
      * Returns SdkRepoConstants.NS_PATTERN or SdkAddonConstants.NS_PATTERN.
+     *
+     * @return The regular expression pattern for the namespace URI.
      */
     protected abstract String getNsPattern();
 
     /**
      * Returns SdkRepoConstants.getSchemaUri() or SdkAddonConstants.getSchemaUri().
+     *
+     * @param version The schema version to load.
+     * @return The URI of the schema for this source.
      */
     protected abstract String getSchemaUri(int version);
 
-    /* Returns SdkRepoConstants.NODE_SDK_REPOSITORY or SdkAddonConstants.NODE_SDK_ADDON. */
+    /**
+     * Returns SdkRepoConstants.NODE_SDK_REPOSITORY or SdkAddonConstants.NODE_SDK_ADDON.
+     *
+     * @return The root element name of the XML document.
+     */
     protected abstract String getRootElementName();
 
     /**
      * Returns SdkRepoConstants.getXsdStream() or SdkAddonConstants.getXsdStream().
+     *
+     * @param version The schema version to load.
+     * @return An input stream to the XSD file or null if there is no schema for the given version.
      */
     protected abstract InputStream getXsdStream(int version);
 
@@ -170,6 +193,7 @@ public abstract class SdkSource implements IDescription, Comparable<SdkSource> {
      * @param xml The input XML stream. Can be null.
      * @return Null on failure, otherwise returns an XML DOM with just the tools we
      * need to update this SDK Manager.
+     * @throws IOException If an error occurred while reading the XML stream.
      */
     protected abstract Document findAlternateToolsXml(@Nullable InputStream xml)
             throws IOException;
@@ -202,6 +226,8 @@ public abstract class SdkSource implements IDescription, Comparable<SdkSource> {
 
     /**
      * Returns the UI-visible name of the source. Can be null.
+     *
+     * @return The UI-visible name of the source.
      */
     public String getUiName() {
         return mUiName;
@@ -209,6 +235,8 @@ public abstract class SdkSource implements IDescription, Comparable<SdkSource> {
 
     /**
      * Returns the URL of the XML file for this source.
+     *
+     * @return The URL of the XML file for this source.
      */
     public String getUrl() {
         return mUrl;
@@ -218,11 +246,16 @@ public abstract class SdkSource implements IDescription, Comparable<SdkSource> {
      * Returns the list of known packages found by the last call to load().
      * This is null when the source hasn't been loaded yet -- caller should
      * then call {@link #load} to load the packages.
+     *
+     * @return The list of packages found by the last call to load(), or null if not loaded yet.
      */
     public Package[] getPackages() {
         return mPackages;
     }
 
+    /**
+     * @param packages The packages to set. Can be null.
+     */
     @VisibleForTesting(visibility = Visibility.PRIVATE)
     protected void setPackages(Package[] packages) {
         mPackages = packages;
@@ -275,7 +308,7 @@ public abstract class SdkSource implements IDescription, Comparable<SdkSource> {
 
     /**
      * Returns the short description of the source, if not null.
-     * Otherwise returns the default Object toString result.
+     * Otherwise, returns the default Object toString result.
      * <p>
      * This is mostly helpful for debugging.
      * For UI display, use the {@link IDescription} interface.
@@ -318,6 +351,8 @@ public abstract class SdkSource implements IDescription, Comparable<SdkSource> {
     /**
      * Returns the last fetch error description.
      * If there was no error, returns null.
+     *
+     * @return the last fetch description
      */
     public String getFetchError() {
         return mFetchError;
@@ -325,13 +360,17 @@ public abstract class SdkSource implements IDescription, Comparable<SdkSource> {
 
     /**
      * Tries to fetch the repository index for the given URL and updates the package list.
-     * When a source is disabled, this create an empty non-null package list.
+     * When a source is disabled, this creates an empty non-null package list.
      * <p>
      * Callers can get the package list using {@link #getPackages()} after this. It will be
      * null in case of error, in which case {@link #getFetchError()} can be used to an
      * error message.
+     *
+     * @param cache     The {@link DownloadCache} object to use for downloading files.
+     * @param monitor   The {@link ITaskMonitor} to use for displaying errors.
+     * @param forceHttp If true, force the use of http:// URLs instead of https://
      */
-    public void load(DownloadCache cache, ITaskMonitor monitor, boolean forceHttp) {
+    public void load(DownloadCache cache, @NonNull ITaskMonitor monitor, boolean forceHttp) {
 
         setDefaultDescription();
         monitor.setProgressMax(7);
@@ -410,7 +449,7 @@ public abstract class SdkSource implements IDescription, Comparable<SdkSource> {
         }
 
         // If the original URL can't be fetched
-        // and the URL doesn't explicitly end with our filename
+        // and the URL doesn't explicitly end with our filename,
         // and it wasn't an HTTP authentication operation canceled by the user
         // then make another tentative after changing the URL.
         if (xml == null
@@ -527,7 +566,7 @@ public abstract class SdkSource implements IDescription, Comparable<SdkSource> {
                 reason = "File not found";
                 mFetchError += ": " + reason;
             } else if (exception[0] instanceof SSLKeyException) {
-                // That's a common error and we have a pref for it.
+                // That's a common error, and we have a pref for it.
                 reason = "HTTPS SSL error. You might want to force download through HTTP in the settings.";
                 mFetchError += ": HTTPS SSL error";
             } else if (exception[0].getMessage() != null) {
@@ -622,7 +661,7 @@ public abstract class SdkSource implements IDescription, Comparable<SdkSource> {
      *
      * @param urlString    The URL to load, as a string.
      * @param monitor      {@link ITaskMonitor} related to this URL.
-     * @param outException If non null, where to store any exception that
+     * @param outException If non-null, where to store any exception that
      *                     happens during the fetch.
      */
     private InputStream fetchXmlUrl(String urlString,
@@ -648,7 +687,7 @@ public abstract class SdkSource implements IDescription, Comparable<SdkSource> {
 
     /**
      * Closes the stream, ignore any exception from InputStream.close().
-     * If the stream is a NonClosingInputStream, sets it to CloseBehavior.CLOSE first.
+     * If the stream is a NonClosingInputStream, sets it to {@code CloseBehavior.CLOSE} first.
      */
     private void closeStream(InputStream is) {
         if (is != null) {
@@ -667,6 +706,13 @@ public abstract class SdkSource implements IDescription, Comparable<SdkSource> {
      * If the XML was correctly validated, returns the schema that worked.
      * If it doesn't validate, returns null and stores the error in outError[0].
      * If we can't find a validator, returns null and set validatorFound[0] to false.
+     *
+     * @param xml            The XML InputStream to validate.
+     * @param url            The URL where the XML was loaded from.
+     * @param version        The version of the schema to validate against.
+     * @param outError       Where to store the error message if validation fails.
+     * @param validatorFound Where to store whether a validator was found.
+     * @return The URI of the schema that worked, or null if validation failed.
      */
     @VisibleForTesting(visibility = Visibility.PRIVATE)
     protected String validateXml(InputStream xml, String url, int version,
@@ -681,9 +727,9 @@ public abstract class SdkSource implements IDescription, Comparable<SdkSource> {
 
             if (validator == null) {
                 validatorFound[0] = Boolean.FALSE;
-                outError[0] = String.format(
-                        "XML verification failed for %1$s.\nNo suitable XML Schema Validator could be found in your Java environment. Please consider updating your version of Java.",
-                        url);
+                outError[0] = String.format("XML verification failed for %1$s.\n" +
+                        "No suitable XML Schema Validator could be found in your Java environment." +
+                        " Please consider updating your version of Java.", url);
                 return null;
             }
 
@@ -719,6 +765,7 @@ public abstract class SdkSource implements IDescription, Comparable<SdkSource> {
      * at the end of the xmlns:sdk="http://schemas.android.com/sdk/android/repository/$N"
      * declaration.
      *
+     * @param xml XML InputStream to read
      * @return 1..{@link SdkRepoConstants#NS_LATEST_VERSION} for a valid schema version
      * or 0 if no schema could be found.
      */
@@ -868,6 +915,11 @@ public abstract class SdkSource implements IDescription, Comparable<SdkSource> {
     /**
      * Parse all packages defined in the SDK Repository XML and creates
      * a new mPackages array with them.
+     *
+     * @param doc     The XML document to parse.
+     * @param nsUri   The namespace URI of the XML document.
+     * @param monitor The {@link ITaskMonitor} to use for displaying errors.
+     * @return True if the XML was parsed successfully, false otherwise.
      */
     @VisibleForTesting(visibility = Visibility.PRIVATE)
     protected boolean parsePackages(Document doc, String nsUri, ITaskMonitor monitor) {
@@ -875,10 +927,10 @@ public abstract class SdkSource implements IDescription, Comparable<SdkSource> {
         Node root = getFirstChild(doc, nsUri, getRootElementName());
         if (root != null) {
 
-            ArrayList<Package> packages = new ArrayList<Package>();
+            ArrayList<Package> packages = new ArrayList<>();
 
             // Parse license definitions
-            HashMap<String, String> licenses = new HashMap<String, String>();
+            HashMap<String, String> licenses = new HashMap<>();
             for (Node child = root.getFirstChild();
                  child != null;
                  child = child.getNextSibling()) {
@@ -973,9 +1025,13 @@ public abstract class SdkSource implements IDescription, Comparable<SdkSource> {
      * Takes an XML document as a string as parameter and returns a DOM for it.
      * <p>
      * On error, returns null and prints a (hopefully) useful message on the monitor.
+     *
+     * @param xml     The XML document as a string.
+     * @param monitor The {@link ITaskMonitor} to use for displaying errors.
+     * @return A DOM for the XML document.
      */
     @VisibleForTesting(visibility = Visibility.PRIVATE)
-    protected Document getDocument(InputStream xml, ITaskMonitor monitor) {
+    protected Document getDocument(@NonNull InputStream xml, ITaskMonitor monitor) {
         try {
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
             factory.setIgnoringComments(true);

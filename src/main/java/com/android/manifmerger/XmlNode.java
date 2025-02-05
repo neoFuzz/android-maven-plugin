@@ -35,6 +35,9 @@ import java.util.function.Function;
  */
 public abstract class XmlNode {
 
+    /**
+     * node to name function
+     */
     protected static final Function<Node, String> NODE_TO_NAME =
             input -> {
                 assert input != null;
@@ -59,6 +62,10 @@ public abstract class XmlNode {
                 : new NamespaceAwareName(node);
     }
 
+    /**
+     * @param name the name of the node to create
+     * @return a new {@link NodeName} instance representing the fully qualified name
+     */
     @NonNull
     public static NodeName fromXmlName(@NonNull String name) {
         if (name.contains(":")) {
@@ -70,6 +77,14 @@ public abstract class XmlNode {
         return new Name(name);
     }
 
+    /**
+     * Creates a new namespace-aware node name from the provided namespace URI, prefix and local name.
+     *
+     * @param namespaceUri The namespace URI for the node name
+     * @param prefix       The namespace prefix to use
+     * @param localName    The local name without the namespace prefix
+     * @return A new {@link NodeName} instance representing the fully qualified name
+     */
     @NonNull
     public static NodeName fromNSName(
             @NonNull String namespaceUri, @NonNull String prefix, @NonNull String localName) {
@@ -80,6 +95,8 @@ public abstract class XmlNode {
      * Returns a constant {@code NodeKey} that can be used throughout the lifecycle of the XML element.
      * The {@link #getId} can return different values over time as the key of the element can be
      * for instance, changed through placeholder replacement.
+     *
+     * @return a constant {@code NodeKey} that can be used throughout the lifecycle of the XML element.
      */
     @NonNull
     public synchronized NodeKey getOriginalId() {
@@ -91,24 +108,32 @@ public abstract class XmlNode {
 
     /**
      * Returns a unique id within the manifest file for the element.
+     *
+     * @return a unique id within the manifest file for the element.
      */
     @NonNull
     public abstract NodeKey getId();
 
     /**
      * Returns the element's position
+     *
+     * @return the element's position
      */
     @NonNull
     public abstract SourcePosition getPosition();
 
     /**
      * Returns the element's document xml source file location.
+     *
+     * @return the element's document xml source file location.
      */
     @NonNull
     public abstract SourceFile getSourceFile();
 
     /**
      * Returns the element's document xml source file location.
+     *
+     * @return the element's document xml source file location.
      */
     @NonNull
     public SourceFilePosition getSourceFilePosition() {
@@ -117,12 +142,16 @@ public abstract class XmlNode {
 
     /**
      * Returns the element's xml
+     *
+     * @return the element's xml
      */
     @NonNull
     public abstract Node getXml();
 
     /**
      * Returns the name of this xml element or attribute.
+     *
+     * @return the name of this xml element or attribute.
      */
     @NonNull
     public abstract NodeName getName();
@@ -147,6 +176,10 @@ public abstract class XmlNode {
         /**
          * Returns true if this attribute name has a namespace declaration and that namespace is
          * the same as provided, false otherwise.
+         *
+         * @param namespaceURI the namespace URI to check for.
+         * @return true if this attribute name has a namespace declaration and that namespace is
+         * the same as provided, false otherwise.
          */
         boolean isInNamespace(@NonNull String namespaceURI);
 
@@ -160,6 +193,8 @@ public abstract class XmlNode {
 
         /**
          * The local name.
+         *
+         * @return the local name without the namespace prefix.
          */
         String getLocalName();
     }
@@ -283,6 +318,10 @@ public abstract class XmlNode {
             mKey = key;
         }
 
+        /**
+         * @param element the xml element to create a key for.
+         * @return a new {@link NodeKey} instance representing the element.
+         */
         @NonNull
         public static NodeKey fromXml(@NonNull Element element) {
             return new OrphanXmlElement(element).getId();

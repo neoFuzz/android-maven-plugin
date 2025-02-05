@@ -36,11 +36,18 @@ public class SymbolLoader {
     private final ILogger mLogger;
     private Table<String, String, SymbolEntry> mSymbols;
 
+    /**
+     * @param symbolFile the text symbol file to load.
+     * @param logger     the logger to use
+     */
     public SymbolLoader(File symbolFile, ILogger logger) {
         mSymbolFile = symbolFile;
         mLogger = logger;
     }
 
+    /**
+     * @throws IOException if there is a problem reading the text symbol file.
+     */
     public void load() throws IOException {
         List<String> lines = Files.readLines(mSymbolFile, Charsets.UTF_8);
 
@@ -73,29 +80,49 @@ public class SymbolLoader {
         }
     }
 
+    /**
+     * @return the table of symbols loaded from the text symbol file.
+     */
     Table<String, String, SymbolEntry> getSymbols() {
         return mSymbols;
     }
 
+    /**
+     * A class representing a symbol entry from the text symbol file.
+     */
     public static class SymbolEntry {
         private final String mName;
         private final String mType;
         private final String mValue;
 
+        /**
+         * @param name  the name of the symbol, as it appears in Java code.
+         * @param type  the type of the symbol, as a Java type.
+         * @param value the value of the symbol, as a string.
+         */
         public SymbolEntry(String name, String type, String value) {
             mName = name;
             mType = type;
             mValue = value;
         }
 
+        /**
+         * @return the value of the symbol, as a string.
+         */
         public String getValue() {
             return mValue;
         }
 
+        /**
+         * @return the name of the symbol, as it appears in Java code.
+         */
         public String getName() {
             return mName;
         }
 
+        /**
+         * @return the type of the symbol, as a Java type.
+         */
         public String getType() {
             return mType;
         }

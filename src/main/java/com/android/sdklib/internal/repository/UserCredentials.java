@@ -27,6 +27,15 @@ public class UserCredentials {
     private final String mWorkstation;
     private final String mDomain;
 
+
+    /**
+     * Constructor for UserCredentials.
+     *
+     * @param userName    The username for authentication
+     * @param password    The password for authentication
+     * @param workstation The workstation name
+     * @param domain      The domain name
+     */
     public UserCredentials(String userName, String password, String workstation, String domain) {
         mUserName = userName;
         mPassword = password;
@@ -34,18 +43,30 @@ public class UserCredentials {
         mDomain = domain;
     }
 
+    /**
+     * @return the username, or null if not set
+     */
     public String getUserName() {
         return mUserName;
     }
 
+    /**
+     * @return the password, or null if not set
+     */
     public String getPassword() {
         return mPassword;
     }
 
+    /**
+     * @return the workstation, or null if not set
+     */
     public String getWorkstation() {
         return mWorkstation;
     }
 
+    /**
+     * @return the domain, or null if not set
+     */
     public String getDomain() {
         return mDomain;
     }

@@ -25,17 +25,24 @@ import java.util.List;
  */
 public interface JavaProcessInfo extends ProcessInfo {
 
+    /**
+     * @return the classpath to use.
+     */
     @NonNull
     String getClasspath();
 
     /**
      * The main Java Class. This is optional.
+     *
+     * @return the main class to use, or null if not set.
      */
     @NonNull
     String getMainClass();
 
     /**
      * The JVM args to use.
+     *
+     * @return the list of JVM args to use.
      */
     @NonNull
     List<String> getJvmArgs();

@@ -34,29 +34,98 @@ import java.util.*;
  */
 public final class FolderConfiguration implements Comparable<FolderConfiguration> {
 
+    /**
+     * The default qualifiers array
+     */
     @NonNull
     private static final ResourceQualifier[] DEFAULT_QUALIFIERS;
+    /**
+     * The default qualifiers for country code
+     */
     private static final int INDEX_COUNTRY_CODE = 0;
+    /**
+     * The default qualifiers for network code
+     */
     private static final int INDEX_NETWORK_CODE = 1;
+    /**
+     * The default qualifiers for language
+     */
     private static final int INDEX_LANGUAGE = 2;
+    /**
+     * The default qualifiers for the index region
+     */
     private static final int INDEX_REGION = 3;
+    /**
+     * The default qualifiers for a folder configuration
+     */
     private static final int INDEX_LAYOUT_DIR = 4;
+    /**
+     * The default qualifiers for smallest screen width
+     */
     private static final int INDEX_SMALLEST_SCREEN_WIDTH = 5;
+    /**
+     * The default qualifiers for screen width
+     */
     private static final int INDEX_SCREEN_WIDTH = 6;
+    /**
+     * The default qualifiers for screen height
+     */
     private static final int INDEX_SCREEN_HEIGHT = 7;
+    /**
+     * The default qualifiers for screen size
+     */
     private static final int INDEX_SCREEN_LAYOUT_SIZE = 8;
+    /**
+     * the default qualifiers for screen ratio
+     */
     private static final int INDEX_SCREEN_RATIO = 9;
+    /**
+     * The default qualifiers for screen orientation
+     */
     private static final int INDEX_SCREEN_ORIENTATION = 10;
+    /**
+     * The default qualifiers for ui mode
+     */
     private static final int INDEX_UI_MODE = 11;
+    /**
+     * The default qualifiers for night mode
+     */
     private static final int INDEX_NIGHT_MODE = 12;
+    /**
+     * The default qualifiers for pixel density
+     */
     private static final int INDEX_PIXEL_DENSITY = 13;
+    /**
+     * The default qualifiers for touch type
+     */
     private static final int INDEX_TOUCH_TYPE = 14;
+    /**
+     * The default qualifiers for keyboard state
+     */
     private static final int INDEX_KEYBOARD_STATE = 15;
+    /**
+     * The default qualifiers for text input method
+     */
     private static final int INDEX_TEXT_INPUT_METHOD = 16;
+    /**
+     * The default qualifiers for navigation state
+     */
     private static final int INDEX_NAVIGATION_STATE = 17;
+    /**
+     * The default qualifiers for navigation method
+     */
     private static final int INDEX_NAVIGATION_METHOD = 18;
+    /**
+     * The default screen dimension index
+     */
     private static final int INDEX_SCREEN_DIMENSION = 19;
+    /**
+     * The version of the configuration. This is used to handle changes to the configuration over time.
+     */
     private static final int INDEX_VERSION = 20;
+    /**
+     * The number of qualifiers in the default configuration
+     */
     private static final int INDEX_COUNT = 21;
 
     static {
@@ -176,6 +245,8 @@ public final class FolderConfiguration implements Comparable<FolderConfiguration
 
     /**
      * Returns the number of {@link ResourceQualifier} that make up a Folder configuration.
+     *
+     * @return the number of qualifiers
      */
     public static int getQualifierCount() {
         return INDEX_COUNT;
@@ -222,8 +293,10 @@ public final class FolderConfiguration implements Comparable<FolderConfiguration
     /**
      * Removes the qualifiers from the receiver if they are present (and valid)
      * in the given configuration.
+     *
+     * @param config the {@link FolderConfiguration} to subtract.
      */
-    public void substract(@NonNull FolderConfiguration config) {
+    public void subtract(@NonNull FolderConfiguration config) {
         for (int i = 0; i < INDEX_COUNT; i++) {
             if (config.mQualifiers[i] != null && config.mQualifiers[i].isValid()) {
                 mQualifiers[i] = null;
@@ -234,6 +307,8 @@ public final class FolderConfiguration implements Comparable<FolderConfiguration
     /**
      * Adds the non-qualifiers from the given config.
      * Qualifiers that are null in the given config do not change in the receiver.
+     *
+     * @param config the {@link FolderConfiguration} to add.
      */
     public void add(@NonNull FolderConfiguration config) {
         for (int i = 0; i < INDEX_COUNT; i++) {
@@ -246,6 +321,8 @@ public final class FolderConfiguration implements Comparable<FolderConfiguration
     /**
      * Returns the first invalid qualifier, or <code>null</code> if they are all valid (or if none
      * exists).
+     *
+     * @return the resource qualifier
      */
     @Nullable
     public ResourceQualifier getInvalidQualifier() {
@@ -367,191 +444,319 @@ public final class FolderConfiguration implements Comparable<FolderConfiguration
         return mQualifiers[index];
     }
 
+    /**
+     * @return the {@link CountryCodeQualifier} or null if it doesn't exist
+     */
     @Nullable
     public CountryCodeQualifier getCountryCodeQualifier() {
         return (CountryCodeQualifier) mQualifiers[INDEX_COUNTRY_CODE];
     }
 
+    /**
+     * @param qualifier the qualifier to set
+     */
     public void setCountryCodeQualifier(CountryCodeQualifier qualifier) {
         mQualifiers[INDEX_COUNTRY_CODE] = qualifier;
     }
 
+    /**
+     * @return the {@link NetworkCodeQualifier} or null if it doesn't exist
+     */
     @Nullable
     public NetworkCodeQualifier getNetworkCodeQualifier() {
         return (NetworkCodeQualifier) mQualifiers[INDEX_NETWORK_CODE];
     }
 
+    /**
+     * @param qualifier the qualifier to set
+     */
     public void setNetworkCodeQualifier(NetworkCodeQualifier qualifier) {
         mQualifiers[INDEX_NETWORK_CODE] = qualifier;
     }
 
+    /**
+     * @return the {@link LanguageQualifier} or null if it doesn't exist
+     */
     @Nullable
     public LanguageQualifier getLanguageQualifier() {
         return (LanguageQualifier) mQualifiers[INDEX_LANGUAGE];
     }
 
+    /**
+     * @param qualifier the qualifier to set
+     */
     public void setLanguageQualifier(LanguageQualifier qualifier) {
         mQualifiers[INDEX_LANGUAGE] = qualifier;
     }
 
+    /**
+     * @return the {@link RegionQualifier} or null if it doesn't exist
+     */
     @Nullable
     public RegionQualifier getRegionQualifier() {
         return (RegionQualifier) mQualifiers[INDEX_REGION];
     }
 
+    /**
+     * @param qualifier the qualifier to set
+     */
     public void setRegionQualifier(RegionQualifier qualifier) {
         mQualifiers[INDEX_REGION] = qualifier;
     }
 
+    /**
+     * @return the {@link LayoutDirectionQualifier} or null if it doesn't exist
+     */
     @Nullable
     public LayoutDirectionQualifier getLayoutDirectionQualifier() {
         return (LayoutDirectionQualifier) mQualifiers[INDEX_LAYOUT_DIR];
     }
 
+    /**
+     * @param qualifier the qualifier to set
+     */
     public void setLayoutDirectionQualifier(LayoutDirectionQualifier qualifier) {
         mQualifiers[INDEX_LAYOUT_DIR] = qualifier;
     }
 
+    /**
+     * @return the {@link SmallestScreenWidthQualifier} or null if it doesn't exist
+     */
     @Nullable
     public SmallestScreenWidthQualifier getSmallestScreenWidthQualifier() {
         return (SmallestScreenWidthQualifier) mQualifiers[INDEX_SMALLEST_SCREEN_WIDTH];
     }
 
+    /**
+     * @param qualifier the qualifier to set
+     */
     public void setSmallestScreenWidthQualifier(SmallestScreenWidthQualifier qualifier) {
         mQualifiers[INDEX_SMALLEST_SCREEN_WIDTH] = qualifier;
     }
 
+    /**
+     * @return the {@link ScreenWidthQualifier} or null if it doesn't exist
+     */
     @Nullable
     public ScreenWidthQualifier getScreenWidthQualifier() {
         return (ScreenWidthQualifier) mQualifiers[INDEX_SCREEN_WIDTH];
     }
 
+    /**
+     * @param qualifier the qualifier to set
+     */
     public void setScreenWidthQualifier(ScreenWidthQualifier qualifier) {
         mQualifiers[INDEX_SCREEN_WIDTH] = qualifier;
     }
 
+    /**
+     * @return the {@link ScreenHeightQualifier} or null if it doesn't exist
+     */
     @Nullable
     public ScreenHeightQualifier getScreenHeightQualifier() {
         return (ScreenHeightQualifier) mQualifiers[INDEX_SCREEN_HEIGHT];
     }
 
+    /**
+     * @param qualifier the qualifier to set
+     */
     public void setScreenHeightQualifier(ScreenHeightQualifier qualifier) {
         mQualifiers[INDEX_SCREEN_HEIGHT] = qualifier;
     }
 
+    /**
+     * @return the {@link ScreenSizeQualifier} or null if it doesn't exist
+     */
     @Nullable
     public ScreenSizeQualifier getScreenSizeQualifier() {
         return (ScreenSizeQualifier) mQualifiers[INDEX_SCREEN_LAYOUT_SIZE];
     }
 
+    /**
+     * @param qualifier the qualifier to set
+     */
     public void setScreenSizeQualifier(ScreenSizeQualifier qualifier) {
         mQualifiers[INDEX_SCREEN_LAYOUT_SIZE] = qualifier;
     }
 
+    /**
+     * @return the {@link ScreenRatioQualifier} or null if it doesn't exist
+     */
     @Nullable
     public ScreenRatioQualifier getScreenRatioQualifier() {
         return (ScreenRatioQualifier) mQualifiers[INDEX_SCREEN_RATIO];
     }
 
+    /**
+     * @param qualifier the qualifier to set
+     */
     public void setScreenRatioQualifier(ScreenRatioQualifier qualifier) {
         mQualifiers[INDEX_SCREEN_RATIO] = qualifier;
     }
 
+    /**
+     * @return the {@link ScreenOrientationQualifier} or null if it doesn't exist
+     */
     @Nullable
     public ScreenOrientationQualifier getScreenOrientationQualifier() {
         return (ScreenOrientationQualifier) mQualifiers[INDEX_SCREEN_ORIENTATION];
     }
 
+    /**
+     * @param qualifier the qualifier to set
+     */
     public void setScreenOrientationQualifier(ScreenOrientationQualifier qualifier) {
         mQualifiers[INDEX_SCREEN_ORIENTATION] = qualifier;
     }
 
+    /**
+     * @return the {@link UiModeQualifier} or null if it doesn't exist
+     */
     @Nullable
     public UiModeQualifier getUiModeQualifier() {
         return (UiModeQualifier) mQualifiers[INDEX_UI_MODE];
     }
 
+    /**
+     * @param qualifier the qualifier to set
+     */
     public void setUiModeQualifier(UiModeQualifier qualifier) {
         mQualifiers[INDEX_UI_MODE] = qualifier;
     }
 
+    /**
+     * @return the {@link NightModeQualifier} or null if it doesn't exist
+     */
     @Nullable
     public NightModeQualifier getNightModeQualifier() {
         return (NightModeQualifier) mQualifiers[INDEX_NIGHT_MODE];
     }
 
+    /**
+     * @param qualifier the qualifier to set
+     */
     public void setNightModeQualifier(NightModeQualifier qualifier) {
         mQualifiers[INDEX_NIGHT_MODE] = qualifier;
     }
 
+    /**
+     * @return the {@link DensityQualifier} or null if it doesn't exist
+     */
     @Nullable
     public DensityQualifier getDensityQualifier() {
         return (DensityQualifier) mQualifiers[INDEX_PIXEL_DENSITY];
     }
 
+    /**
+     * @param qualifier the qualifier to set
+     */
     public void setDensityQualifier(DensityQualifier qualifier) {
         mQualifiers[INDEX_PIXEL_DENSITY] = qualifier;
     }
 
+    /**
+     * @return the {@link TouchScreenQualifier} or null if it doesn't exist
+     */
     @Nullable
     public TouchScreenQualifier getTouchTypeQualifier() {
         return (TouchScreenQualifier) mQualifiers[INDEX_TOUCH_TYPE];
     }
 
+    /**
+     * @param qualifier the qualifier to set
+     */
     public void setTouchTypeQualifier(TouchScreenQualifier qualifier) {
         mQualifiers[INDEX_TOUCH_TYPE] = qualifier;
     }
 
+    /**
+     * @return the keyboard qualifier
+     */
     @Nullable
     public KeyboardStateQualifier getKeyboardStateQualifier() {
         return (KeyboardStateQualifier) mQualifiers[INDEX_KEYBOARD_STATE];
     }
 
+    /**
+     * @param qualifier The qualifier to set
+     */
     public void setKeyboardStateQualifier(KeyboardStateQualifier qualifier) {
         mQualifiers[INDEX_KEYBOARD_STATE] = qualifier;
     }
 
+    /**
+     * @return TextMethodInput qualifier
+     */
     @Nullable
     public TextInputMethodQualifier getTextInputMethodQualifier() {
         return (TextInputMethodQualifier) mQualifiers[INDEX_TEXT_INPUT_METHOD];
     }
 
+    /**
+     * Sets the text input method qualifier
+     *
+     * @param qualifier the text input method qualifier to set
+     */
     public void setTextInputMethodQualifier(TextInputMethodQualifier qualifier) {
         mQualifiers[INDEX_TEXT_INPUT_METHOD] = qualifier;
     }
 
+    /**
+     * @return the {@link NavigationStateQualifier} or null if it doesn't exist
+     */
     @Nullable
     public NavigationStateQualifier getNavigationStateQualifier() {
         return (NavigationStateQualifier) mQualifiers[INDEX_NAVIGATION_STATE];
     }
 
+    /**
+     * @param qualifier the qualifier to set
+     */
     public void setNavigationStateQualifier(NavigationStateQualifier qualifier) {
         mQualifiers[INDEX_NAVIGATION_STATE] = qualifier;
     }
 
+    /**
+     * @return the {@link NavigationMethodQualifier} or null if it doesn't exist
+     */
     @Nullable
     public NavigationMethodQualifier getNavigationMethodQualifier() {
         return (NavigationMethodQualifier) mQualifiers[INDEX_NAVIGATION_METHOD];
     }
 
+    /**
+     * @param qualifier the qualifier to set
+     */
     public void setNavigationMethodQualifier(NavigationMethodQualifier qualifier) {
         mQualifiers[INDEX_NAVIGATION_METHOD] = qualifier;
     }
 
+    /**
+     * @return the {@link ScreenDimensionQualifier} or null if it doesn't exist
+     */
     @Nullable
     public ScreenDimensionQualifier getScreenDimensionQualifier() {
         return (ScreenDimensionQualifier) mQualifiers[INDEX_SCREEN_DIMENSION];
     }
 
+    /**
+     * @param qualifier the qualifier to set
+     */
     public void setScreenDimensionQualifier(ScreenDimensionQualifier qualifier) {
         mQualifiers[INDEX_SCREEN_DIMENSION] = qualifier;
     }
 
+    /**
+     * @return the {@link VersionQualifier} or null if it doesn't exist
+     */
     @Nullable
     public VersionQualifier getVersionQualifier() {
         return (VersionQualifier) mQualifiers[INDEX_VERSION];
     }
 
+    /**
+     * @param qualifier the qualifier to set
+     */
     public void setVersionQualifier(VersionQualifier qualifier) {
         mQualifiers[INDEX_VERSION] = qualifier;
     }
@@ -637,6 +842,8 @@ public final class FolderConfiguration implements Comparable<FolderConfiguration
 
     /**
      * Returns whether an object is equals to the receiver.
+     *
+     * @param obj the object to compare with
      */
     @Override
     public boolean equals(Object obj) {
@@ -663,6 +870,9 @@ public final class FolderConfiguration implements Comparable<FolderConfiguration
         return false;
     }
 
+    /**
+     * @return the hash code of the object.
+     */
     @Override
     public int hashCode() {
         return toString().hashCode();
@@ -670,6 +880,8 @@ public final class FolderConfiguration implements Comparable<FolderConfiguration
 
     /**
      * Returns whether the Configuration has only default values.
+     *
+     * @return true if the configuration has only default values.
      */
     public boolean isDefault() {
         for (ResourceQualifier irq : mQualifiers) {
@@ -683,6 +895,9 @@ public final class FolderConfiguration implements Comparable<FolderConfiguration
 
     /**
      * Returns the name of a folder with the configuration.
+     *
+     * @param folder the {@link ResourceFolderType} to get the name for.
+     * @return the name of the folder.
      */
     @NonNull
     public String getFolderName(@NonNull ResourceFolderType folder) {
@@ -703,6 +918,8 @@ public final class FolderConfiguration implements Comparable<FolderConfiguration
 
     /**
      * Returns the folder configuration as a unique key
+     *
+     * @return the unique key
      */
     @NonNull
     public String getUniqueKey() {
@@ -723,6 +940,8 @@ public final class FolderConfiguration implements Comparable<FolderConfiguration
 
     /**
      * Returns {@link #toDisplayString()}.
+     *
+     * @return a string valid for display purpose.
      */
     @NonNull
     @Override
@@ -732,6 +951,8 @@ public final class FolderConfiguration implements Comparable<FolderConfiguration
 
     /**
      * Returns a string valid for display purpose.
+     *
+     * @return a string valid for display purpose.
      */
     @NonNull
     public String toDisplayString() {
@@ -757,7 +978,7 @@ public final class FolderConfiguration implements Comparable<FolderConfiguration
             }
         }
 
-        // process the language/region qualifier in a custom way, if there are both non null.
+        // process the language/region qualifier in a custom way, if there are both non-null.
         if (mQualifiers[INDEX_LANGUAGE] != null && mQualifiers[INDEX_REGION] != null) {
             String language = mQualifiers[INDEX_LANGUAGE].getLongDisplayValue();
             String region = mQualifiers[INDEX_REGION].getLongDisplayValue();
@@ -791,6 +1012,8 @@ public final class FolderConfiguration implements Comparable<FolderConfiguration
 
     /**
      * Returns a string for display purposes which uses only the short names of the qualifiers
+     *
+     * @return a string valid for display purpose
      */
     @NonNull
     public String toShortDisplayString() {
@@ -805,7 +1028,7 @@ public final class FolderConfiguration implements Comparable<FolderConfiguration
         while (index < INDEX_COUNT) {
             ResourceQualifier qualifier = mQualifiers[index++];
             if (qualifier != null) {
-                if (result.length() > 0) {
+                if (!result.isEmpty()) {
                     result.append(',');
                 }
                 result.append(qualifier.getShortDisplayValue());
@@ -815,6 +1038,11 @@ public final class FolderConfiguration implements Comparable<FolderConfiguration
         return result.toString();
     }
 
+    /**
+     * @param folderConfig the object to be compared.
+     * @return a negative integer, zero, or a positive integer as this object is less than, equal
+     * to, or greater than the specified object.
+     */
     @Override
     public int compareTo(@NonNull FolderConfiguration folderConfig) {
         // default are always at the top.
@@ -1007,7 +1235,7 @@ public final class FolderConfiguration implements Comparable<FolderConfiguration
     }
 
     /**
-     * Returns the index of the first non null {@link ResourceQualifier} starting at index
+     * Returns the index of the first non-null {@link ResourceQualifier} starting at index
      * <var>startIndex</var>
      *
      * @param startIndex the index to start the search from.
@@ -1052,7 +1280,9 @@ public final class FolderConfiguration implements Comparable<FolderConfiguration
     }
 
     /**
-     * Returns an array of all the non null qualifiers.
+     * Returns an array of all the non-null qualifiers.
+     *
+     * @return an array of {@link ResourceQualifier}
      */
     @NonNull
     public ResourceQualifier[] getQualifiers() {

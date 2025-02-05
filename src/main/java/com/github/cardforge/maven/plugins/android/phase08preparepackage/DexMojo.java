@@ -290,7 +290,7 @@ public class DexMojo extends AbstractAndroidMojo {
             return;
         }
 
-        CommandExecutor executor = CommandExecutor.Factory.createDefaultCommmandExecutor();
+        CommandExecutor executor = CommandExecutor.Factory.createDefaultCommandExecutor();
         executor.setLogger(getLog());
 
         File outputFile;

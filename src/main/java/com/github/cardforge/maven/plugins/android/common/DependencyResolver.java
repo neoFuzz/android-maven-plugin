@@ -8,6 +8,7 @@ import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
+import org.apache.maven.project.ProjectBuildingRequest;
 import org.apache.maven.repository.RepositorySystem;
 import org.apache.maven.shared.dependency.graph.DependencyGraphBuilder;
 import org.apache.maven.shared.dependency.graph.DependencyGraphBuilderException;
@@ -65,7 +66,7 @@ public final class DependencyResolver {
     public Set<Artifact> getProjectDependenciesFor(MavenProject project, @NonNull MavenSession session)
             throws DependencyGraphBuilderException {
         // No need to filter our search. We want to resolve all artifacts.
-        final DependencyNode node = dependencyGraphBuilder.buildDependencyGraph(project, null, session.getProjects());
+        final DependencyNode node = dependencyGraphBuilder.buildDependencyGraph((ProjectBuildingRequest) project, null, session.getProjects());
 
         final DependencyCollector collector = new DependencyCollector(log, project.getArtifact());
         collector.visit(node, false);

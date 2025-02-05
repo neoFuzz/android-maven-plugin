@@ -21,17 +21,30 @@ package com.android.ide.common.internal;
  */
 public class PngException extends Exception {
 
+    /**
+     * Blank constructor.
+     */
     public PngException() {
     }
 
+    /**
+     * @param s the message for the exception
+     */
     public PngException(String s) {
         super(s);
     }
 
+    /**
+     * @param s         the message for the exception
+     * @param throwable the cause of the exception
+     */
     public PngException(String s, Throwable throwable) {
         super(s, throwable);
     }
 
+    /**
+     * @param throwable the cause of the exception
+     */
     public PngException(Throwable throwable) {
         super(throwable);
     }

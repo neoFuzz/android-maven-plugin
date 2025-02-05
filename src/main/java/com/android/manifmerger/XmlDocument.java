@@ -72,6 +72,14 @@ public class XmlDocument {
     @NonNull
     private final Optional<String> mMainManifestPackageName;
 
+    /**
+     * @param sourceLocation          the location of the source file.
+     * @param selectors               the key resolver for selectors.
+     * @param systemPropertyResolver  the key resolver for system properties.
+     * @param element                 the root element of the document.
+     * @param type                    the type of the document.
+     * @param mainManifestPackageName the package name of the main manifest.
+     */
     public XmlDocument(
             @NonNull SourceFile sourceLocation,
             @NonNull KeyResolver<String> selectors,
@@ -122,13 +130,16 @@ public class XmlDocument {
         return "android.permission." + permissionName;
     }
 
+    /**
+     * @return the file type
+     */
     @NonNull
     public Type getFileType() {
         return mType;
     }
 
     /**
-     * Returns a pretty string representation of this document.
+     * @return a pretty string representation of this document.
      */
     @NonNull
     public String prettyPrint() {
@@ -203,7 +214,7 @@ public class XmlDocument {
     }
 
     /**
-     * Returns a {@link com.android.manifmerger.KeyResolver} capable of resolving all selectors
+     * @return a {@link com.android.manifmerger.KeyResolver} capable of resolving all selectors
      * types
      */
     @NonNull
@@ -212,7 +223,7 @@ public class XmlDocument {
     }
 
     /**
-     * Returns the {@link com.android.manifmerger.PlaceholderHandler.KeyBasedValueResolver} capable
+     * @return the {@link com.android.manifmerger.PlaceholderHandler.KeyBasedValueResolver} capable
      * of resolving all injected {@link ManifestSystemProperty}
      */
     @NonNull
@@ -246,6 +257,9 @@ public class XmlDocument {
         return mSourceFile;
     }
 
+    /**
+     * @return the root {@link XmlElement} of this document.
+     */
     public synchronized XmlElement getRootNode() {
         if (mRootNode.get() == null) {
             this.mRootNode.set(new XmlElement(mRootElement, this));
@@ -253,6 +267,11 @@ public class XmlDocument {
         return mRootNode.get();
     }
 
+    /**
+     * @param type     the {@link com.android.manifmerger.ManifestModel.NodeTypes} to search for
+     * @param keyValue the key value to search for, if null, search for a node with no key.
+     * @return the {@link XmlElement} if found, {@link Optional#empty()} otherwise.
+     */
     public Optional<XmlElement> getByTypeAndKey(
             ManifestModel.NodeTypes type,
             @Nullable String keyValue) {
@@ -297,6 +316,9 @@ public class XmlDocument {
         throw new RuntimeException("No package present in overlay or main manifest file");
     }
 
+    /**
+     * @return the package attribute if present, {@link Optional#empty()} otherwise.
+     */
     public Optional<XmlAttribute> getPackage() {
         Optional<XmlAttribute> packageAttribute =
                 getRootNode().getAttribute(XmlNode.fromXmlName(ATTRIBUTE_PACKAGE));
@@ -306,6 +328,9 @@ public class XmlDocument {
                 SdkConstants.ANDROID_URI, "android", ATTRIBUTE_PACKAGE));
     }
 
+    /**
+     * @return the xml document as a {@link org.w3c.dom.Document}
+     */
     public Document getXml() {
         return mRootElement.getOwnerDocument();
     }
@@ -313,6 +338,8 @@ public class XmlDocument {
     /**
      * Returns the minSdk version specified in the uses_sdk element if present or the
      * default value.
+     *
+     * @return the minSdk version as a string.
      */
     @NonNull
     private String getRawMinSdkVersion() {
@@ -331,6 +358,8 @@ public class XmlDocument {
     /**
      * Returns the minSdk version for this manifest file. It can be injected from the outer
      * build.gradle or can be expressed in the uses_sdk element.
+     *
+     * @return the minSdk version as a string.
      */
     @NonNull
     public String getMinSdkVersion() {

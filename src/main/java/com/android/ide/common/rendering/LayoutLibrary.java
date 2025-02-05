@@ -16,6 +16,7 @@
 
 package com.android.ide.common.rendering;
 
+import com.android.annotations.NonNull;
 import com.android.annotations.VisibleForTesting;
 import com.android.ide.common.rendering.api.*;
 import com.android.ide.common.rendering.api.Result.Status;
@@ -57,7 +58,13 @@ import static com.android.ide.common.rendering.api.Result.Status.ERROR_REFLECTIO
 @SuppressWarnings("deprecation")
 public class LayoutLibrary {
 
+    /**
+     * Class name of the LayoutBridge implementation
+     */
     public static final String CLASS_BRIDGE = "com.android.layoutlib.bridge.Bridge"; //$NON-NLS-1$
+    /**
+     * Static string for icu4j .jar file.
+     */
     public static final String FN_ICU_JAR = "icu4j.jar"; //$NON-NLS-1$
 
     /**
@@ -92,6 +99,13 @@ public class LayoutLibrary {
     private Field mRightMarginField;
     private Field mBottomMarginField;
 
+    /**
+     * @param bridge
+     * @param legacyBridge
+     * @param classLoader
+     * @param status
+     * @param message
+     */
     private LayoutLibrary(Bridge bridge, ILayoutBridge legacyBridge, ClassLoader classLoader,
                           LoadStatus status, String message) {
         mBridge = bridge;
@@ -101,6 +115,9 @@ public class LayoutLibrary {
         mLoadMessage = message;
     }
 
+    /**
+     * Create a blank Layout
+     */
     @VisibleForTesting(visibility = VisibleForTesting.Visibility.PRIVATE)
     protected LayoutLibrary() {
         mBridge = null;
@@ -119,8 +136,11 @@ public class LayoutLibrary {
      *
      * @param layoutLibJarOsPath the path of the jar file
      * @param log                an optional log file.
+     * @param toolName           the name of the tool requesting the layout library. This is used
+     *                           for logging purposes.
      * @return a {@link LayoutLibrary} object always.
      */
+    @NonNull
     public static LayoutLibrary load(String layoutLibJarOsPath, ILogger log, String toolName) {
 
         LoadStatus status = LoadStatus.LOADING;
@@ -213,6 +233,8 @@ public class LayoutLibrary {
 
     /**
      * Returns the {@link LoadStatus} of the loading of the layoutlib jar file.
+     *
+     * @return the status
      */
     public LoadStatus getStatus() {
         return mStatus;
@@ -223,6 +245,8 @@ public class LayoutLibrary {
     /**
      * Returns the message associated with the {@link LoadStatus}. This is mostly used when
      * {@link #getStatus()} returns {@link LoadStatus#FAILED}.
+     *
+     * @return the message
      */
     public String getLoadMessage() {
         return mLoadMessage;
@@ -230,6 +254,8 @@ public class LayoutLibrary {
 
     /**
      * Returns the classloader used to load the classes in the layoutlib jar file.
+     *
+     * @return the classloader
      */
     public ClassLoader getClassLoader() {
         return mClassLoader;
@@ -237,6 +263,8 @@ public class LayoutLibrary {
 
     /**
      * Returns the API level of the layout library.
+     *
+     * @return the API level or 0 if the library failed to load.
      */
     public int getApiLevel() {
         if (mBridge != null) {
@@ -253,6 +281,8 @@ public class LayoutLibrary {
     /**
      * Returns the revision of the library inside a given (layoutlib) API level.
      * The true version number of the library is {@link #getApiLevel()}.{@link #getRevision()}
+     *
+     * @return the revision number or 0 if the library failed to load.
      */
     public int getRevision() {
         if (mBridge != null) {
@@ -265,18 +295,21 @@ public class LayoutLibrary {
     /**
      * Returns whether the LayoutLibrary supports a given {@link Capability}.
      *
+     * @param capability the capability to check
      * @return true if it supports it.
      * @see Bridge#getCapabilities()
      * @deprecated use {@link #supports(int)}
      */
     @Deprecated
-    public boolean supports(Capability capability) {
+    public boolean supports(@NonNull Capability capability) {
         return supports(capability.ordinal());
     }
 
     /**
      * Returns whether the LayoutLibrary supports a given {@link Features}.
      *
+     * @param capability the feature to check
+     * @return true if it supports it.
      * @see Bridge#supports(int)
      */
     public boolean supports(int capability) {
@@ -327,6 +360,7 @@ public class LayoutLibrary {
     /**
      * Prepares the layoutlib to unloaded.
      *
+     * @return true if success.
      * @see Bridge#dispose()
      */
     public boolean dispose() {
@@ -344,6 +378,7 @@ public class LayoutLibrary {
      * Before taking further actions on the scene, it is recommended to use
      * {@link #supports(int)} to check what the scene can do.
      *
+     * @param params the rendering parameters.
      * @return a new {@link RenderSession} object that contains the result of the scene creation and
      * first rendering or null if {@link #getStatus()} doesn't return {@link LoadStatus#LOADED}.
      * @see Bridge#createSession(SessionParams)
@@ -473,7 +508,12 @@ public class LayoutLibrary {
         return apiLevel;
     }
 
-    private RenderSession createLegacySession(SessionParams params) {
+    /**
+     * @param params the rendering parameters.
+     * @return the result of the action.
+     */
+    @NonNull
+    private RenderSession createLegacySession(@NonNull SessionParams params) {
         if (params.getLayoutDescription() instanceof IXmlPullParser == false) {
             throw new IllegalArgumentException("Parser must be of type ILegacyPullParser");
         }
@@ -574,11 +614,15 @@ public class LayoutLibrary {
         return convertToScene(result);
     }
 
+    /**
+     * @param map the {@link Map} to convert
+     * @return a {@link Map} where the values are {@link IResourceValue} instead of {@link ResourceValue}.
+     */
     @SuppressWarnings("unchecked")
+    @NonNull
     private Map<String, Map<String, IResourceValue>> convertMap(
-            Map<ResourceType, Map<String, ResourceValue>> map) {
-        Map<String, Map<String, IResourceValue>> result =
-                new HashMap<String, Map<String, IResourceValue>>();
+            @NonNull Map<ResourceType, Map<String, ResourceValue>> map) {
+        Map<String, Map<String, IResourceValue>> result = new HashMap<>();
 
         for (Entry<ResourceType, Map<String, ResourceValue>> entry : map.entrySet()) {
             // ugly case but works.
@@ -591,8 +635,12 @@ public class LayoutLibrary {
 
     /**
      * Converts a {@link ILayoutResult} to a {@link RenderSession}.
+     *
+     * @param result the {@link ILayoutResult} to convert
+     * @return the converted {@link RenderSession}
      */
-    private RenderSession convertToScene(ILayoutResult result) {
+    @NonNull
+    private RenderSession convertToScene(@NonNull ILayoutResult result) {
 
         Result sceneResult;
         ViewInfo rootViewInfo = null;
@@ -615,8 +663,12 @@ public class LayoutLibrary {
 
     /**
      * Converts a {@link ILayoutViewInfo} (and its children) to a {@link ViewInfo}.
+     *
+     * @param view the {@link ILayoutViewInfo} to convert
+     * @return the converted {@link ViewInfo}
      */
-    private ViewInfo convertToViewInfo(ILayoutViewInfo view) {
+    @NonNull
+    private ViewInfo convertToViewInfo(@NonNull ILayoutViewInfo view) {
         // create the view info.
         ViewInfo viewInfo = new ViewInfo(view.getName(), view.getViewKey(),
                 view.getLeft(), view.getTop(), view.getRight(), view.getBottom());
@@ -624,7 +676,7 @@ public class LayoutLibrary {
         // then convert the children
         ILayoutViewInfo[] children = view.getChildren();
         if (children != null) {
-            ArrayList<ViewInfo> convertedChildren = new ArrayList<ViewInfo>(children.length);
+            ArrayList<ViewInfo> convertedChildren = new ArrayList<>(children.length);
             for (ILayoutViewInfo child : children) {
                 convertedChildren.add(convertToViewInfo(child));
             }
@@ -655,6 +707,11 @@ public class LayoutLibrary {
         }
     }
 
+    /**
+     * @param viewObject the object for which to return the parent.
+     * @return a {@link Result} indicating the status of the action, and if success, the parent
+     * object in {@link Result#getData()}
+     */
     private Result getViewParentWithReflection(Object viewObject) {
         // default implementation using reflection.
         try {
@@ -702,6 +759,9 @@ public class LayoutLibrary {
         }
     }
 
+    /**
+     * @param info the {@link ViewInfo} to update with extended information.
+     */
     private void addExtendedViewInfo(ViewInfo info) {
         computeExtendedViewInfo(info);
 
@@ -711,7 +771,10 @@ public class LayoutLibrary {
         }
     }
 
-    private void computeExtendedViewInfo(ViewInfo info) {
+    /**
+     * @param info the {@link ViewInfo} to update with extended information.
+     */
+    private void computeExtendedViewInfo(@NonNull ViewInfo info) {
         Object viewObject = info.getViewObject();
         Object params = info.getLayoutParamsObject();
 

@@ -55,9 +55,17 @@ public abstract class MinToolsPackage extends MajorRevisionPackage implements IM
      * This is used to create packages from local directories in which case there must be
      * one archive which URL is the actual target location.
      * <p>
-     * Properties from props are used first when possible, e.g. if props is non null.
+     * Properties from props are used first when possible, e.g. if props is non-null.
      * <p>
      * By design, this creates a package with one and only one archive.
+     *
+     * @param source     The {@link SdkSource} where this is loaded from.
+     * @param props      The properties to parse the package's attributes from.
+     * @param revision   The revision of the package.
+     * @param license    The license of the package, as parsed from its XML.
+     * @param description The description of the package, as parsed from its XML.
+     * @param descUrl    The Url of the package, as parsed from its XML.
+     * @param archiveOsPath The path of the package within its archive.
      */
     public MinToolsPackage(
             SdkSource source,

@@ -39,19 +39,37 @@ import java.util.List;
  * Exception for errors during merging.
  */
 public class MergingException extends Exception {
+    /**
+     * Static sting for display
+     */
     public static final String MULTIPLE_ERRORS = "Multiple errors:";
+    /**
+     * Static string for Error
+     */
     public static final String STRERROR = "Error: ";
+    /** List of messages associated with this exception */
     @NonNull
     private final transient List<Message> mMessages;
-    private String mMessage; // Keeping our own copy since parent prepends exception class name
+    /** Text message describing the exception. Keeping our own copy since parent prepends exception class name */
+    private String mMessage;
+    /** File where the exception occurred */
     private File mFile;
+    /** Line number where the exception occurred (0-based), or -1 if unknown */
     private int mLine = -1;
+    /** Column number where the exception occurred (0-based), or -1 if unknown */
     private int mColumn = -1;
 
+    /**
+     * @param message the message to display
+     */
     public MergingException(@NonNull String message) {
         this(message, null);
     }
 
+    /**
+     * @param message the message to display
+     * @param cause   the original exception. May be null.
+     */
     public MergingException(@NonNull String message, @Nullable Throwable cause) {
         super(message, cause);
         mMessages = new ArrayList<>();
@@ -68,20 +86,37 @@ public class MergingException extends Exception {
         mMessages = ImmutableList.copyOf(messages);
     }
 
+    /**
+     * @param cause the original exception. May be null.
+     * @return a new MergingException
+     */
     public static Builder wrapException(@NonNull Throwable cause) {
         return new Builder().wrapException(cause);
     }
 
+    /**
+     * @param message the error message
+     * @param args    the arguments for the message
+     * @return a new MergingException
+     */
     public static Builder withMessage(@NonNull String message, Object... args) {
         return new Builder().withMessage(message, args);
     }
 
+    /**
+     * @param messages the messages to add to the exception
+     * @throws MergingException If the merge fails
+     */
     public static void throwIfNonEmpty(@NonNull Collection<Message> messages) throws MergingException {
         if (!messages.isEmpty()) {
             throw new MergingException(null, Iterables.toArray(messages, Message.class));
         }
     }
 
+    /**
+     * @param file the file that caused this exception
+     * @return a MergingException with the given file set
+     */
     public MergingException setFile(@NonNull File file) {
         mFile = file;
         return this;
@@ -94,6 +129,10 @@ public class MergingException extends Exception {
         return mLine;
     }
 
+    /**
+     * @param line the 0-based line number, if known, otherwise -1
+     * @return this
+     */
     public MergingException setLine(int line) {
         mLine = line;
         return this;
@@ -106,11 +145,18 @@ public class MergingException extends Exception {
         return mColumn;
     }
 
+    /**
+     * @param column the 0-based column number, if known, otherwise -1
+     * @return this
+     */
     public MergingException setColumn(int column) {
         mColumn = column;
         return this;
     }
 
+    /**
+     * @return the messages that caused this exception
+     */
     @NonNull
     public List<Message> getMessages() {
         return mMessages;
@@ -176,6 +222,9 @@ public class MergingException extends Exception {
         return getMessage();
     }
 
+    /**
+     * Class that helps build a MergingException.
+     */
     public static class Builder {
         @Nullable
         private Throwable mCause = null;
@@ -191,32 +240,56 @@ public class MergingException extends Exception {
         private Builder() {
         }
 
+        /**
+         * @param cause the original exception. May be null.
+         * @return this
+         */
         public Builder wrapException(@NonNull Throwable cause) {
             mCause = cause;
             mOriginalMessageText = Throwables.getStackTraceAsString(cause);
             return this;
         }
 
+        /**
+         * @param file the file associated with the error. May be null.
+         * @return this
+         */
         public Builder withFile(@NonNull File file) {
             mFile = new SourceFile(file);
             return this;
         }
 
+        /**
+         * @param file the file associated with the error. May be null.
+         * @return this
+         */
         public Builder withFile(@NonNull SourceFile file) {
             mFile = file;
             return this;
         }
 
+        /**
+         * @param position the position in the file associated with the error. May be null.
+         * @return this
+         */
         public Builder withPosition(@NonNull SourcePosition position) {
             mPosition = position;
             return this;
         }
 
+        /**
+         * @param messageText the error message
+         * @param args        the arguments for the error message
+         * @return this
+         */
         public Builder withMessage(@NonNull String messageText, @NonNull Object... args) {
             mMessageText = args.length == 0 ? messageText : String.format(messageText, args);
             return this;
         }
 
+        /**
+         * @return the new MergingException instance
+         */
         public MergingException build() {
             if (mCause != null) {
                 if (mMessageText == null) {

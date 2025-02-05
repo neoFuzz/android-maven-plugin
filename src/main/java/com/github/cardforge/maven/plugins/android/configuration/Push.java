@@ -19,10 +19,16 @@ public class Push {
      */
     private String destination;
 
+    /**
+     * @return Mirror of {@link PushMojo}#source
+     */
     public String getSource() {
         return source;
     }
 
+    /**
+     * @return Mirror of {@link PushMojo}#destination
+     */
     public String getDestination() {
         return destination;
     }

@@ -38,6 +38,9 @@ import java.util.StringTokenizer;
  */
 public class Merger {
 
+    /**
+     * @param args the command line arguments
+     */
     public static void main(String[] args) {
         try {
             System.exit(new Merger().process(args));
@@ -47,6 +50,9 @@ public class Merger {
         System.exit(0);
     }
 
+    /**
+     * Display the usage for this tool
+     */
     public static void usage() {
         String sb = "Android Manifest Merger Tool Version 2\n" +
                 "Usage:\n" +
@@ -62,6 +68,11 @@ public class Merger {
         System.out.println(sb);
     }
 
+    /**
+     * @param args the command line arguments
+     * @return 0 if all went well, non-zero otherwise
+     * @throws FileNotFoundException if the main manifest file does not exist
+     */
     public int process(String[] args) throws FileNotFoundException {
 
         Iterator<String> arguments = Arrays.asList(args).iterator();
@@ -193,11 +204,21 @@ public class Merger {
         return 0;
     }
 
+    /**
+     * @param mainManifestFile the main manifest file to merge
+     * @param logger           the logger to use for logging
+     * @return a new invoker instance for merging manifests
+     */
     protected ManifestMerger2.Invoker createInvoker(@NonNull File mainManifestFile,
                                                     @NonNull ILogger logger) {
         return ManifestMerger2.newMerger(mainManifestFile, logger, ManifestMerger2.MergeType.APPLICATION);
     }
 
+    /**
+     * @param path the path to check for existence
+     * @return the file corresponding to the path
+     * @throws FileNotFoundException if the file does not exist
+     */
     @VisibleForTesting
     protected File checkPath(@NonNull String path) throws FileNotFoundException {
         @NonNull File file = new File(path);
@@ -208,6 +229,10 @@ public class Merger {
         return file;
     }
 
+    /**
+     * @param level the log level to use for the logger
+     * @return a new logger instance with the specified log level
+     */
     @VisibleForTesting
     protected ILogger createLogger(@NonNull StdLogger.Level level) {
         return new StdLogger(level);

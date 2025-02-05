@@ -35,6 +35,7 @@ import com.android.sdklib.repository.descriptors.PkgDesc;
 import com.android.utils.GrabProcessOutput;
 import com.android.utils.GrabProcessOutput.IProcessOutput;
 import com.android.utils.GrabProcessOutput.Wait;
+import org.checkerframework.checker.units.qual.N;
 import org.w3c.dom.Node;
 
 import java.io.File;
@@ -103,6 +104,16 @@ public class ToolPackage extends FullRevisionPackage implements IMinPlatformTool
                 .create();
     }
 
+    /**
+     * @param source        The {@link SdkSource} where this is loaded from.
+     * @param props         The properties to parse the package's attributes from.
+     * @param revision      The revision of the {@link ToolPackage} or {@code 0} if this is a
+     *                      local package with no revision.
+     * @param license       The license of the package, which may be {@code null}.
+     * @param description   The description of the package, which may be {@code null}.
+     * @param descUrl       The URL of the package description, which may be {@code null}.
+     * @param archiveOsPath The path of the archive file relative to the package folder.
+     */
     @VisibleForTesting(visibility = Visibility.PRIVATE)
     protected ToolPackage(
             SdkSource source,
@@ -144,7 +155,18 @@ public class ToolPackage extends FullRevisionPackage implements IMinPlatformTool
      * one archive which URL is the actual target location.
      * <p>
      * By design, this creates a package with one and only one archive.
+     *
+     * @param source        The {@link SdkSource} where this is loaded from.
+     * @param props         The properties to parse the package's attributes from.
+     * @param revision      The revision of the {@link ToolPackage} or {@code 0} if this is a
+     *                      local package with no revision.
+     * @param license       The license of the package, which may be {@code null}.
+     * @param description   The description of the package, which may be {@code null}.
+     * @param descUrl       The URL of the package description, which may be {@code null}.
+     * @param archiveOsPath The path of the archive file relative to the package folder.
+     * @return The created {@link ToolPackage}.
      */
+    @NonNull
     public static Package create(
             SdkSource source,
             Properties props,

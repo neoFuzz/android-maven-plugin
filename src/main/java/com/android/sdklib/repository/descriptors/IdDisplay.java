@@ -23,7 +23,13 @@ import com.android.annotations.NonNull;
  */
 public final class IdDisplay implements Comparable<IdDisplay> {
 
+    /**
+     * The immutable tuple (id-string  + display-string.)
+     */
     private final String mId;
+    /**
+     * The immutable tuple (id-string  + display-string.)
+     */
     private final String mDisplay;
 
     /**
@@ -37,11 +43,17 @@ public final class IdDisplay implements Comparable<IdDisplay> {
         mDisplay = display;
     }
 
+    /**
+     * @return The non-null id string.
+     */
     @NonNull
     public String getId() {
         return mId;
     }
 
+    /**
+     * @return The non-null display string.
+     */
     @NonNull
     public String getDisplay() {
         return mDisplay;
@@ -50,6 +62,9 @@ public final class IdDisplay implements Comparable<IdDisplay> {
     /**
      * {@link IdDisplay} instances are the same if they have the same id.
      * The display value is not used for comparison or ordering.
+     *
+     * @param tag The {@link IdDisplay} to compare to this one.
+     * @return 0 if the ids are the same, -1 or 1 if they are different.
      */
     @Override
     public int compareTo(@NonNull IdDisplay tag) {
@@ -58,6 +73,8 @@ public final class IdDisplay implements Comparable<IdDisplay> {
 
     /**
      * Hash code of {@link IdDisplay} instances only rely on the id hash code.
+     *
+     * @return The hash code of the id string.
      */
     @Override
     public int hashCode() {
@@ -67,6 +84,9 @@ public final class IdDisplay implements Comparable<IdDisplay> {
     /**
      * Equality of {@link IdDisplay} instances only rely on the id equality.
      * The display value is not used for comparison or ordering.
+     *
+     * @param obj The object to compare to this one.
+     * @return True if the ids are the same, false otherwise.
      */
     @Override
     public boolean equals(Object obj) {
@@ -75,6 +95,8 @@ public final class IdDisplay implements Comparable<IdDisplay> {
 
     /**
      * Returns a string representation for *debug* purposes only, not for UI display.
+     *
+     * @return A string representation of the tuple.
      */
     @Override
     @NonNull

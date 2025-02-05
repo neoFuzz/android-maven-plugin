@@ -41,14 +41,37 @@ import java.util.Properties;
 public abstract class LocalPkgInfo
         implements IDescription, IListDescription, Comparable<LocalPkgInfo> {
 
+    /**
+     * The local SDK this package is part of.
+     */
     private final LocalSdk mLocalSdk;
+    /**
+     * The local directory where this package is installed.
+     */
     private final File mLocalDir;
+    /**
+     * The source properties for this package.
+     */
     private final Properties mSourceProperties;
 
+    /**
+     * The package object for this local package.
+     */
     private Package mPackage;
+    /**
+     * The error message when loading this package, if any.
+     */
     private String mLoadError;
+    /**
+     * The update information, if any.
+     */
     private RemotePkgInfo mUpdate;
 
+    /**
+     * @param localSdk    The local SDK this package is part of.
+     * @param localDir    The local directory where this package is installed.
+     * @param sourceProps The source properties for this package.
+     */
     protected LocalPkgInfo(@NonNull LocalSdk localSdk,
                            @NonNull File localDir,
                            @NonNull Properties sourceProps) {
@@ -59,21 +82,33 @@ public abstract class LocalPkgInfo
 
     //---- Attributes ----
 
+    /**
+     * @return The package object for this local package.
+     */
     @NonNull
     public LocalSdk getLocalSdk() {
         return mLocalSdk;
     }
 
+    /**
+     * @return The local directory where this package is installed.
+     */
     @NonNull
     public File getLocalDir() {
         return mLocalDir;
     }
 
+    /**
+     * @return The source properties for this package.
+     */
     @NonNull
     public Properties getSourceProperties() {
         return mSourceProperties;
     }
 
+    /**
+     * @return The load error message
+     */
     @Nullable
     public String getLoadError() {
         return mLoadError;
@@ -111,6 +146,7 @@ public abstract class LocalPkgInfo
 
     /**
      * Returns the {@link IPkgDesc} describing this package.
+     * @return The {@link IPkgDesc} describing this package.
      */
     @NonNull
     public abstract IPkgDesc getDesc();
@@ -132,6 +168,8 @@ public abstract class LocalPkgInfo
 
     /**
      * String representation for debugging purposes.
+     *
+     * @return A string representation of this object.
      */
     @Override
     public String toString() {
@@ -150,6 +188,8 @@ public abstract class LocalPkgInfo
      * Computes a hash code specific to this instance based on the underlying
      * {@link IPkgDesc} but also specific local properties such a local directory,
      * update available and actual source properties.
+     *
+     * @return The hash code for this instance.
      */
     @Override
     public int hashCode() {
@@ -168,6 +208,9 @@ public abstract class LocalPkgInfo
      * update available and actual source properties. This is different from
      * the behavior of {@link #compareTo(LocalPkgInfo)} which only uses the
      * {@link IPkgDesc} for ordering.
+     *
+     * @param obj The object to compare with this instance.
+     * @return True if the objects are equal, false otherwise.
      */
     @Override
     public boolean equals(Object obj) {
@@ -214,11 +257,17 @@ public abstract class LocalPkgInfo
      * <p>
      * Operational code should generally ignore broken packages.
      * Only the SDK Updater cares about displaying them so that they can be fixed.
+     *
+     * @return True if this package is broken.
      */
     public boolean hasLoadError() {
         return mLoadError != null;
     }
 
+    /**
+     * @param format A format string for the error message.
+     * @param params Optional parameters to the format string.
+     */
     void appendLoadError(@NonNull String format, Object... params) {
         String loadError = String.format(format, params);
         if (mLoadError == null) {
@@ -228,21 +277,33 @@ public abstract class LocalPkgInfo
         }
     }
 
+    /**
+     * @return The package object for this local package.
+     */
     @Nullable
     public Package getPackage() {
         return mPackage;
     }
 
+    /**
+     * @param pkg The package object for this local package.
+     */
     void setPackage(@Nullable Package pkg) {
         mPackage = pkg;
     }
 
+    /**
+     * @return The package list description for this local package.
+     */
     @NonNull
     @Override
     public String getListDescription() {
         return getDesc().getListDescription();
     }
 
+    /**
+     * @return The package short description for this local package.
+     */
     @Override
     public String getShortDescription() {
         // revisit to differentiate from list-description depending
@@ -250,6 +311,9 @@ public abstract class LocalPkgInfo
         return getListDescription();
     }
 
+    /**
+     * @return The package long description for this local package.
+     */
     @Override
     public String getLongDescription() {
         StringBuilder sb = new StringBuilder();

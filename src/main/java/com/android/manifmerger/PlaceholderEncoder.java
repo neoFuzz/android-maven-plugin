@@ -33,8 +33,6 @@ public class PlaceholderEncoder {
      * Visits a document's entire tree and check each attribute for a placeholder existence. If one
      * is found, encode its name so tools like aapt will not object invalid characters and such.
      *
-     * <p>
-     *
      * @param document the document to visit
      */
     public static void visit(@NonNull Document document) {

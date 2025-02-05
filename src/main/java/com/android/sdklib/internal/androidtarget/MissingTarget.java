@@ -33,14 +33,31 @@ import java.util.Map;
  */
 public class MissingTarget implements IAndroidTarget {
 
+    /**
+     * The vendor of the missing target. Can be null.
+     */
     private final String mVendor;
 
+    /**
+     * The {@link AndroidVersion} of the missing target.
+     */
     private final AndroidVersion mVersion;
 
+    /**
+     * The list of system images for this target.
+     */
     private final List<ISystemImage> mSystemImages = Lists.newArrayList();
 
+    /**
+     * The name of the missing target.
+     */
     private final String mName;
 
+    /**
+     * @param vendor  The vendor of the missing target. Can be null.
+     * @param name    The name of the missing target.
+     * @param version The {@link AndroidVersion} of the missing target.
+     */
     public MissingTarget(String vendor, String name, AndroidVersion version) {
         mVendor = vendor;
         mVersion = version;
@@ -193,6 +210,9 @@ public class MissingTarget implements IAndroidTarget {
         return mSystemImages.toArray(new ISystemImage[mSystemImages.size()]);
     }
 
+    /**
+     * @param image The {@link ISystemImage} to add to this target
+     */
     public void addSystemImage(ISystemImage image) {
         mSystemImages.add(image);
     }

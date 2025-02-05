@@ -31,12 +31,15 @@ public final class UpdateResult {
     private final Set<RemotePkgInfo> mNewPkgs = Sets.newTreeSet();
     private final long mTimestampMs;
 
+    /**
+     * Creates a new empty {@link UpdateResult} object.
+     */
     public UpdateResult() {
         mTimestampMs = System.currentTimeMillis();
     }
 
     /**
-     * Returns the timestamp (in {@link System#currentTimeMillis()} time) when this object was created.
+     * @return the timestamp (in {@link System#currentTimeMillis()} time) when this object was created.
      */
     public long getTimestampMs() {
         return mTimestampMs;

@@ -30,6 +30,10 @@ public class UIAutomatorRemoteAndroidTestRunner {
     private boolean noHup;
     private Object dumpFilePath;
 
+    /**
+     * @param jarFile      the test package file, typically ".jar"
+     * @param remoteDevice the device where the tests will be run
+     */
     public UIAutomatorRemoteAndroidTestRunner(String jarFile, IDevice remoteDevice) {
         this.jarFile = jarFile;
         mRemoteDevice = remoteDevice;
@@ -122,6 +126,11 @@ public class UIAutomatorRemoteAndroidTestRunner {
      * Builds the command line syntax for the instrumentation arguments and executes the command.
      *
      * @param listeners {@link ITestRunListener}s that will receive test results. May be empty.
+     * @throws TimeoutException                  if the command timed out
+     * @throws AdbCommandRejectedException       if adb rejected the command
+     * @throws ShellCommandUnresponsiveException if the shell command doesn't send any output for a period longer than
+     *                                           {@link #setMaxtimeToOutputResponse(int)}
+     * @throws IOException                       if the test run failed to complete due to a device connection problem
      */
     public void run(ITestRunListener... listeners) throws TimeoutException, AdbCommandRejectedException,
             ShellCommandUnresponsiveException, IOException {
@@ -132,6 +141,11 @@ public class UIAutomatorRemoteAndroidTestRunner {
      * Builds the command line syntax for the instrumentation arguments and executes the command.
      *
      * @param listeners {@link ITestRunListener}s that will receive test results. May be empty.
+     * @throws TimeoutException                  if the command timed out
+     * @throws AdbCommandRejectedException       if adb rejected the command
+     * @throws ShellCommandUnresponsiveException if the shell command doesn't send any output for a period longer than
+     *                                           {@link #setMaxtimeToOutputResponse(int)}
+     * @throws IOException                       if the test run failed to complete due to a device connection problem
      */
     public void run(Collection<ITestRunListener> listeners) throws TimeoutException, AdbCommandRejectedException,
             ShellCommandUnresponsiveException, IOException {

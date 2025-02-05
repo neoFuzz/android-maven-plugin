@@ -28,12 +28,16 @@ public interface ManifestDependency extends ManifestProvider {
 
     /**
      * Returns a user friendly name.
+     *
+     * @return the name or null if not known
      */
     @Nullable
     String getName();
 
     /**
      * Returns the direct dependency of this dependency.
+     *
+     * @return a list of dependencies. May be empty but not null.
      */
     @NonNull
     List<? extends ManifestDependency> getManifestDependencies();

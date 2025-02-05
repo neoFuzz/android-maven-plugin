@@ -42,6 +42,9 @@ public class ResourceItem extends DataItem<ResourceFile>
         implements Configurable, Comparable<ResourceItem> {
 
     private final ResourceType mType;
+    /**
+     * The value of the resource as a {@link ResourceValue}.
+     */
     protected ResourceValue mResourceValue;
     private Node mValue;
     private boolean mIgnoredFromDiskMerge = false;
@@ -252,6 +255,9 @@ public class ResourceItem extends DataItem<ResourceFile>
         return resourceFile.getQualifiers();
     }
 
+    /**
+     * @return the {@link Density} of the resource, if applicable, or null otherwise
+     */
     @NonNull
     public DataFile.FileType getSourceType() {
         ResourceFile resourceFile = getSource();
@@ -301,6 +307,10 @@ public class ResourceItem extends DataItem<ResourceFile>
         mResourceValue = null;
     }
 
+    /**
+     * @param isFrameworks Whether this resource is in the framework or not
+     * @return the {@link ResourceValue} for this resource item
+     */
     @Nullable
     public ResourceValue getResourceValue(boolean isFrameworks) {
         if (mResourceValue == null) {
@@ -344,6 +354,7 @@ public class ResourceItem extends DataItem<ResourceFile>
     /**
      * Returns a formatted string usable in an XML to use for the {@link ResourceItem}.
      *
+     * @param type   The type of the resource.
      * @param system Whether this is a system resource or a project resource.
      * @return a string in the format @[type]/[name]
      */
@@ -538,6 +549,10 @@ public class ResourceItem extends DataItem<ResourceFile>
         return value;
     }
 
+    /**
+     * @param declareStyleable the {@link DeclareStyleableResourceValue} to be parsed
+     * @return the {@link DeclareStyleableResourceValue} parsed
+     */
     @NonNull
     private ResourceValue parseDeclareStyleable(
             @NonNull DeclareStyleableResourceValue declareStyleable) {
@@ -566,6 +581,10 @@ public class ResourceItem extends DataItem<ResourceFile>
         return declareStyleable;
     }
 
+    /**
+     * @param value the {@link ResourceValue} to be parsed
+     * @return the {@link ResourceValue} parsed
+     */
     @NonNull
     private ResourceValue parseValue(@NonNull ResourceValue value) {
         String text = getTextNode(mValue.getChildNodes());
@@ -574,6 +593,10 @@ public class ResourceItem extends DataItem<ResourceFile>
         return value;
     }
 
+    /**
+     * @param value the {@link TextResourceValue} to be parsed
+     * @return the {@link TextResourceValue} parsed
+     */
     @NonNull
     private TextResourceValue parseTextValue(@NonNull TextResourceValue value) {
         NodeList children = mValue.getChildNodes();
@@ -599,6 +622,11 @@ public class ResourceItem extends DataItem<ResourceFile>
         return value;
     }
 
+    /**
+     * @param resourceItem the object to be compared.
+     * @return a negative integer, zero, or a positive integer as this object is less than, equal
+     * to, or greater than the specified object.
+     */
     @Override
     public int compareTo(@NonNull ResourceItem resourceItem) {
         int comp = mType.compareTo(resourceItem.getType());
@@ -609,10 +637,16 @@ public class ResourceItem extends DataItem<ResourceFile>
         return comp;
     }
 
+    /**
+     * @return Whether the resource should be ignored from disk merging
+     */
     public boolean getIgnoredFromDiskMerge() {
         return mIgnoredFromDiskMerge;
     }
 
+    /**
+     * @param ignored Whether the resource should be ignored from disk merging
+     */
     public void setIgnoredFromDiskMerge(boolean ignored) {
         mIgnoredFromDiskMerge = ignored;
     }

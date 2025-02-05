@@ -54,12 +54,15 @@ public class FrameworkResources extends ResourceRepository {
     protected final Map<ResourceType, List<ResourceItem>> mPublicResourceMap =
             new EnumMap<>(ResourceType.class);
 
+    /**
+     * @param resFolder the resource folder
+     */
     public FrameworkResources(@NonNull IAbstractFolder resFolder) {
         super(resFolder, true /*isFrameworkRepository*/);
     }
 
     /**
-     * Returns a {@link Collection} (always non null, but can be empty) of <b>public</b>
+     * Returns a {@link Collection} (always non-null, but can be empty) of <b>public</b>
      * {@link ResourceItem} matching a given {@link ResourceType}.
      *
      * @param type the type of the resources to return

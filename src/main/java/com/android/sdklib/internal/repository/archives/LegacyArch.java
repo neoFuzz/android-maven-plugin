@@ -32,19 +32,39 @@ package com.android.sdklib.internal.repository.archives;
  */
 @Deprecated
 public enum LegacyArch {
+    /**
+     * Any architecture.
+     */
     ANY("Any"),
+    /**
+     * PowerPC
+     */
     PPC("PowerPC"),
+    /**
+     * Intel x86
+     */
     X86("x86"),
+    /**
+     * Intel x86_64
+     */
     X86_64("x86_64");
 
+    /**
+     * The UI name of the architecture.
+     */
     private final String mUiName;
 
+    /**
+     * @param uiName the UI name of the architecture. Must not be null nor empty.
+     */
     LegacyArch(String uiName) {
         mUiName = uiName;
     }
 
     /**
      * Returns the UI name of the architecture.
+     *
+     * @return the UI name of the architecture.
      */
     public String getUiName() {
         return mUiName;

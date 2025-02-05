@@ -29,10 +29,31 @@ import com.android.sdklib.repository.descriptors.PkgDesc;
 import java.io.File;
 import java.util.Properties;
 
+/**
+ * Local implementation of {@link ExtraPackage}.
+ *
+ * @see ExtraPackage
+ */
 public class LocalExtraPkgInfo extends LocalPkgInfo {
 
+    /**
+     * The package descriptor.
+     */
     private final @NonNull IPkgDescExtra mDesc;
 
+    /**
+     * @param localSdk    The {@link LocalSdk} this package belongs to.
+     * @param localDir    The root directory of the package.
+     * @param sourceProps The source properties of the package.
+     *                    Must not be null.
+     * @param vendor      The vendor id of the extra. Can be null, in which case
+     *                    the default vendor will be computed.
+     * @param path        The non-null path of the package, relative to the SDK root.
+     * @param displayName The display name of the package. Can be null, in which case
+     *                    the default name will be computed.
+     * @param oldPaths    The list of old paths, if any. Can be empty but not null.
+     * @param revision    The {@link NoPreviewRevision} of the package.
+     */
     public LocalExtraPkgInfo(@NonNull LocalSdk localSdk,
                              @NonNull File localDir,
                              @NonNull Properties sourceProps,
@@ -68,10 +89,10 @@ public class LocalExtraPkgInfo extends LocalPkgInfo {
         // In the past, we used to save the extras in a folder vendor-path,
         // and that "vendor" would end up in the path when we reload the extra from
         // disk. Detect this and compensate.
-        String disp = vendor == null ? null : vendor.getDisplay();
-        if (disp != null && !disp.isEmpty() &&
-                name.startsWith(disp + "-")) {  //$NON-NLS-1$
-            name = name.substring(disp.length() + 1);
+        String displayString = vendor == null ? null : vendor.getDisplay();
+        if (displayString != null && !displayString.isEmpty() &&
+                name.startsWith(displayString + "-")) {  //$NON-NLS-1$
+            name = name.substring(displayString.length() + 1);
         }
 
 
@@ -83,8 +104,8 @@ public class LocalExtraPkgInfo extends LocalPkgInfo {
             name = "Unknown Extra";
         }
 
-        if (disp != null && !disp.isEmpty()) {
-            name = disp + " " + name;  //$NON-NLS-1$
+        if (displayString != null && !displayString.isEmpty()) {
+            name = displayString + " " + name;  //$NON-NLS-1$
             name = name.replaceAll("[ _\t\f-]+", " ").trim();   //$NON-NLS-1$ //$NON-NLS-2$
         }
 
@@ -110,12 +131,18 @@ public class LocalExtraPkgInfo extends LocalPkgInfo {
         return name;
     }
 
+    /**
+     * @return The extra's description. Never null.
+     */
     @NonNull
     @Override
     public IPkgDesc getDesc() {
         return mDesc;
     }
 
+    /**
+     * @return The old paths of the extra, or an empty array if none. Never null.
+     */
     @NonNull
     public String[] getOldPaths() {
         return mDesc.getOldPaths();
@@ -123,6 +150,9 @@ public class LocalExtraPkgInfo extends LocalPkgInfo {
 
     // --- helpers ---
 
+    /**
+     * @return The package from this local package info, or null if not yet parsed.
+     */
     @Nullable
     @Override
     public Package getPackage() {
@@ -130,7 +160,7 @@ public class LocalExtraPkgInfo extends LocalPkgInfo {
         if (pkg == null) {
             try {
                 pkg = ExtraPackage.create(
-                        null,                       //source
+                        null,                //source
                         getSourceProperties(),      //properties
                         mDesc.getVendor().getId(),  //vendor
                         mDesc.getPath(),            //path

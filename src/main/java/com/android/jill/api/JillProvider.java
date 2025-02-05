@@ -29,6 +29,7 @@ public interface JillProvider {
      * Creates a {@link JillConfig} instance for an interface representing a {@link JillConfig} API
      * version.
      *
+     * @param <T> the {@link JillConfig} API interface type
      * @param cls the {@link JillConfig} API interface
      * @return the {@link JillConfig} instance
      * @throws ConfigNotSupportedException If no implementation is found for the given interface.
@@ -39,6 +40,7 @@ public interface JillProvider {
     /**
      * Returns whether an interface representing a {@link JillConfig} API version is supported.
      *
+     * @param <T> the {@link JillConfig} API interface type
      * @param cls the {@link JillConfig} API interface
      * @return <code>true</code> if the config is supported
      */

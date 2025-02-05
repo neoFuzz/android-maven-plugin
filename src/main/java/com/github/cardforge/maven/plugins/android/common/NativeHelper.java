@@ -12,6 +12,7 @@ import org.apache.maven.model.Exclusion;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.project.MavenProject;
+import org.apache.maven.project.ProjectBuildingRequest;
 import org.apache.maven.shared.dependency.graph.DependencyGraphBuilder;
 import org.apache.maven.shared.dependency.graph.DependencyNode;
 import org.apache.maven.shared.dependency.graph.traversal.CollectingDependencyNodeVisitor;
@@ -27,19 +28,43 @@ import static com.github.cardforge.maven.plugins.android.common.AndroidExtension
  */
 public class NativeHelper {
 
+    /**
+     * Message to be displayed when including attached artifacts.
+     */
     public static final String FOR_NATIVE_ARTIFACTS = " for native artifacts";
+    /**
+     * Message to be displayed when including attached artifacts.
+     */
     public static final String INC_ATT_ART = "Including attached artifact: ";
 
+    /**
+     * The Maven project instance.
+     */
     private final MavenProject project;
+    /**
+     * The dependency graph builder instance.
+     */
     private final DependencyGraphBuilder dependencyGraphBuilder;
+    /**
+     * The logger instance.
+     */
     private final Log log;
 
+    /**
+     * @param project                The Maven project instance.
+     * @param dependencyGraphBuilder The dependency graph builder instance.
+     * @param log                    The logger instance.
+     */
     public NativeHelper(MavenProject project, DependencyGraphBuilder dependencyGraphBuilder, Log log) {
         this.project = project;
         this.dependencyGraphBuilder = dependencyGraphBuilder;
         this.log = log;
     }
 
+    /**
+     * @param applicationMakefile The application makefile to retrieve the ABI from.
+     * @return The ABI, or <code>null</code> if not found
+     */
     @Nullable
     public static String[] getAppAbi(@NonNull File applicationMakefile) {
         try (Scanner scanner = new Scanner(applicationMakefile)) {
@@ -137,8 +162,9 @@ public class NativeHelper {
      * If the artifact is legacy and defines no valid architecture, the artifact architecture will
      * default to <strong>armeabi</strong>.
      *
-     * @param ndkArchitecture Architecture to check for match
-     * @param artifact        Artifact to check the classifier match for
+     * @param ndkArchitecture     Architecture to check for match
+     * @param defaultArchitecture Default architecture to use if the artifact does not define one
+     * @param artifact            Artifact to check the classifier match for
      * @return True if the architecture matches, otherwise false
      */
     public static boolean artifactHasHardwareArchitecture(@NonNull Artifact artifact, String ndkArchitecture,
@@ -147,6 +173,13 @@ public class NativeHelper {
                 && ndkArchitecture.equals(extractArchitectureFromArtifact(artifact, defaultArchitecture));
     }
 
+    /**
+     * @param mojo            The mojo to use for logging
+     * @param unpackDirectory The directory to unpack the artifacts to
+     * @param sharedLibraries Whether to include shared libraries or not
+     * @return Set of artifacts to include in the APK
+     * @throws MojoExecutionException If there is a problem resolving the artifacts
+     */
     public Set<Artifact> getNativeDependenciesArtifacts(
             AbstractAndroidMojo mojo, File unpackDirectory, boolean sharedLibraries)
             throws MojoExecutionException {
@@ -221,6 +254,11 @@ public class NativeHelper {
         return filteredArtifacts;
     }
 
+    /**
+     * @param sharedLibraries Whether to include shared libraries or not
+     * @param artifactType    The artifact type to check
+     * @return True if the artifact type is a native library, otherwise false
+     */
     private boolean isNativeLibrary(boolean sharedLibraries, String artifactType) {
         return (sharedLibraries
                 ? Const.ArtifactType.NATIVE_SYMBOL_OBJECT.equals(artifactType)
@@ -228,6 +266,12 @@ public class NativeHelper {
         );
     }
 
+    /**
+     * @param dependencies    The dependencies to process
+     * @param sharedLibraries Whether to include shared libraries or not
+     * @return Set of artifacts to include in the APK
+     * @throws MojoExecutionException If there is a problem resolving the artifacts
+     */
     @NonNull
     private Set<Artifact> processTransitiveDependencies(@NonNull List<Dependency> dependencies, boolean sharedLibraries)
             throws MojoExecutionException {
@@ -244,6 +288,12 @@ public class NativeHelper {
 
     }
 
+    /**
+     * @param dependency      The dependency to process
+     * @param sharedLibraries Whether to include shared libraries or not
+     * @return Set of artifacts to include in the APK
+     * @throws MojoExecutionException If there is a problem resolving the artifacts
+     */
     @NonNull
     private Set<Artifact> processTransitiveDependencies(Dependency dependency, boolean sharedLibraries)
             throws MojoExecutionException {
@@ -265,7 +315,7 @@ public class NativeHelper {
                     new ScopeArtifactFilter("test"))));
             filter.add(optionalFilter);
 
-            final DependencyNode node = dependencyGraphBuilder.buildDependencyGraph(project, filter);
+            final DependencyNode node = dependencyGraphBuilder.buildDependencyGraph((ProjectBuildingRequest) project, filter);
             final CollectingDependencyNodeVisitor collectingVisitor = new CollectingDependencyNodeVisitor();
             node.accept(collectingVisitor);
 

@@ -24,18 +24,31 @@ import com.android.resources.ScreenSize;
  */
 public class ScreenSizeQualifier extends EnumBasedResourceQualifier {
 
+    /**
+     * String used to represent the screen size qualifier.
+     */
     public static final String NAME = "Screen Size";
 
     private ScreenSize mValue = null;
 
 
+    /**
+     * Default constructor
+     * This constructor is used when building a {@link FolderConfiguration} from scratch
+     */
     public ScreenSizeQualifier() {
     }
 
+    /**
+     * @param value the screen size value as a {@link ScreenSize} enum
+     */
     public ScreenSizeQualifier(ScreenSize value) {
         mValue = value;
     }
 
+    /**
+     * @return the screen size value as a {@link ScreenSize} enum
+     */
     public ScreenSize getValue() {
         return mValue;
     }

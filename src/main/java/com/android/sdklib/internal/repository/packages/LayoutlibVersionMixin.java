@@ -47,6 +47,8 @@ public class LayoutlibVersionMixin implements ILayoutlibVersion {
      * <p>
      * The layoutlib element is new in the XSD rev 4, so we need to cope with it missing
      * in earlier XMLs.
+     *
+     * @param pkgNode The XML element to parse.
      */
     public LayoutlibVersionMixin(Node pkgNode) {
 
@@ -66,6 +68,8 @@ public class LayoutlibVersionMixin implements ILayoutlibVersion {
 
     /**
      * Parses the layoutlib version optionally available in the given {@link Properties}.
+     *
+     * @param props The properties to parse.
      */
     public LayoutlibVersionMixin(Properties props) {
         int layoutlibApi = Package.getPropertyInt(props, PkgProps.LAYOUTLIB_API,
@@ -77,6 +81,7 @@ public class LayoutlibVersionMixin implements ILayoutlibVersion {
 
     /**
      * Stores the layoutlib version in the given {@link Properties}.
+     * @param props The properties to store the layoutlib version in.
      */
     void saveProperties(Properties props) {
         if (mLayoutlibVersion.getFirst().intValue() != LAYOUTLIB_API_NOT_SPECIFIED) {
@@ -95,6 +100,7 @@ public class LayoutlibVersionMixin implements ILayoutlibVersion {
      * The second integer is the revision for that given API. It is >= 0
      * and works as a minor revision number, incremented for the same API level.
      *
+     * @return The layoutlib version, as a pair of integers.
      * @since sdk-repository-4.xsd and sdk-addon-2.xsd
      */
     @Override
@@ -102,6 +108,9 @@ public class LayoutlibVersionMixin implements ILayoutlibVersion {
         return mLayoutlibVersion;
     }
 
+    /**
+     * @return The hashcode of the layoutlib version.
+     */
     @Override
     public int hashCode() {
         final int prime = 31;
@@ -110,6 +119,10 @@ public class LayoutlibVersionMixin implements ILayoutlibVersion {
         return result;
     }
 
+    /**
+     * @param obj The object to compare with this instance.
+     * @return True if the objects are equal, false otherwise.
+     */
     @Override
     public boolean equals(Object obj) {
         if (this == obj) {

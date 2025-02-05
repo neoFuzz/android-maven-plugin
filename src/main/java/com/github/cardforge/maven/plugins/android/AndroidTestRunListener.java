@@ -11,9 +11,9 @@ import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.surefire.ObjectFactory;
 import org.apache.maven.surefire.Testsuite;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.JAXBException;
+import jakarta.xml.bind.Marshaller;
 import java.io.File;
 import java.io.IOException;
 import java.text.DecimalFormat;
@@ -453,7 +453,7 @@ public class AndroidTestRunListener implements ITestRunListener {
             exceptionMessages.append(e.getMessage());
         } catch (JAXBException e) {
             threwException = true;
-            exceptionMessages.append("Failed to create jaxb context");
+            exceptionMessages.append("Failed to create jaxb context. ");
             exceptionMessages.append(e.getMessage());
         }
     }

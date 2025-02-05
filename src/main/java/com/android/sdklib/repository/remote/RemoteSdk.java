@@ -54,6 +54,9 @@ public class RemoteSdk {
     private long mSdkSourceTS;
     private DownloadCache mDownloadCache;
 
+    /**
+     * @param settingsController The {@link SettingsController} to use.
+     */
     public RemoteSdk(@NonNull SettingsController settingsController) {
         mSettingsController = settingsController;
         settingsController.registerOnChangedListener((controller, oldSettings) -> {
@@ -215,6 +218,8 @@ public class RemoteSdk {
     /**
      * Returns the {@link DownloadCache}
      * Extracted so that we can override this in unit tests.
+     *
+     * @return A non-null {@link DownloadCache} instance.
      */
     @VisibleForTesting(visibility = Visibility.PRIVATE)
     protected DownloadCache getDownloadCache() {

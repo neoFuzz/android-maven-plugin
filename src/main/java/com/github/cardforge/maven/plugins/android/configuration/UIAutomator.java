@@ -59,50 +59,86 @@ public class UIAutomator {
      */
     private String propertiesKeyPrefix;
 
+    /**
+     * @return the skip
+     */
     public Boolean isSkip() {
         return skip;
     }
 
+    /**
+     * @return the jarFile
+     */
     public String getJarFile() {
         return jarFile;
     }
 
+    /**
+     * @return the testClassOrMethods
+     */
     public String[] getTestClassOrMethods() {
         return testClassOrMethods;
     }
 
+    /**
+     * @return the noHup
+     */
     public Boolean getNoHup() {
         return noHup;
     }
 
+    /**
+     * @return the debug
+     */
     public Boolean getDebug() {
         return debug;
     }
 
+    /**
+     * @return the useDump
+     */
     public Boolean getUseDump() {
         return useDump;
     }
 
+    /**
+     * @return the dumpFilePath
+     */
     public String getDumpFilePath() {
         return dumpFilePath;
     }
 
+    /**
+     * @return the createReport
+     */
     public Boolean isCreateReport() {
         return createReport;
     }
 
+    /**
+     * @return the report suffix
+     */
     public String getReportSuffix() {
         return reportSuffix;
     }
 
+    /**
+     * @return the takeScreenshotOnFailure
+     */
     public Boolean isTakeScreenshotOnFailure() {
         return takeScreenshotOnFailure;
     }
 
+    /**
+     * @return the screenshotsPathOnDevice
+     */
     public String getScreenshotsPathOnDevice() {
         return screenshotsPathOnDevice;
     }
 
+    /**
+     * @return the propertiesKeyPrefix
+     */
     public String getPropertiesKeyPrefix() {
         return propertiesKeyPrefix;
     }

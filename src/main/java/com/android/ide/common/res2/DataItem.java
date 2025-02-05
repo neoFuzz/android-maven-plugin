@@ -176,6 +176,9 @@ public abstract class DataItem<F extends DataFile> {
         return (mStatus & MASK_WRITTEN) != 0;
     }
 
+    /**
+     * @return the status of the item
+     */
     protected int getStatus() {
         return mStatus;
     }
@@ -189,14 +192,27 @@ public abstract class DataItem<F extends DataFile> {
         return getName();
     }
 
+    /**
+     * @param document     the document to create the node with
+     * @param node         the node to add the extra attributes to
+     * @param namespaceUri the namespace URI to use for the attributes
+     */
     void addExtraAttributes(Document document, Node node, @Nullable String namespaceUri) {
         // nothing
     }
 
+    /**
+     * @param document the document to create the node with
+     * @return the adopted node or null if not applicable
+     */
     Node getAdoptedNode(Document document) {
         return null;
     }
 
+    /**
+     * @param o the object to compare to
+     * @return true if the object is equal to this item
+     */
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -215,6 +231,9 @@ public abstract class DataItem<F extends DataFile> {
         return Objects.equals(mSource, dataItem.mSource);
     }
 
+    /**
+     * @return the hash code for this item
+     */
     @Override
     public int hashCode() {
         int result = mName.hashCode();
@@ -222,6 +241,9 @@ public abstract class DataItem<F extends DataFile> {
         return result;
     }
 
+    /**
+     * does nothing
+     */
     protected void wasTouched() {
 
     }

@@ -8,124 +8,162 @@ import java.util.Properties;
 
 /**
  * Configuration for the manifest update. This class is only the definition of the parameters that are shadowed in
- * {@link com.github.cardforge.maven.plugins.android.standalonemojos.ManifestUpdateMojo} and used there.
+ * ManifestUpdateMojo(deprecated) and used there.
  *
  * @author Manfred Moser - manfred@simpligility.com
  * @deprecated Use ManifestMerger {@link ManifestMerger} in
- * combination with {@link com.github.cardforge.maven.plugins.android.standalonemojos.ManifestUpdateMojo}
+ * combination with ManifestUpdateMojo(deprecated)
  */
 @Deprecated(since = "4.8")
 public class Manifest {
     /**
-     * Mirror of {@link com.github.cardforge.maven.plugins.android.standalonemojos.ManifestUpdateMojo}#manifestVersionName.
+     * Mirror of ManifestUpdateMojo(deprecated)#manifestVersionName.
      */
     protected String versionName;
 
     /**
-     * Mirror of {@link com.github.cardforge.maven.plugins.android.standalonemojos.ManifestUpdateMojo}#manifestVersionCode.
+     * Mirror of ManifestUpdateMojo(deprecated)#manifestVersionCode.
      */
     protected Integer versionCode;
     /**
-     * Mirror of {@link com.github.cardforge.maven.plugins.android.standalonemojos.ManifestUpdateMojo
-     * #manifestVersionCodeUpdateFromVersion}.
+     * Mirror of {@code ManifestUpdateMojo#manifestVersionCodeUpdateFromVersion(deprecated)}.
      */
     protected Boolean versionCodeUpdateFromVersion;
     /**
-     * Mirror of {@link com.github.cardforge.maven.plugins.android.standalonemojos.ManifestUpdateMojo}#manifestApplicationIcon.
+     * Mirror of ManifestUpdateMojo(deprecated)#manifestApplicationIcon.
      */
     protected String applicationIcon;
     /**
-     * Mirror of {@link com.github.cardforge.maven.plugins.android.standalonemojos.ManifestUpdateMojo}#manifestApplicationLabel.
+     * Mirror of ManifestUpdateMojo(deprecated)#manifestApplicationLabel.
      */
     protected String applicationLabel;
     /**
-     * Mirror of {@link com.github.cardforge.maven.plugins.android.standalonemojos.ManifestUpdateMojo}#manifestApplicationTheme.
+     * Mirror of ManifestUpdateMojo(deprecated)#manifestApplicationTheme.
      */
     protected String applicationTheme;
     /**
-     * Mirror of {@link com.github.cardforge.maven.plugins.android.standalonemojos.ManifestUpdateMojo}#manifestSharedUserId.
+     * Mirror of ManifestUpdateMojo(deprecated)#manifestSharedUserId.
      */
     protected String sharedUserId;
     /**
-     * Mirror of {@link com.github.cardforge.maven.plugins.android.standalonemojos.ManifestUpdateMojo}#manifestDebuggable.
+     * Mirror of ManifestUpdateMojo(deprecated)#manifestDebuggable.
      */
     protected Boolean debuggable;
     /**
      * Mirror of
-     * {@link com.github.cardforge.maven.plugins.android.standalonemojos.ManifestUpdateMojo}#manifestSupportsScreens
+     * ManifestUpdateMojo(deprecated)#manifestSupportsScreens
      * .
      */
     protected SupportsScreens supportsScreens;
     /**
      * Mirror of
-     * {@link com.github.cardforge.maven.plugins.android.standalonemojos.ManifestUpdateMojo}#manifestCompatibleScreens
+     * ManifestUpdateMojo(deprecated)#manifestCompatibleScreens
      * .
      */
     protected List<CompatibleScreen> compatibleScreens;
     /**
      * Mirror of
-     * {@link com.github.cardforge.maven.plugins.android.standalonemojos.ManifestUpdateMojo}#manifestProviderAuthorities
+     * ManifestUpdateMojo(deprecated)#manifestProviderAuthorities
      * .
      */
     protected Properties providerAuthorities;
     /**
      * Mirror of
-     * {@link com.github.cardforge.maven.plugins.android.standalonemojos.ManifestUpdateMojo}#manifestUsesSdk
+     * ManifestUpdateMojo(deprecated)#manifestUsesSdk
      */
     protected UsesSdk usesSdk;
     /**
-     * Mirror of {@link com.github.cardforge.maven.plugins.android.standalonemojos.ManifestUpdateMojo}#manifestVersionCodeAutoIncrement.
+     * Mirror of ManifestUpdateMojo(deprecated)#manifestVersionCodeAutoIncrement.
      */
     private Boolean versionCodeAutoIncrement;
 
+    /**
+     * @return the versionName
+     */
     public String getVersionName() {
         return versionName;
     }
 
+    /**
+     * @return the versionCode
+     */
     public Integer getVersionCode() {
         return versionCode;
     }
 
+    /**
+     * @return the versionCodeAutoIncrement
+     */
     public Boolean getVersionCodeAutoIncrement() {
         return versionCodeAutoIncrement;
     }
 
+    /**
+     * @return the versionCodeUpdateFromVersion
+     */
     public Boolean getVersionCodeUpdateFromVersion() {
         return versionCodeUpdateFromVersion;
     }
 
+    /**
+     * @return the applicationIcon
+     */
     public String getApplicationIcon() {
         return applicationIcon;
     }
 
+    /**
+     * @return the applicationLabel
+     */
     public String getApplicationLabel() {
         return applicationLabel;
     }
 
+    /**
+     * @return the applicationTheme
+     */
     public String getApplicationTheme() {
         return applicationTheme;
     }
 
+    /**
+     * @return the sharedUserId
+     */
     public String getSharedUserId() {
         return sharedUserId;
     }
 
+    /**
+     * @return the debuggable
+     */
     public Boolean getDebuggable() {
         return debuggable;
     }
 
+    /**
+     * @return the supportsScreens
+     */
     public SupportsScreens getSupportsScreens() {
         return supportsScreens;
     }
 
+    /**
+     * @return the compatibleScreens
+     */
     public List<CompatibleScreen> getCompatibleScreens() {
         return compatibleScreens;
     }
 
+    /**
+     * @return the providerAuthorities
+     */
     public Properties getProviderAuthorities() {
         return providerAuthorities;
     }
 
+    /**
+     * @return the usesSdk
+     */
     public UsesSdk getUsesSdk() {
         return usesSdk;
     }

@@ -33,12 +33,21 @@ import static com.android.manifmerger.ManifestModel.NodeTypes;
  */
 public class OrphanXmlElement extends XmlNode {
 
+    /**
+     * The xml element to wrap.
+     */
     @NonNull
     private final Element mXml;
 
+    /**
+     * The type of the element.
+     */
     @NonNull
     private final NodeTypes mType;
 
+    /**
+     * @param xml the xml element to wrap.
+     */
     public OrphanXmlElement(@NonNull Element xml) {
 
         mXml = Preconditions.checkNotNull(xml);
@@ -64,11 +73,17 @@ public class OrphanXmlElement extends XmlNode {
     /**
      * Returns true if this xml element's {@link NodeTypes} is
      * the passed one.
+     * @param type the {@link NodeTypes} to check for.
+     * @return true if this xml element's {@link NodeTypes} is
+     * the passed one.
      */
     public boolean isA(NodeTypes type) {
         return this.mType == type;
     }
 
+    /**
+     * @return the xml element wrapped by this class.
+     */
     @NonNull
     @Override
     public Element getXml() {
@@ -76,6 +91,9 @@ public class OrphanXmlElement extends XmlNode {
     }
 
 
+    /**
+     * @return the key for this xml element.
+     */
     @NonNull
     @Override
     public NodeKey getId() {
@@ -84,6 +102,9 @@ public class OrphanXmlElement extends XmlNode {
                 : getName() + "#" + getKey());
     }
 
+    /**
+     * @return the name of this xml element.
+     */
     @NonNull
     @Override
     public NodeName getName() {
@@ -92,6 +113,7 @@ public class OrphanXmlElement extends XmlNode {
 
     /**
      * Returns this xml element {@link NodeTypes}
+     * @return the {@link NodeTypes} of this xml element.
      */
     @NonNull
     public NodeTypes getType() {
@@ -101,18 +123,26 @@ public class OrphanXmlElement extends XmlNode {
     /**
      * Returns the unique key for this xml element within the xml file or null if there can be only
      * one element of this type.
+     *
+     * @return the key for this xml element.
      */
     @Nullable
     public String getKey() {
         return mType.getNodeKeyResolver().getKey(mXml);
     }
 
+    /**
+     * @return the source position of this xml element.
+     */
     @NonNull
     @Override
     public SourcePosition getPosition() {
         return SourcePosition.UNKNOWN;
     }
 
+    /**
+     * @return the source file of this xml element.
+     */
     @Override
     @NonNull
     public SourceFile getSourceFile() {

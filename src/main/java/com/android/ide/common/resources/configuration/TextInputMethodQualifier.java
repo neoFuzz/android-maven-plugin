@@ -25,19 +25,31 @@ import com.android.resources.ResourceEnum;
  */
 public final class TextInputMethodQualifier extends EnumBasedResourceQualifier {
 
+    /**
+     * The display name for the Text Input Method qualifier.
+     */
     public static final String NAME = "Text Input Method";
 
     private Keyboard mValue;
 
 
+    /**
+     * Default constructor
+     */
     public TextInputMethodQualifier() {
         // pass
     }
 
+    /**
+     * @param value the keyboard value
+     */
     public TextInputMethodQualifier(Keyboard value) {
         mValue = value;
     }
 
+    /**
+     * @return the keyboard value
+     */
     public Keyboard getValue() {
         return mValue;
     }

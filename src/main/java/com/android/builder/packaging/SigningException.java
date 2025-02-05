@@ -25,14 +25,26 @@ public final class SigningException extends Exception {
     @Serial
     private static final long serialVersionUID = 1L;
 
+    /**
+     * @param format the format string
+     * @param args   the arguments for the format string
+     */
     public SigningException(String format, Object... args) {
         super(String.format(format, args));
     }
 
+    /**
+     * @param cause  the cause of the exception
+     * @param format the format string
+     * @param args   the arguments for the format string
+     */
     public SigningException(Throwable cause, String format, Object... args) {
         super(String.format(format, args), cause);
     }
 
+    /**
+     * @param cause the cause of the exception
+     */
     public SigningException(Throwable cause) {
         super(cause);
     }

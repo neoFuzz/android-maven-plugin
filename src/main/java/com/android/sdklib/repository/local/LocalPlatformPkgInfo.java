@@ -45,11 +45,23 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.*;
 
+/**
+ * Represents an add-on package in the SDK.
+ */
 @SuppressWarnings("ConstantConditions")
 public class LocalPlatformPkgInfo extends LocalPkgInfo {
 
+    /**
+     * The value of the min-sdk-version property in the platform
+     */
     public static final String PROP_VERSION_SDK = "ro.build.version.sdk";      //$NON-NLS-1$
+    /**
+     * The value of the version-release property in the platform
+     */
     public static final String PROP_VERSION_CODENAME = "ro.build.version.codename"; //$NON-NLS-1$
+    /**
+     * The value of the version-release property in the platform
+     */
     public static final String PROP_VERSION_RELEASE = "ro.build.version.release";  //$NON-NLS-1$
     /**
      * List of items in the platform to check when parsing it. These paths are relative to the
@@ -59,14 +71,28 @@ public class LocalPlatformPkgInfo extends LocalPkgInfo {
             SdkConstants.FN_FRAMEWORK_LIBRARY,
             SdkConstants.FN_FRAMEWORK_AIDL,
     };
+    /**
+     * The platform descriptor.
+     */
     @NonNull
     private final IPkgDesc mDesc;
     /**
      * Android target, lazily loaded from #getAndroidTarget
      */
     private IAndroidTarget mTarget;
+    /**
+     * Flag for objects loaded
+     */
     private boolean mLoaded;
 
+    /**
+     * @param localSdk    The {@link LocalSdk} this package belongs to.
+     * @param localDir    The filesystem location where this package is installed.
+     * @param sourceProps The properties to be used for this package.
+     * @param version     The API version of this platform.
+     * @param revision    The revision number of this platform.
+     * @param minToolsRev The minimum tools revision required by this platform.
+     */
     public LocalPlatformPkgInfo(@NonNull LocalSdk localSdk,
                                 @NonNull File localDir,
                                 @NonNull Properties sourceProps,
@@ -100,6 +126,9 @@ public class LocalPlatformPkgInfo extends LocalPkgInfo {
         return null;
     }
 
+    /**
+     * @return The platform descriptor. Never null.
+     */
     @NonNull
     @Override
     public IPkgDesc getDesc() {
@@ -108,12 +137,17 @@ public class LocalPlatformPkgInfo extends LocalPkgInfo {
 
     /**
      * The "path" of a Platform is its Target Hash.
+     *
+     * @return The Target Hash of this platform. Never null.
      */
     @NonNull
     public String getTargetHash() {
         return getDesc().getPath();
     }
 
+    /**
+     * @return The Android target defined in this platform, or null if there is an error
+     */
     @Nullable
     public IAndroidTarget getAndroidTarget() {
         if (!mLoaded) {
@@ -125,10 +159,16 @@ public class LocalPlatformPkgInfo extends LocalPkgInfo {
 
     //-----
 
+    /**
+     * @return True if the platform is loaded.
+     */
     public boolean isLoaded() {
         return mLoaded;
     }
 
+    /**
+     * @return The package as seen by the SDK manager.
+     */
     @Override
     public Package getPackage() {
         Package pkg = super.getPackage();
@@ -157,6 +197,8 @@ public class LocalPlatformPkgInfo extends LocalPkgInfo {
 
     /**
      * Creates the PlatformTarget. Invoked by {@link #getAndroidTarget()}.
+     *
+     * @return The PlatformTarget or null if the platform is not valid.
      */
     @SuppressWarnings("ConstantConditions")
     @Nullable
@@ -409,6 +451,13 @@ public class LocalPlatformPkgInfo extends LocalPkgInfo {
         return found.toArray(new ISystemImage[found.size()]);
     }
 
+    /**
+     * @param apiVersion    The API version to look for.
+     * @param pkg           The package to look at.
+     * @param d             The package description.
+     * @param tagToAbiFound The map of tag to abi found.
+     * @param found         The set of system images found.
+     */
     private void findVersion(AndroidVersion apiVersion, LocalPkgInfo pkg, IPkgDesc d,
                              SetMultimap<IdDisplay, String> tagToAbiFound, Set<ISystemImage> found) {
         if (pkg instanceof LocalSysImgPkgInfo &&
@@ -439,6 +488,7 @@ public class LocalPlatformPkgInfo extends LocalPkgInfo {
      * Parses the skin folder and builds the skin list.
      *
      * @param skinRootFolder The path to the skin root folder.
+     * @return A list of skin folders. Can be empty but not null.
      */
     @NonNull
     protected List<File> parseSkinFolder(@NonNull File skinRootFolder) {

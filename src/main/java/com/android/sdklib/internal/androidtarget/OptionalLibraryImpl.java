@@ -27,14 +27,32 @@ import java.io.File;
  */
 public class OptionalLibraryImpl implements IAndroidTarget.OptionalLibrary {
 
+    /**
+     * The name of the library, as it should be displayed to the user
+     */
     @NonNull
     private final String mLibraryName;
+    /**
+     * The location of the jar file
+     */
     @NonNull
     private final File mJarFile;
+    /**
+     * A description of the library
+     */
     @NonNull
     private final String mDescription;
+    /**
+     * Whether the library is required to be present in the manifest file
+     */
     private final boolean mRequireManifestEntry;
 
+    /**
+     * @param libraryName          the name of the library, as it should be displayed to the user
+     * @param jarFile              the location of the jar file
+     * @param description          a description of the library
+     * @param requireManifestEntry whether the library is required to be present in the manifest file
+     */
     public OptionalLibraryImpl(
             @NonNull String libraryName,
             @NonNull File jarFile,

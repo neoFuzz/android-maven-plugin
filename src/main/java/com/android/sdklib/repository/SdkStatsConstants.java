@@ -98,9 +98,8 @@ public class SdkStatsConstants {
     }
 
     /**
-     * Returns the URI of the sdk-stats schema for the given version number.
-     *
      * @param version Between 1 and {@link #NS_LATEST_VERSION} included.
+     * @return the URI of the sdk-stats schema for the given version number.
      */
     @NonNull
     public static String getSchemaUri(int version) {

@@ -21,7 +21,7 @@ public class DisconnectMojo extends AbstractAndroidMojo {
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
         if (ips.length > 0) {
-            CommandExecutor executor = CommandExecutor.Factory.createDefaultCommmandExecutor();
+            CommandExecutor executor = CommandExecutor.Factory.createDefaultCommandExecutor();
             executor.setLogger(this.getLog());
 
             for (String ip : ips) {

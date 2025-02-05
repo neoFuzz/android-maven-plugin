@@ -2,9 +2,14 @@ package com.github.cardforge.maven.plugins.android;
 
 import com.android.repository.api.ProgressIndicator;
 
-
+/**
+ * Progress indicator implementation.
+ */
 public class ProgressIndicatorImpl implements ProgressIndicator {
 
+    /**
+     * Constructor.
+     */
     public ProgressIndicatorImpl() {
         // empty
     }

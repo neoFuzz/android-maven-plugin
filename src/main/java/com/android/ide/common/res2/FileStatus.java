@@ -20,5 +20,16 @@ package com.android.ide.common.res2;
  * File change state.
  */
 public enum FileStatus {
-    NEW, REMOVED, CHANGED
+    /**
+     * When the file is new
+     */
+    NEW,
+    /**
+     * When the file has been removed
+     */
+    REMOVED,
+    /**
+     * When the file has been changed
+     */
+    CHANGED
 }

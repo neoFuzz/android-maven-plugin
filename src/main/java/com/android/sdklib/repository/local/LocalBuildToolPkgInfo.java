@@ -28,12 +28,28 @@ import com.android.sdklib.repository.descriptors.PkgDesc;
 import java.io.File;
 import java.util.Properties;
 
+/**
+ * Local package info for a build-tool package, such as "build-tools-23.0.0"
+ */
 public class LocalBuildToolPkgInfo extends LocalPkgInfo {
 
 
+    /**
+     * The {@link BuildToolInfo} for this package, if any.
+     */
     private final @Nullable BuildToolInfo mBuildToolInfo;
+    /**
+     * The package descriptor for this build tool package
+     */
     private final @NonNull IPkgDesc mDesc;
 
+    /**
+     * @param localSdk    The {@link LocalSdk} this package belongs to.
+     * @param localDir    The root directory of the package
+     * @param sourceProps The source properties of the package
+     * @param revision    The {@link FullRevision} of the package
+     * @param btInfo      The {@link BuildToolInfo} for this package, if any.
+     */
     public LocalBuildToolPkgInfo(@NonNull LocalSdk localSdk,
                                  @NonNull File localDir,
                                  @NonNull Properties sourceProps,
@@ -44,17 +60,26 @@ public class LocalBuildToolPkgInfo extends LocalPkgInfo {
         mBuildToolInfo = btInfo;
     }
 
+    /**
+     * @return The package descriptor for this build tool package
+     */
     @NonNull
     @Override
     public IPkgDesc getDesc() {
         return mDesc;
     }
 
+    /**
+     * @return The {@link BuildToolInfo} for this package, if any.
+     */
     @Nullable
     public BuildToolInfo getBuildToolInfo() {
         return mBuildToolInfo;
     }
 
+    /**
+     * @return The package object for this local package
+     */
     @Nullable
     @Override
     public Package getPackage() {

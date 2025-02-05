@@ -82,26 +82,39 @@ public enum NodeOperationType implements ConvertibleName {
      * local xml name for overriding uses-sdk operation types.
      */
     static final String OVERRIDE_USES_SDK = "overrideLibrary";
-    // specifies whether the node operation can support an associated {@link Selector}
+    /**
+     * specifies whether the node operation can support an associated {@link Selector}
+     */
     private final boolean mIsSelectable;
 
+    /**
+     * @param isSelectable true if the node operation can support an associated {@link Selector}
+     */
     NodeOperationType(boolean isSelectable) {
         mIsSelectable = isSelectable;
     }
 
     /**
      * Returns true if this operation supports a {@link com.android.manifmerger.Selector}
+     *
+     * @return true if this operation supports a {@link com.android.manifmerger.Selector}
      */
     public boolean isSelectable() {
         return mIsSelectable;
     }
 
+    /**
+     * @return the xml name of the node operation type
+     */
     @Override
     @NonNull
     public String toXmlName() {
         return SdkUtils.constantNameToXmlName(name());
     }
 
+    /**
+     * @return the camel case name of the node operation type
+     */
     @Override
     @NonNull
     public String toCamelCaseName() {
@@ -110,6 +123,8 @@ public enum NodeOperationType implements ConvertibleName {
 
     /**
      * Returns true if the element will override (remove or replace) lower priority elements.
+     *
+     * @return true if the element will override (remove or replace) lower priority elements.
      */
     public boolean isOverriding() {
         return this == REMOVE || this == REMOVE_ALL || this == REPLACE;

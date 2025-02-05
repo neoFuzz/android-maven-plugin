@@ -39,6 +39,11 @@ public class StaticRenderSession extends RenderSession {
     private final List<ViewInfo> mRootViewInfo;
     private final BufferedImage mImage;
 
+    /**
+     * @param result       the result returned by {@code RenderSession#render(boolean)}
+     * @param rootViewInfo the root view returned by {@link RenderSession#getRootViews()}
+     * @param image        the image returned by {@link RenderSession#getImage()}
+     */
     public StaticRenderSession(Result result, ViewInfo rootViewInfo, BufferedImage image) {
         mResult = result;
         mRootViewInfo = Collections.singletonList(rootViewInfo);

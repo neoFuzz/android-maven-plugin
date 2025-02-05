@@ -11,6 +11,9 @@ public final class MavenToPlexusLogAdapter implements Logger {
 
     private final Log delegate;
 
+    /**
+     * @param delegate the Maven logger to adapt
+     */
     public MavenToPlexusLogAdapter(Log delegate) {
         this.delegate = delegate;
     }

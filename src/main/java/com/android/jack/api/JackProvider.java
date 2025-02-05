@@ -29,6 +29,7 @@ public interface JackProvider {
      * Creates a {@link JackConfig} instance for an interface representing a {@link JackConfig} API
      * version.
      *
+     * @param <T> the {@link JackConfig} API interface
      * @param cls the {@link JackConfig} API interface
      * @return the {@link JackConfig} instance
      * @throws ConfigNotSupportedException If no implementation is found for the given interface.
@@ -39,6 +40,7 @@ public interface JackProvider {
     /**
      * Returns whether an interface representing a {@link JackConfig} API version is supported.
      *
+     * @param <T> the {@link JackConfig} API interface
      * @param cls the {@link JackConfig} API interface
      * @return <code>true</code> if the config is supported
      */

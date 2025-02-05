@@ -29,6 +29,7 @@ public interface MergeConsumer<I extends DataItem> {
     /**
      * Called before the merge starts.
      *
+     * @param factory the factory to create XML documents.
      * @throws ConsumerException if the consumer cannot start the merge.
      */
     void start(@NonNull DocumentBuilderFactory factory) throws ConsumerException;
@@ -60,6 +61,10 @@ public interface MergeConsumer<I extends DataItem> {
      */
     void removeItem(@NonNull I removedItem, @Nullable I replacedBy) throws ConsumerException;
 
+    /**
+     * @param item the item to check.
+     * @return true if the item should be ignored by the consumer.
+     */
     boolean ignoreItemInMerge(I item);
 
     /**
@@ -67,6 +72,9 @@ public interface MergeConsumer<I extends DataItem> {
      * as its cause.
      */
     class ConsumerException extends MergingException {
+        /**
+         * @param cause the original exception.
+         */
         public ConsumerException(Throwable cause) {
             super(cause);
         }

@@ -94,6 +94,7 @@ public class SdkSysImgConstants extends RepoConstants {
      * Returns the URI of the sdk-sys-img schema for the given version number.
      *
      * @param version Between 1 and {@link #NS_LATEST_VERSION} included.
+     * @return the URI of the sdk-sys-img schema for the given version number.
      */
     @NonNull
     public static String getSchemaUri(int version) {

@@ -96,17 +96,26 @@ public class SettingsController {
         mSettings = settings;
     }
 
+    /**
+     * @return The current settings. Never null.
+     */
     @NonNull
     public Settings getSettings() {
         return mSettings;
     }
 
+    /**
+     * @param listener The listener to add. If null or already registered, nothing is done.
+     */
     public void registerOnChangedListener(@Nullable OnChangedListener listener) {
         if (listener != null && !mChangedListeners.contains(listener)) {
             mChangedListeners.add(listener);
         }
     }
 
+    /**
+     * @param listener The listener to remove. If null, nothing is done.
+     */
     public void unregisterOnChangedListener(@Nullable OnChangedListener listener) {
         if (listener != null) {
             mChangedListeners.remove(listener);
@@ -288,11 +297,22 @@ public class SettingsController {
         }
     }
 
+    /**
+     * Listener interface for settings changes.
+     */
     public interface OnChangedListener {
+        /**
+         * @param controller  The {@link SettingsController} that has changed settings.
+         * @param oldSettings The old settings.
+         */
         void onSettingsChanged(@NonNull SettingsController controller,
                                @NonNull Settings oldSettings);
     }
 
+    /**
+     * Settings container. This is a simple wrapper around a {@link Properties} instance
+     * that provides typed accessors for the settings.
+     */
     public static class Settings {
         private final Properties mProperties;
 
@@ -305,6 +325,8 @@ public class SettingsController {
 
         /**
          * Duplicates a set of settings.
+         *
+         * @param settings The settings to duplicate.
          */
         public Settings(@NonNull Settings settings) {
             this();
@@ -317,6 +339,8 @@ public class SettingsController {
          * Specialized constructor for unit-tests that wraps an existing
          * {@link Properties} instance. The properties instance is not duplicated,
          * it's merely used as-is and changes will be reflected directly.
+         *
+         * @param properties The {@link Properties} instance to wrap.
          */
         protected Settings(@NonNull Properties properties) {
             mProperties = properties;
@@ -325,6 +349,7 @@ public class SettingsController {
         /**
          * Returns the value of the {@link ISettingsPage#KEY_FORCE_HTTP} setting.
          *
+         * @return True if HTTP should be forced, false otherwise
          * @see ISettingsPage#KEY_FORCE_HTTP
          */
         public boolean getForceHttp() {
@@ -334,6 +359,7 @@ public class SettingsController {
         /**
          * Returns the value of the {@link ISettingsPage#KEY_ASK_ADB_RESTART} setting.
          *
+         * @return True if the user should be asked before restarting ADB, false otherwise
          * @see ISettingsPage#KEY_ASK_ADB_RESTART
          */
         public boolean getAskBeforeAdbRestart() {
@@ -343,6 +369,7 @@ public class SettingsController {
         /**
          * Returns the value of the {@link ISettingsPage#KEY_USE_DOWNLOAD_CACHE} setting.
          *
+         * @return True if the download cache should be used, false otherwise
          * @see ISettingsPage#KEY_USE_DOWNLOAD_CACHE
          */
         public boolean getUseDownloadCache() {
@@ -355,6 +382,7 @@ public class SettingsController {
         /**
          * Returns the value of the {@link ISettingsPage#KEY_SHOW_UPDATE_ONLY} setting.
          *
+         * @return True if only compatible non-obsolete update items should be shown, false otherwise
          * @see ISettingsPage#KEY_SHOW_UPDATE_ONLY
          */
         public boolean getShowUpdateOnly() {
@@ -367,6 +395,7 @@ public class SettingsController {
         /**
          * Returns the value of the {@link ISettingsPage#KEY_ENABLE_PREVIEWS} setting.
          *
+         * @return True if previews should be enabled, false otherwise
          * @see ISettingsPage#KEY_ENABLE_PREVIEWS
          */
         public boolean getEnablePreviews() {
@@ -379,6 +408,7 @@ public class SettingsController {
         /**
          * Returns the value of the {@link ISettingsPage#KEY_MONITOR_DENSITY} setting
          *
+         * @return The monitor density, or -1 if not set or invalid
          * @see ISettingsPage#KEY_MONITOR_DENSITY
          */
         public int getMonitorDensity() {

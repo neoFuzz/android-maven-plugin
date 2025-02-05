@@ -29,6 +29,8 @@ public interface LibraryDependency extends AndroidLibrary, ManifestDependency, S
 
     /**
      * Returns the direct dependency of this dependency. The order is important
+     *
+     * @return a list of dependencies. May be empty but not null.
      */
     @NonNull
     List<LibraryDependency> getDependencies();

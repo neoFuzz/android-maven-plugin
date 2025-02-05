@@ -28,10 +28,23 @@ import com.android.sdklib.repository.descriptors.PkgDesc;
 import java.io.File;
 import java.util.Properties;
 
+/**
+ * Represents a doc package from the local SDK
+ */
 public class LocalDocPkgInfo extends LocalPkgInfo {
 
+    /**
+     * The package descriptor for this doc package
+     */
     private final @NonNull IPkgDesc mDesc;
 
+    /**
+     * @param localSdk    The {@link LocalSdk} this package belongs to.
+     * @param localDir    The local directory where this package is installed.
+     * @param sourceProps The source {@link Properties} of the package from the repository
+     * @param version     The {@link AndroidVersion} of the package.
+     * @param revision    The {@link MajorRevision} of the package.
+     */
     public LocalDocPkgInfo(@NonNull LocalSdk localSdk,
                            @NonNull File localDir,
                            @NonNull Properties sourceProps,
@@ -41,12 +54,18 @@ public class LocalDocPkgInfo extends LocalPkgInfo {
         mDesc = PkgDesc.Builder.newDoc(version, revision).create();
     }
 
+    /**
+     * @return The package descriptor for this doc package
+     */
     @NonNull
     @Override
     public IPkgDesc getDesc() {
         return mDesc;
     }
 
+    /**
+     * @return The package object for this local package
+     */
     @Nullable
     @Override
     public Package getPackage() {

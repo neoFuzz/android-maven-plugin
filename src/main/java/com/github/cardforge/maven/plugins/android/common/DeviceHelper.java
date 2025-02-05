@@ -38,6 +38,7 @@ public class DeviceHelper {
      * AbstractInstrumentationMojo#testCreateReport javadoc since
      * that is the public documentation.
      *
+     * @param device the device to get the identifier for
      * @return the device identifier string
      */
     @NonNull
@@ -70,6 +71,7 @@ public class DeviceHelper {
     }
 
     /**
+     * @param device the device to get the manufacturer for
      * @return the manufacturer of the device as set in #MANUFACTURER_PROPERTY, typically "unknown" for emulators
      */
     @NonNull
@@ -78,6 +80,7 @@ public class DeviceHelper {
     }
 
     /**
+     * @param device the device to get the model for
      * @return the model of the device as set in #MODEL_PROPERTY, typically "sdk" for emulators
      */
     public static String getModel(@NonNull IDevice device) {
@@ -85,6 +88,7 @@ public class DeviceHelper {
     }
 
     /**
+     * @param device the device to get the descriptive name for
      * @return the descriptive name with online/offline/unknown status string appended.
      */
     @NonNull

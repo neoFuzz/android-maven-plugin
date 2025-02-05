@@ -48,8 +48,14 @@ public enum HostOs {
      */
     WINDOWS("Windows");
 
+    /**
+     * The UI name of the OS.
+     */
     private final String mUiName;
 
+    /**
+     * @param uiName The UI name of the OS.
+     */
     HostOs(@NonNull String uiName) {
         mUiName = uiName;
     }
@@ -57,6 +63,7 @@ public enum HostOs {
     /**
      * Returns the enum value matching the given XML name.
      *
+     * @param xmlName The XML name. Can be null or empty.
      * @return A valid {@link HostOs} constnat or null if not a valid XML name.
      */
     @Nullable
@@ -73,6 +80,7 @@ public enum HostOs {
 
     /**
      * Returns the UI name of the OS.
+     * @return The UI name of the OS.
      */
     @NonNull
     public String getUiName() {

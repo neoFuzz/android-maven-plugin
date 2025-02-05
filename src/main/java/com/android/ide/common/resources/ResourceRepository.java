@@ -49,16 +49,42 @@ import static com.android.SdkConstants.*;
  */
 public abstract class ResourceRepository {
 
+    /**
+     * The resource folder of this repository.
+     */
     private final IAbstractFolder mResourceFolder;
+    /**
+     * Whether this repository is for framework resources.
+     */
     private final boolean mFrameworkRepository;
+    /**
+     * Map of {@link ResourceFolderType} to list of folders. It is guaranteed to contain a list for
+     * all possible values of ResourceFolderType.
+     */
     protected Map<ResourceFolderType, List<ResourceFolder>> mFolderMap =
             new EnumMap<>(ResourceFolderType.class);
+    /**
+     * Map of {@link ResourceType} to map of qualified resource name to {@link ResourceItem}. It is
+     * guaranteed to contain a map for all possible values of ResourceType.
+     */
     protected Map<ResourceType, Map<String, ResourceItem>> mResourceMap =
             new EnumMap<>(
                     ResourceType.class);
+    /**
+     * Map of {@link ResourceType} to list of items. It is guaranteed to contain a list for all
+     * possible values of ResourceType.
+     */
     private Map<Map<String, ResourceItem>, Collection<ResourceItem>> mReadOnlyListMap =
             new IdentityHashMap<>();
+    /**
+     * Flag to indicate that the repository is cleared. This is to avoid
+     * infinite loops when the repository is cleared and re-initialized.
+     */
     private boolean mCleared = true;
+    /**
+     * Flag to indicate that the repository is being initialized. This is to avoid
+     * infinite loops when the repository is cleared and re-initialized.
+     */
     private boolean mInitializing = false;
 
     /**
@@ -73,14 +99,23 @@ public abstract class ResourceRepository {
         mFrameworkRepository = isFrameworkRepository;
     }
 
+    /**
+     * @return the resource folder of this repository.
+     */
     public IAbstractFolder getResFolder() {
         return mResourceFolder;
     }
 
+    /**
+     * @return if the repository is for framework resources.
+     */
     public boolean isFrameworkRepository() {
         return mFrameworkRepository;
     }
 
+    /**
+     * Clear out the repository. This is called when the repository is no longer needed.
+     */
     public synchronized void clear() {
         mCleared = true;
         mFolderMap = new EnumMap<>(
@@ -413,6 +448,7 @@ public abstract class ResourceRepository {
      * Returns a list of {@link ResourceFolder} for a specific {@link ResourceFolderType}.
      *
      * @param type The {@link ResourceFolderType}
+     * @return a list of {@link ResourceFolder} or null if none are found.
      */
     @Nullable
     public List<ResourceFolder> getFolders(@NonNull ResourceFolderType type) {
@@ -421,6 +457,9 @@ public abstract class ResourceRepository {
         return mFolderMap.get(type);
     }
 
+    /**
+     * @return a list of all {@link ResourceFolder} in this repository.
+     */
     @NonNull
     public List<ResourceType> getAvailableResourceTypes() {
         ensureInitialized();
@@ -729,6 +768,8 @@ public abstract class ResourceRepository {
 
     /**
      * Returns the sorted list of languages used in the resources.
+     *
+     * @return a sorted list of languages.
      */
     @NonNull
     public SortedSet<String> getLanguages() {
@@ -754,6 +795,7 @@ public abstract class ResourceRepository {
      * Returns the sorted list of regions used in the resources with the given language.
      *
      * @param currentLanguage the current language the region must be associated with.
+     * @return a sorted list of regions.
      */
     @NonNull
     public SortedSet<String> getRegions(@NonNull String currentLanguage) {
@@ -780,6 +822,10 @@ public abstract class ResourceRepository {
         return set;
     }
 
+    /**
+     * @param types the resource types to remove the file from.
+     * @param file  the file to remove.
+     */
     protected void removeFile(@NonNull Collection<ResourceType> types,
                               @NonNull ResourceFile file) {
         ensureInitialized();
@@ -789,6 +835,10 @@ public abstract class ResourceRepository {
         }
     }
 
+    /**
+     * @param type the resource type to remove the file from.
+     * @param file the file to remove.
+     */
     protected void removeFile(@NonNull ResourceType type, @NonNull ResourceFile file) {
         Map<String, ResourceItem> map = mResourceMap.get(type);
         if (map != null) {
@@ -818,6 +868,7 @@ public abstract class ResourceRepository {
      *
      * @param type            the type of the resources.
      * @param referenceConfig the configuration to best match.
+     * @return a map of (resource name, resource value) for the given {@link ResourceType}.
      */
     @NonNull
     private Map<String, ResourceValue> getConfiguredResource(@NonNull ResourceType type,

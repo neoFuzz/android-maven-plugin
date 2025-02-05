@@ -54,15 +54,27 @@ public interface IPkgDesc extends Comparable<IPkgDesc>, IPkgCapabilities, IListD
     @Nullable
     String getListDisplay();
 
+    /**
+     * @return The short description of this package or null.
+     */
     @Nullable
     String getDescriptionShort();
 
+    /**
+     * @return The description URL or null.
+     */
     @Nullable
     String getDescriptionUrl();
 
+    /**
+     * @return The package's {@link License} or null.
+     */
     @Nullable
     License getLicense();
 
+    /**
+     * @return True if this package is obsolete.
+     */
     boolean isObsolete();
 
     /**

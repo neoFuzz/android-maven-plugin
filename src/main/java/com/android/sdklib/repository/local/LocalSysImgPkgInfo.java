@@ -38,9 +38,20 @@ import java.util.Properties;
  */
 public class LocalSysImgPkgInfo extends LocalPkgInfo {
 
-
+    /**
+     * The package descriptor for this system image
+     */
     private final @NonNull IPkgDesc mDesc;
 
+    /**
+     * @param localSdk    The {@link LocalSdk} this package belongs to.
+     * @param localDir    The local directory of the package.
+     * @param sourceProps The source properties of the package.
+     * @param version     The API version of the system image.
+     * @param tag         The tag of the system image. Can be null.
+     * @param abi         The ABI of the system image.
+     * @param revision    The major revision of the system image.
+     */
     public LocalSysImgPkgInfo(@NonNull LocalSdk localSdk,
                               @NonNull File localDir,
                               @NonNull Properties sourceProps,
@@ -55,6 +66,9 @@ public class LocalSysImgPkgInfo extends LocalPkgInfo {
     /**
      * Extracts the tag id &amp; display from the properties.
      * If missing, uses the "default" tag id.
+     *
+     * @param props The properties to extract the tag from.
+     * @return A non-null {@link IdDisplay} object.
      */
     @NonNull
     public static IdDisplay extractTagFromProps(Properties props) {
@@ -97,6 +111,9 @@ public class LocalSysImgPkgInfo extends LocalPkgInfo {
         return name;
     }
 
+    /**
+     * @return The package descriptor for this system image
+     */
     @NonNull
     @Override
     public IPkgDesc getDesc() {

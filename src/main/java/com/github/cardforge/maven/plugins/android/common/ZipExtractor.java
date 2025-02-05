@@ -15,13 +15,26 @@ import java.io.File;
  * Extract an archive to a given location.
  */
 public final class ZipExtractor {
+    /**
+     * Log instance to use for logging
+     */
     private final Log log;
 
+    /**
+     * @param log Log instance to use for logging
+     */
     public ZipExtractor(Log log) {
         this.log = log;
     }
 
-    public void extract(File zipFile, @NonNull File targetFolder, final String suffixToExclude) throws MojoExecutionException {
+    /**
+     * @param zipFile         the archive to extract
+     * @param targetFolder    the target directory to extract to
+     * @param suffixToExclude the suffix to exclude from the archive
+     * @throws MojoExecutionException if there is a problem extracting the archive
+     */
+    public void extract(File zipFile, @NonNull File targetFolder, final String suffixToExclude)
+            throws MojoExecutionException {
         final UnArchiver unArchiver = new ZipUnArchiver(zipFile);
 
         targetFolder.mkdirs();

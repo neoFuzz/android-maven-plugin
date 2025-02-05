@@ -200,8 +200,8 @@ public enum ManifestSystemProperty implements ManifestMerger2.AutoAddingProperty
                 null /* attributeOperationType */));
     }
 
-    // utility method to add an attribute in android namespace which local name is derived from
-    // the enum name().
+    /** utility method to add an attribute in android namespace which local name is derived from
+    // the enum name().*/
     private static void addToElementInAndroidNS(
             @NonNull ManifestSystemProperty manifestSystemProperty,
             @NonNull ActionRecorder actionRecorder,
@@ -229,9 +229,15 @@ public enum ManifestSystemProperty implements ManifestMerger2.AutoAddingProperty
 
     }
 
-    // utility method to create or get an existing use-sdk xml element under manifest.
-    // this could be made more generic by adding more metadata to the enum but since there is
-    // only one case so far, keep it simple.
+    /**
+     * utility method to create or get an existing use-sdk xml element under manifest.
+     * this could be made more generic by adding more metadata to the enum but since there is
+     * only one case so far, keep it simple.
+     *
+     * @param actionRecorder
+     * @param document
+     * @return
+     */
     @NonNull
     private static XmlElement createOrGetUseSdk(
             @NonNull ActionRecorder actionRecorder, @NonNull XmlDocument document) {
@@ -241,6 +247,10 @@ public enum ManifestSystemProperty implements ManifestMerger2.AutoAddingProperty
 
     /**
      * See above for details, similar like for uses-sdk tag
+     *
+     * @param actionRecorder the action recorder to record the action.
+     * @param document       the document to create or get the element from.
+     * @return the created or existing element
      */
     @NonNull
     private static XmlElement createOrGetInstrumentation(
@@ -249,6 +259,13 @@ public enum ManifestSystemProperty implements ManifestMerger2.AutoAddingProperty
                 ManifestModel.NodeTypes.INSTRUMENTATION, "instrumentation injection requested");
     }
 
+    /**
+     * @param actionRecorder the action recorder to record the action.
+     * @param document       the document to create or get the element from.
+     * @param nodeType       the node type to create or get.
+     * @param message        the message to log if the element is created.
+     * @return the created or existing element
+     */
     @NonNull
     private static XmlElement createOrGetElement(
             @NonNull ActionRecorder actionRecorder, @NonNull XmlDocument document,
@@ -278,6 +295,10 @@ public enum ManifestSystemProperty implements ManifestMerger2.AutoAddingProperty
         }
     }
 
+    /**
+     * @param xml the xml element to get the android prefix from.
+     * @return the android prefix for the given element.
+     */
     @NonNull
     private static String getAndroidPrefix(@NonNull Element xml) {
         String toolsPrefix = XmlUtils.lookupNamespacePrefix(
@@ -291,6 +312,9 @@ public enum ManifestSystemProperty implements ManifestMerger2.AutoAddingProperty
         return toolsPrefix;
     }
 
+    /**
+     * @return the name of the enum as a camel case string.
+     */
     public String toCamelCase() {
         return SdkUtils.constantNameToCamelCase(name());
     }

@@ -29,20 +29,36 @@ import java.util.regex.Pattern;
  */
 public class PlaceholderHandler {
 
-    // interesting placeholders names that are documented to be automatically provided.
+    /**
+     * Interesting placeholders names that are documented to be automatically provided.
+     */
     public static final String INSTRUMENTATION_RUNNER = "instrumentationRunner";
+    /**
+     * Static string
+     */
     public static final String PACKAGE_NAME = "packageName";
+    /**
+     * static string
+     */
     public static final String APPLICATION_ID = "applicationId";
+    /**
+     * static string for feature name
+     */
     public static final String FEATURE_NAME = "featureName";
 
-    // regular expression to recognize placeholders like ${name}, potentially surrounded by a
-    // prefix and suffix string. this will split in 3 groups, the prefix, the placeholder name, and
-    // the suffix.
-    // If this pattern is modified, studio ManifestPlaceholderResolver.PLACEHOLDER_PATTERN must be also change
+    /**
+     * regular expression to recognize placeholders like ${name}, potentially surrounded by a
+     * prefix and suffix string. this will split in 3 groups, the prefix, the placeholder name, and
+     * the suffix.
+     * If this pattern is modified, studio ManifestPlaceholderResolver.PLACEHOLDER_PATTERN must be also change
+     */
     static final Pattern PATTERN = Pattern.compile("([^\\$]*)\\$\\{([^\\}]*)\\}(.*)");
 
     /**
      * Returns true if the passed string is a placeholder value, false otherwise.
+     *
+     * @param string the string to check.
+     * @return true if the passed string is a placeholder value, false otherwise.
      */
     public static boolean isPlaceHolder(@NonNull String string) {
         return PATTERN.matcher(string).matches();
@@ -70,6 +86,13 @@ public class PlaceholderHandler {
         visit(severity, xmlDocument.getRootNode(), valueProvider, mergingReportBuilder);
     }
 
+    /**
+     * @param severity             the severity of recorded messages regarding placeholders being found without
+     *                             corresponding values.
+     * @param xmlElement           the xml element to visit
+     * @param valueProvider        the placeholder value provider.
+     * @param mergingReportBuilder to report errors and log actions.
+     */
     private static void visit(
             @NonNull MergingReport.Record.Severity severity,
             @NonNull XmlElement xmlElement,
@@ -151,6 +174,9 @@ public class PlaceholderHandler {
 
         /**
          * Returns a placeholder value for the placeholder key or null if none exists.
+         *
+         * @param key the placeholder key
+         * @return the placeholder value or null if none exists.
          */
         @Nullable
         String getValue(@NonNull T key);

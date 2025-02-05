@@ -28,10 +28,16 @@ import com.android.annotations.NonNull;
  */
 public class MajorRevision extends FullRevision {
 
+    /**
+     * @param fullRevision A non-null {@link FullRevision} to copy from.
+     */
     public MajorRevision(@NonNull FullRevision fullRevision) {
         super(fullRevision.getMajor(), IMPLICIT_MINOR_REV, IMPLICIT_MICRO_REV);
     }
 
+    /**
+     * @param major The major revision number.
+     */
     public MajorRevision(int major) {
         super(major, IMPLICIT_MINOR_REV, IMPLICIT_MICRO_REV);
     }
@@ -52,6 +58,9 @@ public class MajorRevision extends FullRevision {
         return new MajorRevision(r.getMajor());
     }
 
+    /**
+     * @return A short string representation of the revision number.
+     */
     @Override
     public String toString() {
         return super.toShortString();

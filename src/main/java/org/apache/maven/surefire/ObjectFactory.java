@@ -8,9 +8,10 @@
 
 package org.apache.maven.surefire;
 
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.annotation.XmlElementDecl;
-import javax.xml.bind.annotation.XmlRegistry;
+import jakarta.xml.bind.JAXBElement;
+import jakarta.xml.bind.annotation.XmlElementDecl;
+import jakarta.xml.bind.annotation.XmlRegistry;
+
 import javax.xml.namespace.QName;
 
 
@@ -32,10 +33,27 @@ import javax.xml.namespace.QName;
 @XmlRegistry
 public class ObjectFactory {
 
+    /**
+     * Test case skipped
+     */
     private static final QName _TestsuiteTestcaseSkipped_QNAME = new QName("", "skipped");
+    /**
+     * Test case error
+     */
     private static final QName _TestsuiteTestcaseError_QNAME = new QName("", "error");
+    /**
+     * Test case system-out
+     */
     private static final QName _TestsuiteTestcaseSystemOut_QNAME = new QName("", "system-out");
+    /**
+     * Test case system-err
+     */
     private static final QName _TestsuiteTestcaseSystemErr_QNAME = new QName("", "system-err");
+    /**
+     * Test case re-run failure
+     */
+    private static final QName _TestsuiteTestcaseRerunFailure_QNAME =
+            new QName("", "rerunFailure");
 
     /**
      * Create a new ObjectFactory that can be used to create new instances of schema derived classes for package: org.apache.maven.surefire
@@ -46,6 +64,8 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link Testsuite }
+     *
+     * @return A new instance of {@link Testsuite}.
      */
     public Testsuite createTestsuite() {
         return new Testsuite();
@@ -53,6 +73,8 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link Testsuite.Testcase }
+     *
+     * @return A new instance of {@link Testsuite.Testcase}.
      */
     public Testsuite.Testcase createTestsuiteTestcase() {
         return new Testsuite.Testcase();
@@ -60,6 +82,8 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link Testsuite.Properties }
+     *
+     * @return A new instance of {@link Testsuite.Properties}.
      */
     public Testsuite.Properties createTestsuiteProperties() {
         return new Testsuite.Properties();
@@ -67,6 +91,8 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link Testsuite.Testcase.Failure }
+     *
+     * @return A new instance of {@link Testsuite.Testcase.Failure}.
      */
     public Testsuite.Testcase.Failure createTestsuiteTestcaseFailure() {
         return new Testsuite.Testcase.Failure();
@@ -74,6 +100,8 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link Testsuite.Testcase.RerunFailure }
+     *
+     * @return A new instance of {@link Testsuite.Testcase.RerunFailure}.
      */
     public Testsuite.Testcase.RerunFailure createTestsuiteTestcaseRerunFailure() {
         return new Testsuite.Testcase.RerunFailure();
@@ -81,6 +109,8 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link Testsuite.Testcase.Skipped }
+     *
+     * @return A new instance of {@link Testsuite.Testcase.Skipped}.
      */
     public Testsuite.Testcase.Skipped createTestsuiteTestcaseSkipped() {
         return new Testsuite.Testcase.Skipped();
@@ -88,6 +118,8 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link Testsuite.Testcase.Error }
+     *
+     * @return A new instance of {@link Testsuite.Testcase.Error}.
      */
     public Testsuite.Testcase.Error createTestsuiteTestcaseError() {
         return new Testsuite.Testcase.Error();
@@ -95,6 +127,8 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link Testsuite.Properties.Property }
+     *
+     * @return A new instance of {@link Testsuite.Properties.Property}.
      */
     public Testsuite.Properties.Property createTestsuitePropertiesProperty() {
         return new Testsuite.Properties.Property();
@@ -102,6 +136,9 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link JAXBElement }{@code <}{@link Testsuite.Testcase.Skipped }{@code >}}
+     *
+     * @param value The value of the skipped property.
+     * @return A new instance of {@link JAXBElement} with the specified value.
      */
     @XmlElementDecl(namespace = "", name = "skipped", scope = Testsuite.Testcase.class)
     public JAXBElement<Testsuite.Testcase.Skipped> createTestsuiteTestcaseSkipped(Testsuite.Testcase.Skipped value) {
@@ -109,7 +146,21 @@ public class ObjectFactory {
     }
 
     /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link Testsuite.Testcase.RerunFailure }{@code >}}
+     *
+     * @param value The value of the rerunFailure property.
+     * @return A new instance of {@link JAXBElement} with the specified value.
+     */
+    @XmlElementDecl(namespace = "", name = "rerunFailure", scope = Testsuite.Testcase.class)
+    public JAXBElement<Testsuite.Testcase.RerunFailure> createTestsuiteTestcaseRerunFailure(Testsuite.Testcase.RerunFailure value) {
+        return new JAXBElement<>(_TestsuiteTestcaseRerunFailure_QNAME, Testsuite.Testcase.RerunFailure.class, null, value);
+    }
+
+    /**
      * Create an instance of {@link JAXBElement }{@code <}{@link Testsuite.Testcase.Error }{@code >}}
+     *
+     * @param value The value of the error property.
+     * @return A new instance of {@link JAXBElement} with the specified value.
      */
     @XmlElementDecl(namespace = "", name = "error", scope = Testsuite.Testcase.class)
     public JAXBElement<Testsuite.Testcase.Error> createTestsuiteTestcaseError(Testsuite.Testcase.Error value) {
@@ -118,6 +169,9 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link JAXBElement }{@code <}{@link Object }{@code >}}
+     *
+     * @param value The value of the system-out property.
+     * @return A new instance of {@link JAXBElement} with the specified value.
      */
     @XmlElementDecl(namespace = "", name = "system-out", scope = Testsuite.Testcase.class)
     public JAXBElement<Object> createTestsuiteTestcaseSystemOut(Object value) {
@@ -126,6 +180,9 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link JAXBElement }{@code <}{@link Object }{@code >}}
+     *
+     * @param value The value of the system-err property.
+     * @return A new instance of {@link JAXBElement} with the specified value.
      */
     @XmlElementDecl(namespace = "", name = "system-err", scope = Testsuite.Testcase.class)
     public JAXBElement<Object> createTestsuiteTestcaseSystemErr(Object value) {

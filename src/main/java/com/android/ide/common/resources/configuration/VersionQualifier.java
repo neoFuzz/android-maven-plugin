@@ -26,6 +26,10 @@ import java.util.regex.Pattern;
  * Resource Qualifier for Platform Version.
  */
 public final class VersionQualifier extends ResourceQualifier {
+
+    /**
+     * The name of this resource qualifier, "Platform Version"
+     */
     public static final String NAME = "Platform Version";
     /**
      * Default pixel density value. This means the property is not set.
@@ -34,10 +38,16 @@ public final class VersionQualifier extends ResourceQualifier {
     private static final Pattern sVersionPattern = Pattern.compile("^v(\\d+)$");//$NON-NLS-1$
     private int mVersion = DEFAULT_VERSION;
 
+    /**
+     * @param apiLevel the version of the platform as an integer
+     */
     public VersionQualifier(int apiLevel) {
         mVersion = apiLevel;
     }
 
+    /**
+     * Default constructor. The value is set to {@link #DEFAULT_VERSION}.
+     */
     public VersionQualifier() {
         //pass
     }
@@ -76,6 +86,7 @@ public final class VersionQualifier extends ResourceQualifier {
      * {@link #toString()} on a {@link VersionQualifier} object.
      *
      * @param version the value of the qualifier, as returned by {@link #getVersion()}.
+     * @return the string to use as the folder segment
      */
     @NonNull
     public static String getFolderSegment(int version) {
@@ -86,6 +97,9 @@ public final class VersionQualifier extends ResourceQualifier {
         return ""; //$NON-NLS-1$
     }
 
+    /**
+     * @return the version number, or -1 if not set
+     */
     public int getVersion() {
         return mVersion;
     }

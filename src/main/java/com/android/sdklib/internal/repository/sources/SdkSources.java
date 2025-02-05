@@ -52,6 +52,9 @@ public class SdkSources {
     private ArrayList<Runnable> mChangeListeners; // lazily initialized
 
 
+    /**
+     * Default constructor.
+     */
     public SdkSources() {
     }
 
@@ -62,6 +65,9 @@ public class SdkSources {
      * directly. Callers who use {@code add()} are responsible for notifying the listeners once
      * they are done modifying the sources list. The intent is to notify the listeners only once
      * at the end, not for every single addition.
+     *
+     * @param category The category of the source.
+     * @param source   The source to add.
      */
     public void add(SdkSourceCategory category, SdkSource source) {
         synchronized (mSources) {
@@ -80,6 +86,8 @@ public class SdkSources {
      * <p>
      * Callers who remove entries are responsible for notifying the listeners using
      * {@link #notifyChangeListeners()} once they are done modifying the sources list.
+     *
+     * @param source The source to remove.
      */
     public void remove(SdkSource source) {
         synchronized (mSources) {
@@ -104,6 +112,8 @@ public class SdkSources {
      * <p>
      * Callers who remove entries are responsible for notifying the listeners using
      * {@link #notifyChangeListeners()} once they are done modifying the sources list.
+     *
+     * @param category The category of the sources to remove.
      */
     public void removeAll(SdkSourceCategory category) {
         synchronized (mSources) {
@@ -116,6 +126,8 @@ public class SdkSources {
      * categories that are to be always displayed as well as all categories which
      * have at least one source.
      * Might return a empty array, but never returns null.
+     *
+     * @return An array of categories.
      */
     public SdkSourceCategory[] getCategories() {
         ArrayList<SdkSourceCategory> cats = new ArrayList<SdkSourceCategory>();
@@ -139,6 +151,9 @@ public class SdkSources {
     /**
      * Returns a new array of sources attached to the given category.
      * Might return an empty array, but never returns null.
+     *
+     * @param category The category of the sources to return.
+     * @return An array of sources.
      */
     public SdkSource[] getSources(SdkSourceCategory category) {
         synchronized (mSources) {
@@ -152,7 +167,8 @@ public class SdkSources {
     }
 
     /**
-     * Returns true if there are sources for the given category.
+     * @param category The category of the sources to return.
+     * @return true if there are sources for the given category.
      */
     public boolean hasSources(SdkSourceCategory category) {
         synchronized (mSources) {
@@ -162,7 +178,7 @@ public class SdkSources {
     }
 
     /**
-     * Returns an array of the sources across all categories. This is never null.
+     * @return an array of the sources across all categories. This is never null.
      */
     public SdkSource[] getAllSources() {
         synchronized (mSources) {
@@ -208,6 +224,9 @@ public class SdkSources {
      * not identify sources by their URL like {@link #hasSourceUrl(SdkSource)} does.
      * <p>
      * The search is O(N), which should be acceptable on the expectedly small source list.
+     *
+     * @param source The source to look for.
+     * @return The category of the source, or null if not found.
      */
     public SdkSourceCategory getCategory(SdkSource source) {
         if (source != null) {
@@ -231,6 +250,9 @@ public class SdkSources {
      * {@link SdkSource#equals(Object)} which compares the source URLs.
      * <p>
      * The search is O(N), which should be acceptable on the expectedly small source list.
+     *
+     * @param source The source to look for.
+     * @return True if the source is already in the sources list, false otherwise.
      */
     public boolean hasSourceUrl(SdkSource source) {
         synchronized (mSources) {
@@ -254,6 +276,10 @@ public class SdkSources {
      * {@link SdkSource#equals(Object)} which compares the source URLs.
      * <p>
      * The search is O(N), which should be acceptable on the expectedly small source list.
+     *
+     * @param category The category of the source.
+     * @param source   The source to look for.
+     * @return True if the source is already in the sources list, false otherwise.
      */
     public boolean hasSourceUrl(SdkSourceCategory category, SdkSource source) {
         synchronized (mSources) {
@@ -274,6 +300,8 @@ public class SdkSources {
      * by the ones from the property file.
      * <p>
      * This calls {@link #notifyChangeListeners()} at the end of the operation.
+     *
+     * @param log The logger to use for logging errors. Can be null.
      */
     public void loadUserAddons(ILogger log) {
         // Implementation detail: synchronize on the sources list to make sure that

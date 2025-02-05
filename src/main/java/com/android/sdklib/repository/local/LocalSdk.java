@@ -215,8 +215,10 @@ public class LocalSdk {
         mFileOp = fileOp;
     }
 
-    /*
+    /**
      * Returns the current IFileOp being used.
+     *
+     * @return The current IFileOp being used.
      */
     @NonNull
     public IFileOp getFileOp() {
@@ -286,6 +288,7 @@ public class LocalSdk {
      * This does not refresh or reload any package information.
      *
      * @param filters A set of PkgType constants or {@link PkgType#PKG_ALL} to clear everything.
+     * @return True if any of the requested filters have changed.
      */
     public boolean hasChanged(@NonNull EnumSet<PkgType> filters) {
         for (PkgType filter : filters) {
@@ -691,6 +694,8 @@ public class LocalSdk {
      * and/or add-ons.
      * <p>
      * The array can be empty but not null.
+     *
+     * @return An array of {@link IAndroidTarget}. Never null.
      */
     @NonNull
     public IAndroidTarget[] getTargets() {

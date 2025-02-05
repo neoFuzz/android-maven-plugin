@@ -40,6 +40,11 @@ public class ProcessInfoBuilder extends ProcessEnvBuilder<ProcessInfoBuilder> {
     private String mClasspath;
     private String mMain;
 
+    /**
+     * Creates a new ProcessInfoBuilder.
+     *
+     * @see ProcessInfoBuilder#ProcessInfoBuilder()
+     */
     public ProcessInfoBuilder() {
         // nothing to do
     }
@@ -296,12 +301,29 @@ public class ProcessInfoBuilder extends ProcessEnvBuilder<ProcessInfoBuilder> {
     }
 
 
+    /**
+     * Class to hold information about a process.
+     */
     protected static class ProcessInfoImpl implements ProcessInfo {
 
+        /**
+         * The executable to run.
+         */
         private final String mExecutable;
+        /**
+         * The arguments to pass to the process.
+         */
         private final List<String> mArgs;
+        /**
+         * The environment variables to pass to the process.
+         */
         private final Map<String, Object> mEnvironment;
 
+        /**
+         * @param executable  the executable to run
+         * @param args        the arguments to pass to the process
+         * @param environment the environment variables to pass to the process
+         */
         public ProcessInfoImpl(
                 @NonNull String executable,
                 @NonNull List<String> args,
@@ -330,14 +352,39 @@ public class ProcessInfoBuilder extends ProcessEnvBuilder<ProcessInfoBuilder> {
         }
     }
 
+    /**
+     * Class to hold information about a Java process.
+     */
     protected static class JavaProcessInfoImpl implements JavaProcessInfo {
 
+        /**
+         * The classpath to use.
+         */
         private final String mClasspath;
+        /**
+         * The main class to run.
+         */
         private final String mMain;
+        /**
+         * The arguments to pass to the process.
+         */
         private final List<String> mArgs;
+        /**
+         * The environment variables to pass to the process.
+         */
         private final Map<String, Object> mEnvironment;
+        /**
+         * The JVM arguments to pass to the process.
+         */
         private final List<String> mJvmArgs;
 
+        /**
+         * @param classpath   the classpath to use
+         * @param main        the main class to run
+         * @param args        the arguments to pass to the process
+         * @param environment the environment variables to pass to the process
+         * @param jvmArgs     the JVM arguments to pass to the process
+         */
         public JavaProcessInfoImpl(
                 @NonNull String classpath,
                 @NonNull String main,

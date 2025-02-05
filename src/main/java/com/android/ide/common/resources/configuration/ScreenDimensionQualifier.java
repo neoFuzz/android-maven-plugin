@@ -26,6 +26,9 @@ import java.util.regex.Pattern;
  * Resource Qualifier for Screen Dimension.
  */
 public final class ScreenDimensionQualifier extends ResourceQualifier {
+    /**
+     * String for the name of the screen dimension qualifier
+     */
     public static final String NAME = "Screen Dimension";
     /**
      * Default screen size value. This means the property is not set
@@ -49,15 +52,27 @@ public final class ScreenDimensionQualifier extends ResourceQualifier {
      */
     private int mValue2 = DEFAULT_SIZE;
 
+    /**
+     * Creates a new qualifier and initializes it to {@link #DEFAULT_SIZE}
+     */
     public ScreenDimensionQualifier() {
         // pass
     }
 
+    /**
+     * @param value1 the first value of the dimension qualifier
+     * @param value2 the second value of the dimension qualifier
+     */
     public ScreenDimensionQualifier(int value1, int value2) {
         mValue1 = value1;
         mValue2 = value2;
     }
 
+    /**
+     * @param size1 the first value of the dimension qualifier
+     * @param size2 the second value of the dimension qualifier
+     * @return a new {@link ScreenDimensionQualifier} or null if the given values cannot be parsed
+     */
     @Nullable
     public static ScreenDimensionQualifier getQualifier(String size1, String size2) {
         try {
@@ -82,10 +97,16 @@ public final class ScreenDimensionQualifier extends ResourceQualifier {
         return null;
     }
 
+    /**
+     * @return the first value of the dimension qualifier
+     */
     public int getValue1() {
         return mValue1;
     }
 
+    /**
+     * @return the second value of the dimension qualifier
+     */
     public int getValue2() {
         return mValue2;
     }

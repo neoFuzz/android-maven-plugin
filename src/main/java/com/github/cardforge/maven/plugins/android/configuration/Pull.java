@@ -20,10 +20,16 @@ public class Pull {
      */
     private String destination;
 
+    /**
+     * @return Mirror of {@link PullMojo}#source
+     */
     public String getSource() {
         return source;
     }
 
+    /**
+     * @return Mirror of {@link PullMojo}#destination
+     */
     public String getDestination() {
         return destination;
     }

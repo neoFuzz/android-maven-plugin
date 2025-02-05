@@ -25,17 +25,29 @@ import com.android.resources.ScreenOrientation;
  */
 public final class ScreenOrientationQualifier extends EnumBasedResourceQualifier {
 
+    /**
+     * String name of the resource being qualified
+     */
     public static final String NAME = "Screen Orientation";
 
     private ScreenOrientation mValue = null;
 
+    /**
+     * Default constructor
+     */
     public ScreenOrientationQualifier() {
     }
 
+    /**
+     * @param value the screen orientation value as a {@link ScreenOrientation} enum
+     */
     public ScreenOrientationQualifier(ScreenOrientation value) {
         mValue = value;
     }
 
+    /**
+     * @return the screen orientation value as a {@link ScreenOrientation} enum
+     */
     public ScreenOrientation getValue() {
         return mValue;
     }

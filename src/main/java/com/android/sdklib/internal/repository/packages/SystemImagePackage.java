@@ -142,6 +142,14 @@ public class SystemImagePackage extends MajorRevisionPackage
         mAddonVendor = vendor;
     }
 
+    /**
+     * @param platformVersion The {@link AndroidVersion} of the {@link SystemImagePackage}.
+     * @param revision        The revision of the {@link SystemImagePackage} or {@code 0} if this is a
+     *                        local package with no revision.
+     * @param abi             The ABI of the system image. Must not be null nor empty.
+     * @param props           The properties to parse the package's attributes from.
+     * @param localOsPath     The actual location of the directory.
+     */
     @VisibleForTesting(visibility = Visibility.PRIVATE)
     public SystemImagePackage(
             AndroidVersion platformVersion,
@@ -152,6 +160,15 @@ public class SystemImagePackage extends MajorRevisionPackage
         this(null /*source*/, platformVersion, revision, abi, props, localOsPath);
     }
 
+    /**
+     * @param source          The {@link SdkSource} where this is loaded from.
+     * @param platformVersion The {@link AndroidVersion} of the {@link SystemImagePackage}.
+     * @param revision        The revision of the {@link SystemImagePackage} or {@code 0} if this is a
+     *                        local package with no revision.
+     * @param abi             The ABI of the system image. Must not be null nor empty.
+     * @param props           The properties to parse the package's attributes from.
+     * @param localOsPath     The actual location of the directory.
+     */
     @VisibleForTesting(visibility = Visibility.PRIVATE)
     protected SystemImagePackage(
             SdkSource source,
@@ -208,7 +225,8 @@ public class SystemImagePackage extends MajorRevisionPackage
      * @param props  The properties located in {@code abiDir} or null if not found.
      * @return A new {@link BrokenPackage} that represents this installed package.
      */
-    public static Package createBroken(File abiDir, Properties props) {
+    @NonNull
+    public static Package createBroken(@NonNull File abiDir, Properties props) {
         AndroidVersion version = null;
         String abiType = abiDir.getName();
         String error = null;
@@ -324,7 +342,8 @@ public class SystemImagePackage extends MajorRevisionPackage
                 desc);
     }
 
-    private static String getAbiDisplayNameInternal(String abi) {
+    @NonNull
+    private static String getAbiDisplayNameInternal(@NonNull String abi) {
         return abi.replace("armeabi", "ARM EABI")          //$NON-NLS-1$  //$NON-NLS-2$
                 .replace("arm64", "ARM 64")            //$NON-NLS-1$  //$NON-NLS-2$
                 .replace("x86", "Intel x86 Atom")    //$NON-NLS-1$  //$NON-NLS-2$
@@ -359,7 +378,7 @@ public class SystemImagePackage extends MajorRevisionPackage
     }
 
     /**
-     * Returns the tag of the system-image.
+     * @return the tag of the system-image.
      */
     @NonNull
     public IdDisplay getTag() {
@@ -367,14 +386,14 @@ public class SystemImagePackage extends MajorRevisionPackage
     }
 
     /**
-     * Returns the ABI of the system-image. Cannot be null nor empty.
+     * @return the ABI of the system-image. Cannot be null nor empty.
      */
     public String getAbi() {
         return mAbi;
     }
 
     /**
-     * Returns a display-friendly name for the ABI of the system-image.
+     * @return a display-friendly name for the ABI of the system-image.
      */
     public String getAbiDisplayName() {
         return getAbiDisplayNameInternal(mAbi);
@@ -384,6 +403,8 @@ public class SystemImagePackage extends MajorRevisionPackage
      * Returns the version of the platform dependency of this package.
      * <p>
      * A system-image has the same {@link AndroidVersion} as the platform it depends on.
+     *
+     * @return The {@link AndroidVersion} of this package.
      */
     @NonNull
     @Override
@@ -397,6 +418,8 @@ public class SystemImagePackage extends MajorRevisionPackage
      * <p>
      * Returns false if the system-image belongs to an add-on.
      * In this case {@link #getAndroidVersion()} returns a non-null {@link IdDisplay}.
+     *
+     * @return True if this is a platform system-image.
      */
     public boolean isPlatform() {
         return mAddonVendor == null;
@@ -405,6 +428,8 @@ public class SystemImagePackage extends MajorRevisionPackage
     /**
      * Returns the add-on vendor if this is an add-on system image.
      * Returns null if this is a platform system-image.
+     *
+     * @return The add-on vendor or null.
      */
     @Nullable
     public IdDisplay getAddonVendor() {

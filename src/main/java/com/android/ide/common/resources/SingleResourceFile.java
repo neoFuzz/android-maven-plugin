@@ -50,6 +50,10 @@ public class SingleResourceFile extends ResourceFile {
     private final ResourceType mType;
     private final ResourceValue mValue;
 
+    /**
+     * @param file    the underlying resource file.
+     * @param folder  the {@link ResourceFolder} this file belongs to.
+     */
     public SingleResourceFile(IAbstractFile file, ResourceFolder folder) {
         super(file, folder);
 

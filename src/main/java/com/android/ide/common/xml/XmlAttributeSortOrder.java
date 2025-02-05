@@ -29,8 +29,17 @@ import static com.google.common.base.Strings.nullToEmpty;
  * Order to use when sorting attributes
  */
 public enum XmlAttributeSortOrder {
+    /**
+     * No sorting
+     */
     NO_SORTING("none"),     //$NON-NLS-1$
+    /**
+     * Sort attributes alphabetical
+     */
     ALPHABETICAL("alpha"),  //$NON-NLS-1$
+    /**
+     * Sort attributes according to the coding style priority order
+     */
     LOGICAL("logical");     //$NON-NLS-1$
 
     /**
@@ -73,8 +82,14 @@ public enum XmlAttributeSortOrder {
         // then by names.
         return attr1.getName().compareTo(attr2.getName());
     };
+    /**
+     * The key to use in the preferences to specify the sort order
+     */
     public final String key;
 
+    /**
+     * @param key the key to use in the preferences to specify the sort order
+     */
     XmlAttributeSortOrder(String key) {
         this.key = key;
     }

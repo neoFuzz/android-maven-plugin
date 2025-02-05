@@ -30,6 +30,10 @@ public class SdkInfo {
     @NonNull
     private final File mAdb;
 
+    /**
+     * @param annotationJar the location of the annotations jar for compilation targets that are {@code <= 15}.
+     * @param adb           the location of the adb tool.
+     */
     SdkInfo(@NonNull File annotationJar,
             @NonNull File adb) {
         mAnnotationJar = annotationJar;
@@ -37,7 +41,7 @@ public class SdkInfo {
     }
 
     /**
-     * Returns the location of the annotations jar for compilation targets that are {@code <= 15}.
+     * @return the location of the annotations jar for compilation targets that are {@code <= 15}.
      */
     @NonNull
     public File getAnnotationsJar() {
@@ -45,7 +49,7 @@ public class SdkInfo {
     }
 
     /**
-     * Returns the location of the adb tool.
+     * @return the location of the adb tool.
      */
     @NonNull
     public File getAdb() {

@@ -71,6 +71,9 @@ public class SdkAddonConstants extends RepoConstants {
      */
     public static final String NS_URI = getSchemaUri(NS_LATEST_VERSION);
 
+    /**
+     * Private constructor to prevent instantiation.
+     */
     private SdkAddonConstants() {
         super();
         // Not instantiable
@@ -91,6 +94,7 @@ public class SdkAddonConstants extends RepoConstants {
      * Returns the URI of the sdk-addon schema for the given version number.
      *
      * @param version Between 1 and {@link #NS_LATEST_VERSION} included.
+     * @return The URI of the schema.
      */
     @NonNull
     public static String getSchemaUri(int version) {

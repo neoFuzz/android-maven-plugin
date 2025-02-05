@@ -58,26 +58,39 @@ import java.util.*;
 @Deprecated(since = "4.7.0")
 public class UpdaterData implements IUpdaterData {
 
+    /** Constant indicating no tools message */
     public static final int NO_TOOLS_MSG = 0;
+
+    /** Constant indicating tools were updated from ADT */
     public static final int TOOLS_MSG_UPDATED_FROM_ADT = 1;
+
+    /** Constant indicating tools were updated from SDK Manager */
     public static final int TOOLS_MSG_UPDATED_FROM_SDKMAN = 2;
+
+    /** Parser for the local SDK */
     private final LocalSdkParser mLocalSdkParser = new LocalSdkParser();
     /**
      * Holds all sources. Do not use this directly.
-     * Instead use {@link #getSources()} so that unit tests can override this as needed.
+     * Instead, use {@link #getSources()} so that unit tests can override this as needed.
      */
     private final SdkSources mSources = new SdkSources();
     /**
      * Holds settings. Do not use this directly.
-     * Instead use {@link #getSettingsController()} so that unit tests can override this.
+     * Instead ,use {@link #getSettingsController()} so that unit tests can override this.
      */
     private final SettingsController mSettingsController;
+    /** List of listeners to be notified when SDK changes occur */
     private final ArrayList<ISdkChangeListener> mListeners = new ArrayList<>();
+    /** Logger for SDK-related messages and operations */
     private final ILogger mSdkLog;
+    /** The OS-specific path to the SDK root directory */
     private String mOsSdkRoot;
+    /** Factory for creating SDK management tasks */
     private ITaskFactory mTaskFactory;
 
+    /** Manager for SDK packages and components */
     private SdkManager mSdkManager;
+    /** Manager for Android Virtual Devices (AVDs) */
     private AvdManager mAvdManager;
     /**
      * The current {@link PackageLoader} to use.
@@ -89,6 +102,9 @@ public class UpdaterData implements IUpdaterData {
      * Lazily created in {@link #getDownloadCache()}.
      */
     private DownloadCache mDownloadCache;
+    /**
+     * Error from  the AVD manager initialization.
+     */
     private AndroidLocationException mAvdManagerInitError;
 
     /**
@@ -110,6 +126,8 @@ public class UpdaterData implements IUpdaterData {
     /**
      * Computes the transitive dependencies of the given list of archives. This will only
      * include dependencies that also need to be installed, not satisfied dependencies.
+     * @param archives The archives to compute the dependencies for.
+     * @return The transitive dependencies of the given archives.
      */
     private static List<ArchiveInfo> getDependencies(@NonNull List<ArchiveInfo> archives) {
         List<ArchiveInfo> dependencies = Lists.newArrayList();
@@ -119,6 +137,11 @@ public class UpdaterData implements IUpdaterData {
         return dependencies;
     }
 
+    /**
+     * @param dependencies The list of dependencies to add to.
+     * @param archive      The archive to add dependencies for.
+     * @param visited      The set of archives already visited.
+     */
     private static void addDependencies(@NonNull List<ArchiveInfo> dependencies,
                                         @NonNull ArchiveInfo archive,
                                         @NonNull Set<ArchiveInfo> visited) {
@@ -138,6 +161,9 @@ public class UpdaterData implements IUpdaterData {
         }
     }
 
+    /**
+     * @return The OS path to the SDK root.
+     */
     public String getOsSdkRoot() {
         return mOsSdkRoot;
     }
@@ -153,19 +179,31 @@ public class UpdaterData implements IUpdaterData {
         return mDownloadCache;
     }
 
+    /**
+     * @return The task factory to use. Cannot be null.
+     */
     @Override
     public ITaskFactory getTaskFactory() {
         return mTaskFactory;
     }
 
+    /**
+     * @param taskFactory The task factory to use. Cannot be null.
+     */
     public void setTaskFactory(ITaskFactory taskFactory) {
         mTaskFactory = taskFactory;
     }
 
+    /**
+     * @return The sources to use. Never null.
+     */
     public SdkSources getSources() {
         return mSources;
     }
 
+    /**
+     * @return The local SDK parser to use. Never null.
+     */
     public LocalSdkParser getLocalSdkParser() {
         return mLocalSdkParser;
     }
@@ -180,6 +218,9 @@ public class UpdaterData implements IUpdaterData {
         return mSdkManager;
     }
 
+    /**
+     * @param sdkManager sdk-manager instance to use
+     */
     @VisibleForTesting(visibility = Visibility.PRIVATE)
     protected void setSdkManager(SdkManager sdkManager) {
         mSdkManager = sdkManager;
@@ -197,6 +238,8 @@ public class UpdaterData implements IUpdaterData {
 
     /**
      * Adds a listener ({@link ISdkChangeListener}) that is notified when the SDK is reloaded.
+     *
+     * @param listener The listener to add.
      */
     public void addListeners(ISdkChangeListener listener) {
         if (mListeners.contains(listener) == false) {
@@ -206,6 +249,8 @@ public class UpdaterData implements IUpdaterData {
 
     /**
      * Removes a listener ({@link ISdkChangeListener}) that is notified when the SDK is reloaded.
+     *
+     * @param listener The listener to remove.
      */
     public void removeListener(ISdkChangeListener listener) {
         mListeners.remove(listener);
@@ -213,6 +258,9 @@ public class UpdaterData implements IUpdaterData {
 
     // -----
 
+    /**
+     * @return The package loader to use.
+     */
     public PackageLoader getPackageLoader() {
         // The package loader is lazily initialized here.
         if (mPackageLoader == null) {
@@ -251,6 +299,9 @@ public class UpdaterData implements IUpdaterData {
         return false;
     }
 
+    /**
+     * @param error The error message to display.
+     */
     protected void displayInitError(String error) {
         mSdkLog.error(null /* Throwable */, "%s", error);  //$NON-NLS-1$
     }
@@ -295,6 +346,8 @@ public class UpdaterData implements IUpdaterData {
     /**
      * Initializes the {@link SettingsController}
      * Extracted so that we can override this in unit tests.
+     *
+     * @return A new {@link SettingsController} instance.
      */
     @VisibleForTesting(visibility = Visibility.PRIVATE)
     protected SettingsController initSettingsController() {
@@ -392,6 +445,9 @@ public class UpdaterData implements IUpdaterData {
      * <p>
      * The package list is cached in the {@link LocalSdkParser} and will be reset when
      * {@link #reloadSdk()} is invoked.
+     *
+     * @param monitor The progress monitor to use.
+     * @return The list of installed packages. Can be empty but not null.
      */
     public Package[] getInstalledPackages(ITaskMonitor monitor) {
         LocalSdkParser parser = getLocalSdkParser();
@@ -594,6 +650,8 @@ public class UpdaterData implements IUpdaterData {
      * <p>
      * If the "ask before restart" setting is set (the default), prompt the user whether
      * now is a good time to restart ADB.
+     *
+     * @param monitor The progress monitor to use.
      */
     protected void askForAdbRestart(ITaskMonitor monitor) {
         // Restart ADB if we don't need to ask.
@@ -604,6 +662,9 @@ public class UpdaterData implements IUpdaterData {
         }
     }
 
+    /**
+     * @param flags Optional flags for the installer, such as {@link #NO_TOOLS_MSG}.
+     */
     protected void notifyToolsNeedsToBeRestarted(int flags) {
 
         String msg = null;
@@ -1244,6 +1305,8 @@ public class UpdaterData implements IUpdaterData {
     /**
      * Internal helper to return a new {@link ArchiveInstaller}.
      * This allows us to override the installer for unit-testing.
+     *
+     * @return A new {@link ArchiveInstaller} instance.
      */
     @VisibleForTesting(visibility = Visibility.PRIVATE)
     protected ArchiveInstaller createArchiveInstaler() {

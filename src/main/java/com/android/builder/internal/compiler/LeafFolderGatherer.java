@@ -27,14 +27,24 @@ import java.util.Set;
  */
 public class LeafFolderGatherer implements SourceSearcher.SourceFileProcessor {
 
+    /**
+     * Set of folders containing source files.
+     */
     @NonNull
     private final Set<File> mFolders = Sets.newHashSet();
 
+    /**
+     * @param sourceFolder the root folder where the file is located.
+     * @param sourceFile   the file to process.
+     */
     @Override
     public void processFile(@NonNull File sourceFolder, @NonNull File sourceFile) {
         mFolders.add(sourceFile.getParentFile());
     }
 
+    /**
+     * @return the set of folders containing source files.
+     */
     @NonNull
     public Set<File> getFolders() {
         return mFolders;

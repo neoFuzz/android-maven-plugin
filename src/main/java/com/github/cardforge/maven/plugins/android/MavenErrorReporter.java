@@ -31,6 +31,10 @@ public class MavenErrorReporter extends ErrorReporter implements MessageReceiver
     @NonNull
     private final EvaluationMode mMode;
 
+    /**
+     * @param logger the logger to be used for logging errors
+     * @param mMode  the evaluation mode for the error reporter
+     */
     public MavenErrorReporter(ILogger logger, @NonNull EvaluationMode mMode) {
         super(mMode);
         this.logger = logger;
@@ -43,28 +47,53 @@ public class MavenErrorReporter extends ErrorReporter implements MessageReceiver
         return mMode;
     }
 
+    /**
+     * @param data the data associated with the error, e.g. a file path
+     * @param type the type of error
+     * @param msg  the error message
+     * @return a new SyncIssue object representing the error
+     */
     @NonNull
     public SyncIssue handleSyncError(@NonNull String data, int type, @NonNull String msg) {
         return new SyncIssueImpl(0, type, data, msg);
     }
 
+    /**
+     * @param data the data to be received
+     * @param type the type of the issue
+     * @param i1   the severity of the issue
+     * @param msg  the message to be received
+     * @return a new SyncIssue object with the given parameters
+     */
     public SyncIssue handleIssue(String data, int type, int i1, String msg) {
         logger.info("Sync Error.  Data: " + data + "\tmsg: " + msg);
         return new SyncIssueImpl(0, type, data, msg);
     }
 
+    /**
+     * @param message the message to be received
+     */
     public void receiveMessage(@NonNull Message message) {
         logger.info(message.toString());
     }
 
 }
 
+/**
+ * Implementation of the SyncIssue interface to represent a sync issue.
+ */
 class SyncIssueImpl implements SyncIssue {
     private int severity;
     private int type;
     private String data;
     private String message;
 
+    /**
+     * @param severity the severity of the issue
+     * @param type     the type of the issue
+     * @param data     the data associated with the issue
+     * @param message  the message describing the issue
+     */
     SyncIssueImpl(int severity, int type, String data, String message) {
         this.severity = severity;
         this.type = type;

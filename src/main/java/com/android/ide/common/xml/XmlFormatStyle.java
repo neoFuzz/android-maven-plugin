@@ -56,6 +56,10 @@ public enum XmlFormatStyle {
      */
     MANIFEST;
 
+    /**
+     * @param node the node to determine the style for
+     * @return the style to use when printing the given node
+     */
     @NonNull
     public static XmlFormatStyle get(@Nullable Node node) {
         if (node != null) {

@@ -37,11 +37,11 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <maven-plugin-plugin.version>3.15.1</maven-plugin-plugin.version>
         <maven.api.version>3.6.0</maven.api.version>
-        <takari.test.version>2.9.1</takari.test.version>
+        <takari.test.version>3.0.5</takari.test.version>
         <easymock.version>3.4</easymock.version>
         <powermock.version>2.0.9</powermock.version>
         <publisher.version>v2-rev13-1.19.0</publisher.version>
-        <asm.version>5.0.4</asm.version>
+        <asm.version>9.7.1</asm.version>
         <!-- Attention - make sure that the tools version is the versions of
           the transitive dependencies of the builder version -->
         <android.builder.version>7.3.0</android.builder.version>
@@ -109,18 +109,9 @@
         </developer>
     </developers>
 
-    <prerequisites>
-        <!-- define the version need to run this plugin -->
-        <maven>3.7.0</maven>
-    </prerequisites>
 
     <dependencyManagement>
         <dependencies>
-            <dependency>
-                <groupId>org.codehaus.plexus</groupId>
-                <artifactId>plexus-archiver</artifactId>
-                <version>4.10.0</version>
-            </dependency>
             <dependency>
                 <groupId>com.android.tools</groupId>
                 <artifactId>common</artifactId>
@@ -199,6 +190,11 @@
             </dependency>
             <dependency>
                 <groupId>org.codehaus.plexus</groupId>
+                <artifactId>plexus-archiver</artifactId>
+                <version>4.10.0</version>
+            </dependency>
+            <dependency>
+                <groupId>org.codehaus.plexus</groupId>
                 <artifactId>plexus-utils</artifactId>
                 <version>3.1.0</version>
             </dependency>
@@ -220,6 +216,12 @@
             <dependency>
                 <groupId>jakarta.xml.bind</groupId>
                 <artifactId>jaxb-api</artifactId>
+                <version>2.3.5</version>
+            </dependency>
+            <dependency>
+                <groupId>jakarta.xml.bind</groupId>
+                <artifactId>jakarta.xml.bind-api</artifactId>
+                <version>4.0.2</version>
             </dependency>
 
             <!--  managed since its transitive from SDK and others -->
@@ -251,7 +253,7 @@
             <dependency>
                 <groupId>org.apache.maven.shared</groupId>
                 <artifactId>maven-dependency-tree</artifactId>
-                <version>2.2</version>
+                <version>3.2.1</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -266,45 +268,32 @@
 
             <!-- test deps -->
             <dependency>
-                <groupId>junit</groupId>
-                <artifactId>junit</artifactId>
-                <version>4.12</version>
+                <groupId>org.junit.jupiter</groupId>
+                <artifactId>junit-jupiter</artifactId>
+                <version>5.10.0</version>
             </dependency>
             <dependency>
-                <groupId>org.easytesting</groupId>
-                <artifactId>fest-reflect</artifactId>
-                <version>1.4.1</version>
-            </dependency>
-            <dependency>
-                <groupId>org.easymock</groupId>
-                <artifactId>easymock</artifactId>
-                <version>${easymock.version}</version>
+                <groupId>org.mockito</groupId>
+                <artifactId>mockito-core</artifactId>
+                <version>5.14.2</version>
                 <scope>test</scope>
             </dependency>
             <dependency>
-                <groupId>org.powermock</groupId>
-                <artifactId>powermock-module-junit4</artifactId>
-                <version>${powermock.version}</version>
+                <groupId>org.mockito</groupId>
+                <artifactId>mockito-inline</artifactId>
+                <version>5.5.0</version>
+                <scope>test</scope>
             </dependency>
             <dependency>
-                <groupId>org.powermock</groupId>
-                <artifactId>powermock-api-easymock</artifactId>
-                <version>${powermock.version}</version>
+                <groupId>org.assertj</groupId>
+                <artifactId>assertj-core</artifactId>
+                <version>3.24.2</version>
+                <scope>test</scope>
             </dependency>
             <dependency>
-                <groupId>org.powermock</groupId>
-                <artifactId>powermock-api-support</artifactId>
-                <version>${powermock.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.powermock</groupId>
-                <artifactId>powermock-reflect</artifactId>
-                <version>${powermock.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.powermock</groupId>
-                <artifactId>powermock-core</artifactId>
-                <version>${powermock.version}</version>
+                <groupId>org.objenesis</groupId>
+                <artifactId>objenesis</artifactId>
+                <version>3.2</version>
             </dependency>
             <dependency>
                 <groupId>com.google.apis</groupId>
@@ -509,13 +498,19 @@
         <dependency>
             <groupId>jakarta.xml.bind</groupId>
             <artifactId>jakarta.xml.bind-api</artifactId>
-            <version>2.3.3</version>
+            <version>4.0.2</version>
         </dependency>
         <dependency>
-            <groupId>com.sun.xml.bind</groupId>
-            <artifactId>jaxb-impl</artifactId>
-            <version>2.3.3</version>
-            <scope>runtime</scope>
+            <groupId>org.glassfish.jaxb</groupId>
+            <artifactId>jaxb-core</artifactId>
+            <version>4.0.2</version>
+        </dependency>
+
+        <!-- JAXB Runtime (the actual implementation) -->
+        <dependency>
+            <groupId>org.glassfish.jaxb</groupId>
+            <artifactId>jaxb-runtime</artifactId>
+            <version>4.0.2</version>
         </dependency>
 
         <!-- test deps -->
@@ -533,8 +528,8 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -544,38 +539,23 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.easytesting</groupId>
-            <artifactId>fest-reflect</artifactId>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.easymock</groupId>
-            <artifactId>easymock</artifactId>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.powermock</groupId>
-            <artifactId>powermock-module-junit4</artifactId>
+            <groupId>org.assertj</groupId>
+            <artifactId>assertj-core</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.powermock</groupId>
-            <artifactId>powermock-api-easymock</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.powermock</groupId>
-            <artifactId>powermock-api-support</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.powermock</groupId>
-            <artifactId>powermock-reflect</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.powermock</groupId>
-            <artifactId>powermock-core</artifactId>
+            <groupId>org.objenesis</groupId>
+            <artifactId>objenesis</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -708,6 +688,8 @@
                         <manifestEntries>
                             <Build-Source-Version>17</Build-Source-Version>
                             <Build-Target-Version>17</Build-Target-Version>
+                            <Add-Opens>java.base/java.lang java.base/java.util java.base/java.net java.base/java.io
+                            </Add-Opens>
                         </manifestEntries>
                     </archive>
                 </configuration>
@@ -778,7 +760,18 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
+                <version>3.3.1</version>
                 <configuration>
+                    <argLine>
+                        --add-modules java.base
+                        -Djdk.net.URLClassPath.disableClassPathURLCheck=true
+                        --add-opens java.base/java.lang=ALL-UNNAMED
+                        --add-opens java.base/java.util=ALL-UNNAMED
+                        --add-opens java.base/java.net=ALL-UNNAMED
+                        --add-opens java.base/java.io=ALL-UNNAMED
+                    </argLine>
+                    <forkCount>1</forkCount>
+                    <reuseForks>true</reuseForks>
                     <!-- prevent PermGen OOM in site build -->
                     <argLine>-Xmx512m</argLine>
                 </configuration>
@@ -840,6 +833,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-report-plugin</artifactId>
+                <version>3.3.1</version>
             </plugin>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
@@ -887,18 +881,8 @@
 
         </profile>
         <profile>
-            <id>disable-java8-doclint</id>
-            <activation>
-                <jdk>[1.8,)</jdk>
-            </activation>
-            <properties>
-                <additionalparam>-Xdoclint:none</additionalparam>
-            </properties>
-        </profile>
-        <profile>
             <id>it</id>
-            <!-- the integration tests require a device or emulator attached via
-              ADB -->
+            <!-- the integration tests require a device or emulator attached via ADB -->
             <build>
                 <plugins>
                     <plugin>

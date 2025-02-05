@@ -249,7 +249,10 @@ public class ManifestMergerMojo extends AbstractAndroidMojo {
     }
 
 
-    public void manifestMergerV2() throws MojoExecutionException, MojoFailureException {
+    /**
+     * @throws MojoExecutionException the mojo execution exception
+     */
+    public void manifestMergerV2() throws MojoExecutionException {
         ILogger logger = new MavenILogger(getLog(), (parsedMergeReportFile != null));
         AndroidBuilder builder = new AndroidBuilder(project.toString(), "created by Android Maven Plugin",
                 new DefaultProcessExecutor(logger),

@@ -569,7 +569,7 @@ public class VariantConfiguration<T extends BuildType, D extends ProductFlavor, 
     /**
      * Returns the list of external/module jar dependencies
      *
-     * @return a non null collection of Jar dependencies.
+     * @return a non-null collection of Jar dependencies.
      */
     @NonNull
     public Collection<JarDependency> getExternalJarDependencies() {
@@ -579,7 +579,7 @@ public class VariantConfiguration<T extends BuildType, D extends ProductFlavor, 
     /**
      * Returns the list of local jar dependencies
      *
-     * @return a non null collection of Jar dependencies.
+     * @return a non-null collection of Jar dependencies.
      */
     @NonNull
     public Collection<JarDependency> getLocalJarDependencies() {
@@ -689,7 +689,7 @@ public class VariantConfiguration<T extends BuildType, D extends ProductFlavor, 
     /**
      * Returns the direct library dependencies
      *
-     * @return a non null collection of LibraryDependency
+     * @return a non-null collection of LibraryDependency
      */
     @NonNull
     public List<LibraryDependency> getDirectLibraries() {
@@ -699,7 +699,7 @@ public class VariantConfiguration<T extends BuildType, D extends ProductFlavor, 
     /**
      * Returns all the library dependencies, direct and transitive.
      *
-     * @return a non null collection of LibraryDependency
+     * @return a non-null collection of LibraryDependency
      */
     @NonNull
     public List<LibraryDependency> getAllLibraries() {
@@ -1765,6 +1765,9 @@ public class VariantConfiguration<T extends BuildType, D extends ProductFlavor, 
         return false;
     }
 
+    /**
+     * @return the jar jar rule files for this variant.
+     */
     public Collection<File> getJarJarRuleFiles() {
         ImmutableList.Builder<File> jarjarRuleFiles = ImmutableList.builder();
         jarjarRuleFiles.addAll(getMergedFlavor().getJarJarRuleFiles());

@@ -58,14 +58,27 @@ import static com.google.common.base.Preconditions.checkState;
  */
 public class PreDexCache extends PreProcessCache<DexKey> {
 
+    /**
+     * Attribute name for the jumbo mode
+     */
     private static final String ATTR_JUMBO_MODE = "jumboMode";
 
+    /**
+     * Singleton instance of the cache
+     */
     private static final PreDexCache sSingleton = new PreDexCache();
 
+    /**
+     * @return the singleton instance of the cache
+     */
     public static PreDexCache getCache() {
         return sSingleton;
     }
 
+    /**
+     * @param source the source file to compare with the destination file
+     * @param dest   the destination file to compare with the source file
+     */
     private static void checkSame(@NonNull File source, @NonNull File dest) {
         if (source.equals(dest)) {
             String s = String.format("%s l:%d ts:%d", source, source.length(), source.lastModified());
@@ -90,6 +103,7 @@ public class PreDexCache extends PreProcessCache<DexKey> {
      * @param buildToolInfo   the build tools info
      * @param verbose         verbose flag
      * @param processExecutor the process executor
+     * @param processOutputHandler the process output handler
      * @throws IOException          if an IO error occurs
      * @throws ProcessException     if the pre-dexing failed
      * @throws InterruptedException if the pre-dexing was interrupted

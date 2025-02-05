@@ -18,23 +18,44 @@ package com.android.ide.common.signing;
 
 import java.io.Serial;
 
+/**
+ * Exception thrown when keytool fails.
+ */
 public class KeytoolException extends Exception {
     /**
      * default serial uid
      */
     @Serial
     private static final long serialVersionUID = 1L;
+    /**
+     * The java home used to run keytool
+     */
     private String mJavaHome = null;
+    /**
+     * The command line used to run keytool
+     */
     private String mCommandLine = null;
 
+    /**
+     * @param message the message to display
+     */
     KeytoolException(String message) {
         super(message);
     }
 
+    /**
+     * @param message the message to display
+     * @param t       the cause of the exception
+     */
     KeytoolException(String message, Throwable t) {
         super(message, t);
     }
 
+    /**
+     * @param message     the message to display
+     * @param javaHome    the java home used to run keytool
+     * @param commandLine the command line used to run keytool
+     */
     KeytoolException(String message, String javaHome, String commandLine) {
         super(message);
 
@@ -42,10 +63,16 @@ public class KeytoolException extends Exception {
         mCommandLine = commandLine;
     }
 
+    /**
+     * @return the java home used to run keytool
+     */
     public String getJavaHome() {
         return mJavaHome;
     }
 
+    /**
+     * @return the command line used to run keytool
+     */
     public String getCommandLine() {
         return mCommandLine;
     }

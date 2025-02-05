@@ -39,6 +39,9 @@ public class PluralsResourceValue extends ResourceValue {
 
     /**
      * Adds an element into the array
+     *
+     * @param quantity the quantity string, such as "one", "two", "few", etc.
+     * @param value    the string value
      */
     public void addPlural(String quantity, String value) {
         mQuantities.add(quantity);

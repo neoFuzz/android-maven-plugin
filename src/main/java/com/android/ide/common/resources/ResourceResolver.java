@@ -29,11 +29,29 @@ import java.util.*;
 
 import static com.android.SdkConstants.*;
 
+/**
+ * Utility class to resolve resources and theme references.
+ */
 public class ResourceResolver extends RenderResources {
+    /**
+     * The name of the theme resource
+     */
     public static final String THEME_NAME = "Theme";
+    /**
+     * The name of the theme resource with a dot
+     */
     public static final String THEME_NAME_DOT = "Theme.";
+    /**
+     * namespace prefix
+     */
     public static final String XLIFF_NAMESPACE_PREFIX = "urn:oasis:names:tc:xliff:document:";
+    /**
+     * Tag descriptor
+     */
     public static final String XLIFF_G_TAG = "g";
+    /**
+     * Attribute value in values file that stores the example text
+     */
     public static final String ATTR_EXAMPLE = "example";
 
     /**
@@ -111,6 +129,8 @@ public class ResourceResolver extends RenderResources {
      * Create a map from the normalized form of the style names in {@code styles} to the original
      * style name.
      *
+     * @param styles the set of styles to create the map for
+     * @return Map with the styles reversed
      * @see #getNormalizedStyleName(String)
      */
     @NonNull
@@ -135,6 +155,9 @@ public class ResourceResolver extends RenderResources {
     /**
      * Sets up the light and dark default styles with the given concrete styles. This is used if we
      * want to override the defaults configured in the framework for this particular platform.
+     *
+     * @param lightStyle the concrete style to use for the light default
+     * @param darkStyle  the concrete style to use for the dark default
      */
     public void setDeviceDefaults(@Nullable String lightStyle, @Nullable String darkStyle) {
         if (darkStyle != null) {
@@ -160,20 +183,32 @@ public class ResourceResolver extends RenderResources {
         return false;
     }
 
+    /**
+     * @return the name of the current theme. This is the name as it appears in the XML file.
+     */
     public String getThemeName() {
         return mThemeName;
     }
 
     // ---- RenderResources Methods
 
+    /**
+     * @return the name of the current theme. This is the name as it appears in the XML file.
+     */
     public boolean isProjectTheme() {
         return mIsProjectTheme;
     }
 
+    /**
+     * @return the project resources.
+     */
     public Map<ResourceType, Map<String, ResourceValue>> getProjectResources() {
         return mProjectResources;
     }
 
+    /**
+     * @return the framework resources.
+     */
     public Map<ResourceType, Map<String, ResourceValue>> getFrameworkResources() {
         return mFrameworkResources;
     }
@@ -638,6 +673,12 @@ public class ResourceResolver extends RenderResources {
         return res instanceof StyleResourceValue r ? r : null;
     }
 
+    /**
+     * @param type        The type of the resource. This must be {@link ResourceType#STYLE}.
+     * @param name        The name of the style. This may be a flattened name.
+     * @param isFramework Whether the style is a framework style.
+     * @return The name of the XML style that corresponds to the given name.
+     */
     @Nullable
     public String getXmlName(@NonNull ResourceType type, @NonNull String name,
                              boolean isFramework) {
@@ -763,7 +804,9 @@ public class ResourceResolver extends RenderResources {
     }
 
     /**
-     * Returns true if the given {@link ResourceValue} represents a theme
+     * @param value the {@link ResourceValue} to check
+     * @param cache a cache of previously computed results. Can be null
+     * @return true if the given {@link ResourceValue} represents a theme
      */
     public boolean isTheme(@NonNull ResourceValue value, @Nullable Map<ResourceValue, Boolean> cache) {
         return isTheme(value, cache, 0);
@@ -813,6 +856,11 @@ public class ResourceResolver extends RenderResources {
 
     /**
      * Returns true if the given {@code themeStyle} extends the theme given by
+     * {@code parentStyle}
+     *
+     * @param parentStyle the parent style
+     * @param themeStyle  the theme style to check
+     * @return true if the given {@code themeStyle} extends the theme given by
      * {@code parentStyle}
      */
     public boolean themeExtends(@NonNull String parentStyle, @NonNull String themeStyle) {

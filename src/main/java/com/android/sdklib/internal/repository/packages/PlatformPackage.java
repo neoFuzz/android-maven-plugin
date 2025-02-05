@@ -110,11 +110,20 @@ public class PlatformPackage extends MinToolsPackage
                 .create();
     }
 
+    /**
+     * @param target The {@link IAndroidTarget} to wrap.
+     * @param props  The properties to parse the package's attributes from.
+     */
     @VisibleForTesting(visibility = Visibility.PRIVATE)
     protected PlatformPackage(@NonNull IAndroidTarget target, @Nullable Properties props) {
         this(null /*source*/, target, props);
     }
 
+    /**
+     * @param source The {@link SdkSource} where this is loaded from.
+     * @param target The {@link IAndroidTarget} to wrap.
+     * @param props  The properties to parse the package's attributes from.
+     */
     @VisibleForTesting(visibility = Visibility.PRIVATE)
     protected PlatformPackage(@Nullable SdkSource source,
                               @NonNull IAndroidTarget target,
@@ -145,7 +154,12 @@ public class PlatformPackage extends MinToolsPackage
      * URL is the actual target location.
      * <p>
      * By design, this creates a package with one and only one archive.
+     *
+     * @param target The {@link IAndroidTarget} to wrap.
+     * @param props  The properties to parse the package's attributes from.
+     * @return The created {@link PlatformPackage}.
      */
+    @NonNull
     public static Package create(@NonNull IAndroidTarget target, @Nullable Properties props) {
         return new PlatformPackage(target, props);
     }
@@ -179,6 +193,8 @@ public class PlatformPackage extends MinToolsPackage
 
     /**
      * Returns the version, a string, for platform packages.
+     *
+     * @return The version, a string, for platform packages.
      */
     public String getVersionName() {
         return mVersionName;

@@ -37,20 +37,22 @@ import static com.android.SdkConstants.*;
  * Miscellaneous utilities used by the Android SDK tools
  */
 public class SdkUtils {
-    private SdkUtils() {
-        // empty
-    }
-
     /**
      * Prefix in comments which mark the source locations for merge results
      */
     public static final String FILENAME_PREFIX = "From: ";
+    /**
+     * List of image file extensions.
+     */
     public static final List<String> IMAGE_EXTENSIONS = ImmutableList.of(
             DOT_PNG, DOT_9PNG, DOT_GIF, DOT_JPEG, DOT_JPG, DOT_BMP, DOT_WEBP);
     /**
      * For use by {@link #getLineSeparator()}
      */
     private static String sLineSeparator;
+    private SdkUtils() {
+        // empty
+    }
 
     /**
      * Returns true if the given string ends with the given suffix, using a
@@ -317,6 +319,11 @@ public class SdkUtils {
         return urlToFile(new URL(url));
     }
 
+    /**
+     * @param url the URL to look up the {@link File} for
+     * @return the corresponding {@link File} (which may or may not exist)
+     * @throws MalformedURLException if the URL is malformed or is not a file: URL
+     */
     @NonNull
     public static File urlToFile(@NonNull URL url) throws MalformedURLException {
         try {
@@ -364,6 +371,7 @@ public class SdkUtils {
      *                       the start marker {@code (From:);} you can disable padding if the caller
      *                       already is in a context where the padding has been added.
      * @return the corresponding XML contents of the string
+     * @throws MalformedURLException if the URL string is malformed or is not a file: URL.
      */
     @NonNull
     public static String createPathComment(@NonNull File file, boolean includePadding)
@@ -386,6 +394,10 @@ public class SdkUtils {
      * for use with error parsers which can rewrite for example AAPT error messages in
      * say layout or manifest files, which occur in the merged (copied) output, and present
      * it as an error pointing to one of the user's original source files.
+     *
+     * @param from the file to copy
+     * @param to   the destination file to copy to
+     * @throws IOException if an I/O error occurs
      */
     public static void copyXmlWithSourceReference(@NonNull File from, @NonNull File to)
             throws IOException {

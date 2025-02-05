@@ -197,7 +197,7 @@ public abstract class AbstractEmulatorMojo extends AbstractAndroidMojo {
     public void startAndroidEmulator() throws MojoExecutionException {
         parseParameters();
 
-        CommandExecutor executor = CommandExecutor.Factory.createDefaultCommmandExecutor();
+        CommandExecutor executor = CommandExecutor.Factory.createDefaultCommandExecutor();
         executor.setLogger(this.getLog());
 
         try {

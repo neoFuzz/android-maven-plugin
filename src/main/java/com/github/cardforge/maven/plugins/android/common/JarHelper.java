@@ -54,6 +54,10 @@ public class JarHelper {
      * Listener for jar extraction.
      */
     public interface UnjarListener {
+        /**
+         * @param jarEntry The jar entry to potentially include in the un-jarring process
+         * @return true if the entry should be included, false otherwise
+         */
         boolean include(JarEntry jarEntry);
     }
 

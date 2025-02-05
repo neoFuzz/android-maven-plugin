@@ -15,20 +15,41 @@ import java.util.Properties;
  * @author Manfred Moser
  */
 public class PluginInfo {
+    /**
+     * Colon character.
+     */
     private static final String COLON = ":";
+    /**
+     * Properties loaded from plugin.properties.
+     */
     private static Properties prop;
+    /**
+     * Group ID of the plugin.
+     */
     private static String groupId;
+    /**
+     * Artifact ID of the plugin.
+     */
     private static String artifactId;
+    /**
+     * Version of the plugin.
+     */
     private static String version;
 
     static {
         loadProperties();
     }
 
+    /**
+     * Private constructor to prevent instantiation.
+     */
     private PluginInfo() {
         // no instances
     }
 
+    /**
+     * Load the properties from the plugin.properties file.
+     */
     private static void loadProperties() {
         prop = new Properties();
         InputStream in = PluginInfo.class.getResourceAsStream("plugin.properties");
@@ -61,18 +82,31 @@ public class PluginInfo {
         return builder.toString();
     }
 
+    /**
+     * @return the groupId of the plugin
+     */
     public static String getGroupId() {
         return groupId;
     }
 
+    /**
+     * @return the artifactId of the plugin
+     */
     public static String getArtifactId() {
         return artifactId;
     }
 
+    /**
+     * @return the version of the plugin
+     */
     public static String getVersion() {
         return version;
     }
 
+    /**
+     * @param goal the goal to be qualified with the plugin coordinates
+     * @return the qualified goal string
+     */
     @NonNull
     public static String getQualifiedGoal(String goal) {
         StringBuilder builder = new StringBuilder()

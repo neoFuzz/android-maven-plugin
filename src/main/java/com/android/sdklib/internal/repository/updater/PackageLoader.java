@@ -27,10 +27,7 @@ import com.android.sdklib.repository.SdkAddonsListConstants;
 import com.android.sdklib.repository.SdkRepoConstants;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Loads packages fetched from the remote SDK Repository and keeps track
@@ -39,7 +36,7 @@ import java.util.Map;
  * @deprecated com.android.sdklib.internal.repository has moved into Studio as
  * com.android.tools.idea.sdk.remote.internal.
  */
-@Deprecated
+@Deprecated(since = "4.7")
 public class PackageLoader {
 
     /**
@@ -56,8 +53,8 @@ public class PackageLoader {
     private final DownloadCache mOverrideCache;
 
     /**
-     * 0 = need to fetch remote addons list once..
-     * 1 = fetch succeeded, don't need to do it any more.
+     * 0 = need to fetch remote addons list once.
+     * 1 = fetch succeeded, don't need to do it anymore.
      * -1= fetch failed, do it again only if the user requests a refresh
      * or changes the force-http setting.
      */
@@ -88,6 +85,9 @@ public class PackageLoader {
         mOverrideCache = cache;
     }
 
+    /**
+     * @return the updater data
+     */
     public UpdaterData getUpdaterData() {
         return mUpdaterData;
     }
@@ -184,14 +184,14 @@ public class PackageLoader {
      * Load packages, source by source using
      * {@link #loadPackages(boolean, ISourceLoadedCallback)},
      * and executes the given {@link IAutoInstallTask} on the current package list.
-     * That is for each package known, the install task is queried to find if
+     * That is for each package known, the {@code install} task is queried to find if
      * the package is the one to be installed or updated.
      * <p>
      * - If an already installed package is accepted by the task, it is returned. <br/>
      * - If a new package (remotely available but not installed locally) is accepted,
      * the user will be <em>prompted</em> for permission to install it. <br/>
-     * - If an existing package has updates, the install task will be accept if it
-     * accepts one of the updating packages, and if yes the the user will be
+     * - If an existing package has updates, the {@code install} task will accept if it
+     * accepts one of the updating packages, and if yes the user will be
      * <em>prompted</em> for permission to install it. <br/>
      * <p>
      * Only one package can be accepted, after which the task is completed.
@@ -304,7 +304,7 @@ public class PackageLoader {
                 final Package[] localPkgs = mUpdaterData.getInstalledPackages(
                         new NullTaskMonitor(mUpdaterData.getSdkLog()));
 
-                // Scan the installed package list to find the install paths.
+                // Scan the installed package list to find the 'install' paths.
                 for (Archive installedArchive : installedArchives) {
                     Package pkg = installedArchive.getParentPackage();
 
@@ -325,6 +325,11 @@ public class PackageLoader {
 
     /**
      * Loads the remote add-ons list.
+     * <p>
+     * This method is called by {@link #loadPackages(boolean, ISourceLoadedCallback)}
+     * and should not be called directly.
+     *
+     * @param monitor The monitor to use.
      */
     public void loadRemoteAddonsList(ITaskMonitor monitor) {
 
@@ -335,6 +340,9 @@ public class PackageLoader {
         mUpdaterData.getTaskFactory().start("Load Add-ons List", monitor, subMonitor -> loadRemoteAddonsListInTask(subMonitor));
     }
 
+    /**
+     * @param monitor The monitor to use.
+     */
     private void loadRemoteAddonsListInTask(ITaskMonitor monitor) {
         mStateFetchRemoteAddonsList = -1;
 
@@ -367,15 +375,12 @@ public class PackageLoader {
 
             if (fetch3rdParties) {
                 for (Site s : sites) {
-                    switch (s.getType()) {
-                        case ADDON_SITE:
-                            sources.add(SdkSourceCategory.ADDONS_3RD_PARTY,
-                                    new SdkAddonSource(s.getUrl(), s.getUiName()));
-                            break;
-                        case SYS_IMG_SITE:
-                            sources.add(SdkSourceCategory.ADDONS_3RD_PARTY,
-                                    new SdkSysImgSource(s.getUrl(), s.getUiName()));
-                            break;
+                    if (Objects.requireNonNull(s.getType()) == AddonsListFetcher.SiteType.ADDON_SITE) {
+                        sources.add(SdkSourceCategory.ADDONS_3RD_PARTY,
+                                new SdkAddonSource(s.getUrl(), s.getUiName()));
+                    } else if (s.getType() == AddonsListFetcher.SiteType.SYS_IMG_SITE) {
+                        sources.add(SdkSourceCategory.ADDONS_3RD_PARTY,
+                                new SdkSysImgSource(s.getUrl(), s.getUiName()));
                     }
                 }
             }
@@ -416,7 +421,7 @@ public class PackageLoader {
         /**
          * After processing each source, the package loader calls this method with the
          * list of packages found in that source.
-         * By returning true from {@link #onUpdateSource}, the client tells
+         * By returning true from {@code #onUpdateSource}, the client tells
          * the loader to continue and process the next source.
          * By returning false, it tells to stop loading.
          * <p>
@@ -425,6 +430,7 @@ public class PackageLoader {
          * {@code Display.syncExec(Runnable)} or {@code Display.asyncExec(Runnable)}.
          *
          * @param packages All the packages loaded from the source. Never null.
+         * @param source   The source of the packages. Null for the locally installed packages.
          * @return True if the load operation should continue, false if it should stop.
          */
         boolean onUpdateSource(SdkSource source, Package[] packages);
@@ -452,17 +458,21 @@ public class PackageLoader {
          *
          * @param source   The source of the packages. Null for the locally installed packages.
          * @param packages The packages found in the source.
+         * @return The packages to be considered for installation.
          */
         Package[] filterLoadedSource(SdkSource source, Package[] packages);
 
         /**
-         * Called by the install task for every package available (new ones, updates as well
+         * Called by the {@code install} task for every package available (new ones, updates as well
          * as existing ones that don't have a potential update.)
          * The method should return true if this is a package that should be installed.
          * <p>
          * <em>Important</em>: This method is called from a sub-thread, so clients who try
          * to access any UI widgets must wrap their calls into {@code Display.syncExec(Runnable)}
          * or {@code Display.asyncExec(Runnable)}.
+         *
+         * @param pkg The package to consider for installation.
+         * @return True if the package should be installed.
          */
         boolean acceptPackage(Package pkg);
 
@@ -474,6 +484,9 @@ public class PackageLoader {
          * <em>Important</em>: This method is called from a sub-thread, so clients who try
          * to access any UI widgets must wrap their calls into {@code Display.syncExec(Runnable)}
          * or {@code Display.asyncExec(Runnable)}.
+         *
+         * @param success      True if the package was installed successfully.
+         * @param installPaths The 'install' paths of the package, if it was installed.
          */
         void setResult(boolean success, Map<Package, File> installPaths);
 

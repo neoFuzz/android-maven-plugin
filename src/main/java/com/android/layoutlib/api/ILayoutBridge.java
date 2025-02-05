@@ -52,6 +52,13 @@ import java.util.Map;
 @Deprecated
 public interface ILayoutBridge {
 
+    /**
+     * API level 5
+     * <p>
+     * This is the current API level of the layout library. This value is used to know which methods
+     * are available.
+     * </p>
+     */
     final int API_CURRENT = 4;
 
     /**
@@ -60,6 +67,8 @@ public interface ILayoutBridge {
      * will appear.
      * <p>If calling this method throws an {@link AbstractMethodError}, then the API level
      * should be considered to be 1.
+     *
+     * @return the API level of the layout library.
      */
     int getApiLevel();
 
@@ -75,6 +84,8 @@ public interface ILayoutBridge {
 
     /**
      * Prepares the layoutlib to unloaded.
+     *
+     * @return true if success. False if the bridge is already disposed.
      */
     boolean dispose();
 
@@ -195,8 +206,8 @@ public interface ILayoutBridge {
      * @param layoutDescription  the {@link IXmlPullParser} letting the LayoutLib Bridge visit the
      *                           layout file.
      * @param projectKey         An Object identifying the project. This is used for the cache mechanism.
-     * @param screenWidth
-     * @param screenHeight
+     * @param screenWidth        the screen width
+     * @param screenHeight       the screen height
      * @param themeName          The name of the theme to use. In order to differentiate project and platform
      *                           themes sharing the same name, all project themes must be prepended with a '*' character.
      * @param projectResources   the resources of the project. The map contains (String, map) pairs

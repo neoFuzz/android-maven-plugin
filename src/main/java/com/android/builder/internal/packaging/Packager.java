@@ -55,19 +55,55 @@ import static com.android.SdkConstants.FN_APK_CLASSES_N_DEX;
  */
 public final class Packager implements IArchiveBuilder {
 
+    /**
+     * Static failed message
+     */
     public static final String FAILED_TO_ADD_S = "Failed to add %s";
+    /**
+     * Static sealed message
+     */
     public static final String ALREADY_SEALED = "APK is already sealed";
+    /**
+     * Static pattern used for nativelibs
+     */
     private static final Pattern PATTERN_NATIVELIB_EXT = Pattern.compile("^.+\\.so$",
             Pattern.CASE_INSENSITIVE);
+    /**
+     * Logger instance
+     */
     private final ILogger mLogger;
+    /**
+     * internal Zip filter
+     */
     private final DuplicateZipFilter mNoDuplicateFilter = new DuplicateZipFilter();
+    /**
+     * internal Zip filter
+     */
     private final NoBinaryZipFilter mNoBinaryZipFilter = new NoBinaryZipFilter(mNoDuplicateFilter);
+    /**
+     * internal packaging filter
+     */
     @Nullable
     private final SignedJarBuilder.IZipEntryFilter mPackagingOptionsFilter;
+    /**
+     * Files to add
+     */
     private final HashMap<String, File> mAddedFiles = new HashMap<>();
+    /**
+     * Files to merge
+     */
     private final HashMap<String, File> mMergeFiles = new HashMap<>();
+    /**
+     * The manifest file to create. If null, no manifest will be created.
+     */
     private SignedJarBuilder mBuilder = null;
+    /**
+     * JNI debug mode. If true, the APK will be built with JNI debug symbols.
+     */
     private boolean mJniDebugMode = false;
+    /**
+     * Whether the APK has already been sealed
+     */
     private boolean mIsSealed = false;
 
     /**
@@ -82,11 +118,14 @@ public final class Packager implements IArchiveBuilder {
      * An optional {@link ILogger} can also be provided for verbose output. If null, there will
      * be no output.
      *
-     * @param apkLocation     the file to create
-     * @param resLocation     the file representing the packaged resource file.
-     * @param mergingFolder   the folder to store files that are being merged.
-     * @param certificateInfo the signing information used to sign the package. Optional the OS path to the debug keystore, if needed or null.
-     * @param logger          the logger.
+     * @param apkLocation            the file to create
+     * @param resLocation            the file representing the packaged resource file.
+     * @param mergingFolder          the folder to store files that are being merged.
+     * @param certificateInfo        the signing information used to sign the package. Optional the OS path to the debug keystore, if needed or null.
+     * @param createdBy              the creator of the APK, or null
+     * @param packagingOptions       the packaging options, or null
+     * @param packagingOptionsFilter the packaging options filter, or null
+     * @param logger                 the logger.
      * @throws com.android.builder.packaging.PackagerException if an error occurred
      */
     public Packager(
@@ -223,6 +262,9 @@ public final class Packager implements IArchiveBuilder {
         }
     }
 
+    /**
+     * @return the local version of the builder, or null if it cannot be determined.
+     */
     @Nullable
     public static String getLocalVersion() {
         Class clazz = Packager.class;
@@ -249,6 +291,13 @@ public final class Packager implements IArchiveBuilder {
         return null;
     }
 
+    /**
+     * @param mainDexFolder the folder containing the main dex files.
+     * @param extraDexFiles the extra dex files to add.
+     * @throws DuplicateFileException if a file conflicts with another already added to the APK
+     * @throws SealedPackageException if the APK is already sealed
+     * @throws PackagerException      if an error occurred
+     */
     public void addDexFiles(@NonNull File mainDexFolder, @NonNull Collection<File> extraDexFiles)
             throws DuplicateFileException, SealedPackageException, PackagerException {
 

@@ -326,18 +326,33 @@ public class SignedJarBuilder {
             @Serial
             private static final long serialVersionUID = 1L;
 
+            /**
+             * Constructs a new ZipAbortException with no detail message.
+             */
             public ZipAbortException() {
                 super();
             }
 
+            /**
+             * @param format the format string
+             * @param args   the arguments
+             */
             public ZipAbortException(String format, Object... args) {
                 super(String.format(format, args));
             }
 
+            /**
+             * @param cause  the cause of the exception
+             * @param format the format string
+             * @param args   the arguments
+             */
             public ZipAbortException(Throwable cause, String format, Object... args) {
                 super(String.format(format, args), cause);
             }
 
+            /**
+             * @param cause the cause of the exception
+             */
             public ZipAbortException(Throwable cause) {
                 super(cause);
             }

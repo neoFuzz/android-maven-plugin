@@ -34,6 +34,9 @@ import java.util.regex.Pattern;
  */
 public class FileOp implements IFileOp {
 
+    /**
+     * Static empty file array
+     */
     public static final File[] EMPTY_FILE_ARRAY = new File[0];
     /**
      * Parameters to call File.setExecutable through reflection.

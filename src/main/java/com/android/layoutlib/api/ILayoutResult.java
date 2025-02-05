@@ -44,6 +44,7 @@ public interface ILayoutResult {
     /**
      * Returns the result code.
      *
+     * @return one of {@link #SUCCESS}, {@link #ERROR}
      * @see #SUCCESS
      * @see #ERROR
      */
@@ -51,17 +52,23 @@ public interface ILayoutResult {
 
     /**
      * Returns the {@link ILayoutViewInfo} object for the top level view.
+     *
+     * @return the {@link ILayoutViewInfo} object for the top level view.
      */
     ILayoutViewInfo getRootView();
 
     /**
      * Returns the rendering of the full layout.
+     *
+     * @return the rendering of the full layout.
      */
     BufferedImage getImage();
 
     /**
      * Returns the error message.
      * <p>Only valid when {@link #getSuccess()} returns {@link #ERROR}
+     *
+     * @return the error message
      */
     String getErrorMessage();
 
@@ -75,38 +82,53 @@ public interface ILayoutResult {
 
         /**
          * Returns the list of children views.
+         * <p>Only valid for views that have children.
+         *
+         * @return the list of children views.
          */
         ILayoutViewInfo[] getChildren();
 
         /**
          * Returns the key associated with the node.
          *
+         * @return the key associated with the node. This is the same key as returned by
+         * {@link IXmlPullParser#getViewKey()}
          * @see IXmlPullParser#getViewKey()
          */
         Object getViewKey();
 
         /**
          * Returns the name of the view.
+         *
+         * @return the name of the view
          */
         String getName();
 
         /**
          * Returns the left of the view bounds.
+         *
+         * @return the left of the view bounds
          */
         int getLeft();
 
         /**
          * Returns the top of the view bounds.
+         *
+         * @return the top of the view bounds
          */
         int getTop();
 
         /**
          * Returns the right of the view bounds.
+         *
+         * @return the right of the view bounds
          */
         int getRight();
 
         /**
          * Returns the bottom of the view bounds.
+         *
+         * @return the bottom of the view bounds
          */
         int getBottom();
     }

@@ -27,10 +27,23 @@ import com.android.sdklib.repository.descriptors.PkgDesc;
 import java.io.File;
 import java.util.Properties;
 
+/**
+ * Represents a platform package in the SDK./
+ */
 public class LocalToolPkgInfo extends LocalPkgInfo {
 
+    /**
+     * The package descriptor for this tool package
+     */
     private final @NonNull IPkgDesc mDesc;
 
+    /**
+     * @param localSdk            The {@link LocalSdk} this package belongs to.
+     * @param localDir            The filesystem location where this package is installed.
+     * @param sourceProps         The properties to be used for this package.
+     * @param revision            The tools revision of this package.
+     * @param minPlatformToolsRev The minimum tools revision required by this platform.
+     */
     public LocalToolPkgInfo(@NonNull LocalSdk localSdk,
                             @NonNull File localDir,
                             @NonNull Properties sourceProps,
@@ -40,12 +53,18 @@ public class LocalToolPkgInfo extends LocalPkgInfo {
         mDesc = PkgDesc.Builder.newTool(revision, minPlatformToolsRev).create();
     }
 
+    /**
+     * @return The package descriptor for this tool package
+     */
     @NonNull
     @Override
     public IPkgDesc getDesc() {
         return mDesc;
     }
 
+    /**
+     * @return The package object for this local package
+     */
     @Nullable
     @Override
     public Package getPackage() {

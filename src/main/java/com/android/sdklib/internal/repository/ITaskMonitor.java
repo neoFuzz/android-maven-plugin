@@ -56,18 +56,33 @@ public interface ITaskMonitor extends ILogger {
     /**
      * Sets the description in the current task dialog.
      * This method can be invoked from a non-UI thread.
+     *
+     * @param format A format string as defined for {@link String#format(String, Object...)}
+     * @param args   Optional arguments referenced by the format specifiers in the format string. If there are
+     *               more arguments than format specifiers, the extra arguments are ignored. The number of arguments is
+     *               variable and may be zero.
      */
     void setDescription(String format, Object... args);
 
     /**
      * Logs a "normal" information line.
      * This method can be invoked from a non-UI thread.
+     *
+     * @param format A format string as defined for {@link String#format(String, Object...)}
+     * @param args   Optional arguments referenced by the format specifiers in the format string. If there are
+     *               more arguments than format specifiers, the extra arguments are ignored. The number of arguments is
+     *               variable and may be zero.
      */
     void log(String format, Object... args);
 
     /**
      * Logs an "error" information line.
      * This method can be invoked from a non-UI thread.
+     *
+     * @param format A format string as defined for {@link String#format(String, Object...)}
+     * @param args   Optional arguments referenced by the format specifiers in the format string. If there are
+     *               more arguments than format specifiers, the extra arguments are ignored. The number of arguments is
+     *               variable and may be zero.
      */
     void logError(String format, Object... args);
 
@@ -75,12 +90,19 @@ public interface ITaskMonitor extends ILogger {
      * Logs a "verbose" information line, that is extra details which are typically
      * not that useful for the end-user and might be hidden until explicitly shown.
      * This method can be invoked from a non-UI thread.
+     *
+     * @param format A format string as defined for {@link String#format(String, Object...)}
+     * @param args   Optional arguments referenced by the format specifiers in the format string. If there are
+     *               more arguments than format specifiers, the extra arguments are ignored. The number of arguments is
+     *               variable and may be zero.
      */
     void logVerbose(String format, Object... args);
 
     /**
      * Returns the max value of the progress bar, as last set by {@link #setProgressMax(int)}.
      * Returns 0 if the max has never been set yet.
+     *
+     * @return The max value of the progress bar, or 0 if it has never been set.
      */
     int getProgressMax();
 
@@ -92,6 +114,8 @@ public interface ITaskMonitor extends ILogger {
      * {@link #getProgress()} or {@link #createSubMonitor(int)}. Callers are
      * discouraged from using more than once -- implementations can either discard
      * the next calls or behave incoherently.
+     *
+     * @param max The max value of the progress bar.
      */
     void setProgressMax(int max);
 
@@ -100,6 +124,8 @@ public interface ITaskMonitor extends ILogger {
      * This method can be invoked from a non-UI thread.
      * <p>
      * Callers MUST use setProgressMax before using this method.
+     *
+     * @param delta The number of steps to increment the progress bar
      */
     void incProgress(int delta);
 
@@ -108,6 +134,8 @@ public interface ITaskMonitor extends ILogger {
      * between 0 and up to {@link #setProgressMax(int)} - 1.
      * <p>
      * Callers MUST use setProgressMax before using this method.
+     *
+     * @return The current value of the progress bar, or 0 if the max has never been set.
      */
     int getProgress();
 
@@ -115,12 +143,17 @@ public interface ITaskMonitor extends ILogger {
      * Returns true if the user requested to cancel the operation.
      * It is up to the task thread to pool this and exit as soon
      * as possible.
+     *
+     * @return if the user requested to cancel the operation
      */
     boolean isCancelRequested();
 
     /**
      * Creates a sub-monitor that will use up to tickCount on the progress bar.
      * tickCount must be 1 or more.
+     *
+     * @param tickCount The number of steps to use on the progress bar.
+     * @return A new monitor that will use up to tickCount on the progress bar.
      */
     ITaskMonitor createSubMonitor(int tickCount);
 

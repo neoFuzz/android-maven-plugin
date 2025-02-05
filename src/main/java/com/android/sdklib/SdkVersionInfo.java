@@ -71,6 +71,10 @@ public class SdkVersionInfo {
         }
     }
 
+    /**
+     * @param api the api level
+     * @return the version string, or null if not known
+     */
     @Nullable
     public static String getVersionString(int api) {
         return switch (api) {
@@ -104,6 +108,10 @@ public class SdkVersionInfo {
         };
     }
 
+    /**
+     * @param api the api level
+     * @return the code name, or null if not known
+     */
     @Nullable
     public static String getCodeName(int api) {
         return switch (api) {

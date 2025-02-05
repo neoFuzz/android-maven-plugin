@@ -59,6 +59,11 @@ public enum SdkSourceCategory implements IDescription {
     private final String mUiName;
     private final boolean mAlwaysDisplay;
 
+    /**
+     * @param uiName        The UI-visible name of the category.
+     * @param alwaysDisplay True if this category must always be displayed by the available package tree, even
+     *                      if empty. When false, the category must not be displayed when empty.
+     */
     SdkSourceCategory(String uiName, boolean alwaysDisplay) {
         mUiName = uiName;
         mAlwaysDisplay = alwaysDisplay;
@@ -67,6 +72,8 @@ public enum SdkSourceCategory implements IDescription {
     /**
      * Returns the UI-visible name of the category. Displayed in the available package tree.
      * Cannot be null nor empty.
+     *
+     * @return The UI-visible name of the category.
      */
     public String getUiName() {
         return mUiName;
@@ -76,6 +83,9 @@ public enum SdkSourceCategory implements IDescription {
      * True if this category must always be displayed by the available package tree, even
      * if empty.
      * When false, the category must not be displayed when empty.
+     *
+     * @return True if this category must always be displayed by the available package tree, even
+     * if empty.
      */
     public boolean getAlwaysDisplay() {
         return mAlwaysDisplay;

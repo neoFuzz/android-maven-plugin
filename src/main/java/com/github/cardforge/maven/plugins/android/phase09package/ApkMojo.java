@@ -945,7 +945,7 @@ public class ApkMojo extends AbstractAndroidMojo {
      * @throws MojoExecutionException if an error occurs during the apk generation process
      */
     private void generateIntermediateApk() throws MojoExecutionException {
-        CommandExecutor executor = CommandExecutor.Factory.createDefaultCommmandExecutor();
+        CommandExecutor executor = CommandExecutor.Factory.createDefaultCommandExecutor();
         executor.setLogger(this.getLog());
         File[] overlayDirectories = getResourceOverlayDirectories();
 

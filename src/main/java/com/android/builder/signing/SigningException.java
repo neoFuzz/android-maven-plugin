@@ -17,22 +17,35 @@
 package com.android.builder.signing;
 
 /**
- *
+ * Base class for all signing related exceptions.
  */
 public class SigningException extends Exception {
 
+    /**
+     * Creates a new {@code SigningException} with no detail message and no cause.
+     */
     public SigningException() {
         super();
     }
 
+    /**
+     * @param message the description of the error
+     */
     public SigningException(String message) {
         super(message);
     }
 
+    /**
+     * @param message   the description of the error
+     * @param throwable the root cause of this exception
+     */
     public SigningException(String message, Throwable throwable) {
         super(message, throwable);
     }
 
+    /**
+     * @param throwable the root cause of this exception
+     */
     public SigningException(Throwable throwable) {
         super(throwable);
     }

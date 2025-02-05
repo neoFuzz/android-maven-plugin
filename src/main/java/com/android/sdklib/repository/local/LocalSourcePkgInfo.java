@@ -37,6 +37,13 @@ public class LocalSourcePkgInfo extends LocalPkgInfo {
 
     private final @NonNull IPkgDesc mDesc;
 
+    /**
+     * @param localSdk  The {@link LocalSdk} this source package belongs to.
+     * @param localDir  The filesystem location of this package.
+     * @param sourceProps The properties of this source package.
+     * @param version   The {@link AndroidVersion} of this source package.
+     * @param revision  The major revision of this source package.
+     */
     public LocalSourcePkgInfo(@NonNull LocalSdk localSdk,
                               @NonNull File localDir,
                               @NonNull Properties sourceProps,
@@ -46,12 +53,18 @@ public class LocalSourcePkgInfo extends LocalPkgInfo {
         mDesc = PkgDesc.Builder.newSource(version, revision).create();
     }
 
+    /**
+     * @return The package descriptor for this source package
+     */
     @NonNull
     @Override
     public IPkgDesc getDesc() {
         return mDesc;
     }
 
+    /**
+     * @return The package object for this local package
+     */
     @Nullable
     @Override
     public Package getPackage() {

@@ -33,6 +33,9 @@ import java.util.Locale;
  * A system image has an installation path, a location type, a tag and an ABI type.
  */
 public class SystemImage implements ISystemImage {
+    /**
+     * static for default Id
+     */
     public static final IdDisplay DEFAULT_TAG = new IdDisplay("default",    //$NON-NLS-1$
             "Default");   //$NON-NLS-1$
     /**
@@ -100,6 +103,7 @@ public class SystemImage implements ISystemImage {
      * The actual location is computed based on the {@code locationType}.
      *
      * @param sdkManager   The current SDK manager.
+     * @param target       The target for which the system image is being created.
      * @param locationType Where the system image folder is located for this ABI.
      * @param tag          The tag of the system-image. Use {@link #DEFAULT_TAG} for backward compatibility.
      * @param abiType      The ABI type. For example, one of {@link SdkConstants#ABI_ARMEABI},
@@ -125,6 +129,7 @@ public class SystemImage implements ISystemImage {
      * The actual location is computed based on the {@code locationType}.
      *
      * @param sdkManager   The current SDK manager.
+     * @param target       The target for which the system image is being created.
      * @param locationType Where the system image folder is located for this ABI.
      * @param tag          The tag of the system-image. Use {@link #DEFAULT_TAG} for backward compatibility.
      * @param addonVendor  Non-null add-on vendor name. Null for platforms.

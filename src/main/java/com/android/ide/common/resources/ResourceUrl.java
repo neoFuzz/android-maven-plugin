@@ -70,6 +70,7 @@ public class ResourceUrl {
      * @param name      the name
      * @param framework whether it's a framework resource
      * @param create    if it's an id resource, whether it's of the form {@code @+id}
+     * @return a new resource url
      */
     @NonNull
     public static ResourceUrl create(@NonNull ResourceType type, @NonNull String name,
@@ -77,6 +78,10 @@ public class ResourceUrl {
         return new ResourceUrl(type, name, framework, create);
     }
 
+    /**
+     * @param value the resource value to create a resource url from
+     * @return a new resource url
+     */
     @NonNull
     public static ResourceUrl create(@NonNull ResourceValue value) {
         return create(value.getResourceType(), value.getName(), value.isFramework(), false);
@@ -147,7 +152,9 @@ public class ResourceUrl {
     }
 
     /**
-     * Marks the given url, if any, as corresponding to a theme attribute
+     * Marks the given url, if ny, as corresponding to a theme attribute
+     *
+     * @return the url, if any, or null
      */
     @Nullable
     private static ResourceUrl setTheme(@Nullable ResourceUrl url) {
@@ -160,6 +167,8 @@ public class ResourceUrl {
     /**
      * Checks whether this resource has a valid name. Used when parsing data that isn't
      * necessarily known to be a valid resource; for example, "?attr/hello world"
+     *
+     * @return true if the name is valid
      */
     public boolean hasValidName() {
         // Make sure it looks like a resource name; if not, it could just be a string
