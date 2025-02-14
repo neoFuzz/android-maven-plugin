@@ -18,7 +18,7 @@ public class ApkMojoTest
 
     @Parameters
     static public List<Object[]> suite() {
-        final List<Object[]> suite = new ArrayList<Object[]>();
+        final List<Object[]> suite = new ArrayList<>();
 
         suite.add(new Object[]{"apk-config-project1", null});
         suite.add(new Object[]{"apk-config-project2", new String[]{"persistence.xml"}});

@@ -20,17 +20,18 @@ import com.github.cardforge.maven.plugins.android.AbstractAndroidMojo;
 import com.github.cardforge.maven.plugins.android.AndroidSdk;
 import org.apache.commons.io.IOUtils;
 import org.apache.maven.plugin.MojoExecutionException;
-import org.fest.reflect.core.Reflection;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import javax.annotation.Nonnull;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.lang.reflect.Field;
 
 /**
  * @author hugo.josefson@jayway.com
@@ -45,13 +46,15 @@ public class AbstractAndroidMojoTest {
     }
 
     @Test
-    public void givenNoPathThenUseAndroidHomePath() throws MojoExecutionException {
+    public void givenNoPathThenUseAndroidHomePath() throws Exception {
         SdkTestSupport testSupport = new SdkTestSupport();
         androidMojo = new EmptyAndroidMojo();
-        Reflection.field("sdkPath").ofType(File.class).in(androidMojo).set(null);
-        Reflection.field("sdkPlatform").ofType(String.class).in(androidMojo).set("19");
+
+        setField(androidMojo, "sdkPath", null);
+        setField(androidMojo, "sdkPlatform", "19");
+
         AndroidSdk sdk = androidMojo.getAndroidSdk();
-        File path = Reflection.field("sdkPath").ofType(File.class).in(sdk).get();
+        File path = (File) getField(sdk, "sdkPath");
         Assert.assertEquals(new File(testSupport.getenvAndroidHome()).getAbsolutePath(), path.getAbsolutePath());
     }
 
@@ -66,7 +69,7 @@ public class AbstractAndroidMojoTest {
 
     @Test
     public void givenAndroidManifestThenInstrumentationRunnerIsFound()
-            throws URISyntaxException, MojoExecutionException {
+            throws URISyntaxException, Exception {
         final URL url = this.getClass().getResource(BASE_PATH + "AndroidManifest.xml");
         final URI uri = url.toURI();
         final File file = new File(uri);
@@ -94,14 +97,14 @@ public class AbstractAndroidMojoTest {
     }
 
     @Test
-    public void givenApidemosApkThenPackageIsFound() throws MojoExecutionException, URISyntaxException {
+    public void givenApidemosApkThenPackageIsFound() throws Exception {
         final URL resource = this.getClass().getResource(BASE_PATH + "apidemos-0.1.0-SNAPSHOT.apk");
         final String foundPackage = androidMojo.extractPackageNameFromApk(new File(new URI(resource.toString())));
         Assert.assertEquals("com.example.android.apis", foundPackage);
     }
 
     @Test
-    public void givenApidemosPlatformtestsApkThenPackageIsFound() throws MojoExecutionException, URISyntaxException {
+    public void givenApidemosPlatformtestsApkThenPackageIsFound() throws Exception {
         final URL resource = this.getClass().getResource(BASE_PATH + "apidemos-platformtests-0.1.0-SNAPSHOT.apk");
         final String foundPackage = androidMojo.extractPackageNameFromApk(new File(new URI(resource.toString())));
         Assert.assertEquals("com.example.android.apis.tests", foundPackage);
@@ -114,6 +117,20 @@ public class AbstractAndroidMojoTest {
         androidMojo.initAndroidDebugBridge();
 
         Assert.assertEquals(DdmPreferences.getTimeOut(), expectedTimeout);
+    }
+
+    // Utility to set a private field value using reflection
+    private void setField(@Nonnull Object target, String fieldName, Object value) throws Exception {
+        Field field = target.getClass().getDeclaredField(fieldName);
+        field.setAccessible(true);
+        field.set(target, value);
+    }
+
+    // Utility to get a private field value using reflection
+    private Object getField(@Nonnull Object target, String fieldName) throws Exception {
+        Field field = target.getClass().getDeclaredField(fieldName);
+        field.setAccessible(true);
+        return field.get(target);
     }
 
     private class DefaultTestAndroidMojo extends AbstractAndroidMojo {

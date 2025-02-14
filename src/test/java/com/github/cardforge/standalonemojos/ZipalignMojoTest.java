@@ -9,28 +9,24 @@ import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectHelper;
 import org.codehaus.plexus.util.FileUtils;
-import org.easymock.Capture;
-import org.easymock.EasyMock;
 import org.junit.Ignore;
+import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
-import org.powermock.api.easymock.PowerMock;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
-import org.powermock.reflect.Whitebox;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Mockito;
+import org.mockito.junit.MockitoJUnitRunner;
 
+import javax.annotation.Nonnull;
 import java.io.File;
-import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
+import java.lang.reflect.Field;
+import java.util.Arrays;
 import java.util.List;
 
 /**
  * User: Eugen
  */
 @Ignore("This test has to be migrated to be an IntegrationTest using AbstractAndroidMojoIntegrationTest")
-@RunWith(PowerMockRunner.class)
-@PrepareForTest(
-        {CommandExecutor.Factory.class, FileUtils.class, ZipalignMojo.class})
+@RunWith(MockitoJUnitRunner.class)
 public class ZipalignMojoTest extends AbstractAndroidMojoTestCase<ZipalignMojo> {
     @Override
     public String getPluginGoalName() {
@@ -40,28 +36,28 @@ public class ZipalignMojoTest extends AbstractAndroidMojoTestCase<ZipalignMojo> 
     /**
      * Tests all options, checks if their default values are correct.
      *
-     * @throws Exception
+     * @throws Exception if any error occurs during the test execution
      */
+    @Test
     public void testDefaultConfig() throws Exception {
         ZipalignMojo mojo = createMojo("zipalign-config-project0");
-        final ConfigHandler cfh = new ConfigHandler(mojo, this.session, this.execution);
-        cfh.parseConfiguration();
+        ConfigHandler configHandler = new ConfigHandler(mojo, this.session, this.execution);
+        configHandler.parseConfiguration();
 
-        Boolean skip = Whitebox.getInternalState(mojo, "parsedSkip");
+        Boolean skip = getPrivateField(mojo, "parsedSkip");
         assertTrue("zipalign 'skip' parameter should be true", skip);
 
-        Boolean verbose = Whitebox.getInternalState(mojo, "parsedVerbose");
+        Boolean verbose = getPrivateField(mojo, "parsedVerbose");
         assertFalse("zipalign 'verbose' parameter should be false", verbose);
 
-        MavenProject project = Whitebox.getInternalState(mojo, "project");
+        MavenProject project = getPrivateField(mojo, "project");
 
-        String inputApk = Whitebox.getInternalState(mojo, "parsedInputApk");
+        String inputApk = getPrivateField(mojo, "parsedInputApk");
         File inputApkFile = new File(project.getBuild().getDirectory(), project.getBuild().getFinalName() + ".apk");
         assertEquals("zipalign 'inputApk' parameter should be equal", inputApkFile.getAbsolutePath(), inputApk);
 
-        String outputApk = Whitebox.getInternalState(mojo, "parsedOutputApk");
-        File outputApkFile = new File(project.getBuild().getDirectory(), project.getBuild().getFinalName()
-                + "-aligned.apk");
+        String outputApk = getPrivateField(mojo, "parsedOutputApk");
+        File outputApkFile = new File(project.getBuild().getDirectory(), project.getBuild().getFinalName() + "-aligned.apk");
         assertEquals("zipalign 'outputApk' parameter should be equal", outputApkFile.getAbsolutePath(), outputApk);
     }
 
@@ -70,137 +66,140 @@ public class ZipalignMojoTest extends AbstractAndroidMojoTestCase<ZipalignMojo> 
      * <p>
      * Probably not needed since it is like testing maven itself
      *
-     * @throws Exception
+     * @throws Exception if any error occurs during the test execution
      */
+    @Test
     public void testConfigParse() throws Exception {
         ZipalignMojo mojo = createMojo("zipalign-config-project1");
-        final ConfigHandler cfh = new ConfigHandler(mojo, this.session, this.execution);
-        cfh.parseConfiguration();
+        ConfigHandler configHandler = new ConfigHandler(mojo, this.session, this.execution);
+        configHandler.parseConfiguration();
 
-        Boolean skip = Whitebox.getInternalState(mojo, "parsedSkip");
+        Boolean skip = getPrivateField(mojo, "parsedSkip");
         assertFalse("zipalign 'skip' parameter should be false", skip);
 
-        Boolean verbose = Whitebox.getInternalState(mojo, "parsedVerbose");
+        Boolean verbose = getPrivateField(mojo, "parsedVerbose");
         assertTrue("zipalign 'verbose' parameter should be true", verbose);
 
-        String inputApk = Whitebox.getInternalState(mojo, "parsedInputApk");
+        String inputApk = getPrivateField(mojo, "parsedInputApk");
         assertEquals("zipalign 'inputApk' parameter should be equal", "app.apk", inputApk);
 
-        String outputApk = Whitebox.getInternalState(mojo, "parsedOutputApk");
+        String outputApk = getPrivateField(mojo, "parsedOutputApk");
         assertEquals("zipalign 'outputApk' parameter should be equal", "app-updated.apk", outputApk);
     }
 
     /**
      * Tests run of zipalign with correct parameters as well adding aligned file to artifacts
      *
-     * @throws Exception
+     * @throws Exception if any error occurs during the test execution
      */
+    @Test
     public void testDefaultRun() throws Exception {
         ZipalignMojo mojo = createMojo("zipalign-config-project3");
 
-        MavenProject project = Whitebox.getInternalState(mojo, "project");
+        MavenProject project = getPrivateField(mojo, "project");
         project.setPackaging(AndroidExtension.APK);
 
-        MavenProjectHelper projectHelper = EasyMock.createNiceMock(MavenProjectHelper.class);
-        Capture<File> capturedParameter = new Capture<File>();
-        projectHelper.attachArtifact(EasyMock.eq(project), EasyMock.eq(AndroidExtension.APK),
-                EasyMock.eq("aligned"), EasyMock.capture(capturedParameter));
-        Whitebox.setInternalState(mojo, "projectHelper", projectHelper);
+        MavenProjectHelper projectHelper = Mockito.mock(MavenProjectHelper.class);
+        setPrivateField(mojo, "projectHelper", projectHelper);
 
-        final CommandExecutor mockExecutor = PowerMock.createMock(CommandExecutor.class);
-        PowerMock.replace(CommandExecutor.Factory.class.getDeclaredMethod("createDefaultCommmandExecutor")).with(
-                new InvocationHandler() {
-                    @Override
-                    public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-                        return mockExecutor;
-                    }
-                });
+        CommandExecutor mockExecutor = Mockito.mock(CommandExecutor.class);
+        setPrivateField(CommandExecutor.Factory.class, "executor", mockExecutor);
 
-        Capture<List<String>> capturedFile = new Capture<List<String>>();
-        mockExecutor.setLogger(EasyMock.anyObject(Log.class));
-        mockExecutor.setCaptureStdOut(EasyMock.anyBoolean());
-        mockExecutor.executeCommand(EasyMock.anyObject(String.class), EasyMock.capture(capturedFile));
+        // Capture arguments passed to CommandExecutor
+        @SuppressWarnings("unchecked") ArgumentCaptor<List<String>> commandCaptor = ArgumentCaptor.forClass(List.class);
+        Mockito.doNothing().when(mockExecutor).setLogger(Mockito.any(Log.class));
+        Mockito.doNothing().when(mockExecutor).executeCommand(Mockito.anyString(), commandCaptor.capture());
 
-        PowerMock.mockStatic(FileUtils.class);
-        EasyMock.expect(FileUtils.fileExists("app-updated.apk")).andReturn(true);
+        // Mock static methods in FileUtils
+        try (var mockedFileUtils = Mockito.mockStatic(FileUtils.class)) {
+            mockedFileUtils.when(() -> FileUtils.fileExists("app-updated.apk")).thenReturn(true);
 
-        EasyMock.replay(projectHelper);
-        PowerMock.replay(mockExecutor);
-        PowerMock.replay(FileUtils.class);
+            // when
+            mojo.execute();
 
-        mojo.execute();
+            // then
+            Mockito.verify(mockExecutor).executeCommand(Mockito.anyString(), Mockito.anyList());
+            Mockito.verify(projectHelper).attachArtifact(
+                    Mockito.eq(project),
+                    Mockito.eq(AndroidExtension.APK),
+                    Mockito.eq("aligned"),
+                    Mockito.any(File.class)
+            );
 
-        PowerMock.verify(mockExecutor);
-        List<String> parameters = capturedFile.getValue();
-        List<String> parametersExpected = new ArrayList<String>();
-        parametersExpected.add("-v");
-        parametersExpected.add("-f");
-        parametersExpected.add("4");
-        parametersExpected.add("app.apk");
-        parametersExpected.add("app-updated.apk");
-        assertEquals("Zipalign arguments aren't as expected", parametersExpected, parameters);
+            // Verify the arguments passed to zipalign
+            List<String> parameters = commandCaptor.getValue();
+            List<String> expectedParameters = Arrays.asList("-v", "-f", "4", "app.apk", "app-updated.apk");
+            assertEquals("Zipalign arguments aren't as expected", expectedParameters, parameters);
 
-        PowerMock.verify(projectHelper);
-        assertEquals("File should be same as expected", new File("app-updated.apk"), capturedParameter.getValue());
+            // Verify attachArtifact was called with the correct file
+            File expectedFile = new File("app-updated.apk");
+            Mockito.verify(projectHelper).attachArtifact(
+                    Mockito.eq(project),
+                    Mockito.eq(AndroidExtension.APK),
+                    Mockito.eq("aligned"),
+                    Mockito.eq(expectedFile)
+            );
 
-        // verify that all method were invoked
-        PowerMock.verify(FileUtils.class);
+            mockedFileUtils.verify(() -> FileUtils.fileExists("app-updated.apk"));
+        }
     }
 
     /**
      * Tests run of zipalign with correct parameters
      *
-     * @throws Exception
+     * @throws Exception if any error occurs during the test execution
      */
+    @Test
     public void testRunWhenInputApkIsSameAsOutput() throws Exception {
+        // given
         ZipalignMojo mojo = createMojo("zipalign-config-project2");
 
-        MavenProject project = Whitebox.getInternalState(mojo, "project");
+        MavenProject project = getPrivateField(mojo, "project");
         project.setPackaging(AndroidExtension.APK);
 
-        MavenProjectHelper projectHelper = EasyMock.createNiceMock(MavenProjectHelper.class);
-        Whitebox.setInternalState(mojo, "projectHelper", projectHelper);
+        MavenProjectHelper projectHelper = Mockito.mock(MavenProjectHelper.class);
+        setPrivateField(mojo, "projectHelper", projectHelper);
 
-        final CommandExecutor mockExecutor = PowerMock.createMock(CommandExecutor.class);
-        PowerMock.replace(CommandExecutor.Factory.class.getDeclaredMethod("createDefaultCommmandExecutor")).with(
-                new InvocationHandler() {
-                    @Override
-                    public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-                        return mockExecutor;
-                    }
-                });
+        CommandExecutor mockExecutor = Mockito.mock(CommandExecutor.class);
+        setPrivateField(CommandExecutor.Factory.class, "executor", mockExecutor);
 
-        Capture<List<String>> capturedFile = new Capture<List<String>>();
-        mockExecutor.setLogger(EasyMock.anyObject(Log.class));
-        mockExecutor.setCaptureStdOut(EasyMock.anyBoolean());
-        mockExecutor.executeCommand(EasyMock.anyObject(String.class), EasyMock.capture(capturedFile));
+        // Capture arguments passed to CommandExecutor
+        @SuppressWarnings("unchecked") ArgumentCaptor<List<String>> commandCaptor = ArgumentCaptor.forClass(List.class);
+        Mockito.doNothing().when(mockExecutor).setLogger(Mockito.any(Log.class));
+        Mockito.doNothing().when(mockExecutor).executeCommand(Mockito.anyString(), commandCaptor.capture());
 
-        PowerMock.mockStatic(FileUtils.class);
-        EasyMock.expect(FileUtils.fileExists("app-aligned-temp.apk")).andReturn(true);
-        FileUtils.rename(new File("app-aligned-temp.apk"), new File("app.apk"));
-        EasyMock.expectLastCall();
+        // Mock static methods in FileUtils
+        try (var mockedFileUtils = Mockito.mockStatic(FileUtils.class)) {
+            mockedFileUtils.when(() -> FileUtils.fileExists("app-aligned-temp.apk")).thenReturn(true);
+            mockedFileUtils.when(() -> FileUtils.rename(new File("app-aligned-temp.apk"), new File("app.apk")));
 
-        PowerMock.replay(projectHelper);
-        PowerMock.replay(mockExecutor);
-        PowerMock.replay(FileUtils.class);
+            // when
+            mojo.execute();
 
-        mojo.execute();
+            // then
+            Mockito.verify(mockExecutor).executeCommand(Mockito.anyString(), Mockito.anyList());
 
-        PowerMock.verify(mockExecutor);
-        List<String> parameters = capturedFile.getValue();
-        List<String> parametersExpected = new ArrayList<String>();
-        parametersExpected.add("-v");
-        parametersExpected.add("-f");
-        parametersExpected.add("4");
-        parametersExpected.add("app.apk");
-        parametersExpected.add("app-aligned-temp.apk");
-        assertEquals("Zipalign arguments aren't as expected", parametersExpected, parameters);
+            List<String> parameters = commandCaptor.getValue();
+            List<String> expectedParameters = Arrays.asList("-v", "-f", "4", "app.apk", "app-aligned-temp.apk");
+            assertEquals("Zipalign arguments aren't as expected", expectedParameters, parameters);
 
-        // no invocations to attach artifact
-        PowerMock.verify(projectHelper);
+            mockedFileUtils.verify(() -> FileUtils.rename(new File("app-aligned-temp.apk"), new File("app.apk")));
+        }
+    }
 
-        // verify that all method were invoked
-        PowerMock.verify(FileUtils.class);
+    // Helper method to get private fields using reflection
+    @SuppressWarnings("unchecked")
+    private <T> T getPrivateField(@Nonnull Object target, String fieldName) throws Exception {
+        Field field = target.getClass().getDeclaredField(fieldName);
+        field.setAccessible(true);
+        return (T) field.get(target);
+    }
+
+    // Helper method to set private fields using reflection
+    private void setPrivateField(@Nonnull Object target, String fieldName, Object value) throws Exception {
+        Field field = target.getClass().getDeclaredField(fieldName);
+        field.setAccessible(true);
+        field.set(target, value);
     }
 }
 

@@ -65,8 +65,14 @@ public final class DependencyResolver {
     @NonNull
     public Set<Artifact> getProjectDependenciesFor(MavenProject project, @NonNull MavenSession session)
             throws DependencyGraphBuilderException {
+        // Get a valid ProjectBuildingRequest from the session
+        ProjectBuildingRequest buildingRequest = session.getProjectBuildingRequest();
+
+        // Set the correct project in the request
+        buildingRequest.setProject(project);
+
         // No need to filter our search. We want to resolve all artifacts.
-        final DependencyNode node = dependencyGraphBuilder.buildDependencyGraph((ProjectBuildingRequest) project, null, session.getProjects());
+        final DependencyNode node = dependencyGraphBuilder.buildDependencyGraph(buildingRequest, null);
 
         final DependencyCollector collector = new DependencyCollector(log, project.getArtifact());
         collector.visit(node, false);

@@ -6,49 +6,52 @@ import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.project.MavenProject;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
 
 import java.util.Properties;
 
-import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
+import static org.mockito.Mockito.when;
+import static org.mockito.MockitoAnnotations.openMocks;
 
 public class ConfigHandlerTest {
 
     private DummyMojo mojo = new DummyMojo();
 
+    @Mock
     private MavenSession session;
+
+    @Mock
+    private MavenExecutionRequest request;
+
+    @Mock
+    private MavenProject project;
+
     private MojoExecution execution;
 
-    @Before
+    @BeforeEach
     public void setUp() {
-        // Create mock objects
-        session = createNiceMock(MavenSession.class);
-        MavenExecutionRequest request = createNiceMock(MavenExecutionRequest.class);
-        MavenProject project = createNiceMock(MavenProject.class);
-
+        openMocks(this);
         // Mock the session request to return a mock execution request
-        expect(session.getRequest()).andReturn(request).anyTimes();
+        when(session.getRequest()).thenReturn(request);
 
         // Mock project properties (system properties)
         Properties properties = new Properties();
         properties.put("key", "value");
-        expect(project.getProperties()).andReturn(properties).anyTimes(); // Return properties for project
+        when(project.getProperties()).thenReturn(properties);
 
         // Mock session to return the current project
-        expect(session.getCurrentProject()).andReturn(project).anyTimes();
+        when(session.getCurrentProject()).thenReturn(project);
 
-        // Mock the system properties (we assume they are the same as project properties)
-        expect(session.getSystemProperties()).andReturn(properties).anyTimes();
-        expect(session.getUserProperties()).andReturn(properties).anyTimes();
+        // Mock the system properties
+        when(session.getSystemProperties()).thenReturn(properties);
+        when(session.getUserProperties()).thenReturn(properties);
 
-        // Mock MojoExecution setup
+        // Setup MojoExecution
         MojoDescriptor mojoDesc = new MojoDescriptor();
         this.execution = new MojoExecution(mojoDesc);
-
-        // Replay the mocks
-        replay(session, request, project);
     }
 
     @Test

@@ -24,7 +24,7 @@
         <executions>
           <execution>
             <goals>
-              <goal>manifest-update</goal>
+              <goal>manifest-merger</goal>
             </goals>
           </execution>
         </executions>

@@ -3,6 +3,7 @@ package com.github.cardforge;
 import org.apache.maven.artifact.Artifact;
 import org.junit.Test;
 
+import javax.annotation.Nonnull;
 import java.util.Collection;
 import java.util.LinkedHashSet;
 
@@ -10,8 +11,9 @@ import static com.github.cardforge.maven.plugins.android.InclusionExclusionResol
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptySet;
 import static java.util.Collections.singleton;
-import static org.easymock.EasyMock.*;
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class InclusionExclusionResolverTest {
 
@@ -187,17 +189,18 @@ public class InclusionExclusionResolverTest {
         filterArtifacts(ALL, false, null, null, singleton("G1:A1:V:X"), null);
     }
 
+    @Nonnull
     private static Collection<Artifact> collect(Artifact... artifacts) {
-        return new LinkedHashSet<Artifact>(asList(artifacts));
+        return new LinkedHashSet<>(asList(artifacts));
     }
 
+    @Nonnull
     private static Artifact artifact(String type, String groupId, String artifactId, String version) {
-        final Artifact artifact = createMock(Artifact.class);
-        expect(artifact.getType()).andReturn(type).anyTimes();
-        expect(artifact.getGroupId()).andReturn(groupId).anyTimes();
-        expect(artifact.getArtifactId()).andReturn(artifactId).anyTimes();
-        expect(artifact.getVersion()).andReturn(version).anyTimes();
-        replay(artifact);
+        final Artifact artifact = mock(Artifact.class);
+        when(artifact.getType()).thenReturn(type);
+        when(artifact.getGroupId()).thenReturn(groupId);
+        when(artifact.getArtifactId()).thenReturn(artifactId);
+        when(artifact.getVersion()).thenReturn(version);
         return artifact;
     }
 

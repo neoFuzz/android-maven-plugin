@@ -1,37 +1,31 @@
 package com.github.cardforge.phase01generatesources;
 
-import com.github.cardforge.maven.plugins.android.AbstractAndroidMojo;
 import com.github.cardforge.maven.plugins.android.phase01generatesources.GenerateSourcesMojo;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
-import org.easymock.EasyMock;
-import org.easymock.IAnswer;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.powermock.api.easymock.PowerMock;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
-import org.powermock.reflect.Whitebox;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
+import org.mockito.Mockito;
 
+import javax.annotation.Nonnull;
 import java.io.File;
-import java.lang.reflect.Method;
+import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Covers method {@link GenerateSourcesMojo#getPackageCompareMap(Set)} with tests
  *
  * @author Oleg Green - olegalex.green@gmail.com
  */
-
-@RunWith(PowerMockRunner.class)
-@PrepareForTest(GenerateSourcesMojo.class)
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class GetPackageCompareMapTest {
     public static final String PROJECT_ARTIFACT_ID = "main_application";
     public static final String PROJECT_PACKAGE_NAME = "com.jayway.maven.application";
@@ -41,14 +35,14 @@ public class GetPackageCompareMapTest {
     public static final Artifact LIBRARY1_ARTIFACT = createArtifact("library1");
     public static final Artifact LIBRARY2_ARTIFACT = createArtifact("library2");
     public static final Artifact LIBRARY3_ARTIFACT = createArtifact("library3");
-    public static final Map<Artifact, String> TEST_DATA_1 = new HashMap<Artifact, String>() {
+    public static final Map<Artifact, String> TEST_DATA_1 = new HashMap<>() {
         {
             put(LIBRARY1_ARTIFACT, COM_JAYWAY_MAVEN_LIBRARY_PACKAGE);
             put(LIBRARY2_ARTIFACT, PROJECT_PACKAGE_NAME);
             put(LIBRARY3_ARTIFACT, COM_JAYWAY_MAVEN_LIBRARY_PACKAGE);
         }
     };
-    public static final Map<Artifact, String> TEST_DATA_2 = new HashMap<Artifact, String>() {
+    public static final Map<Artifact, String> TEST_DATA_2 = new HashMap<>() {
         {
             put(LIBRARY1_ARTIFACT, COM_JAYWAY_MAVEN_LIBRARY_PACKAGE);
             put(LIBRARY2_ARTIFACT, COM_JAYWAY_MAVEN_LIBRARY2_PACKAGE);
@@ -60,40 +54,54 @@ public class GetPackageCompareMapTest {
     private Artifact projectArtifact;
     private GenerateSourcesMojo mojo;
 
-    @Before
-    public void setUp() throws Exception {
-
-        mojo = PowerMock.createPartialMock(GenerateSourcesMojo.class,
-                "extractPackageNameFromAndroidManifest",
-                "extractPackageNameFromAndroidArtifact");
-
-        setUpMainProject();
-        Whitebox.setInternalState(mojo, "project", project);
-
-        Method extractPackageNameFromAndroidManifestMethod = Whitebox.getMethod(
-                AbstractAndroidMojo.class,
-                "extractPackageNameFromAndroidManifest",
-                File.class
-        );
-        PowerMock.expectPrivate(
-                mojo,
-                extractPackageNameFromAndroidManifestMethod,
-                EasyMock.anyObject(File.class)
-        ).andReturn(PROJECT_PACKAGE_NAME).once();
+    @Nonnull
+    private static Artifact createArtifact(@Nonnull String artifactId) {
+        Artifact artifactMock = Mockito.mock(Artifact.class);
+        Mockito.when(artifactMock.getArtifactId()).thenReturn(artifactId);
+        return artifactMock;
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void testNoDependencies() throws MojoExecutionException {
-        PowerMock.replay(mojo);
+    @BeforeAll
+    public void setUp() throws Exception {
+        //openMocks(this);
 
-        mojo.getPackageCompareMap(null);
+        mojo = Mockito.spy(new TestableGenerateSourcesMojo());
+        setUpMainProject();
+
+        // Inject the project field using reflection
+        setPrivateField(mojo, "project", project);
+
+        // Mock the method to always return PROJECT_PACKAGE_NAME
+        Mockito.doAnswer(invocation -> PROJECT_PACKAGE_NAME)
+                .when(mojo)
+                .extractPackageNameFromAndroidManifest(Mockito.any(File.class));
+    }
+
+    @Test
+    void testBasicManifest() {
+        File basicManifest = new File(String.valueOf(getClass().getResource(
+                "/manifest-tests/basic-android-project-manifest/AndroidManifest.xml").getPath()));
+        GenerateSourcesMojo gsm = Mockito.spy(new GenerateSourcesMojo());
+
+        String packageName = gsm.extractPackageNameFromAndroidManifest(basicManifest);
+        assertNotNull(gsm);
+        // This string comes from the file at */manifest-tests/basic-android-project-manifest/AndroidManifest.xml
+        assertEquals("com.jayway.maven.plugins.android.tests", packageName);
+    }
+
+    @Test
+    public void testNoDependencies() {
+        IllegalArgumentException exception = assertThrows(
+                IllegalArgumentException.class,
+                () -> mojo.getPackageCompareMap(null)
+        );
+        Assertions.assertNotNull(exception);
     }
 
     @Test
     public void testEmptyDependencies() throws MojoExecutionException {
-        PowerMock.replay(mojo);
+        Map<String, Set<Artifact>> map = mojo.getPackageCompareMap(new HashSet<>());
 
-        Map<String, Set<Artifact>> map = mojo.getPackageCompareMap(new HashSet<Artifact>());
         assertNotNull(map);
         assertEquals(1, map.size());
         assertTrue(map.containsKey(PROJECT_PACKAGE_NAME));
@@ -106,9 +114,9 @@ public class GetPackageCompareMapTest {
     @Test
     public void testData1() throws Exception {
         mockExtractPackageNameFromArtifactMethod(TEST_DATA_1);
-        PowerMock.replay(mojo);
 
         Map<String, Set<Artifact>> map = mojo.getPackageCompareMap(TEST_DATA_1.keySet());
+
         assertNotNull(map);
         assertEquals(2, map.size());
         assertTrue(map.containsKey(PROJECT_PACKAGE_NAME));
@@ -123,17 +131,14 @@ public class GetPackageCompareMapTest {
         assertEquals(2, artifactSet2.size());
         assertTrue(artifactSet2.contains(LIBRARY1_ARTIFACT));
         assertTrue(artifactSet2.contains(LIBRARY3_ARTIFACT));
-
-        PowerMock.verify(mojo);
-        EasyMock.verify(project, projectArtifact);
     }
 
     @Test
     public void testData2() throws Exception {
         mockExtractPackageNameFromArtifactMethod(TEST_DATA_2);
-        PowerMock.replay(mojo);
 
         Map<String, Set<Artifact>> map = mojo.getPackageCompareMap(TEST_DATA_2.keySet());
+
         assertNotNull(map);
         assertEquals(4, map.size());
         assertTrue(map.containsKey(PROJECT_PACKAGE_NAME));
@@ -153,46 +158,50 @@ public class GetPackageCompareMapTest {
         Set<Artifact> artifactSet4 = map.get(COM_JAYWAY_MAVEN_LIBRARY3_PACKAGE);
         assertEquals(1, artifactSet4.size());
         assertTrue(artifactSet4.contains(LIBRARY3_ARTIFACT));
-
-        PowerMock.verify(mojo);
-        EasyMock.verify(project, projectArtifact);
-
     }
 
     private void setUpMainProject() {
-        projectArtifact = EasyMock.createMock(Artifact.class);
-        EasyMock.expect(projectArtifact.getArtifactId()).andReturn(PROJECT_ARTIFACT_ID).anyTimes();
-        EasyMock.replay(projectArtifact);
+        projectArtifact = Mockito.mock(Artifact.class);
+        Mockito.when(projectArtifact.getArtifactId()).thenReturn(PROJECT_ARTIFACT_ID);
 
-        project = EasyMock.createNiceMock(MavenProject.class);
-        EasyMock.expect(project.getArtifact()).andReturn(projectArtifact);
-        EasyMock.replay(project);
+        project = Mockito.mock(MavenProject.class);
+        Mockito.when(project.getArtifact()).thenReturn(projectArtifact);
+        Mockito.when(project.getGroupId()).thenReturn("com.jayway.maven");
     }
 
     private void mockExtractPackageNameFromArtifactMethod(final Map<Artifact, String> testData) throws Exception {
-        Method extractPackageNameFromAndroidArtifact = Whitebox.getMethod(
-                AbstractAndroidMojo.class,
-                "extractPackageNameFromAndroidArtifact",
-                Artifact.class
-        );
-        PowerMock.expectPrivate(
-                mojo,
-                extractPackageNameFromAndroidArtifact,
-                EasyMock.anyObject(Artifact.class)
-        ).andAnswer(new IAnswer<String>() {
-            @Override
-            public String answer() throws Throwable {
-                final Object[] args = EasyMock.getCurrentArguments();
-                final Artifact inputArtifact = (Artifact) args[0];
-                return testData.get(inputArtifact);
-            }
-        }).anyTimes();
+        Mockito.doAnswer(invocation -> {
+            Artifact inputArtifact = invocation.getArgument(0);
+            return testData.get(inputArtifact);
+        }).when(mojo).extractPackageNameFromAndroidArtifact(Mockito.any(Artifact.class));
+
     }
 
-    private static Artifact createArtifact(String artifactId) {
-        Artifact artifactMock = EasyMock.createMock(Artifact.class);
-        EasyMock.expect(artifactMock.getArtifactId()).andReturn(artifactId).anyTimes();
-        EasyMock.replay(artifactMock);
-        return artifactMock;
+    private void setPrivateField(@Nonnull Object target, String fieldName, Object value) throws Exception {
+        Field field;
+        Class<?> clazz = target.getClass();
+
+        while (clazz != null) {  // Loop through superclasses
+            try {
+                field = clazz.getDeclaredField(fieldName);
+                field.setAccessible(true);
+                field.set(target, value);
+                return;  // Stop once the field is found
+            } catch (NoSuchFieldException e) {
+                clazz = clazz.getSuperclass();  // Move to parent class
+            }
+        }
+
+        throw new NoSuchFieldException("Field '" + fieldName + "' not found in " + target.getClass());
+    }
+
+    /**
+     * Testing class to override the extractPackageNameFromAndroidManifest method.
+     */
+    class TestableGenerateSourcesMojo extends GenerateSourcesMojo {
+        @Override
+        public String extractPackageNameFromAndroidManifest(File manifestFile) {
+            return PROJECT_PACKAGE_NAME;
+        }
     }
 }

@@ -1,21 +1,24 @@
 package com.github.cardforge.standalonemojos;
 
 import com.github.cardforge.AbstractAndroidMojoTestCase;
-import com.github.cardforge.maven.plugins.android.CommandExecutor;
 import com.github.cardforge.maven.plugins.android.config.ConfigHandler;
 import com.github.cardforge.maven.plugins.android.standalonemojos.MonkeyMojo;
 import org.apache.maven.model.Build;
 import org.apache.maven.project.MavenProject;
-import org.easymock.EasyMock;
 import org.junit.Ignore;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 import org.junit.runner.RunWith;
-import org.powermock.api.easymock.PowerMock;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
-import org.powermock.reflect.Whitebox;
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import java.io.File;
 import java.util.Arrays;
+
+import static org.mockito.Mockito.when;
+import static org.mockito.MockitoAnnotations.openMocks;
 
 /**
  * Test the Monkey mojo. Tests options' default values and parsing. We do not test the command line that is passed to
@@ -23,21 +26,30 @@ import java.util.Arrays;
  *
  * @author Stéphane Nicolas - snicolas@octo.com
  */
+@RunWith(MockitoJUnitRunner.class)
 @Ignore("This test has to be migrated to be an IntegrationTest using AbstractAndroidMojoIntegrationTest")
-@RunWith(PowerMockRunner.class)
-@PrepareForTest(
-        {CommandExecutor.Factory.class, ConfigHandler.class})
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class MonkeyMojoTest extends AbstractAndroidMojoTestCase<MonkeyMojo> {
+    @Mock
+    private MavenProject project;
+
+
     @Override
     public String getPluginGoalName() {
         return "monkey";
     }
 
+    @BeforeAll
+    public void setup() {
+        openMocks(this);
+    }
+
     /**
      * Tests all options, checks if their default values are correct.
      *
-     * @throws Exception
+     * @throws Exception if any error occurs during the test execution
      */
+    @Test
     public void testDefaultMonkeyConfig() throws Exception {
         // given
         MonkeyMojo mojo = createMojo("monkey-config-project0");
@@ -45,7 +57,7 @@ public class MonkeyMojoTest extends AbstractAndroidMojoTestCase<MonkeyMojo> {
         cfh.parseConfiguration();
 
         // when
-        Boolean automatorSkip = Whitebox.getInternalState(mojo, "parsedSkip");
+        Boolean automatorSkip = getFieldValue(mojo, "parsedSkip");
 
         // then
         assertTrue("Monkey skip parameter should be true", automatorSkip);
@@ -54,167 +66,147 @@ public class MonkeyMojoTest extends AbstractAndroidMojoTestCase<MonkeyMojo> {
     /**
      * Tests all options, checks if their default values are correct.
      *
-     * @throws Exception
+     * @throws Exception if any error occurs during the test execution
      */
+    @Test
     public void testDefaultUnskippedMonkeyConfig() throws Exception {
         // given
         MonkeyMojo mojo = createMojo("monkey-config-project1");
 
-        MavenProject project = EasyMock.createNiceMock(MavenProject.class);
-        Whitebox.setInternalState(mojo, "project", project);
-        File projectBaseDir = new File(getBasedir());
-        Build projectBuild = new Build();
-        String buildName = "monkey-config-project1-15.4.3.1011";
-        projectBuild.setFinalName(buildName);
-        projectBuild.setDirectory("target/");
-        projectBuild.setSourceDirectory("src/");
-        projectBuild.setOutputDirectory("classes/");
-        EasyMock.expect(project.getBasedir()).andReturn(projectBaseDir).anyTimes();
-        EasyMock.expect(project.getBuild()).andReturn(projectBuild).anyTimes();
-        PowerMock.replay(project);
+        setupProjectMock("monkey-config-project1-15.4.3.1011");
+        setInternalState(mojo, "project", project);
 
         // when
         final ConfigHandler cfh = new ConfigHandler(mojo, this.session, this.execution);
         cfh.parseConfiguration();
 
         // then
-        Boolean monkeySkip = Whitebox.getInternalState(mojo, "parsedSkip");
-        Integer monkeyEventCount = Whitebox.getInternalState(mojo, "parsedEventCount");
-        Long monkeySeed = Whitebox.getInternalState(mojo, "parsedSeed");
-        Long monkeyThrottle = Whitebox.getInternalState(mojo, "parsedThrottle");
-        Integer monkeyPercentTouch = Whitebox.getInternalState(mojo, "parsedPercentTouch");
-        Integer monkeyPercentMotion = Whitebox.getInternalState(mojo, "parsedPercentMotion");
-        Integer monkeyPercentTrackball = Whitebox.getInternalState(mojo, "parsedPercentTrackball");
-        Integer monkeyPercentNav = Whitebox.getInternalState(mojo, "parsedPercentNav");
-        Integer monkeyPercentMajorNav = Whitebox.getInternalState(mojo, "parsedPercentMajorNav");
-        Integer monkeyPercentSyskeys = Whitebox.getInternalState(mojo, "parsedPercentSyskeys");
-        Integer monkeyPercentAppSwitch = Whitebox.getInternalState(mojo, "parsedPercentAppswitch");
-        Integer monkeyPercentAnyEvent = Whitebox.getInternalState(mojo, "parsedPercentAnyevent");
-
-        String[] monkeyPackages = Whitebox.getInternalState(mojo, "parsedPackages");
-        String[] monkeyCategories = Whitebox.getInternalState(mojo, "parsedCategories");
-
-        Boolean monkeyDebugNoEvents = Whitebox.getInternalState(mojo, "parsedDebugNoEvents");
-        Boolean monkeyHprof = Whitebox.getInternalState(mojo, "parsedHprof");
-        Boolean monkeyIgnoreCrashes = Whitebox.getInternalState(mojo, "parsedIgnoreCrashes");
-        Boolean monkeyIgnoreTimeouts = Whitebox.getInternalState(mojo, "parsedIgnoreTimeouts");
-        Boolean monkeyIgnoreSecurityExceptions = Whitebox.getInternalState(mojo, "parsedIgnoreSecurityExceptions");
-        Boolean monkeyKillProcessAfterError = Whitebox.getInternalState(mojo, "parsedKillProcessAfterError");
-        Boolean monkeyMonitorNativeCrashes = Whitebox.getInternalState(mojo, "parsedMonitorNativeCrashes");
-        Boolean monkeyCreateReport = Whitebox.getInternalState(mojo, "parsedCreateReport");
-
-        assertFalse("Monkey skip parameter should be false", monkeySkip);
-        final int expectedEventCount = 1000;
-        assertEquals("Monkey eventCount parameter should be 5000", new Integer(expectedEventCount), //
-                monkeyEventCount);
-        assertNull("Monkey seed should be null", monkeySeed);
-        assertNull("Monkey throttle should be null", monkeyThrottle);
-        assertNull("Monkey percentTouch should be null", monkeyPercentTouch);
-        assertNull("Monkey percentMotion should be null", monkeyPercentMotion);
-        assertNull("Monkey percentTrackball should be null", monkeyPercentTrackball);
-        assertNull("Monkey percentNav should be null", monkeyPercentNav);
-        assertNull("Monkey percentMajorNav should be null", monkeyPercentMajorNav);
-        assertNull("Monkey percentSyskeys should be null", monkeyPercentSyskeys);
-        assertNull("Monkey percentAppswitch should be null", monkeyPercentAppSwitch);
-        assertNull("Monkey percentAnyevent should be null", monkeyPercentAnyEvent);
-
-        assertNull("Monkey packages should be null", monkeyPackages);
-        assertNull("Monkey categories should be null", monkeyCategories);
-
-        assertFalse("Monkey debugNoEvents should be false", monkeyDebugNoEvents);
-        assertFalse("Monkey hprof should be false", monkeyHprof);
-        assertFalse("Monkey ignoreCrashes should be false", monkeyIgnoreCrashes);
-        assertFalse("Monkey ignoreTimeouts should be false", monkeyIgnoreTimeouts);
-        assertFalse("Monkey ignoreSecurityExceptions should be false", monkeyIgnoreSecurityExceptions);
-        assertFalse("Monkey killProcessAfterError should be false", monkeyKillProcessAfterError);
-        assertFalse("Monkey monitorNativeCrashes should be false", monkeyMonitorNativeCrashes);
-        assertFalse("Monkey createReport should be false", monkeyCreateReport);
+        assertCustomConfiguration(mojo);
     }
 
     /**
      * Tests all options, checks if they are parsed correctly.
      *
-     * @throws Exception
+     * @throws Exception if any error occurs during the test execution
      */
+    @Test
     public void testCustomMonkeyConfig() throws Exception {
         // given
         MonkeyMojo mojo = createMojo("monkey-config-project2");
-        MavenProject project = EasyMock.createNiceMock(MavenProject.class);
-        Whitebox.setInternalState(mojo, "project", project);
-        File projectBaseDir = new File(getBasedir());
-        Build projectBuild = new Build();
-        String buildName = "ui-automator-config-project1-15.4.3.1011";
-        projectBuild.setFinalName(buildName);
-        projectBuild.setDirectory("target/");
-        projectBuild.setSourceDirectory("src/");
-        projectBuild.setOutputDirectory("classes/");
-        EasyMock.expect(project.getBasedir()).andReturn(projectBaseDir).anyTimes();
-        EasyMock.expect(project.getBuild()).andReturn(projectBuild).anyTimes();
-
-        PowerMock.replay(project);
+        setupProjectMock("ui-automator-config-project1-15.4.3.1011");
+        setInternalState(mojo, "project", project);
 
         // when
         final ConfigHandler cfh = new ConfigHandler(mojo, this.session, this.execution);
         cfh.parseConfiguration();
 
         // then
-        Boolean monkeySkip = Whitebox.getInternalState(mojo, "parsedSkip");
-        Integer monkeyEventCount = Whitebox.getInternalState(mojo, "parsedEventCount");
-        Long monkeySeed = Whitebox.getInternalState(mojo, "parsedSeed");
-        Long monkeyThrottle = Whitebox.getInternalState(mojo, "parsedThrottle");
-        Integer monkeyPercentTouch = Whitebox.getInternalState(mojo, "parsedPercentTouch");
-        Integer monkeyPercentMotion = Whitebox.getInternalState(mojo, "parsedPercentMotion");
-        Integer monkeyPercentTrackball = Whitebox.getInternalState(mojo, "parsedPercentTrackball");
-        Integer monkeyPercentNav = Whitebox.getInternalState(mojo, "parsedPercentNav");
-        Integer monkeyPercentMajorNav = Whitebox.getInternalState(mojo, "parsedPercentMajorNav");
-        Integer monkeyPercentSyskeys = Whitebox.getInternalState(mojo, "parsedPercentSyskeys");
-        Integer monkeyPercentAppSwitch = Whitebox.getInternalState(mojo, "parsedPercentAppswitch");
-        Integer monkeyPercentAnyEvent = Whitebox.getInternalState(mojo, "parsedPercentAnyevent");
-
-        String[] monkeyPackages = Whitebox.getInternalState(mojo, "parsedPackages");
-        String[] monkeyCategories = Whitebox.getInternalState(mojo, "parsedCategories");
-
-        Boolean monkeyDebugNoEvents = Whitebox.getInternalState(mojo, "parsedDebugNoEvents");
-        Boolean monkeyHprof = Whitebox.getInternalState(mojo, "parsedHprof");
-        Boolean monkeyIgnoreCrashes = Whitebox.getInternalState(mojo, "parsedIgnoreCrashes");
-        Boolean monkeyIgnoreTimeouts = Whitebox.getInternalState(mojo, "parsedIgnoreTimeouts");
-        Boolean monkeyIgnoreSecurityExceptions = Whitebox.getInternalState(mojo, "parsedIgnoreSecurityExceptions");
-        Boolean monkeyKillProcessAfterError = Whitebox.getInternalState(mojo, "parsedKillProcessAfterError");
-        Boolean monkeyMonitorNativeCrashes = Whitebox.getInternalState(mojo, "parsedMonitorNativeCrashes");
-        Boolean monkeyCreateReport = Whitebox.getInternalState(mojo, "parsedCreateReport");
-
-        assertFalse("Monkey skip parameter should be false", monkeySkip);
-        final int expectedEventCount = 5000;
-        assertEquals("Monkey eventCount parameter should be 5000", new Integer(expectedEventCount), //
-                monkeyEventCount);
-        final int expectedSeed = 123456;
-        assertEquals("Monkey seed should be 123456", new Long(expectedSeed), monkeySeed);
-        assertEquals("Monkey throttle should be 10", new Long(10), monkeyThrottle);
-        assertEquals("Monkey percentTouch should be 10", new Integer(10), monkeyPercentTouch);
-        assertEquals("Monkey percentMotion should be 10", new Integer(10), monkeyPercentMotion);
-        assertEquals("Monkey percentTrackball should be 10", new Integer(10), monkeyPercentTrackball);
-        assertEquals("Monkey percentNav should be 10", new Integer(10), monkeyPercentNav);
-        assertEquals("Monkey percentMajorNav should be 10", new Integer(10), monkeyPercentMajorNav);
-        assertEquals("Monkey percentSyskeys should be 10", new Integer(10), monkeyPercentSyskeys);
-        assertEquals("Monkey percentAppswitch should be 10", new Integer(10), monkeyPercentAppSwitch);
-        assertEquals("Monkey percentAnyevent should be 10", new Integer(10), monkeyPercentAnyEvent);
-
-        String[] expectedPackages = new String[]
-                {"com.foo", "com.bar"};
-        assertTrue("Monkey packages should be [com.foo,com.bar]", Arrays.equals(expectedPackages, monkeyPackages));
-        String[] expectedCategories = new String[]
-                {"foo", "bar"};
-        assertTrue("Monkey categories should be [foo,bar]", Arrays.equals(expectedCategories, monkeyCategories));
-
-        assertTrue("Monkey debugNoEvents should be true", monkeyDebugNoEvents);
-        assertTrue("Monkey hprof should be true", monkeyHprof);
-        assertTrue("Monkey ignoreCrashes should be true", monkeyIgnoreCrashes);
-        assertTrue("Monkey ignoreTimeouts should be true", monkeyIgnoreTimeouts);
-        assertTrue("Monkey ignoreSecurityExceptions should be true", monkeyIgnoreSecurityExceptions);
-        assertTrue("Monkey killProcessAfterError should be true", monkeyKillProcessAfterError);
-        assertTrue("Monkey monitorNativeCrashes should be true", monkeyMonitorNativeCrashes);
-        assertTrue("Monkey createReport should be true", monkeyCreateReport);
-
+        assertCustomConfiguration(mojo);
     }
 
+    @SuppressWarnings("unchecked")
+    private <T> T getFieldValue(Object object, String fieldName) {
+        try {
+            return (T) object.getClass().getDeclaredField(fieldName).get(object);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to get field value: " + fieldName, e);
+        }
+    }
+
+    private void setInternalState(Object object, String fieldName, Object value) {
+        try {
+            var field = object.getClass().getDeclaredField(fieldName);
+            field.setAccessible(true);
+            field.set(object, value);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to set field value: " + fieldName, e);
+        }
+    }
+
+    private void setupProjectMock(String buildName) {
+        Build projectBuild = new Build();
+        projectBuild.setFinalName(buildName);
+        projectBuild.setDirectory("target/");
+        projectBuild.setSourceDirectory("src/");
+        projectBuild.setOutputDirectory("classes/");
+
+        when(project.getBasedir()).thenReturn(new File(getBasedir()));
+        when(project.getBuild()).thenReturn(projectBuild);
+    }
+
+    private void assertDefaultConfiguration(MonkeyMojo mojo) {
+        assertFalse("Monkey skip parameter should be false", getFieldValue(mojo, "parsedSkip"));
+        assertEquals("Monkey eventCount parameter should be 1000",
+                Integer.valueOf(1000), getFieldValue(mojo, "parsedEventCount"));
+
+        // Verify null values
+        Assertions.assertNull(getFieldValue(mojo, "parsedSeed"),"Monkey seed should be null");
+        assertNull("Monkey throttle should be null", getFieldValue(mojo, "parsedThrottle"));
+        assertNull("Monkey percentTouch should be null", getFieldValue(mojo, "parsedPercentTouch"));
+        assertNull("Monkey percentMotion should be null", getFieldValue(mojo, "parsedPercentMotion"));
+        assertNull("Monkey percentTrackball should be null", getFieldValue(mojo, "parsedPercentTrackball"));
+        assertNull("Monkey percentNav should be null", getFieldValue(mojo, "parsedPercentNav"));
+        assertNull("Monkey percentMajorNav should be null", getFieldValue(mojo, "parsedPercentMajorNav"));
+        assertNull("Monkey percentSyskeys should be null", getFieldValue(mojo, "parsedPercentSyskeys"));
+        assertNull("Monkey percentAppswitch should be null", getFieldValue(mojo, "parsedPercentAppswitch"));
+        assertNull("Monkey percentAnyevent should be null", getFieldValue(mojo, "parsedPercentAnyevent"));
+        assertNull("Monkey packages should be null", getFieldValue(mojo, "parsedPackages"));
+        assertNull("Monkey categories should be null", getFieldValue(mojo, "parsedCategories"));
+
+        // Verify boolean defaults
+        assertFalse("Monkey debugNoEvents should be false", getFieldValue(mojo, "parsedDebugNoEvents"));
+        assertFalse("Monkey hprof should be false", getFieldValue(mojo, "parsedHprof"));
+        assertFalse("Monkey ignoreCrashes should be false", getFieldValue(mojo, "parsedIgnoreCrashes"));
+        assertFalse("Monkey ignoreTimeouts should be false", getFieldValue(mojo, "parsedIgnoreTimeouts"));
+        assertFalse("Monkey ignoreSecurityExceptions should be false", getFieldValue(mojo, "parsedIgnoreSecurityExceptions"));
+        assertFalse("Monkey killProcessAfterError should be false", getFieldValue(mojo, "parsedKillProcessAfterError"));
+        assertFalse("Monkey monitorNativeCrashes should be false", getFieldValue(mojo, "parsedMonitorNativeCrashes"));
+        assertFalse("Monkey createReport should be false", getFieldValue(mojo, "parsedCreateReport"));
+    }
+
+    private void assertCustomConfiguration(MonkeyMojo mojo) {
+        assertFalse("Monkey skip parameter should be false", getFieldValue(mojo, "parsedSkip"));
+        assertEquals("Monkey eventCount parameter should be 5000",
+                Integer.valueOf(5000), getFieldValue(mojo, "parsedEventCount"));
+        assertEquals("Monkey seed should be 123456",
+                Long.valueOf(123456), getFieldValue(mojo, "parsedSeed"));
+        assertEquals("Monkey throttle should be 10",
+                Long.valueOf(10), getFieldValue(mojo, "parsedThrottle"));
+
+        // Verify percentage values
+        assertEquals("Monkey percentTouch should be 10",
+                Integer.valueOf(10), getFieldValue(mojo, "parsedPercentTouch"));
+        assertEquals("Monkey percentMotion should be 10",
+                Integer.valueOf(10), getFieldValue(mojo, "parsedPercentMotion"));
+        assertEquals("Monkey percentTrackball should be 10",
+                Integer.valueOf(10), getFieldValue(mojo, "parsedPercentTrackball"));
+        assertEquals("Monkey percentNav should be 10",
+                Integer.valueOf(10), getFieldValue(mojo, "parsedPercentNav"));
+        assertEquals("Monkey percentMajorNav should be 10",
+                Integer.valueOf(10), getFieldValue(mojo, "parsedPercentMajorNav"));
+        assertEquals("Monkey percentSyskeys should be 10",
+                Integer.valueOf(10), getFieldValue(mojo, "parsedPercentSyskeys"));
+        assertEquals("Monkey percentAppswitch should be 10",
+                Integer.valueOf(10), getFieldValue(mojo, "parsedPercentAppswitch"));
+        assertEquals("Monkey percentAnyevent should be 10",
+                Integer.valueOf(10), getFieldValue(mojo, "parsedPercentAnyevent"));
+
+        // Verify arrays
+        String[] expectedPackages = {"com.foo", "com.bar"};
+        assertTrue("Monkey packages should be [com.foo,com.bar]",
+                Arrays.equals(expectedPackages, getFieldValue(mojo, "parsedPackages")));
+        String[] expectedCategories = {"foo", "bar"};
+        assertTrue("Monkey categories should be [foo,bar]",
+                Arrays.equals(expectedCategories, getFieldValue(mojo, "parsedCategories")));
+
+        // Verify boolean values
+        assertTrue("Monkey debugNoEvents should be true", getFieldValue(mojo, "parsedDebugNoEvents"));
+        assertTrue("Monkey hprof should be true", getFieldValue(mojo, "parsedHprof"));
+        assertTrue("Monkey ignoreCrashes should be true", getFieldValue(mojo, "parsedIgnoreCrashes"));
+        assertTrue("Monkey ignoreTimeouts should be true", getFieldValue(mojo, "parsedIgnoreTimeouts"));
+        assertTrue("Monkey ignoreSecurityExceptions should be true", getFieldValue(mojo, "parsedIgnoreSecurityExceptions"));
+        assertTrue("Monkey killProcessAfterError should be true", getFieldValue(mojo, "parsedKillProcessAfterError"));
+        assertTrue("Monkey monitorNativeCrashes should be true", getFieldValue(mojo, "parsedMonitorNativeCrashes"));
+        assertTrue("Monkey createReport should be true", getFieldValue(mojo, "parsedCreateReport"));
+    }
 }

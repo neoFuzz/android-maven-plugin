@@ -9,6 +9,7 @@
         <plugins>
             <plugin>
                 <artifactId>android-maven-plugin</artifactId>
+                <version>4.7.0</version>
                 <!-- no ui-automator config -->
                 <configuration>
                     <monkey>

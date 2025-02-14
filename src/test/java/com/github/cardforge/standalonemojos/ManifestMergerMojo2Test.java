@@ -1,25 +1,25 @@
 package com.github.cardforge.standalonemojos;
 
 import com.github.cardforge.AbstractAndroidMojoTestCase;
-import com.github.cardforge.maven.plugins.android.standalonemojos.ManifestUpdateMojo;
+import com.github.cardforge.maven.plugins.android.standalonemojos.ManifestMergerMojo;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.plugin.MojoFailureException;
-import org.junit.Assert;
-import org.junit.Ignore;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Disabled;
 
 import java.io.File;
 import java.io.IOException;
 
-@Ignore("This test has to be migrated to be an IntegrationTest using AbstractAndroidMojoIntegrationTest")
-public class ManifestUpdateMojoTest extends AbstractAndroidMojoTestCase<ManifestUpdateMojo> {
+@Disabled("This test has to be migrated to be an IntegrationTest using AbstractAndroidMojoIntegrationTest")
+public class ManifestMergerMojo2Test extends AbstractAndroidMojoTestCase<ManifestMergerMojo> {
     @Override
     public String getPluginGoalName() {
-        return "manifest-update";
+        return "manifest-merger";
     }
 
     public void testAndroidApplicationChanges() throws Exception {
-        ManifestUpdateMojo mojo = createMojo("manifest-tests/application-changes");
+        ManifestMergerMojo mojo = createMojo("manifest-tests/application-changes");
         mojo.execute();
         File dir = getProjectDir(mojo);
         File manifestFile = new File(dir, "AndroidManifest.xml");
@@ -27,7 +27,7 @@ public class ManifestUpdateMojoTest extends AbstractAndroidMojoTestCase<Manifest
     }
 
     public void testBasicAndroidProjectVersion() throws Exception {
-        ManifestUpdateMojo mojo = createMojo("manifest-tests/basic-android-project");
+        ManifestMergerMojo mojo = createMojo("manifest-tests/basic-android-project");
         mojo.execute();
         File dir = getProjectDir(mojo);
         File manifestFile = new File(dir, "AndroidManifest.xml");
@@ -35,7 +35,7 @@ public class ManifestUpdateMojoTest extends AbstractAndroidMojoTestCase<Manifest
     }
 
     public void testBasicAndroidProjectManifest() throws Exception {
-        ManifestUpdateMojo mojo = createMojo("manifest-tests/basic-android-project-manifest");
+        ManifestMergerMojo mojo = createMojo("manifest-tests/basic-android-project-manifest");
         mojo.execute();
         File dir = getProjectDir(mojo);
         File manifestFile = new File(dir, "AndroidManifest.xml");
@@ -43,15 +43,15 @@ public class ManifestUpdateMojoTest extends AbstractAndroidMojoTestCase<Manifest
     }
 
     public void testBasicJarProject() throws Exception {
-        ManifestUpdateMojo mojo = createMojo("manifest-tests/basic-jar-project");
+        ManifestMergerMojo mojo = createMojo("manifest-tests/basic-jar-project");
         mojo.execute();
         File dir = getProjectDir(mojo);
         File manifestFile = new File(dir, "AndroidManifest.xml");
-        Assert.assertFalse("Should not have an AndroidManifest for a jar project", manifestFile.exists());
+        Assertions.assertFalse(manifestFile.exists(),"Should not have an AndroidManifest for a jar project");
     }
 
     public void testVersionlessAndroidProject() throws Exception {
-        ManifestUpdateMojo mojo = createMojo("manifest-tests/versionless-android-project");
+        ManifestMergerMojo mojo = createMojo("manifest-tests/versionless-android-project");
         mojo.execute();
         File dir = getProjectDir(mojo);
         File manifestFile = new File(dir, "androidManifest.xml"); // intentionally small lowercase 'a'
@@ -59,7 +59,7 @@ public class ManifestUpdateMojoTest extends AbstractAndroidMojoTestCase<Manifest
     }
 
     public void testManyVersionsAndroidProject() throws Exception {
-        ManifestUpdateMojo mojo = createMojo("manifest-tests/manyversions-android-project");
+        ManifestMergerMojo mojo = createMojo("manifest-tests/manyversions-android-project");
         for (int i = 0; i < 50; i++) { // Simulate 50 runs of the mojo
             mojo.execute();
         }
@@ -69,23 +69,23 @@ public class ManifestUpdateMojoTest extends AbstractAndroidMojoTestCase<Manifest
     }
 
     public void testMinorVersionAndroidProject() throws Exception {
-        ManifestUpdateMojo mojo = createMojo("manifest-tests/minorversion-android-project");
+        ManifestMergerMojo mojo = createMojo("manifest-tests/minorversion-android-project");
         mojo.execute();
         File dir = getProjectDir(mojo);
         File manifestFile = new File(dir, "AndroidManifest.xml");
         assertExpectedAndroidManifest(manifestFile, dir);
     }
 
-    public void testWhenNewVersionHasLessDigitsItshouldBePaddedSoVersionCodeIsLess() throws Exception {
-        ManifestUpdateMojo mojo = createMojo("manifest-tests/differentLengthVersion-android-project");
+    public void testWhenNewVersionHasLessDigitsItShouldBePaddedSoVersionCodeIsLess() throws Exception {
+        ManifestMergerMojo mojo = createMojo("manifest-tests/differentLengthVersion-android-project");
         mojo.execute();
         File dir = getProjectDir(mojo);
         File manifestFile = new File(dir, "AndroidManifest.xml");
         assertExpectedAndroidManifest(manifestFile, dir);
     }
 
-    public void testWhenNewVersionHasfiveDigits() throws Exception {
-        ManifestUpdateMojo mojo = createMojo("manifest-tests/fiveDigitLengthVersion-android-project");
+    public void testWhenNewVersionHasFiveDigits() throws Exception {
+        ManifestMergerMojo mojo = createMojo("manifest-tests/fiveDigitLengthVersion-android-project");
         mojo.execute();
         File dir = getProjectDir(mojo);
         File manifestFile = new File(dir, "AndroidManifest.xml");
@@ -93,40 +93,40 @@ public class ManifestUpdateMojoTest extends AbstractAndroidMojoTestCase<Manifest
     }
 
     public void testVersionCodeUpdateAndIncrementFail() throws Exception {
-        ManifestUpdateMojo mojo = createMojo("manifest-tests/bad-android-project1");
+        ManifestMergerMojo mojo = createMojo("manifest-tests/bad-android-project1");
         try {
             mojo.execute();
         } catch (MojoFailureException e) {
-            Assert.assertTrue(e.getMessage().startsWith("versionCodeAutoIncrement, versionCodeUpdateFromVersion and versionCode"));
+            Assertions.assertTrue(e.getMessage().startsWith("versionCodeAutoIncrement, versionCodeUpdateFromVersion and versionCode"));
             return;
         }
-        Assert.assertTrue("bad-android-project1 did not throw MojoFailureException", false);
+        Assertions.fail("bad-android-project1 did not throw MojoFailureException");
     }
 
     public void testVersionCodeAndVersionCodeUpdateFail() throws Exception {
-        ManifestUpdateMojo mojo = createMojo("manifest-tests/bad-android-project2");
+        ManifestMergerMojo mojo = createMojo("manifest-tests/bad-android-project2");
         try {
             mojo.execute();
         } catch (MojoFailureException e) {
-            Assert.assertTrue(e.getMessage().startsWith("versionCodeAutoIncrement, versionCodeUpdateFromVersion and versionCode"));
+            Assertions.assertTrue(e.getMessage().startsWith("versionCodeAutoIncrement, versionCodeUpdateFromVersion and versionCode"));
             return;
         }
-        Assert.assertTrue("bad-android-project2 did not throw MojoFailureException", false);
+        fail("bad-android-project2 did not throw MojoFailureException");
     }
 
     public void testVersionCodeAndVersionIncrementFail() throws Exception {
-        ManifestUpdateMojo mojo = createMojo("manifest-tests/bad-android-project3");
+        ManifestMergerMojo mojo = createMojo("manifest-tests/bad-android-project3");
         try {
             mojo.execute();
         } catch (MojoFailureException e) {
-            Assert.assertTrue(e.getMessage().startsWith("versionCodeAutoIncrement, versionCodeUpdateFromVersion and versionCode"));
+            Assertions.assertTrue(e.getMessage().startsWith("versionCodeAutoIncrement, versionCodeUpdateFromVersion and versionCode"));
             return;
         }
-        Assert.assertTrue("bad-android-project3 did not throw MojoFailureException", false);
+        fail("bad-android-project3 did not throw MojoFailureException");
     }
 
     public void testSupportsScreensUpdate() throws Exception {
-        ManifestUpdateMojo mojo = createMojo("manifest-tests/supports-screens-android-project");
+        ManifestMergerMojo mojo = createMojo("manifest-tests/supports-screens-android-project");
         mojo.execute();
         File dir = getProjectDir(mojo);
         File manifestFile = new File(dir, "AndroidManifest.xml");
@@ -138,8 +138,9 @@ public class ManifestUpdateMojoTest extends AbstractAndroidMojoTestCase<Manifest
         assertExpectedAndroidManifest(manifestFile, dir);
     }
 
-    public void DISABLED_testCompatibleScreensUpdate() throws Exception {
-        ManifestUpdateMojo mojo = createMojo("manifest-tests/compatible-screens-android-project");
+    @Disabled("Not tested yet")
+    public void testCompatibleScreensUpdate() throws Exception {
+        ManifestMergerMojo mojo = createMojo("manifest-tests/compatible-screens-android-project");
         mojo.execute();
         File dir = getProjectDir(mojo);
         File manifestFile = new File(dir, "AndroidManifest.xml");
@@ -152,7 +153,7 @@ public class ManifestUpdateMojoTest extends AbstractAndroidMojoTestCase<Manifest
     }
 
     public void testProviderAuthoritiesUpdate() throws Exception {
-        ManifestUpdateMojo mojo = createMojo("manifest-tests/provider-authorities-project");
+        ManifestMergerMojo mojo = createMojo("manifest-tests/provider-authorities-project");
         mojo.execute();
         File dir = getProjectDir(mojo);
         File manifestFile = new File(dir, "AndroidManifest.xml");
@@ -160,7 +161,7 @@ public class ManifestUpdateMojoTest extends AbstractAndroidMojoTestCase<Manifest
     }
 
     public void testUsesSdkMinVersionUpdate() throws Exception {
-        ManifestUpdateMojo mojo = createMojo("manifest-tests/uses-sdk-project1");
+        ManifestMergerMojo mojo = createMojo("manifest-tests/uses-sdk-project1");
         mojo.execute();
         File dir = getProjectDir(mojo);
         File manifestFile = new File(dir, "AndroidManifest.xml");
@@ -168,7 +169,7 @@ public class ManifestUpdateMojoTest extends AbstractAndroidMojoTestCase<Manifest
     }
 
     public void testUsesSdkMaxVersionUpdate() throws Exception {
-        ManifestUpdateMojo mojo = createMojo("manifest-tests/uses-sdk-project2");
+        ManifestMergerMojo mojo = createMojo("manifest-tests/uses-sdk-project2");
         mojo.execute();
         File dir = getProjectDir(mojo);
         File manifestFile = new File(dir, "AndroidManifest.xml");
@@ -176,7 +177,7 @@ public class ManifestUpdateMojoTest extends AbstractAndroidMojoTestCase<Manifest
     }
 
     public void testUsesTargetSdkVersionUpdate() throws Exception {
-        ManifestUpdateMojo mojo = createMojo("manifest-tests/uses-sdk-project3");
+        ManifestMergerMojo mojo = createMojo("manifest-tests/uses-sdk-project3");
         mojo.execute();
         File dir = getProjectDir(mojo);
         File manifestFile = new File(dir, "AndroidManifest.xml");
@@ -184,19 +185,19 @@ public class ManifestUpdateMojoTest extends AbstractAndroidMojoTestCase<Manifest
     }
 
     public void testUsesSdkVersionFullUpdate() throws Exception {
-        ManifestUpdateMojo mojo = createMojo("manifest-tests/uses-sdk-project4");
+        ManifestMergerMojo mojo = createMojo("manifest-tests/uses-sdk-project4");
         mojo.execute();
         File dir = getProjectDir(mojo);
         File manifestFile = new File(dir, "AndroidManifest.xml");
         assertExpectedAndroidManifest(manifestFile, dir);
     }
 
-    private void assertExpectedAndroidManifest(File manifestFile, File testdir) throws IOException {
-        File expectFile = new File(testdir, "AndroidManifest-expected.xml");
+    private void assertExpectedAndroidManifest(File manifestFile, File testDir) throws IOException {
+        File expectFile = new File(testDir, "AndroidManifest-expected.xml");
         // different white space causes issues when between going Windows and *nix via git and wrongly configured
-        // autocrlf .. since we dont need to worry about whitespace.. we strip it out
+        // autocrlf. Since we don't need to worry about whitespace, we strip it out
         String actual = StringUtils.deleteWhitespace(FileUtils.readFileToString(manifestFile));
         String expected = StringUtils.deleteWhitespace(FileUtils.readFileToString(expectFile));
-        Assert.assertEquals(expected, actual);
+        Assertions.assertEquals(expected, actual);
     }
 }

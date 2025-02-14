@@ -5,25 +5,31 @@ import com.github.cardforge.maven.plugins.android.CommandExecutor;
 import com.github.cardforge.maven.plugins.android.config.ConfigHandler;
 import com.github.cardforge.maven.plugins.android.configuration.Program;
 import com.github.cardforge.maven.plugins.android.standalonemojos.MonkeyRunnerMojo;
+import org.apache.maven.project.MavenProject;
 import org.junit.Ignore;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
-import org.powermock.reflect.Whitebox;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Mockito;
+import org.mockito.junit.MockitoJUnitRunner;
 
+import javax.annotation.Nonnull;
+import java.io.File;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 
 /**
  * Test the monkeyrunner mojo. Tests options' default values and parsing. Tests the parameters passed to monkeyrunner.
  *
  * @author Stéphane Nicolas - snicolas@octo.com
  */
-@Ignore("This test has to be migrated to be an IntegrationTest using AbstractAndroidMojoIntegrationTest")
-@RunWith(PowerMockRunner.class)
-@PrepareForTest(
-        {CommandExecutor.Factory.class, ConfigHandler.class})
+@Disabled("This test has to be migrated to be an IntegrationTest using AbstractAndroidMojoIntegrationTest")
+@RunWith(MockitoJUnitRunner.class)
 public class MonkeyRunnerMojoTest extends AbstractAndroidMojoTestCase<MonkeyRunnerMojo> {
     @Override
     public String getPluginGoalName() {
@@ -33,14 +39,15 @@ public class MonkeyRunnerMojoTest extends AbstractAndroidMojoTestCase<MonkeyRunn
     /**
      * Tests all options, checks if their default values are correct.
      *
-     * @throws Exception
+     * @throws Exception if any error occurs
      */
+    @Test
     public void testDefaultMonkeyRunnerConfig() throws Exception {
         MonkeyRunnerMojo mojo = createMojo("monkey-runner-config-project0");
-        final ConfigHandler cfh = new ConfigHandler(mojo, this.session, this.execution);
-        cfh.parseConfiguration();
+        ConfigHandler configHandler = new ConfigHandler(mojo, this.session, this.execution);
+        configHandler.parseConfiguration();
 
-        Boolean monkeyrunnerSkip = Whitebox.getInternalState(mojo, "parsedSkip");
+        Boolean monkeyrunnerSkip = getPrivateField(mojo, "parsedSkip");
 
         assertTrue("monkeyrunner skip parameter should be true", monkeyrunnerSkip);
     }
@@ -48,17 +55,18 @@ public class MonkeyRunnerMojoTest extends AbstractAndroidMojoTestCase<MonkeyRunn
     /**
      * Tests all options, checks if their default values are correct.
      *
-     * @throws Exception
+     * @throws Exception if any error occurs
      */
+    @Test
     public void testDefaultUnskippedMonkeyRunnerConfig() throws Exception {
         MonkeyRunnerMojo mojo = createMojo("monkey-runner-config-project1");
-        final ConfigHandler cfh = new ConfigHandler(mojo, this.session, this.execution);
-        cfh.parseConfiguration();
+        ConfigHandler configHandler = new ConfigHandler(mojo, this.session, this.execution);
+        configHandler.parseConfiguration();
 
-        Boolean monkeyrunnerSkip = Whitebox.getInternalState(mojo, "parsedSkip");
-        String[] monkeyrunnerPlugins = Whitebox.getInternalState(mojo, "parsedPlugins");
-        List<Program> monkeyrunnerPrograms = Whitebox.getInternalState(mojo, "parsedPrograms");
-        Boolean monkeyrunnerCreateReport = Whitebox.getInternalState(mojo, "parsedCreateReport");
+        Boolean monkeyrunnerSkip = getPrivateField(mojo, "parsedSkip");
+        String[] monkeyrunnerPlugins = getPrivateField(mojo, "parsedPlugins");
+        List<Program> monkeyrunnerPrograms = getPrivateField(mojo, "parsedPrograms");
+        Boolean monkeyrunnerCreateReport = getPrivateField(mojo, "parsedCreateReport");
 
         assertFalse("monkeyrunner skip parameter should be false", monkeyrunnerSkip);
         assertNull("monkeyrunner plugins parameter should not contain plugins", monkeyrunnerPlugins);
@@ -69,60 +77,76 @@ public class MonkeyRunnerMojoTest extends AbstractAndroidMojoTestCase<MonkeyRunn
     /**
      * Tests all options, checks if they are parsed correctly.
      *
-     * @throws Exception
+     * @throws Exception if any error occurs
+     *
      */
+    @Test
     public void testCustomMonkeyRunnerConfig() throws Exception {
         MonkeyRunnerMojo mojo = createMojo("monkey-runner-config-project2");
-        final ConfigHandler cfh = new ConfigHandler(mojo, this.session, this.execution);
-        cfh.parseConfiguration();
+        ConfigHandler configHandler = new ConfigHandler(mojo, this.session, this.execution);
+        configHandler.parseConfiguration();
 
-        Boolean monkeyrunnerSkip = Whitebox.getInternalState(mojo, "parsedSkip");
-        String[] monkeyrunnerPlugins = Whitebox.getInternalState(mojo, "parsedPlugins");
-        List<Program> monkeyrunnerPrograms = Whitebox.getInternalState(mojo, "parsedPrograms");
-        Boolean monkeyrunnerCreateReport = Whitebox.getInternalState(mojo, "parsedCreateReport");
+        Boolean monkeyrunnerSkip = getPrivateField(mojo, "parsedSkip");
+        String[] monkeyrunnerPlugins = getPrivateField(mojo, "parsedPlugins");
+        List<Program> monkeyrunnerPrograms = getPrivateField(mojo, "parsedPrograms");
+        Boolean monkeyrunnerCreateReport = getPrivateField(mojo, "parsedCreateReport");
 
         assertFalse("monkeyrunner skip parameter should be false", monkeyrunnerSkip);
         assertNotNull("monkeyrunner plugins parameter should not contain plugins", monkeyrunnerPlugins);
-        String[] expectedPlugins =
-                {"foo"};
-        assertTrue(Arrays.equals(expectedPlugins, monkeyrunnerPlugins));
+        String[] expectedPlugins = {"foo"};
+        assertArrayEquals(expectedPlugins, monkeyrunnerPlugins);
         assertNotNull("monkeyrunner programs parameter should not contain programs", monkeyrunnerPrograms);
-        List<Program> expectedProgramList = new ArrayList<Program>();
+        List<Program> expectedProgramList = new ArrayList<>();
         expectedProgramList.add(new Program("foo", null));
         expectedProgramList.add(new Program("bar", "qux"));
         assertEquals(expectedProgramList, monkeyrunnerPrograms);
         assertTrue("monkeyrunner monkeyrunnerCreateReport parameter should be false", monkeyrunnerCreateReport);
     }
 
-    /**
-     * I don't understand why getAndroidSdk fails here when it runs fine in LintMojo Test public void
-     * testAllMonkeyRunnerCommandParametersWithCustomConfig() throws Exception { MonkeyRunnerMojo mojo = createMojo(
-     * "monkey-runner-config-project2" );
-     *
-     * MavenProject project = EasyMock.createNiceMock( MavenProject.class ); Whitebox.setInternalState( mojo, "project",
-     * project ); File projectBaseDir = new File( "project/" ); EasyMock.expect( project.getBasedir() ).andReturn(
-     * projectBaseDir ); final CommandExecutor mockExecutor = PowerMock.createMock( CommandExecutor.class );
-     * PowerMock.replace( CommandExecutor.Factory.class.getDeclaredMethod( "createDefaultCommmandExecutor" ) ).with( new
-     * InvocationHandler() {
-     *
-     * @Override public Object invoke( Object proxy, Method method, Object[] args ) throws Throwable { return
-     *           mockExecutor; } } );
-     *
-     *           Capture< List< String > > capturedArgument = new Capture< List< String > >();
-     *
-     *           mockExecutor.setLogger( EasyMock.anyObject( Log.class ) ); mockExecutor.executeCommand(
-     *           EasyMock.anyObject( String.class ), EasyMock.capture( capturedArgument ), EasyMock.eq( false ) );
-     *           mockExecutor.setCustomShell( EasyMock.anyObject( Shell.class ) );
-     *
-     *           IDevice mockDevice = EasyMock.createMock( IDevice.class );
-     *
-     *           PowerMock.replay( project ); PowerMock.replay( mockExecutor ); PowerMock.replay( mockDevice );
-     *
-     *           mojo.run( mockDevice );
-     *
-     *           PowerMock.verify( mockExecutor ); List< String > parameters = capturedArgument.getValue(); List< String
-     *           > parametersExpected = new ArrayList< String >(); parametersExpected.add( "-plugin foo" );
-     *           parametersExpected.add( "foo" ); assertEquals( parametersExpected, parameters ); }
-     */
+    @Test
+    public void testAllMonkeyRunnerCommandParametersWithCustomConfig() throws Exception {
+        MonkeyRunnerMojo mojo = createMojo("monkey-runner-config-project2");
 
+        // Mock MavenProject
+        MavenProject project = Mockito.mock(MavenProject.class);
+        setPrivateField(mojo, "project", project);
+        Mockito.when(project.getBasedir()).thenReturn(new File("project/"));
+
+        // Mock CommandExecutor
+        CommandExecutor mockExecutor = Mockito.mock(CommandExecutor.class);
+        Mockito.doNothing().when(mockExecutor).setLogger(Mockito.any());
+        Mockito.doNothing().when(mockExecutor).setCustomShell(Mockito.any());
+        Mockito.doNothing().when(mockExecutor).executeCommand(Mockito.anyString(), Mockito.anyList(), Mockito.eq(false));
+
+        // Inject mock CommandExecutor
+        setPrivateField(CommandExecutor.Factory.class, "executor", mockExecutor);
+
+        // Execute mojo
+        mojo.run(Mockito.mock(com.android.ddmlib.IDevice.class));
+
+        // Capture the parameters passed to CommandExecutor
+        @SuppressWarnings("unchecked") ArgumentCaptor<List<String>> captor = ArgumentCaptor.forClass(List.class);
+        Mockito.verify(mockExecutor).executeCommand(Mockito.anyString(), captor.capture(), Mockito.eq(false));
+
+        // Verify parameters
+        List<String> parameters = captor.getValue();
+        List<String> expectedParameters = Arrays.asList("-plugin foo", "foo");
+        assertEquals(expectedParameters, parameters);
+    }
+
+
+    // Helper method to get private fields using reflection
+    @SuppressWarnings("unchecked")
+    private <T> T getPrivateField(@Nonnull Object target, String fieldName) throws Exception {
+        Field field = target.getClass().getDeclaredField(fieldName);
+        field.setAccessible(true);
+        return (T) field.get(target);
+    }
+
+    // Helper method to set private fields using reflection
+    private void setPrivateField(@Nonnull Object target, String fieldName, Object value) throws Exception {
+        Field field = target.getClass().getDeclaredField(fieldName);
+        field.setAccessible(true);
+        field.set(target, value);
+    }
 }
