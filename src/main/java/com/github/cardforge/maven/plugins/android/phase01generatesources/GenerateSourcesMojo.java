@@ -31,10 +31,7 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.DependencyResolutionRequiredException;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
-import org.apache.maven.plugins.annotations.LifecyclePhase;
-import org.apache.maven.plugins.annotations.Mojo;
-import org.apache.maven.plugins.annotations.Parameter;
-import org.apache.maven.plugins.annotations.ResolutionScope;
+import org.apache.maven.plugins.annotations.*;
 import org.apache.maven.repository.RepositorySystem;
 import org.codehaus.plexus.archiver.ArchiverException;
 import org.codehaus.plexus.archiver.UnArchiver;
@@ -127,7 +124,7 @@ public class GenerateSourcesMojo extends AbstractAndroidMojo {
     /**
      * RepositorySystem object
      */
-    //@Component
+    @Component
     private RepositorySystem repositorySystem;
     /**
      * Pre AMP-4 AndroidManifest file.
@@ -178,9 +175,6 @@ public class GenerateSourcesMojo extends AbstractAndroidMojo {
             if (warnOnApklibDependencies) {
                 checkForApklibDependencies();
             }
-
-            // TODO: Do we really want to continue supporting APKSOURCES? How long has it been deprecated
-            //extractSourceDependencies();
 
             // Extract the apklib and aar dependencies into unpacked-libs so that they can be referenced in the build.
             extractLibraryDependencies();
@@ -766,10 +760,10 @@ public class GenerateSourcesMojo extends AbstractAndroidMojo {
     /**
      * Generate correct R.java for aar dependencies of a current project
      *
-     * @throws MojoExecutionException if it could not generate the R java for one of the libraries.
+     * @throws IOException if it could not locate files.
      */
     private void generateCorrectRJavaForAarDependencies(ResourceClassGenerator resourceGenerator)
-            throws MojoExecutionException, IOException {
+            throws IOException {
         // Generate corrected R.java for AAR dependencies.
         final Set<Artifact> aarLibraries = getTransitiveDependencyArtifacts(AAR);
         if (!aarLibraries.isEmpty()) {
@@ -949,8 +943,10 @@ public class GenerateSourcesMojo extends AbstractAndroidMojo {
      */
     private boolean isBuildConfigPresent(Artifact artifact, @NonNull String packageName) throws MojoExecutionException {
         try {
-            JarFile jar = new JarFile(getUnpackedAarClassesJar(artifact));
-            JarEntry entry = jar.getJarEntry(packageName.replace('.', '/') + "/BuildConfig.class");
+            JarEntry entry;
+            try (JarFile jar = new JarFile(getUnpackedAarClassesJar(artifact))) {
+                entry = jar.getJarEntry(packageName.replace('.', '/') + "/BuildConfig.class");
+            }
 
             return (entry != null);
         } catch (IOException e) {
@@ -1069,11 +1065,7 @@ public class GenerateSourcesMojo extends AbstractAndroidMojo {
      * @return true if the pom type is APK, APKLIB, or APKSOURCES
      */
     private boolean isCurrentProjectAndroid() {
-        Set<String> androidArtifacts = new HashSet<>() {
-            {
-                addAll(Arrays.asList(APK, APKLIB, APKSOURCES, AAR));
-            }
-        };
+        Set<String> androidArtifacts = new HashSet<>(Arrays.asList(APK, APKLIB, APKSOURCES, AAR));
         return androidArtifacts.contains(project.getArtifact().getType());
     }
 

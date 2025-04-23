@@ -121,7 +121,7 @@ public class AndroidSdk {
     }
 
     /**
-     * @param sdkPath           SDK path containg the tools
+     * @param sdkPath           SDK path containing the tools
      * @param apiLevel          API level to use
      * @param buildToolsVersion Build tool version to use
      */

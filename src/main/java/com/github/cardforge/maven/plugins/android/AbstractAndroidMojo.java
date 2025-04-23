@@ -17,6 +17,7 @@
 package com.github.cardforge.maven.plugins.android;
 
 import com.android.annotations.NonNull;
+import com.android.annotations.VisibleForTesting;
 import com.android.builder.core.DefaultManifestParser;
 import com.android.ddmlib.AndroidDebugBridge;
 import com.android.ddmlib.DdmPreferences;
@@ -48,6 +49,8 @@ import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectHelper;
 import org.apache.maven.shared.dependency.graph.DependencyGraphBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -98,6 +101,7 @@ public abstract class AbstractAndroidMojo extends AbstractMojo {
      * Lock for ADB initialization
      */
     private static final Object ADB_LOCK = new Object();
+    private static final Logger log = LoggerFactory.getLogger(AbstractAndroidMojo.class);
 
     /**
      * Flag to indicate if ADB has been initialized
@@ -117,6 +121,7 @@ public abstract class AbstractAndroidMojo extends AbstractMojo {
      * The maven session.
      */
     @Parameter(defaultValue = "${session}", readonly = true)
+    @VisibleForTesting(visibility = VisibleForTesting.Visibility.PRIVATE)
     protected MavenSession session;
     /**
      * Mojo Execution object
@@ -210,7 +215,7 @@ public abstract class AbstractAndroidMojo extends AbstractMojo {
     @Parameter(property = "android.renameManifestPackage")
     protected String renameManifestPackage;
     /**
-     * the extracted dependencies directory. This will contain the extracted dependencies from the
+     * the extracted dependencies' directory. This will contain the extracted dependencies from the
      * various dependencies.
      */
     @Parameter(defaultValue = "${project.build.directory}/generated-sources/extracted-dependencies", readonly = true)
@@ -623,7 +628,7 @@ public abstract class AbstractAndroidMojo extends AbstractMojo {
             try {
                 Thread.sleep(connectionWaitTime);
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                log.warn(Arrays.toString(e.getStackTrace()));
             }
             if (adb.isConnected()) {
                 break;
@@ -736,7 +741,7 @@ public abstract class AbstractAndroidMojo extends AbstractMojo {
         List<IDevice> deviceList = Arrays.asList(androidDebugBridge.getDevices());
         int numberOfDevices = deviceList.size();
         getLog().debug("Found " + numberOfDevices + " devices connected with the Android Debug Bridge");
-        if (deviceList.size() == 0) {
+        if (deviceList.isEmpty()) {
             throw new MojoExecutionException("No online devices attached.");
         }
 
@@ -748,7 +753,7 @@ public abstract class AbstractAndroidMojo extends AbstractMojo {
             getLog().info("android.devicesThreads parameter set to " + getDeviceThreads());
         }
 
-        boolean shouldRunOnAllDevices = getDevices().size() == 0;
+        boolean shouldRunOnAllDevices = getDevices().isEmpty();
         if (shouldRunOnAllDevices) {
             getLog().info("android.devices parameter not set, using all attached devices");
         } else {
@@ -1328,7 +1333,9 @@ public abstract class AbstractAndroidMojo extends AbstractMojo {
      */
     protected final NativeHelper getNativeHelper() {
         if (nativeHelper == null) {
-            nativeHelper = new NativeHelper(project, dependencyGraphBuilder, getLog());
+            nativeHelper = new NativeHelper(
+                    project, dependencyGraphBuilder, getLog(), (session != null ? session : null)
+            );
         }
         return nativeHelper;
     }

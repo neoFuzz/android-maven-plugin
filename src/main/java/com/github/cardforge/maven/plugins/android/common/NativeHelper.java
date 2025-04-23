@@ -1,22 +1,24 @@
 package com.github.cardforge.maven.plugins.android.common;
 
 import com.android.annotations.NonNull;
-import com.android.annotations.Nullable;
 import com.github.cardforge.maven.plugins.android.AbstractAndroidMojo;
 import com.github.cardforge.maven.plugins.android.AndroidNdk;
 import com.google.common.io.PatternFilenameFilter;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.resolver.filter.*;
+import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Exclusion;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.logging.Log;
+import org.apache.maven.project.DefaultProjectBuildingRequest;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuildingRequest;
 import org.apache.maven.shared.dependency.graph.DependencyGraphBuilder;
 import org.apache.maven.shared.dependency.graph.DependencyNode;
 import org.apache.maven.shared.dependency.graph.traversal.CollectingDependencyNodeVisitor;
 
+import javax.annotation.Nonnull;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.*;
@@ -36,6 +38,7 @@ public class NativeHelper {
      * Message to be displayed when including attached artifacts.
      */
     public static final String INC_ATT_ART = "Including attached artifact: ";
+    public static final String ARMEABI = "armeabi";
 
     /**
      * The Maven project instance.
@@ -50,22 +53,39 @@ public class NativeHelper {
      */
     private final Log log;
 
+    private MavenSession session;
+
     /**
      * @param project                The Maven project instance.
      * @param dependencyGraphBuilder The dependency graph builder instance.
      * @param log                    The logger instance.
      */
-    public NativeHelper(MavenProject project, DependencyGraphBuilder dependencyGraphBuilder, Log log) {
+    public NativeHelper(MavenProject project, DependencyGraphBuilder dependencyGraphBuilder,
+                        Log log) {
         this.project = project;
         this.dependencyGraphBuilder = dependencyGraphBuilder;
         this.log = log;
     }
 
     /**
-     * @param applicationMakefile The application makefile to retrieve the ABI from.
-     * @return The ABI, or <code>null</code> if not found
+     * @param project                The Maven project instance.
+     * @param dependencyGraphBuilder The dependency graph builder instance.
+     * @param log                    The logger instance.
+     * @param mavenSession           The Maven session to use.
      */
-    @Nullable
+    public NativeHelper(MavenProject project, DependencyGraphBuilder dependencyGraphBuilder,
+                        Log log, MavenSession mavenSession) {
+        this.project = project;
+        this.dependencyGraphBuilder = dependencyGraphBuilder;
+        this.log = log;
+        this.session = mavenSession;
+    }
+
+    /**
+     * @param applicationMakefile The application makefile to retrieve the ABI from.
+     * @return The ABI, or default to <code>armeabi</code> if not found
+     */
+    @Nonnull
     public static String[] getAppAbi(@NonNull File applicationMakefile) {
         try (Scanner scanner = new Scanner(applicationMakefile)) {
             if (applicationMakefile.exists()) {
@@ -79,7 +99,9 @@ public class NativeHelper {
         } catch (FileNotFoundException e) {
             // do nothing
         }
-        return null;
+
+        // return a default ndk architecture
+        return new String[]{ARMEABI};
     }
 
     /**
@@ -146,13 +168,13 @@ public class NativeHelper {
         File appMK = new File(basedir, applicationMakefileToUse);
         if (appMK.exists()) {
             String[] foundNdkArchitectures = getAppAbi(appMK);
-            if (foundNdkArchitectures != null) {
+            if (!foundNdkArchitectures[0].equals(ARMEABI)) {
                 return foundNdkArchitectures;
             }
         }
 
         // return a default ndk architecture
-        return new String[]{"armeabi"};
+        return new String[]{ARMEABI};
     }
 
     /**
@@ -300,12 +322,15 @@ public class NativeHelper {
         try {
             final Set<Artifact> artifacts = new LinkedHashSet<>();
 
+            // Setup exclusion patterns
             final List<String> exclusionPatterns = new ArrayList<>();
             if (dependency.getExclusions() != null && !dependency.getExclusions().isEmpty()) {
                 for (final Exclusion exclusion : dependency.getExclusions()) {
                     exclusionPatterns.add(exclusion.getGroupId() + ":" + exclusion.getArtifactId());
                 }
             }
+
+            // Setup filters
             final ArtifactFilter optionalFilter = artifact -> !artifact.isOptional();
 
             final AndArtifactFilter filter = new AndArtifactFilter();
@@ -315,7 +340,15 @@ public class NativeHelper {
                     new ScopeArtifactFilter("test"))));
             filter.add(optionalFilter);
 
-            final DependencyNode node = dependencyGraphBuilder.buildDependencyGraph((ProjectBuildingRequest) project, filter);
+            // Get ProjectBuildingRequest from MavenSession
+            ProjectBuildingRequest request = session.getProjectBuildingRequest();// new DefaultProjectBuildingRequest()
+
+            // Create a new request to avoid modifying the original
+            DefaultProjectBuildingRequest buildingRequest = new DefaultProjectBuildingRequest(request);
+            buildingRequest.setProject(project);
+            buildingRequest.setRemoteRepositories(project.getRemoteArtifactRepositories());
+
+            final DependencyNode node = dependencyGraphBuilder.buildDependencyGraph(buildingRequest, filter);
             final CollectingDependencyNodeVisitor collectingVisitor = new CollectingDependencyNodeVisitor();
             node.accept(collectingVisitor);
 
