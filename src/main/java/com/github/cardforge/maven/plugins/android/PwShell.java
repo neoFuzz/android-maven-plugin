@@ -16,7 +16,6 @@ package com.github.cardforge.maven.plugins.android;
 import org.codehaus.plexus.util.Os;
 import org.codehaus.plexus.util.cli.shell.Shell;
 
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -54,12 +53,11 @@ public class PwShell extends Shell {
      */
     @Override
     public List<String> getCommandLine(String executable, String[] arguments) {
-        StringBuilder sb = new StringBuilder();
-        sb.append("\"");
-        // Put an '&' on the front of the executable string and replace the double-quotes (") to single quotes (')
-        sb.append("&").append((super.getCommandLine(executable, arguments).get(0)).replace("\"", "'"));
-        sb.append("\"");
-        return Arrays.asList(sb.toString());
+        String sb = "\"" +
+                // Put an '&' on the front of the executable string and replace the double-quotes (") to single quotes (')
+                "&" + (super.getCommandLine(executable, arguments).get(0)).replace("\"", "'") +
+                "\"";
+        return List.of(sb);
     }
 
 }

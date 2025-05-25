@@ -8,6 +8,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
+import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,7 +20,14 @@ import java.util.List;
 public class UnpackMojoLazyTest
         extends AbstractAndroidMojoTestCase<UnpackMojo> {
 
+    private final String projectName;
+
+    public UnpackMojoLazyTest(String projectName) {
+        this.projectName = projectName;
+    }
+
     @Parameters
+    @Nonnull
     static public List<Object[]> suite() {
         final List<Object[]> suite = new ArrayList<Object[]>();
 
@@ -29,15 +37,14 @@ public class UnpackMojoLazyTest
         return suite;
     }
 
-    private final String projectName;
-
-    public UnpackMojoLazyTest(String projectName) {
-        this.projectName = projectName;
-    }
-
     @Override
     public String getPluginGoalName() {
         return "unpack";
+    }
+
+    @Override
+    protected Class<UnpackMojo> getMojoClass() {
+        return null;
     }
 
     @Override
@@ -47,14 +54,11 @@ public class UnpackMojoLazyTest
         super.setUp();
     }
 
-    @Override
     @After
-    public void tearDown()
-            throws Exception {
-        super.tearDown();
+    public void tearDown() {
+// not sure
     }
 
-    @Override
     public String getName() {
         return projectName;
     }
@@ -73,8 +77,7 @@ public class UnpackMojoLazyTest
         Assert.assertTrue(result);
     }
 
-    protected <T> T getFieldValue(Object object, String fieldName)
-            throws IllegalAccessException {
+    protected <T> T getFieldValue(Object object, String fieldName) throws Exception {
         return (T) super.getVariableValueFromObject(object, fieldName);
     }
 

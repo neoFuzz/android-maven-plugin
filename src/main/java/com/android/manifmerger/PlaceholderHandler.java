@@ -30,10 +30,6 @@ import java.util.regex.Pattern;
 public class PlaceholderHandler {
 
     /**
-     * Interesting placeholders names that are documented to be automatically provided.
-     */
-    public static final String INSTRUMENTATION_RUNNER = "instrumentationRunner";
-    /**
      * Static string
      */
     public static final String PACKAGE_NAME = "packageName";
@@ -41,10 +37,6 @@ public class PlaceholderHandler {
      * static string
      */
     public static final String APPLICATION_ID = "applicationId";
-    /**
-     * static string for feature name
-     */
-    public static final String FEATURE_NAME = "featureName";
 
     /**
      * regular expression to recognize placeholders like ${name}, potentially surrounded by a

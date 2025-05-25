@@ -64,7 +64,7 @@ public class AndroidTestFinder {
         for (File classFile : classFiles) {
             ClassReader classReader;
             try (FileInputStream inputStream = new FileInputStream(classFile)) {
-                classReader = new ClassReader(inputStream);
+                classReader = new ClassReader(new java.io.BufferedInputStream(inputStream));
                 classReader.accept(descendantFinder,
                         ClassReader.SKIP_DEBUG | ClassReader.SKIP_FRAMES | ClassReader.SKIP_CODE);
                 classReader.accept(annotationFinder,

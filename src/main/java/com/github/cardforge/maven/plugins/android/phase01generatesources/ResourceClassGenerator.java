@@ -1,12 +1,10 @@
 package com.github.cardforge.maven.plugins.android.phase01generatesources;
 
 import com.android.annotations.NonNull;
-import com.android.builder.core.AaptPackageProcessBuilder;
 import com.android.builder.core.DefaultManifestParser;
 import com.android.builder.symbols.RGeneration;
 import com.android.builder.symbols.SymbolIo;
 import com.android.builder.symbols.SymbolTable;
-import com.android.ide.common.process.ProcessOutputHandler;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.plugin.logging.Log;
 
@@ -46,8 +44,6 @@ final class ResourceClassGenerator {
      * If we are generating an integration test APK and the APK under test has a reference to a library for which
      * it generated an R java, then we don't want to generate that R java again for the test APK because otherwise
      * Proguard will fail when building the test APK because of duplication of the R java in the {@code compile} classpath.
-     * <p>
-     * See {@link com.android.builder.core.AndroidBuilder#processResources(AaptPackageProcessBuilder, boolean, ProcessOutputHandler)}
      *
      * @param libraries AAR libraries for which to generate R java files.
      */

@@ -52,17 +52,17 @@ public class PluginInfo {
      */
     private static void loadProperties() {
         prop = new Properties();
-        InputStream in = PluginInfo.class.getResourceAsStream("plugin.properties");
-        try {
+        try (InputStream in = PluginInfo.class.getResourceAsStream("plugin.properties")) {
+            if (in == null) {
+                System.err.println("Could not load plugin.properties");
+                return;
+            }
             prop.load(in);
             groupId = prop.getProperty("groupId");
             artifactId = prop.getProperty("artifactId");
             version = prop.getProperty("version");
-            in.close();
         } catch (IOException e) {
             e.printStackTrace();
-        } catch (NullPointerException e) {
-            System.err.println("Could not load plugin.properties");
         }
     }
 
@@ -73,13 +73,7 @@ public class PluginInfo {
      */
     @NonNull
     public static String getGAV() {
-        StringBuilder builder = new StringBuilder()
-                .append(groupId)
-                .append(COLON)
-                .append(artifactId)
-                .append(COLON)
-                .append(version);
-        return builder.toString();
+        return groupId + COLON + artifactId + COLON + version;
     }
 
     /**
@@ -109,14 +103,6 @@ public class PluginInfo {
      */
     @NonNull
     public static String getQualifiedGoal(String goal) {
-        StringBuilder builder = new StringBuilder()
-                .append(groupId)
-                .append(COLON)
-                .append(artifactId)
-                .append(COLON)
-                .append(version)
-                .append(COLON)
-                .append(goal);
-        return builder.toString();
+        return groupId + COLON + artifactId + COLON + version + COLON + goal;
     }
 }

@@ -394,16 +394,17 @@ public class ApkMojo extends AbstractAndroidMojo {
         getLog().debug("Extracting duplicates");
         List<String> duplicates = new ArrayList<>();
         List<File> jarToModify = new ArrayList<>();
-        for (String s : jars.keySet()) {
-            List<File> l = jars.get(s);
-            if (l.size() > 1) {
-                getLog().warn("Duplicate file " + s + " : " + l);
-                duplicates.add(s);
-                for (File file : l) {
-                    if (!jarToModify.contains(file)) {
-                        jarToModify.add(file);
-                    }
-                }
+        for (Map.Entry<String, List<File>> entry : jars.entrySet()) {
+            List<File> files = entry.getValue();
+            if (files.size() > 1) {
+                String jarName = entry.getKey();
+                getLog().warn("Duplicate file " + jarName + " : " + files);
+                duplicates.add(jarName);
+
+                // Add all non-duplicate files in one go using removeAll
+                List<File> newFiles = new ArrayList<>(files);
+                newFiles.removeAll(jarToModify);
+                jarToModify.addAll(newFiles);
             }
         }
 
@@ -463,13 +464,14 @@ public class ApkMojo extends AbstractAndroidMojo {
 
         //A when jack is running the classes directory will not get filled (usually)
         // so let's skip it if it wasn't created by something else
-        if (projectOutputDirectory.exists() || Boolean.TRUE.equals(!getJack().isEnabled())) {
+        if (projectOutputDirectory.exists() || !getJack().isEnabled()) {
             sourceFolders.add(projectOutputDirectory);
         }
 
         for (Artifact artifact : filterArtifacts(getRelevantCompileArtifacts(), skipDependencies,
                 artifactTypeSet.getIncludes(), artifactTypeSet.getExcludes(), artifactSet.getIncludes(),
                 artifactSet.getExcludes())) {
+
             getLog().debug("Found artifact for APK :" + artifact);
             if (extractDuplicates) {
                 try {
@@ -502,6 +504,7 @@ public class ApkMojo extends AbstractAndroidMojo {
             }
 
             for (File sourceFolder : sourceFolders) {
+
                 getLog().debug("Adding source folder : " + sourceFolder);
                 // Use ApkBuilder#addFile() to explicitly add resource files so that we can add META-INF/services.
                 addResourcesFromFolder(apkBuilder, sourceFolder);
@@ -512,14 +515,17 @@ public class ApkMojo extends AbstractAndroidMojo {
 
                 if (excludeJarResourcesPatterns != null) {
                     final String name = jarFile.getName();
+
                     getLog().debug("Checking " + name + " against patterns");
                     for (Pattern pattern : excludeJarResourcesPatterns) {
                         final Matcher matcher = pattern.matcher(name);
                         if (matcher.matches()) {
+
                             getLog().debug("Jar " + name + " excluded by pattern " + pattern);
                             excluded = true;
                             break;
                         } else {
+
                             getLog().debug("Jar " + name + " not excluded by pattern " + pattern);
                         }
                     }
@@ -530,16 +536,19 @@ public class ApkMojo extends AbstractAndroidMojo {
                 }
 
                 if (jarFile.isDirectory()) {
+
                     getLog().debug("Adding resources from jar folder : " + jarFile);
                     final String[] filenames = jarFile.list((dir, name) ->
                             PATTERN_JAR_EXT.matcher(name).matches());
 
                     for (String filename : Objects.requireNonNull(filenames)) {
                         final File innerJar = new File(jarFile, filename);
+
                         getLog().debug("Adding resources from innerJar : " + innerJar);
                         apkBuilder.addResourcesFromJar(innerJar);
                     }
                 } else {
+
                     getLog().debug("Adding resources from : " + jarFile);
                     apkBuilder.addResourcesFromJar(jarFile);
                 }
@@ -548,6 +557,7 @@ public class ApkMojo extends AbstractAndroidMojo {
             addSecondaryDexes(dexFile, apkBuilder);
 
             for (File nativeFolder : nativeFolders) {
+
                 getLog().debug("Adding native library : " + nativeFolder);
                 apkBuilder.addNativeLibraries(nativeFolder);
             }
@@ -662,7 +672,8 @@ public class ApkMojo extends AbstractAndroidMojo {
         File tmp = new File(target, "unpacked-embedded-jars");
         tmp.mkdirs();
         String jarName = String.format("%s-%d.%s",
-                Files.getNameWithoutExtension(in.getName()), num, Files.getFileExtension(in.getName()));
+                Files.getNameWithoutExtension(in.getName()), num,
+                Files.getFileExtension(in.getName()));
         File out = new File(tmp, jarName);
 
         if (out.exists()) {
@@ -767,10 +778,10 @@ public class ApkMojo extends AbstractAndroidMojo {
                                 if (transformer.canTransformResource(lName)) {
                                     getLog().info("Transforming " + lName
                                             + " using " + transformer.getClass().getName());
-                                    InputStream currIn = new FileInputStream(f);
-                                    transformer.processResource(lName, currIn, null);
-                                    currIn.close();
-                                    resourceTransformed = true;
+                                    try (FileInputStream currIn = new FileInputStream(f)) {
+                                        transformer.processResource(lName, currIn, null);
+                                        resourceTransformed = true;
+                                    }
                                     break;
                                 }
                             }
@@ -781,12 +792,12 @@ public class ApkMojo extends AbstractAndroidMojo {
                             duplicatesAdded.add(lName);
                             ZipEntry entry = new ZipEntry(lName);
                             duplicateZos.putNextEntry(entry);
-                            InputStream currIn = new FileInputStream(f);
-                            copyStreamWithoutClosing(currIn, duplicateZos);
-                            currIn.close();
+                            try (FileInputStream currIn = new FileInputStream(f)) {
+                                copyStreamWithoutClosing(currIn, duplicateZos);
+                            }
                             duplicateZos.closeEntry();
                         }
-                        f.delete();
+                        java.nio.file.Files.delete(f.toPath());
                     }
                 }
             }
@@ -802,6 +813,7 @@ public class ApkMojo extends AbstractAndroidMojo {
     @NonNull
     private Collection<File> getNativeLibraryFolders() throws MojoExecutionException {
         final List<File> natives = new ArrayList<>();
+        final boolean isDebugEnabled = getLog().isDebugEnabled();
 
         if (nativeLibrariesDirectory.exists()) {
             // If we have prebuilt native libs then copy them over to the native output folder.
@@ -814,7 +826,8 @@ public class ApkMojo extends AbstractAndroidMojo {
             if (APKLIB.equals(resolvedArtifact.getType()) || AAR.equals(resolvedArtifact.getType())) {
                 // If the artifact is an AAR or APKLIB then add their native libs folder to the result.
                 final File folder = getUnpackedLibNativesFolder(resolvedArtifact);
-                getLog().debug("Adding native library folder " + folder);
+                if (isDebugEnabled)
+                    getLog().debug("Adding native library folder " + folder);
                 natives.add(folder);
             }
 
@@ -831,13 +844,14 @@ public class ApkMojo extends AbstractAndroidMojo {
         if (Boolean.TRUE.equals(apkDebug)) {
             // Copy the gdbserver binary into the native libs output folder (for each architecture).
             for (String ndkArchitecture : AndroidNdk.NDK_ARCHITECTURES) {
-                copyGdbServer(ndkOutputDirectory, ndkArchitecture);
+                copyGdbServer(ndkOutputDirectory, ndkArchitecture, isDebugEnabled);
             }
         }
 
+        // If we have any native libs in the native output folder then add the output folder to the result.
         if (ndkOutputDirectory.exists()) {
-            // If we have any native libs in the native output folder then add the output folder to the result.
-            getLog().debug("Adding built native library folder " + ndkOutputDirectory);
+            if (isDebugEnabled)
+                getLog().debug("Adding built native library folder " + ndkOutputDirectory);
             natives.add(ndkOutputDirectory);
         }
 
@@ -877,7 +891,9 @@ public class ApkMojo extends AbstractAndroidMojo {
 
             final File folder = new File(destinationDirectory, ndkArchitecture);
             final File file = new File(folder, filename);
-            getLog().debug("Copying native dependency " + artifactId + " (" + artifact.getGroupId() + ") to " + file);
+            if (getLog().isDebugEnabled())
+                getLog().debug("Copying native dependency " + artifactId +
+                        " (" + artifact.getGroupId() + ") to " + file);
             FileUtils.copyFile(artifactFile, file);
         } catch (IOException e) {
             throw new MojoExecutionException("Could not copy native dependency.", e);
@@ -891,7 +907,7 @@ public class ApkMojo extends AbstractAndroidMojo {
      * @param architecture         The architecture to copy the gdbserver binary for.
      * @throws MojoExecutionException if an error occurs during the copy process
      */
-    private void copyGdbServer(File destinationDirectory, String architecture) throws MojoExecutionException {
+    private void copyGdbServer(File destinationDirectory, String architecture, final boolean debug) throws MojoExecutionException {
 
         try {
             final File destDir = new File(destinationDirectory, architecture);
@@ -900,7 +916,8 @@ public class ApkMojo extends AbstractAndroidMojo {
                 final File gdbServerFile = getAndroidNdk().getGdbServer(architecture);
                 final File destFile = new File(destDir, "gdbserver");
                 if (!destFile.exists()) {
-                    getLog().debug("Copying gdbServer to " + destFile);
+                    if (debug)
+                        getLog().debug("Copying gdbServer to " + destFile);
                     FileUtils.copyFile(gdbServerFile, destFile);
                 } else {
                     getLog().info("Note: gdbserver binary already exists at destination, will not copy over");
@@ -918,8 +935,10 @@ public class ApkMojo extends AbstractAndroidMojo {
      * @param destinationDirectory          The directory to copy the native libraries to.
      * @throws MojoExecutionException if an error occurs during the copy process
      */
-    private void copyLocalNativeLibraries(final File localNativeLibrariesDirectory, final File destinationDirectory)
+    private void copyLocalNativeLibraries(final File localNativeLibrariesDirectory,
+                                          final File destinationDirectory)
             throws MojoExecutionException {
+
         getLog().debug("Copying existing native libraries from " + localNativeLibrariesDirectory);
         try {
 
@@ -979,7 +998,8 @@ public class ApkMojo extends AbstractAndroidMojo {
                 .setDebugMode(!release)
                 .addExtraArguments(aaptExtraArgs);
 
-        getLog().debug(getAndroidSdk().getAaptPath() + " " + commandBuilder.toString());
+        if (getLog().isDebugEnabled())
+            getLog().debug(getAndroidSdk().getAaptPath() + " " + commandBuilder.toString());
         try {
             executor.setCaptureStdOut(true);
             List<String> commands = commandBuilder.build();

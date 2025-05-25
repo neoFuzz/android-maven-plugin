@@ -26,6 +26,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import javax.annotation.Nonnull;
 import java.io.File;
 
 @RunWith(MavenJUnitTestRunner.class)
@@ -37,7 +38,7 @@ public class TicTacToeSampleIT {
 
     public final MavenRuntime mavenRuntime;
 
-    public TicTacToeSampleIT(MavenRuntimeBuilder builder) throws Exception {
+    public TicTacToeSampleIT(@Nonnull MavenRuntimeBuilder builder) throws Exception {
         this.mavenRuntime = builder.build();
     }
 

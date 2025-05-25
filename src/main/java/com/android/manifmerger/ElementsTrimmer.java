@@ -23,6 +23,7 @@ import org.w3c.dom.Attr;
 
 import java.util.Map;
 import java.util.NavigableMap;
+import java.util.Optional;
 import java.util.TreeMap;
 
 import static com.android.SdkConstants.ANDROID_URI;
@@ -33,6 +34,9 @@ import static com.android.manifmerger.ManifestModel.ATTRIBUTE_REQUIRED;
  * Trims the document from unwanted, repeated elements.
  */
 public class ElementsTrimmer {
+    private ElementsTrimmer() {
+        // no instances
+    }
 
     /**
      * Trims unwanted, duplicated elements from the merged document.
@@ -114,15 +118,19 @@ public class ElementsTrimmer {
             if (removeElement) {
                 // if the node only contains glEsVersion, then remove the entire node,
                 // if it also contains android:name, just remove the glEsVersion attribute
-                if (glEsVersionDeclaration.getValue().getXml().getAttributeNodeNS(ANDROID_URI,
-                        SdkConstants.ATTR_NAME) != null) {
-                    glEsVersionDeclaration.getValue().getXml().removeAttributeNS(ANDROID_URI,
-                            ATTRIBUTE_GLESVERSION);
-                    mergingReport.getActionRecorder().recordAttributeAction(
-                            glEsVersionDeclaration.getValue().getAttribute(XmlNode.fromXmlName(
-                                    "android:" + ATTRIBUTE_GLESVERSION)).get(),
-                            Actions.ActionType.REJECTED,
-                            null /* attributeOperationType */);
+                if (glEsVersionDeclaration.getValue().getXml()
+                        .getAttributeNodeNS(ANDROID_URI, SdkConstants.ATTR_NAME) != null) {
+                    glEsVersionDeclaration.getValue().getXml().removeAttributeNS(ANDROID_URI, ATTRIBUTE_GLESVERSION);
+
+                    XmlNode.NodeName glEsVersionName = XmlNode.fromXmlName("android:" + ATTRIBUTE_GLESVERSION);
+                    XmlElement glEsElement = glEsVersionDeclaration.getValue();
+                    Optional<XmlAttribute> glEsAttribute = glEsElement.getAttribute(glEsVersionName);
+
+                    glEsAttribute.ifPresent(xmlAttribute -> mergingReport.getActionRecorder()
+                            .recordAttributeAction(
+                                    xmlAttribute,
+                                    Actions.ActionType.REJECTED,
+                                    null /* attributeOperationType */));
                 } else {
                     xmlDocument.getRootNode().getXml().removeChild(
                             glEsVersionDeclaration.getValue().getXml());

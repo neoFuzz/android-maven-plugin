@@ -16,10 +16,6 @@ public class Const {
      */
     public static class ArtifactType {
         /**
-         * Static string representing the native header file extension.
-         */
-        public static final String NATIVE_HEADER_ARCHIVE = "har";
-        /**
          * Static string representing the native library archive file extension.
          */
         public static final String NATIVE_IMPLEMENTATION_ARCHIVE = "a";

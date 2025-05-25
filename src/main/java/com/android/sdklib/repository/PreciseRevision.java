@@ -16,8 +16,6 @@
 
 package com.android.sdklib.repository;
 
-import com.android.annotations.NonNull;
-
 /**
  * A {@link FullRevision} which distinguishes between x and x.0, x.0.0, x.y.0, etc.; it basically
  * keeps track of the precision of the revision string.
@@ -37,42 +35,6 @@ public class PreciseRevision extends FullRevision {
     private final int mPrecision;
 
     /**
-     * @param major The major revision number.
-     */
-    public PreciseRevision(int major) {
-        this(major, IMPLICIT_MINOR_REV, IMPLICIT_MICRO_REV, NOT_A_PREVIEW, PRECISION_MAJOR,
-                DEFAULT_SEPARATOR);
-    }
-
-    /**
-     * @param major The major revision number.
-     * @param minor The minor revision number.
-     */
-    public PreciseRevision(int major, int minor) {
-        this(major, minor, IMPLICIT_MICRO_REV, NOT_A_PREVIEW, PRECISION_MINOR, DEFAULT_SEPARATOR);
-    }
-
-    /**
-     * @param major The major revision number.
-     * @param minor The minor revision number.
-     * @param micro The micro revision number.
-     */
-    public PreciseRevision(int major, int minor, int micro) {
-        this(major, minor, micro, NOT_A_PREVIEW, PRECISION_MICRO, DEFAULT_SEPARATOR);
-    }
-
-    /**
-     * @param major   The major revision number.
-     * @param minor   The minor revision number.
-     * @param micro   The micro revision number.
-     * @param preview The preview number. Use {@link #NOT_A_PREVIEW} if there is no preview.
-     *                Preview numbers are always ignored when comparing versions.
-     */
-    public PreciseRevision(int major, int minor, int micro, int preview) {
-        this(major, minor, micro, preview, PRECISION_PREVIEW, DEFAULT_SEPARATOR);
-    }
-
-    /**
      * @param major     The major revision number.
      * @param minor     The minor revision number.
      * @param micro     The micro revision number.
@@ -84,23 +46,6 @@ public class PreciseRevision extends FullRevision {
                     String separator) {
         super(major, minor, micro, preview, separator);
         mPrecision = precision;
-    }
-
-    /**
-     * Parses a string of format "major.minor.micro rcPreview" and returns
-     * a new {@link com.android.sdklib.repository.PreciseRevision} for it.
-     * <p>
-     * All the fields except major are optional.
-     *
-     * @param revision A non-null revision to parse.
-     * @return A new non-null {@link com.android.sdklib.repository.PreciseRevision}.
-     * @throws NumberFormatException if the parsing failed.
-     */
-    @NonNull
-    public static PreciseRevision parseRevision(@NonNull String revision)
-            throws NumberFormatException {
-        return (PreciseRevision) parseRevisionImpl(revision, true /*supportMinorMicro*/,
-                true /*supportPreview*/, true /*keepPrevision*/);
     }
 
     /**
@@ -186,20 +131,5 @@ public class PreciseRevision extends FullRevision {
             return mPrecision == other.mPrecision;
         }
         return false;
-    }
-
-    /**
-     * @param rhs            The revision to compare against.
-     * @param comparePreview Whether to compare preview numbers.
-     * @return {@code 0} if {@code this} and {@code rhs} are equal, a negative number if
-     * {@code this} is less than {@code rhs}, or a positive number if {@code this} is greater
-     * than {@code rhs}.
-     */
-    public int compareTo(PreciseRevision rhs, PreviewComparison comparePreview) {
-        int delta = super.compareTo(rhs, comparePreview);
-        if (delta == 0) {
-            return mPrecision - rhs.mPrecision;
-        }
-        return delta;
     }
 }

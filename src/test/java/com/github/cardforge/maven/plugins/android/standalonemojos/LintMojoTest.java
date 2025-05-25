@@ -9,7 +9,6 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.maven.model.Build;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.project.MavenProject;
-import org.junit.Ignore;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
@@ -24,6 +23,7 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
@@ -47,6 +47,11 @@ public class LintMojoTest extends AbstractAndroidMojoTestCase<LintMojo> {
         return "lint";
     }
 
+    @Override
+    protected Class<LintMojo> getMojoClass() {
+        return null;
+    }
+
     /**
      * Tests all options, checks if their default values are correct.
      *
@@ -62,8 +67,8 @@ public class LintMojoTest extends AbstractAndroidMojoTestCase<LintMojo> {
         // Set internal state using reflection
         setInternalState(mojo, "parsedSkip", true);
 
-        assertTrue("lint skip parameter should be true",
-                (Boolean) getInternalState(mojo, "parsedSkip"));
+        assertTrue((Boolean) getInternalState(mojo, "parsedSkip"),
+                "lint skip parameter should be true");
     }
 
     /**
@@ -117,7 +122,7 @@ public class LintMojoTest extends AbstractAndroidMojoTestCase<LintMojo> {
         build.setSourceDirectory("src/");
         build.setOutputDirectory("classes/");
 
-        File projectBaseDir = new File(getBasedir());
+        File projectBaseDir = new File(getBasedir().toURI());
         when(project.getBasedir()).thenReturn(projectBaseDir);
         when(project.getBuild()).thenReturn(build);
 
@@ -281,114 +286,108 @@ public class LintMojoTest extends AbstractAndroidMojoTestCase<LintMojo> {
     }
 
     private void verifyDefaultValues(LintMojo mojo, MavenProject project) {
-        assertFalse("lint skip parameter should be false",
-                (Boolean) getInternalState(mojo, "parsedSkip"));
-        assertFalse("lint failOnError parameter should be false",
-                (Boolean) getInternalState(mojo, "parsedFailOnError"));
-        assertFalse("lint ignoreWarning parameter should be false",
-                (Boolean) getInternalState(mojo, "parsedIgnoreWarnings"));
-        assertFalse("lint warnAll parameter should be false",
-                (Boolean) getInternalState(mojo, "parsedWarnAll"));
-        assertFalse("lint warningsAsErrors parameter should be false",
-                (Boolean) getInternalState(mojo, "parsedWarningsAsErrors"));
-        assertEquals("lint config parameter should be null", "null",
-                getInternalState(mojo, "parsedConfig"));
+        assertFalse((Boolean) getInternalState(mojo, "parsedSkip"),
+                "lint skip parameter should be false");
+        assertFalse((Boolean) getInternalState(mojo, "parsedFailOnError"),
+                "lint failOnError parameter should be false");
+        assertFalse((Boolean) getInternalState(mojo, "parsedIgnoreWarnings"),
+                "lint ignoreWarning parameter should be false");
+        assertFalse((Boolean) getInternalState(mojo, "parsedWarnAll"),
+                "lint warnAll parameter should be false");
+        assertFalse((Boolean) getInternalState(mojo, "parsedWarningsAsErrors"),
+                "lint warningsAsErrors parameter should be false");
+        assertEquals("null", getInternalState(mojo, "parsedConfig"),
+                "lint config parameter should be null");
 
-        assertFalse("lint fullPath parameter should be false",
-                (Boolean) getInternalState(mojo, "parsedFullPath"));
-        assertTrue("lint showAll parameter should be true",
-                (Boolean) getInternalState(mojo, "parsedShowAll"));
-        assertFalse("lint disableSourceLines parameter should be false",
-                (Boolean) getInternalState(mojo, "parsedDisableSourceLines"));
-        assertEquals("lint url parameter should be none", "none",
-                getInternalState(mojo, "parsedUrl"));
+        assertFalse((Boolean) getInternalState(mojo, "parsedFullPath"),
+                "lint fullPath parameter should be false");
+        assertTrue((Boolean) getInternalState(mojo, "parsedShowAll"),
+                "lint showAll parameter should be true");
+        assertFalse((Boolean) getInternalState(mojo, "parsedDisableSourceLines"),
+                "lint disableSourceLines parameter should be false");
+        assertEquals("none", getInternalState(mojo, "parsedUrl"),
+                "lint url parameter should be none");
+        assertTrue((Boolean) getInternalState(mojo, "parsedEnableXml"),
+                "lint enableXml parameter should be true");
 
-        assertTrue("lint enableXml parameter should be true",
-                (Boolean) getInternalState(mojo, "parsedEnableXml"));
         File lintXmlOutputFile = new File(project.getBuild().getDirectory(), "lint-results/lint-results.xml");
-        assertEquals("lint xmlOutputPath parameter should point to lint-results.xml",
-                lintXmlOutputFile.getAbsolutePath(),
-                getInternalState(mojo, "parsedXmlOutputPath"));
-        assertFalse("lint enableHtml parameter should be false",
-                (Boolean) getInternalState(mojo, "parsedEnableHtml"));
-        File lintHtmlOutputFile = new File(project.getBuild().getDirectory(), "lint-results/lint-results-html");
-        assertEquals("lint htmlOutputPath parameter should point to lint-html",
-                lintHtmlOutputFile.getAbsolutePath(),
-                getInternalState(mojo, "parsedHtmlOutputPath"));
-        assertFalse("lint enableSimpleHtml parameter should be false",
-                (Boolean) getInternalState(mojo, "parsedEnableSimpleHtml"));
-        File lintSimpleHtmlOutputFile = new File(project.getBuild().getDirectory(), "lint-results/lint-results-simple-html");
-        assertEquals("lint simpleHtmlOutputPath parameter should point to lint-simple-html",
-                lintSimpleHtmlOutputFile.getAbsolutePath(),
-                getInternalState(mojo, "parsedSimpleHtmlOutputPath"));
+        assertEquals(lintXmlOutputFile.getAbsolutePath(), getInternalState(mojo, "parsedXmlOutputPath"),
+                "lint xmlOutputPath parameter should point to lint-results.xml");
+        assertFalse((Boolean) getInternalState(mojo, "parsedEnableHtml"),
+                "lint enableHtml parameter should be false");
 
-        assertTrue("lint enableSources parameter should be true",
-                (Boolean) getInternalState(mojo, "parsedEnableSources"));
-        assertEquals("lint sources parameter should point to src/",
-                project.getBuild().getSourceDirectory(),
-                getInternalState(mojo, "parsedSources"));
-        assertFalse("lint enableClasspath parameter should be false",
-                (Boolean) getInternalState(mojo, "parsedEnableClasspath"));
-        assertEquals("lint classpath parameter should point to target/classes",
-                project.getBuild().getOutputDirectory(),
-                getInternalState(mojo, "parsedClasspath"));
-        assertFalse("lint enableLibraries parameter should be false",
-                (Boolean) getInternalState(mojo, "parsedEnableLibraries"));
-        assertNull("lint libraries parameter should point not contain dependencies",
-                getInternalState(mojo, "parsedLibraries"));
+        File lintHtmlOutputFile = new File(project.getBuild().getDirectory(), "lint-results/lint-results-html");
+        assertEquals(lintHtmlOutputFile.getAbsolutePath(), getInternalState(mojo, "parsedHtmlOutputPath"),
+                "lint htmlOutputPath parameter should point to lint-html");
+        assertFalse((Boolean) getInternalState(mojo, "parsedEnableSimpleHtml"),
+                "lint enableSimpleHtml parameter should be false");
+
+        File lintSimpleHtmlOutputFile = new File(project.getBuild().getDirectory(), "lint-results/lint-results-simple-html");
+        assertEquals(lintSimpleHtmlOutputFile.getAbsolutePath(),
+                getInternalState(mojo, "parsedSimpleHtmlOutputPath"),
+                "lint simpleHtmlOutputPath parameter should point to lint-simple-html");
+        assertTrue((Boolean) getInternalState(mojo, "parsedEnableSources"),
+                "lint enableSources parameter should be true");
+        assertEquals(project.getBuild().getSourceDirectory(), getInternalState(mojo, "parsedSources"),
+                "lint sources parameter should point to src/");
+        assertFalse((Boolean) getInternalState(mojo, "parsedEnableClasspath"),
+                "lint enableClasspath parameter should be false");
+        assertEquals(project.getBuild().getOutputDirectory(), getInternalState(mojo, "parsedClasspath"),
+                "lint classpath parameter should point to target/classes");
+        assertFalse((Boolean) getInternalState(mojo, "parsedEnableLibraries"),
+                "lint enableLibraries parameter should be false");
+        assertNull(getInternalState(mojo, "parsedLibraries"),
+                "lint libraries parameter should point not contain dependencies");
     }
 
     private void verifyCustomValues(LintMojo mojo) {
-        assertFalse("lint skip parameter should be false",
-                (Boolean) getInternalState(mojo, "parsedSkip"));
-        assertTrue("lint failOnError parameter should be true",
-                (Boolean) getInternalState(mojo, "parsedFailOnError"));
-        assertTrue("lint ignoreWarning parameter should be true",
-                (Boolean) getInternalState(mojo, "parsedIgnoreWarnings"));
-        assertTrue("lint warnAll parameter should be true",
-                (Boolean) getInternalState(mojo, "parsedWarnAll"));
-        assertTrue("lint warningsAsErrors parameter should be true",
-                (Boolean) getInternalState(mojo, "parsedWarningsAsErrors"));
-        assertNotNull("lint config parameter should be non null",
-                getInternalState(mojo, "parsedConfig"));
-        assertEquals("lint config parameter should point to lint", "lint",
-                getInternalState(mojo, "parsedConfig"));
+        assertFalse((Boolean) getInternalState(mojo, "parsedSkip"),
+                "lint skip parameter should be false");
+        assertTrue((Boolean) getInternalState(mojo, "parsedFailOnError"),
+                "lint failOnError parameter should be true");
+        assertTrue((Boolean) getInternalState(mojo, "parsedIgnoreWarnings"),
+                "lint ignoreWarning parameter should be true");
+        assertTrue((Boolean) getInternalState(mojo, "parsedWarnAll"),
+                "lint warnAll parameter should be true");
+        assertTrue((Boolean) getInternalState(mojo, "parsedWarningsAsErrors"),
+                "lint warningsAsErrors parameter should be true");
+        assertNotNull(getInternalState(mojo, "parsedConfig"),
+                "lint config parameter should be non null");
+        assertEquals("lint", getInternalState(mojo, "parsedConfig"),
+                "lint config parameter should point to lint");
+        assertTrue((Boolean) getInternalState(mojo, "parsedFullPath"),
+                "lint fullPath parameter should be true");
+        assertFalse((Boolean) getInternalState(mojo, "parsedShowAll"),
+                "lint showAll parameter should be false");
+        assertTrue((Boolean) getInternalState(mojo, "parsedDisableSourceLines"),
+                "lint disableSourceLines parameter should be true");
+        assertEquals("url", getInternalState(mojo, "parsedUrl"),
+                "lint url parameter should be url");
+        assertFalse((Boolean) getInternalState(mojo, "parsedEnableXml"),
+                "lint enableXml parameter should be false");
+        assertEquals("xml", getInternalState(mojo, "parsedXmlOutputPath"),
+                "lint xmlOutputPath parameter should point to xml");
+        assertTrue((Boolean) getInternalState(mojo, "parsedEnableHtml"),
+                "lint enableHtml parameter should be true");
+        assertEquals("html", getInternalState(mojo, "parsedHtmlOutputPath"),
+                "lint htmlOutputPath parameter should point to html");
+        assertTrue((Boolean) getInternalState(mojo, "parsedEnableSimpleHtml"),
+                "lint enableSimpleHtml parameter should be true");
+        assertEquals("simple", getInternalState(mojo, "parsedSimpleHtmlOutputPath"),
+                "lint simpleHtmlOutputPath parameter should point to simple");
+        assertFalse((Boolean) getInternalState(mojo, "parsedEnableSources"),
+                "lint enableSources parameter should be false");
+        assertTrue((Boolean) getInternalState(mojo, "parsedEnableClasspath"),
+                "lint enableClasspath parameter should be true");
+        assertTrue((Boolean) getInternalState(mojo, "parsedEnableLibraries"),
+                "lint enableLibraries parameter should be true");
 
-        assertTrue("lint fullPath parameter should be true",
-                (Boolean) getInternalState(mojo, "parsedFullPath"));
-        assertFalse("lint showAll parameter should be false",
-                (Boolean) getInternalState(mojo, "parsedShowAll"));
-        assertTrue("lint disableSourceLines parameter should be true",
-                (Boolean) getInternalState(mojo, "parsedDisableSourceLines"));
-        assertEquals("lint url parameter should be url", "url",
-                getInternalState(mojo, "parsedUrl"));
-
-        assertFalse("lint enableXml parameter should be false",
-                (Boolean) getInternalState(mojo, "parsedEnableXml"));
-        assertEquals("lint xmlOutputPath parameter should point to xml", "xml",
-                getInternalState(mojo, "parsedXmlOutputPath"));
-        assertTrue("lint enableHtml parameter should be true",
-                (Boolean) getInternalState(mojo, "parsedEnableHtml"));
-        assertEquals("lint htmlOutputPath parameter should point to html", "html",
-                getInternalState(mojo, "parsedHtmlOutputPath"));
-        assertTrue("lint enableSimpleHtml parameter should be true",
-                (Boolean) getInternalState(mojo, "parsedEnableSimpleHtml"));
-        assertEquals("lint simpleHtmlOutputPath parameter should point to simple", "simple",
-                getInternalState(mojo, "parsedSimpleHtmlOutputPath"));
-
-        assertFalse("lint enableSources parameter should be false",
-                (Boolean) getInternalState(mojo, "parsedEnableSources"));
-        assertTrue("lint enableClasspath parameter should be true",
-                (Boolean) getInternalState(mojo, "parsedEnableClasspath"));
-        assertTrue("lint enableLibraries parameter should be true",
-                (Boolean) getInternalState(mojo, "parsedEnableLibraries"));
-
-        assertEquals("lint sources parameter should point to src2", "src2",
-                getInternalState(mojo, "parsedSources"));
-        assertEquals("lint classpath parameter should point to cla2", "cla2",
-                getInternalState(mojo, "parsedClasspath"));
-        assertEquals("lint libraries parameter should point to lib2", "lib2",
-                getInternalState(mojo, "parsedLibraries"));
+        assertEquals("src2", getInternalState(mojo, "parsedSources"),
+                "lint sources parameter should point to src2");
+        assertEquals("cla2", getInternalState(mojo, "parsedClasspath"),
+                "lint classpath parameter should point to cla2");
+        assertEquals("lib2", getInternalState(mojo, "parsedLibraries"),
+                "lint libraries parameter should point to lib2");
     }
 
     @Nonnull

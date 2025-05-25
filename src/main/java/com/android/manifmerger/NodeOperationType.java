@@ -31,7 +31,7 @@ import com.android.utils.SdkUtils;
  *     </activity>
  * }</pre>
  */
-public enum NodeOperationType implements ConvertibleName {
+public enum NodeOperationType {
 
     /**
      * Merges further definitions of the same element with this one.
@@ -104,29 +104,11 @@ public enum NodeOperationType implements ConvertibleName {
     }
 
     /**
-     * @return the xml name of the node operation type
-     */
-    @Override
-    @NonNull
-    public String toXmlName() {
-        return SdkUtils.constantNameToXmlName(name());
-    }
-
-    /**
      * @return the camel case name of the node operation type
      */
-    @Override
     @NonNull
     public String toCamelCaseName() {
         return SdkUtils.constantNameToCamelCase(name());
     }
 
-    /**
-     * Returns true if the element will override (remove or replace) lower priority elements.
-     *
-     * @return true if the element will override (remove or replace) lower priority elements.
-     */
-    public boolean isOverriding() {
-        return this == REMOVE || this == REMOVE_ALL || this == REPLACE;
-    }
 }

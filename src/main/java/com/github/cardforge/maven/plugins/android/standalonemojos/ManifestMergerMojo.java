@@ -1,19 +1,19 @@
 package com.github.cardforge.maven.plugins.android.standalonemojos;
 
 import com.android.SdkConstants;
-import com.android.builder.core.AndroidBuilder;
+import com.android.annotations.NonNull;
+import com.android.annotations.Nullable;
 import com.android.builder.dependency.level2.AndroidDependency;
-import com.android.ide.common.process.DefaultProcessExecutor;
-import com.android.manifmerger.ManifestMerger2;
+import com.android.manifmerger.*;
 import com.android.utils.ILogger;
 import com.github.cardforge.maven.plugins.android.AbstractAndroidMojo;
-import com.github.cardforge.maven.plugins.android.DefaultJavaProcessExecutor;
-import com.github.cardforge.maven.plugins.android.MavenErrorReporter;
 import com.github.cardforge.maven.plugins.android.common.AndroidExtension;
 import com.github.cardforge.maven.plugins.android.configuration.ManifestMerger;
 import com.github.cardforge.maven.plugins.android.configuration.UsesSdk;
 import com.github.cardforge.maven.plugins.android.configuration.VersionGenerator;
 import com.github.cardforge.maven.plugins.android.phase01generatesources.MavenILogger;
+import com.google.common.base.Strings;
+import com.google.common.io.Files;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -23,10 +23,9 @@ import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Set;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
 
 /**
  * Manifest Merger V2 <code>AndroidManifest.xml</code> file.
@@ -36,6 +35,15 @@ import java.util.Set;
  */
 @Mojo(name = "manifest-merger", defaultPhase = LifecyclePhase.PROCESS_RESOURCES)
 public class ManifestMergerMojo extends AbstractAndroidMojo {
+
+    /**
+     * Static string for when manifest is merged
+     */
+    public static final String MERGED_MANIFEST_SAVED = "Merged manifest saved to ";
+    /**
+     * Static string message for unhandled result type.
+     */
+    public static final String UNHANDLED_RESULT_TYPE = "Unhandled result type : ";
 
     /**
      * Update the <code>android:versionName</code> with the specified parameter. If left empty it
@@ -158,6 +166,40 @@ public class ManifestMergerMojo extends AbstractAndroidMojo {
     private File parsedMergeReportFile;
 
     /**
+     * Sets the {@link com.android.manifmerger.ManifestSystemProperty} that can be injected
+     * in the manifest file.
+     */
+    private static void setInjectableValues(
+            ManifestMerger2.Invoker<?> invoker,
+            String packageOverride,
+            int versionCode,
+            String versionName,
+            @Nullable String minSdkVersion,
+            @Nullable String targetSdkVersion,
+            @Nullable Integer maxSdkVersion) {
+
+        if (!Strings.isNullOrEmpty(packageOverride)) {
+            invoker.setOverride(ManifestSystemProperty.PACKAGE, packageOverride);
+        }
+        if (versionCode > 0) {
+            invoker.setOverride(ManifestSystemProperty.VERSION_CODE,
+                    String.valueOf(versionCode));
+        }
+        if (!Strings.isNullOrEmpty(versionName)) {
+            invoker.setOverride(ManifestSystemProperty.VERSION_NAME, versionName);
+        }
+        if (!Strings.isNullOrEmpty(minSdkVersion)) {
+            invoker.setOverride(ManifestSystemProperty.MIN_SDK_VERSION, minSdkVersion);
+        }
+        if (!Strings.isNullOrEmpty(targetSdkVersion)) {
+            invoker.setOverride(ManifestSystemProperty.TARGET_SDK_VERSION, targetSdkVersion);
+        }
+        if (maxSdkVersion != null) {
+            invoker.setOverride(ManifestSystemProperty.MAX_SDK_VERSION, maxSdkVersion.toString());
+        }
+    }
+
+    /**
      * Execute.
      *
      * @throws org.apache.maven.plugin.MojoExecutionException the mojo execution exception
@@ -248,18 +290,16 @@ public class ManifestMergerMojo extends AbstractAndroidMojo {
         }
     }
 
-
     /**
      * @throws MojoExecutionException the mojo execution exception
      */
     public void manifestMergerV2() throws MojoExecutionException {
         ILogger logger = new MavenILogger(getLog(), (parsedMergeReportFile != null));
-        AndroidBuilder builder = new AndroidBuilder(project.toString(), "created by Android Maven Plugin",
-                new DefaultProcessExecutor(logger),
-                new DefaultJavaProcessExecutor(logger),
-                new MavenErrorReporter(logger, MavenErrorReporter.EvaluationMode.STANDARD),
-                logger,
-                false);
+//        AndroidBuilder builder = new AndroidBuilder(project.toString(), "created by Android Maven Plugin",
+//                new DefaultProcessExecutor(logger),
+//                new MavenErrorReporter(logger, MavenErrorReporter.EvaluationMode.STANDARD),
+//                logger,
+//                false)
 
         String minSdkVersion = null;
         String targetSdkVersion = null;
@@ -303,7 +343,7 @@ public class ManifestMergerMojo extends AbstractAndroidMojo {
             }
         }
 
-        builder.mergeManifestsForApplication(
+        mergeManifestsForApplication(
                 androidManifestFile,     // mainManifest
                 new ArrayList<>(),   // manifestOverlays
                 manifestDependencies,    // libraries
@@ -319,7 +359,121 @@ public class ManifestMergerMojo extends AbstractAndroidMojo {
                 ManifestMerger2.MergeType.APPLICATION,   // mergeType
                 new HashMap<>(),           // placeHolders
                 new ArrayList<>(),  // optionalFeatures
-                parsedMergeReportFile                    // reportFile
+                parsedMergeReportFile,                    // reportFile
+                logger
         );
+    }
+
+    /**
+     * Merges the manifest of an application with the manifest of its dependencies.
+     *
+     * @param mainManifest                  The main manifest to merge with.
+     * @param manifestOverlays              The List&lt;java.io.File&gt; of manifest overlays to merge the manifest with.
+     * @param dependencies                  The list of dependencies to merge the manifest with.
+     * @param packageOverride               The package to override in the manifest.
+     * @param versionCode                   The version code to use when merging the manifest.
+     * @param versionName                   The version name to use when merging the manifest.
+     * @param minSdkVersion                 The minimum SDK version to use when merging the manifest.
+     * @param targetSdkVersion              The target SDK version to use when merging the manifest.
+     * @param maxSdkVersion                 The maximum SDK version to use when merging the manifest.
+     * @param outManifestLocation           The location to write the merged manifest to.
+     * @param outAaptSafeManifestLocation   The location to write the merged manifest to.
+     * @param outInstantRunManifestLocation The location to write the merged manifest to.
+     * @param mergeType                     The type of merge to perform.
+     * @param placeHolders                  The placeholders to use when merging the manifest.
+     * @param optionalFeatures              The optional features to enable.
+     * @param reportFile                    The file to write the merging report to.
+     * @param mLogger                       The logger to use.
+     */
+    public void mergeManifestsForApplication(@NonNull java.io.File mainManifest,
+                                             @NonNull java.util.List<java.io.File> manifestOverlays,
+                                             @NonNull java.util.List<? extends ManifestProvider> dependencies,
+                                             java.lang.String packageOverride,
+                                             int versionCode,
+                                             java.lang.String versionName,
+                                             @Nullable java.lang.String minSdkVersion,
+                                             @Nullable java.lang.String targetSdkVersion,
+                                             @Nullable java.lang.Integer maxSdkVersion,
+                                             @NonNull java.lang.String outManifestLocation,
+                                             @Nullable java.lang.String outAaptSafeManifestLocation,
+                                             @Nullable java.lang.String outInstantRunManifestLocation,
+                                             ManifestMerger2.MergeType mergeType,
+                                             java.util.Map<java.lang.String, java.lang.Object> placeHolders,
+                                             @NonNull java.util.List<ManifestMerger2.Invoker.Feature> optionalFeatures,
+                                             @Nullable java.io.File reportFile,
+                                             ILogger mLogger) {
+        try {
+            ManifestMerger2.Invoker manifestMergerInvoker =
+                    ManifestMerger2.newMerger(mainManifest, mLogger, mergeType)
+                            .setPlaceHolderValues(placeHolders)
+                            .addFlavorAndBuildTypeManifests(manifestOverlays.toArray(new File[manifestOverlays.size()]))
+                            .addManifestProviders(dependencies)
+                            .withFeatures(optionalFeatures.toArray(
+                                    new ManifestMerger2.Invoker.Feature[0]))
+                            .setMergeReportFile(reportFile);
+            if (mergeType == ManifestMerger2.MergeType.APPLICATION) {
+                manifestMergerInvoker.withFeatures(ManifestMerger2.Invoker.Feature.REMOVE_TOOLS_DECLARATIONS);
+            }
+            //noinspection VariableNotUsedInsideIf
+            if (outAaptSafeManifestLocation != null) {
+                manifestMergerInvoker.withFeatures(ManifestMerger2.Invoker.Feature.MAKE_AAPT_SAFE);
+            }
+            setInjectableValues(manifestMergerInvoker,
+                    packageOverride, versionCode, versionName,
+                    minSdkVersion, targetSdkVersion, maxSdkVersion);
+            MergingReport mergingReport = manifestMergerInvoker.merge();
+            mLogger.verbose("Merging result: %1$s", mergingReport.getResult());
+            switch (mergingReport.getResult()) {
+                case WARNING:
+                    mergingReport.log(mLogger);
+                    // fall through since these are just warnings.
+                case SUCCESS:
+                    XmlDocument xmlDocument = mergingReport.getMergedXmlDocument(
+                            MergingReport.MergedManifestKind.MERGED);
+                    String annotatedDocument = mergingReport.getMergedDocument(
+                            MergingReport.MergedManifestKind.BLAME);
+                    if (annotatedDocument != null) {
+                        mLogger.verbose(annotatedDocument);
+                    }
+                    save(Objects.requireNonNull(xmlDocument), new File(outManifestLocation));
+                    mLogger.verbose(MERGED_MANIFEST_SAVED + outManifestLocation);
+                    if (outAaptSafeManifestLocation != null) {
+                        save(Objects.requireNonNull(
+                                        mergingReport.getMergedXmlDocument(MergingReport.MergedManifestKind.AAPT_SAFE)),
+                                new File(outAaptSafeManifestLocation));
+                    }
+                    if (outInstantRunManifestLocation != null) {
+                        XmlDocument instantRunMergedManifest = mergingReport.getMergedXmlDocument(
+                                MergingReport.MergedManifestKind.INSTANT_RUN);
+                        if (instantRunMergedManifest != null) {
+                            save(instantRunMergedManifest, new File(outInstantRunManifestLocation));
+                        }
+                    }
+                    break;
+                case ERROR:
+                    mergingReport.log(mLogger);
+                    throw new RuntimeException(mergingReport.getReportString());
+                default:
+                    throw new RuntimeException(UNHANDLED_RESULT_TYPE
+                            + mergingReport.getResult());
+            }
+        } catch (ManifestMerger2.MergeFailureException e) {
+            // TODO: unacceptable.
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * Saves the {@link com.android.manifmerger.XmlDocument} to a file in UTF-8 encoding.
+     *
+     * @param xmlDocument xml document to save.
+     * @param out         file to save to.
+     */
+    private void save(@NonNull XmlDocument xmlDocument, File out) {
+        try {
+            Files.write(xmlDocument.prettyPrint(), out, StandardCharsets.UTF_8);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

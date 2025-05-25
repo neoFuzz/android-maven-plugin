@@ -104,16 +104,6 @@ public class UIAutomatorRemoteAndroidTestRunner {
     }
 
     /**
-     * Sets the max time the shell command will wait while receiving instrumentation results from the device.
-     *
-     * @param maxTimeToOutputResponse the max time to wait for instrumentation to handle the test output. A value of 0
-     *                                means wait forever.
-     */
-    public void setMaxtimeToOutputResponse(int maxTimeToOutputResponse) {
-        mMaxTimeToOutputResponse = maxTimeToOutputResponse;
-    }
-
-    /**
      * Sets the Run's name.
      *
      * @param runName the run name to report in logs and instrumentation results. May be null.
@@ -129,7 +119,6 @@ public class UIAutomatorRemoteAndroidTestRunner {
      * @throws TimeoutException                  if the command timed out
      * @throws AdbCommandRejectedException       if adb rejected the command
      * @throws ShellCommandUnresponsiveException if the shell command doesn't send any output for a period longer than
-     *                                           {@link #setMaxtimeToOutputResponse(int)}
      * @throws IOException                       if the test run failed to complete due to a device connection problem
      */
     public void run(ITestRunListener... listeners) throws TimeoutException, AdbCommandRejectedException,
@@ -144,7 +133,6 @@ public class UIAutomatorRemoteAndroidTestRunner {
      * @throws TimeoutException                  if the command timed out
      * @throws AdbCommandRejectedException       if adb rejected the command
      * @throws ShellCommandUnresponsiveException if the shell command doesn't send any output for a period longer than
-     *                                           {@link #setMaxtimeToOutputResponse(int)}
      * @throws IOException                       if the test run failed to complete due to a device connection problem
      */
     public void run(Collection<ITestRunListener> listeners) throws TimeoutException, AdbCommandRejectedException,
@@ -180,15 +168,6 @@ public class UIAutomatorRemoteAndroidTestRunner {
                     e, jarFile, mRemoteDevice.getSerialNumber()));
             mParser.handleTestRunFailed(e.toString());
             throw e;
-        }
-    }
-
-    /**
-     * Cancels the test run.
-     */
-    public void cancel() {
-        if (mParser != null) {
-            mParser.cancel();
         }
     }
 

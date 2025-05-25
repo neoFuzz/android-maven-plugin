@@ -48,6 +48,7 @@ import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectHelper;
+import org.apache.maven.project.ProjectDependenciesResolver;
 import org.apache.maven.shared.dependency.graph.DependencyGraphBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -564,7 +565,7 @@ public abstract class AbstractAndroidMojo extends AbstractMojo {
      *
      * @param types artifact types to be selected
      * @return a {@code List} of all project dependencies. Never {@code null}.
-     * This excludes artifacts of the {@link ArtifactResolverHelper#EXCLUDE_NON_PACKAGED_SCOPES} scopes.
+     * This excludes artifacts of the {@link ArtifactResolverHelper} scopes.
      * This should maintain dependency order to comply with library project resource precedence.
      */
     protected Set<Artifact> getTransitiveDependencyArtifacts(String... types) {
@@ -628,6 +629,7 @@ public abstract class AbstractAndroidMojo extends AbstractMojo {
             try {
                 Thread.sleep(connectionWaitTime);
             } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
                 log.warn(Arrays.toString(e.getStackTrace()));
             }
             if (adb.isConnected()) {

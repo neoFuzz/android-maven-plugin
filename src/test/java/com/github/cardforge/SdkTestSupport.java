@@ -31,7 +31,7 @@ public class SdkTestSupport {
     public SdkTestSupport() {
         Assert.assertNotNull("For running the tests, you must have environment variable ANDROID_HOME set to a valid Android SDK 25 directory.", envAndroidHome);
 
-        sdkWithPlatformDefault = new AndroidSdk(new File(envAndroidHome), "25", "30");
+        sdkWithPlatformDefault = new AndroidSdk(new File(envAndroidHome).toPath().normalize().toFile(), "25", "30");
     }
 
     public String getenvAndroidHome() {

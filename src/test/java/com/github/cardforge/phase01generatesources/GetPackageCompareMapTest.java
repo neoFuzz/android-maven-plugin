@@ -90,7 +90,7 @@ public class GetPackageCompareMapTest {
     }
 
     @Test
-    public void testNoDependencies() {
+    void testNoDependencies() {
         IllegalArgumentException exception = assertThrows(
                 IllegalArgumentException.class,
                 () -> mojo.getPackageCompareMap(null)
@@ -99,7 +99,7 @@ public class GetPackageCompareMapTest {
     }
 
     @Test
-    public void testEmptyDependencies() throws MojoExecutionException {
+    void testEmptyDependencies() throws MojoExecutionException {
         Map<String, Set<Artifact>> map = mojo.getPackageCompareMap(new HashSet<>());
 
         assertNotNull(map);
@@ -112,7 +112,7 @@ public class GetPackageCompareMapTest {
     }
 
     @Test
-    public void testData1() throws Exception {
+    void testData1() throws Exception {
         mockExtractPackageNameFromArtifactMethod(TEST_DATA_1);
 
         Map<String, Set<Artifact>> map = mojo.getPackageCompareMap(TEST_DATA_1.keySet());
@@ -134,7 +134,7 @@ public class GetPackageCompareMapTest {
     }
 
     @Test
-    public void testData2() throws Exception {
+    void testData2() throws Exception {
         mockExtractPackageNameFromArtifactMethod(TEST_DATA_2);
 
         Map<String, Set<Artifact>> map = mojo.getPackageCompareMap(TEST_DATA_2.keySet());

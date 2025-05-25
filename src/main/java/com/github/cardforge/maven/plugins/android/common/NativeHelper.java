@@ -11,9 +11,7 @@ import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Exclusion;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.logging.Log;
-import org.apache.maven.project.DefaultProjectBuildingRequest;
-import org.apache.maven.project.MavenProject;
-import org.apache.maven.project.ProjectBuildingRequest;
+import org.apache.maven.project.*;
 import org.apache.maven.shared.dependency.graph.DependencyGraphBuilder;
 import org.apache.maven.shared.dependency.graph.DependencyNode;
 import org.apache.maven.shared.dependency.graph.traversal.CollectingDependencyNodeVisitor;
@@ -38,6 +36,9 @@ public class NativeHelper {
      * Message to be displayed when including attached artifacts.
      */
     public static final String INC_ATT_ART = "Including attached artifact: ";
+    /**
+     * Static string for {@code armeabi}.
+     */
     public static final String ARMEABI = "armeabi";
 
     /**

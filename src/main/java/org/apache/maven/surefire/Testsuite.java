@@ -8,8 +8,8 @@
 
 package org.apache.maven.surefire;
 
-import jakarta.xml.bind.JAXBElement;
-import jakarta.xml.bind.annotation.*;
+import javax.xml.bind.JAXBElement;
+import javax.xml.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;

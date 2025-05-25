@@ -22,6 +22,8 @@ import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 /**
  * User: Eugen
  */
@@ -31,6 +33,11 @@ public class ZipalignMojoTest extends AbstractAndroidMojoTestCase<ZipalignMojo> 
     @Override
     public String getPluginGoalName() {
         return "zipalign";
+    }
+
+    @Override
+    protected Class<ZipalignMojo> getMojoClass() {
+        return null;
     }
 
     /**
@@ -45,20 +52,23 @@ public class ZipalignMojoTest extends AbstractAndroidMojoTestCase<ZipalignMojo> 
         configHandler.parseConfiguration();
 
         Boolean skip = getPrivateField(mojo, "parsedSkip");
-        assertTrue("zipalign 'skip' parameter should be true", skip);
+        assertTrue(skip, "zipalign 'skip' parameter should be true");
 
         Boolean verbose = getPrivateField(mojo, "parsedVerbose");
-        assertFalse("zipalign 'verbose' parameter should be false", verbose);
+        assertFalse(verbose, "zipalign 'verbose' parameter should be false");
 
         MavenProject project = getPrivateField(mojo, "project");
 
         String inputApk = getPrivateField(mojo, "parsedInputApk");
-        File inputApkFile = new File(project.getBuild().getDirectory(), project.getBuild().getFinalName() + ".apk");
-        assertEquals("zipalign 'inputApk' parameter should be equal", inputApkFile.getAbsolutePath(), inputApk);
+        File inputApkFile = new File(project.getBuild().getDirectory(),
+                project.getBuild().getFinalName() + ".apk");
+        assertEquals(inputApkFile.getAbsolutePath(), inputApk, "zipalign 'inputApk' parameter should be equal");
 
         String outputApk = getPrivateField(mojo, "parsedOutputApk");
-        File outputApkFile = new File(project.getBuild().getDirectory(), project.getBuild().getFinalName() + "-aligned.apk");
-        assertEquals("zipalign 'outputApk' parameter should be equal", outputApkFile.getAbsolutePath(), outputApk);
+        File outputApkFile = new File(project.getBuild().getDirectory(),
+                project.getBuild().getFinalName() + "-aligned.apk");
+        assertEquals(outputApkFile.getAbsolutePath(), outputApk,
+                "zipalign 'outputApk' parameter should be equal");
     }
 
     /**
@@ -75,16 +85,16 @@ public class ZipalignMojoTest extends AbstractAndroidMojoTestCase<ZipalignMojo> 
         configHandler.parseConfiguration();
 
         Boolean skip = getPrivateField(mojo, "parsedSkip");
-        assertFalse("zipalign 'skip' parameter should be false", skip);
+        assertFalse(skip, "zipalign 'skip' parameter should be false");
 
         Boolean verbose = getPrivateField(mojo, "parsedVerbose");
-        assertTrue("zipalign 'verbose' parameter should be true", verbose);
+        assertTrue(verbose, "zipalign 'verbose' parameter should be true");
 
         String inputApk = getPrivateField(mojo, "parsedInputApk");
-        assertEquals("zipalign 'inputApk' parameter should be equal", "app.apk", inputApk);
+        assertEquals("app.apk", inputApk, "zipalign 'inputApk' parameter should be equal");
 
         String outputApk = getPrivateField(mojo, "parsedOutputApk");
-        assertEquals("zipalign 'outputApk' parameter should be equal", "app-updated.apk", outputApk);
+        assertEquals("app-updated.apk", outputApk, "zipalign 'outputApk' parameter should be equal");
     }
 
     /**
@@ -129,15 +139,15 @@ public class ZipalignMojoTest extends AbstractAndroidMojoTestCase<ZipalignMojo> 
             // Verify the arguments passed to zipalign
             List<String> parameters = commandCaptor.getValue();
             List<String> expectedParameters = Arrays.asList("-v", "-f", "4", "app.apk", "app-updated.apk");
-            assertEquals("Zipalign arguments aren't as expected", expectedParameters, parameters);
+            assertEquals(expectedParameters, parameters, "Zipalign arguments aren't as expected");
 
             // Verify attachArtifact was called with the correct file
             File expectedFile = new File("app-updated.apk");
             Mockito.verify(projectHelper).attachArtifact(
-                    Mockito.eq(project),
-                    Mockito.eq(AndroidExtension.APK),
-                    Mockito.eq("aligned"),
-                    Mockito.eq(expectedFile)
+                    (project),
+                    (AndroidExtension.APK),
+                    ("aligned"),
+                    (expectedFile)
             );
 
             mockedFileUtils.verify(() -> FileUtils.fileExists("app-updated.apk"));
@@ -181,7 +191,7 @@ public class ZipalignMojoTest extends AbstractAndroidMojoTestCase<ZipalignMojo> 
 
             List<String> parameters = commandCaptor.getValue();
             List<String> expectedParameters = Arrays.asList("-v", "-f", "4", "app.apk", "app-aligned-temp.apk");
-            assertEquals("Zipalign arguments aren't as expected", expectedParameters, parameters);
+            assertEquals(expectedParameters, parameters, "Zipalign arguments aren't as expected");
 
             mockedFileUtils.verify(() -> FileUtils.rename(new File("app-aligned-temp.apk"), new File("app.apk")));
         }

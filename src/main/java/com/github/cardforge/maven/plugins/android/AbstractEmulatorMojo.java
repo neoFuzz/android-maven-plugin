@@ -18,6 +18,7 @@ package com.github.cardforge.maven.plugins.android;
 
 import com.android.annotations.NonNull;
 import com.android.ddmlib.*;
+import com.android.ddmlib.TimeoutException;
 import com.github.cardforge.maven.plugins.android.common.DeviceHelper;
 import com.github.cardforge.maven.plugins.android.configuration.Emulator;
 import com.github.cardforge.maven.plugins.android.standalonemojos.EmulatorStartMojo;
@@ -33,10 +34,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
+import java.util.concurrent.*;
 
 
 /**
@@ -595,40 +593,41 @@ public abstract class AbstractEmulatorMojo extends AbstractAndroidMojo {
 
             @NonNull
             public Boolean call() throws IOException {
-                Socket socket = null;
-                BufferedReader in = null;
-                PrintWriter out = null;
-                try {
-                    socket = new Socket("127.0.0.1", port);
-                    out = new PrintWriter(socket.getOutputStream(), true);
-                    in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+                try (Socket socket = new Socket("127.0.0.1", port);
+                     PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
+                     BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()))) {
                     if (in.readLine() == null) {
                         return false;
                     }
-
                     out.write(command);
                     out.write("\r\n");
-                } finally {
-                    try {
-                        out.close();
-                        in.close();
-                        socket.close();
-                    } catch (Exception e) {
-                        // Do nothing
-                    }
                 }
-
                 return true;
             }
         };
 
         boolean result = false;
+        ExecutorService executor = Executors.newSingleThreadExecutor();
         try {
-            ExecutorService executor = Executors.newSingleThreadExecutor();
             Future<Boolean> future = executor.submit(task);
             result = future.get();
         } catch (Exception e) {
             getLog().error(String.format("Failed to execute emulator command '%s': %s", command, e));
+        } finally {
+            // Shutdown the executor service
+            executor.shutdown();
+            try {
+                getLog().error(String.format("Failed to execute emulator command '%s'", command));
+                // Wait for tasks to complete with a timeout
+                if (!executor.awaitTermination(60, TimeUnit.SECONDS)) {
+                    // Force shutdown if tasks don't complete in time
+                    executor.shutdownNow();
+                }
+            } catch (InterruptedException e) {
+                // Re-interrupt the thread and force shutdown
+                Thread.currentThread().interrupt();
+                executor.shutdownNow();
+            }
         }
 
         return result;

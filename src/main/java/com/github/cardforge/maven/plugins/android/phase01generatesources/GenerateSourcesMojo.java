@@ -33,11 +33,9 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.*;
 import org.apache.maven.repository.RepositorySystem;
-import org.codehaus.plexus.archiver.ArchiverException;
-import org.codehaus.plexus.archiver.UnArchiver;
-import org.codehaus.plexus.archiver.zip.ZipUnArchiver;
 import org.w3c.dom.Document;
 
+import javax.annotation.Nonnull;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.*;
@@ -184,16 +182,6 @@ public class GenerateSourcesMojo extends AbstractAndroidMojo {
 
             final String[] relativeAidlFileNames1 = findRelativeAidlFileNames(aidlSourceDirectory);
             final String[] relativeAidlFileNames2 = findRelativeAidlFileNames(extractedDependenciesJavaSources);
-            final Map<String, String[]> relativeApklibAidlFileNames = new HashMap<>();
-
-            if (!isInstrumentationTest()) {
-                // Only add transitive APKLIB deps if we are building an APK and not an instrumentation test apk.
-                for (Artifact artifact : getTransitiveDependencyArtifacts(APKLIB)) {
-                    final File libSourceFolder = getUnpackedApkLibSourceFolder(artifact);
-                    final String[] apklibAidlFiles = findRelativeAidlFileNames(libSourceFolder);
-                    relativeApklibAidlFileNames.put(artifact.getId(), apklibAidlFiles);
-                }
-            }
 
             checkPackagesForDuplicates();
             checkForConflictingLayouts();
@@ -208,13 +196,6 @@ public class GenerateSourcesMojo extends AbstractAndroidMojo {
             files.put(aidlSourceDirectory, relativeAidlFileNames1);
             files.put(extractedDependenciesJavaSources, relativeAidlFileNames2);
 
-            if (!isInstrumentationTest()) {
-                // Only add transitive APKLIB deps if we are building an APK and not an instrumentation test apk.
-                for (Artifact artifact : getTransitiveDependencyArtifacts(APKLIB)) {
-                    final File unpackedLibSourceFolder = getUnpackedApkLibSourceFolder(artifact);
-                    files.put(unpackedLibSourceFolder, relativeApklibAidlFileNames.get(artifact.getId()));
-                }
-            }
             generateAidlFiles(files);
         } catch (MojoExecutionException e) {
             getLog().error("Error when generating sources.", e);
@@ -313,51 +294,6 @@ public class GenerateSourcesMojo extends AbstractAndroidMojo {
         } catch (Exception e) {
             getLog().error("Error during copyManifest");
             throw new MojoExecutionException("Error during copyManifest", e);
-        }
-    }
-
-    /**
-     * Extract the source dependencies.
-     *
-     * @throws MojoExecutionException if it fails.
-     */
-    protected void extractSourceDependencies() throws MojoExecutionException {
-        for (Artifact artifact : getDirectDependencyArtifacts()) {
-            String type = artifact.getType();
-            if (type.equals(APKSOURCES)) {
-                getLog().debug("Detected apksources dependency " + artifact + " with file " + artifact.getFile()
-                        + ". Will resolve and extract...");
-
-                final File apksourcesFile = resolveArtifactToFile(artifact);
-                getLog().debug("Extracting " + apksourcesFile + "...");
-                extractApksources(apksourcesFile);
-            }
-        }
-
-        if (extractedDependenciesJavaResources.exists()) {
-            projectHelper.addResource(project, extractedDependenciesJavaResources.getAbsolutePath(), null, null);
-            project.addCompileSourceRoot(extractedDependenciesJavaSources.getAbsolutePath());
-        }
-    }
-
-    /**
-     * @deprecated Support <code>APKSOURCES</code> artifacts has been deprecated. Use APKLIB instead.
-     */
-    @Deprecated(since = "4.8", forRemoval = false)
-    private void extractApksources(@NonNull File apksourcesFile) throws MojoExecutionException {
-        if (apksourcesFile.isDirectory()) {
-            getLog().warn("The apksources artifact points to '" + apksourcesFile
-                    + "' which is a directory; skipping unpacking it.");
-            return;
-        }
-        final UnArchiver unArchiver = new ZipUnArchiver(apksourcesFile);
-        extractedDependenciesDirectory.mkdirs();
-        unArchiver.setDestDirectory(extractedDependenciesDirectory);
-        try {
-            unArchiver.extract();
-        } catch (ArchiverException e) {
-            throw new MojoExecutionException("ArchiverException while extracting " + apksourcesFile.getAbsolutePath()
-                    + ". Message: " + e.getLocalizedMessage(), e);
         }
     }
 
@@ -486,9 +422,11 @@ public class GenerateSourcesMojo extends AbstractAndroidMojo {
         }
 
         if (foundApklib) {
-            getLog().warn("AAR libraries should not depend or include APKLIB artifacts.\n"
-                    + "APKLIBs have been deprecated and the combination of the two may yield unexpected results.\n"
-                    + "Check the problematic AAR libraries for newer versions that use AAR packaging.");
+            getLog().warn("""
+        AAR libraries should not depend or include APKLIB artifacts.
+        APKLIBs have been deprecated and the combination of the two may yield unexpected results.
+        Check the problematic AAR libraries for newer versions that use AAR packaging.
+        """);
         }
     }
 
@@ -500,7 +438,7 @@ public class GenerateSourcesMojo extends AbstractAndroidMojo {
      * @throws MojoExecutionException if duplicates presents and failOnDuplicatePackages is true
      */
     private void checkPackagesForDuplicates() throws MojoExecutionException {
-        Set<Artifact> dependencyArtifacts = getTransitiveDependencyArtifacts(AAR, APKLIB);
+        Set<Artifact> dependencyArtifacts = getTransitiveDependencyArtifacts(AAR);
 
         if (dependencyArtifacts.isEmpty()) {
             //if no AAR or APKLIB dependencies presents than only one package presents
@@ -1013,23 +951,13 @@ public class GenerateSourcesMojo extends AbstractAndroidMojo {
         genDirectoryAidl.mkdirs();
         getLog().info("Adding AIDL gen folder to compile classpath: " + genDirectoryAidl);
         project.addCompileSourceRoot(genDirectoryAidl.getPath());
-        Set<File> sourceDirs = files.keySet();
-        for (File sourceDir : sourceDirs) {
-            protoCommands.add("-I" + sourceDir);
+        for (Map.Entry<File, String[]> entry : files.entrySet()) {
+            protoCommands.add("-I" + entry.getKey());
         }
-        for (File sourceDir : sourceDirs) {
-            for (String relativeAidlFileName : files.get(sourceDir)) {
-                File targetDirectory = new File(genDirectoryAidl, new File(relativeAidlFileName).getParent());
-                targetDirectory.mkdirs();
-
-                final String shortAidlFileName = new File(relativeAidlFileName).getName();
-                final String shortJavaFileName = shortAidlFileName.substring(0, shortAidlFileName.lastIndexOf("."))
-                        + ".java";
-                final File aidlFileInSourceDirectory = new File(sourceDir, relativeAidlFileName);
-
-                List<String> commands = new ArrayList<>(protoCommands);
-                commands.add(aidlFileInSourceDirectory.getAbsolutePath());
-                commands.add(new File(targetDirectory, shortJavaFileName).getAbsolutePath());
+        for (Map.Entry<File, String[]> entry : files.entrySet()) {
+            File sourceDir = entry.getKey();
+            for (String relativeAidlFileName : entry.getValue()) {
+                List<String> commands = getCmdStrings(sourceDir, relativeAidlFileName, protoCommands);
                 try {
                     CommandExecutor executor = CommandExecutor.Factory.createDefaultCommandExecutor();
                     executor.setLogger(this.getLog());
@@ -1041,6 +969,30 @@ public class GenerateSourcesMojo extends AbstractAndroidMojo {
                 }
             }
         }
+    }
+
+    /**
+     * Returns a list of commands to be executed by the AIDL compiler.
+     *
+     * @param sourceDir           The source directory containing the AIDL file
+     * @param relativeAidlFileName The relative path to the AIDL file within the source directory
+     * @param protoCommands       The list of commands to be executed by the AIDL compiler
+     * @return A list of commands to be executed by the AIDL compiler
+     */
+    @Nonnull
+    private List<String> getCmdStrings(File sourceDir, String relativeAidlFileName, List<String> protoCommands) {
+        File targetDirectory = new File(genDirectoryAidl, new File(relativeAidlFileName).getParent());
+        targetDirectory.mkdirs();
+
+        final String shortAidlFileName = new File(relativeAidlFileName).getName();
+        final String shortJavaFileName = shortAidlFileName.substring(0, shortAidlFileName.lastIndexOf("."))
+                + ".java";
+        final File aidlFileInSourceDirectory = new File(sourceDir, relativeAidlFileName);
+
+        List<String> commands = new ArrayList<>(protoCommands);
+        commands.add(aidlFileInSourceDirectory.getAbsolutePath());
+        commands.add(new File(targetDirectory, shortJavaFileName).getAbsolutePath());
+        return commands;
     }
 
     /**
@@ -1065,7 +1017,7 @@ public class GenerateSourcesMojo extends AbstractAndroidMojo {
      * @return true if the pom type is APK, APKLIB, or APKSOURCES
      */
     private boolean isCurrentProjectAndroid() {
-        Set<String> androidArtifacts = new HashSet<>(Arrays.asList(APK, APKLIB, APKSOURCES, AAR));
+        Set<String> androidArtifacts = new HashSet<>(Arrays.asList(APK, APKLIB, AAR));
         return androidArtifacts.contains(project.getArtifact().getType());
     }
 

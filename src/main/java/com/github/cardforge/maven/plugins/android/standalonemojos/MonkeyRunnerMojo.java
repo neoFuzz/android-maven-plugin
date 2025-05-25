@@ -282,7 +282,7 @@ public class MonkeyRunnerMojo extends AbstractAndroidMojo {
                 parameters.add(programFileName);
                 String testName = programFileName;
                 if (testName.contains("/")) {
-                    testName.substring(testName.indexOf('/') + 1);
+                    testName = testName.substring(testName.indexOf('/') + 1); // TODO: correct?
                 }
                 mCurrentTestIndentifier = new TestIdentifier("MonkeyTest ", testName);
 

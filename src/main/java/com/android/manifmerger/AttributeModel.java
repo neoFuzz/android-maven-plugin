@@ -128,21 +128,6 @@ class AttributeModel {
         return new Builder(attributeName);
     }
 
-    /**
-     * Decode a decimal or hexadecimal {@link String} into an {@link Integer}.
-     * String starting with 0 will be considered decimal, not octal.
-     */
-    private static int decodeDecOrHexString(@NonNull String s) {
-        long decodedValue = s.startsWith("0x") || s.startsWith("0X")
-                ? Long.decode(s)
-                : Long.parseLong(s);
-        if (decodedValue < 0xFFFFFFFFL) {
-            return (int) decodedValue;
-        } else {
-            throw new IllegalArgumentException("Value " + s + " too big for 32 bits.");
-        }
-    }
-
     @NonNull
     XmlNode.NodeName getName() {
         return mName;
@@ -253,12 +238,13 @@ class AttributeModel {
 
         Builder(String name) {
             this.mName = name;
+            this.mOnWriteValidator = null;
         }
 
         /**
          * Sets the attribute support for smart substitution of partially fully qualified
-         * class names with package settings as provided by the manifest node's package attribute
-         * {@link <a href=http://developer.android.com/guide/topics/manifest/manifest-element.html>}
+         * class names with package settings as provided by the manifest node's package
+         * <a href="http://developer.android.com/guide/topics/manifest/manifest-element.html">attribute</a>
          */
         @NonNull
         Builder setIsPackageDependent() {
@@ -282,16 +268,6 @@ class AttributeModel {
         @NonNull
         Builder setOnReadValidator(Validator validator) {
             mOnReadValidator = validator;
-            return this;
-        }
-
-        /**
-         * Sets a {@link com.android.manifmerger.AttributeModel.Validator} to validate values
-         * before they are written to the final merged document.
-         */
-        @NonNull
-        Builder setOnWriteValidator(Validator validator) {
-            mOnWriteValidator = validator;
             return this;
         }
 
@@ -320,8 +296,6 @@ class AttributeModel {
      * Validates a boolean attribute type.
      */
     static class BooleanValidator implements Validator {
-
-        // TODO: check with @xav where to find the acceptable values by runtime.
         private static final Pattern TRUE_PATTERN = Pattern.compile("true|True|TRUE");
         private static final Pattern FALSE_PATTERN = Pattern.compile("false|False|FALSE");
 
@@ -347,44 +321,6 @@ class AttributeModel {
                 );
             }
             return matches;
-        }
-    }
-
-    /**
-     * A {@link com.android.manifmerger.AttributeModel.Validator} for verifying that a proposed
-     * value is part of the acceptable list of possible values.
-     */
-    static class MultiValueValidator implements Validator {
-
-        @NonNull
-        private final String[] multiValues;
-        @NonNull
-        private final String allValues;
-
-        MultiValueValidator(@NonNull String... multiValues) {
-            this.multiValues = multiValues;
-            allValues = Joiner.on(',').join(multiValues);
-        }
-
-        @Override
-        public boolean validates(@NonNull MergingReport.Builder mergingReport,
-                                 @NonNull XmlAttribute attribute, @NonNull String value) {
-            for (String multiValue : multiValues) {
-                if (multiValue.equals(value)) {
-                    return true;
-                }
-            }
-            attribute.addMessage(mergingReport, MergingReport.Record.Severity.ERROR,
-                    String.format(
-                            "Invalid value for attribute %1$s at %2$s, value=(%3$s), "
-                                    + "acceptable values are (%4$s)",
-                            attribute.getId(),
-                            attribute.printPosition(),
-                            value,
-                            allValues
-                    )
-            );
-            return false;
         }
     }
 
@@ -438,30 +374,6 @@ class AttributeModel {
     }
 
     /**
-     * A {@link com.android.manifmerger.AttributeModel.Validator} for verifying that a proposed
-     * value is a numerical integer value.
-     */
-    static class IntegerValueValidator implements Validator {
-
-        @Override
-        public boolean validates(@NonNull MergingReport.Builder mergingReport,
-                                 @NonNull XmlAttribute attribute, @NonNull String value) {
-            try {
-                return Integer.parseInt(value) > 0;
-            } catch (NumberFormatException e) {
-                attribute.addMessage(mergingReport, MergingReport.Record.Severity.ERROR,
-                        String.format(
-                                "Attribute %1$s at %2$s must be an integer, found %3$s",
-                                attribute.getId(),
-                                attribute.printPosition(),
-                                value)
-                );
-                return false;
-            }
-        }
-    }
-
-    /**
      * A {@link com.android.manifmerger.AttributeModel.Validator} to validate that a string is
      * a valid 32 bits hexadecimal representation.
      */
@@ -505,7 +417,7 @@ class AttributeModel {
             boolean valid = super.validates(mergingReport, attribute, value);
             if (valid) {
                 try {
-                    Long decodedValue = Long.decode(value);
+                    long decodedValue = Long.decode(value);
                     valid = decodedValue >= mMinimumValue && decodedValue < 0xFFFFFFFFL;
                 } catch (NumberFormatException e) {
                     valid = false;

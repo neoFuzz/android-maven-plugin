@@ -29,7 +29,7 @@ public final class ArtifactResolverHelper {
     /**
      * Which dependency scopes should be excluded when packing dependencies into the apk.
      */
-    public static final List<String> EXCLUDE_NON_PACKAGED_SCOPES = Arrays.asList(
+    private static final List<String> EXCLUDE_NON_PACKAGED_SCOPES = Arrays.asList(
             Artifact.SCOPE_PROVIDED, Artifact.SCOPE_IMPORT
     );
     /**
@@ -134,22 +134,6 @@ public final class ArtifactResolverHelper {
                     + "with \"mvn deploy:deploy-file ...\"");
         }
         return jar;
-    }
-
-    /**
-     * Resolves a collection of artifacts to a collection of resolved artifacts.
-     *
-     * @param artifacts Artifacts to resolve
-     * @return Resolved artifacts
-     * @throws MojoExecutionException if an artifact could not be resolved
-     */
-    @NonNull
-    public Set<Artifact> resolveArtifacts(@NonNull Collection<Artifact> artifacts) throws MojoExecutionException {
-        final Set<Artifact> resolvedArtifacts = new LinkedHashSet<>();
-        for (final Artifact artifact : artifacts) {
-            resolvedArtifacts.add(resolveArtifact(artifact));
-        }
-        return resolvedArtifacts;
     }
 
     /**

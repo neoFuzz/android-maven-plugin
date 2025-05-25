@@ -22,7 +22,6 @@ import org.apache.maven.model.Dependency;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.shared.dependency.graph.DependencyGraphBuilder;
-import org.apache.maven.shared.dependency.graph.DependencyGraphBuilderException;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.Logger;
@@ -49,13 +48,6 @@ import java.util.zip.ZipOutputStream;
 @Component(role = AbstractMavenLifecycleParticipant.class, hint = "default")
 public final class ClasspathModifierLifecycleParticipant extends AbstractMavenLifecycleParticipant {
     /**
-     * Mojo configuration parameter to determine if jar files found inside an apklib are
-     * pulled onto the classpath and into the resulting apk, defaults to false
-     *
-     * @see #INCLUDE_FROM_APKLIB_DEFAULT
-     */
-    private static final String INCLUDE_FROM_APKLIB_PARAM = "includeLibsJarsFromApklib";
-    /**
      * Mojo configuration parameter to determine if jar files found inside an aar are
      * pulled onto the classpath and into the resulting apk, defaults to false
      *
@@ -70,7 +62,6 @@ public final class ClasspathModifierLifecycleParticipant extends AbstractMavenLi
      */
     private static final String DISABLE_CONFLICTING_DEPENDENCIES_WARNING_PARAM
             = "disableConflictingDependenciesWarning";
-    private static final boolean INCLUDE_FROM_APKLIB_DEFAULT = false;
     private static final boolean INCLUDE_FROM_AAR_DEFAULT = true;
     private static final boolean DISABLE_CONFLICTING_DEPENDENCIES_WARNING_DEFAULT = false;
 
@@ -99,7 +90,8 @@ public final class ClasspathModifierLifecycleParticipant extends AbstractMavenLi
 
         log.debug("CurrentProject=" + session.getCurrentProject());
         final List<MavenProject> projects = session.getProjects();
-        final DependencyResolver dependencyResolver = new DependencyResolver(log, dependencyGraphBuilder);
+        final DependencyResolver dependencyResolver =
+                new DependencyResolver(log, dependencyGraphBuilder);
         final ArtifactResolverHelper artifactResolverHelper = new ArtifactResolverHelper(artifactResolver, log);
 
         for (MavenProject project : projects) {
@@ -116,7 +108,7 @@ public final class ClasspathModifierLifecycleParticipant extends AbstractMavenLi
                     unpackedLibsFolder == null ? null : new File(unpackedLibsFolder)
             );
 
-            final Set<Artifact> artifacts;
+            Set<Artifact> artifacts = Set.of();
 
             // If there is an extension ClassRealm loaded for this project then use that
             // as the ContextClassLoader so that Wagon extensions can be used to resolves dependencies.
@@ -125,31 +117,31 @@ public final class ClasspathModifierLifecycleParticipant extends AbstractMavenLi
                     : Thread.currentThread().getContextClassLoader();
 
             final ClassLoader originalClassLoader = Thread.currentThread().getContextClassLoader();
+            boolean exc = true;
             try {
                 Thread.currentThread().setContextClassLoader(projectClassLoader);
                 artifacts = dependencyResolver.getProjectDependenciesFor(project, session);
-            } catch (DependencyGraphBuilderException e) {
+            } catch (Exception e) {
                 // Nothing to do. The resolution failure will be displayed by the standard resolution mechanism.
-                continue;
+                exc = false;
             } finally {
                 Thread.currentThread().setContextClassLoader(originalClassLoader);
             }
+            if (exc) {
+                boolean includeFromAar = getMojoConfigurationParameter(project, INCLUDE_FROM_AAR_PARAM,
+                        INCLUDE_FROM_AAR_DEFAULT);
+                boolean disableConflictingDependenciesWarning = getMojoConfigurationParameter(project,
+                        DISABLE_CONFLICTING_DEPENDENCIES_WARNING_PARAM, DISABLE_CONFLICTING_DEPENDENCIES_WARNING_DEFAULT);
 
-            boolean includeFromAar = getMojoConfigurationParameter(project, INCLUDE_FROM_AAR_PARAM,
-                    INCLUDE_FROM_AAR_DEFAULT);
-            boolean includeFromApklib = getMojoConfigurationParameter(project, INCLUDE_FROM_APKLIB_PARAM,
-                    INCLUDE_FROM_APKLIB_DEFAULT);
-            boolean disableConflictingDependenciesWarning = getMojoConfigurationParameter(project,
-                    DISABLE_CONFLICTING_DEPENDENCIES_WARNING_PARAM, DISABLE_CONFLICTING_DEPENDENCIES_WARNING_DEFAULT);
+                log.debug("projects dependency: : " + artifacts);
 
-            log.debug("projects deps: : " + artifacts);
+                if (!disableConflictingDependenciesWarning) {
+                    ProvidedDependencyChecker checker = new ProvidedDependencyChecker();
+                    checker.checkProvidedDependencies(artifacts, log);
+                }
 
-            if (!disableConflictingDependenciesWarning) {
-                ProvidedDependencyChecker checker = new ProvidedDependencyChecker();
-                checker.checkProvidedDependencies(artifacts, log);
+                handleArtifactsForClasspath(project, artifacts, helper, includeFromAar);
             }
-
-            handleArtifactsForClasspath(project, artifacts, helper, includeFromAar, includeFromApklib);
         }
 
         if (addedJarFromLibs) {
@@ -165,7 +157,7 @@ public final class ClasspathModifierLifecycleParticipant extends AbstractMavenLi
     }
 
     private void handleArtifactsForClasspath(MavenProject project, @NonNull Set<Artifact> artifacts,
-                                             UnpackedLibHelper helper, boolean includeFromAar, boolean includeFromApklib)
+                                             UnpackedLibHelper helper, boolean includeFromAar)
             throws MavenExecutionException {
         for (Artifact artifact : artifacts) {
             final String type = artifact.getType();
@@ -186,10 +178,6 @@ public final class ClasspathModifierLifecycleParticipant extends AbstractMavenLi
                 // So add a placeholder (we cannot resolve the actual dep pre-build) to the 'compile' classpath.
                 // The placeholder will be replaced with the real APK jar later.
                 addClassesToClasspath(helper, project, artifact);
-            } else if (type.equals(AndroidExtension.APKLIB) &&
-                    includeFromApklib) {
-                // Add jar files in 'libs' into classpath.
-                addLibsJarsToClassPath(helper, project, artifact);
             }
 
         }

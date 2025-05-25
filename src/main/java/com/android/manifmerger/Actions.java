@@ -20,22 +20,18 @@ import com.android.annotations.NonNull;
 import com.android.annotations.Nullable;
 import com.android.annotations.VisibleForTesting;
 import com.android.annotations.concurrency.Immutable;
-import com.android.ide.common.blame.MessageJsonSerializer;
 import com.android.ide.common.blame.SourceFile;
 import com.android.ide.common.blame.SourceFilePosition;
 import com.android.utils.ILogger;
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.io.LineReader;
-import com.google.gson.*;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.*;
-import java.lang.reflect.Type;
 import java.util.*;
 
 /**
@@ -44,7 +40,6 @@ import java.util.*;
 @Immutable
 public class Actions {
 
-    // TODO: i18n
     @VisibleForTesting
     static final String HEADER = "-- Merging decision tree log ---\n";
 
@@ -57,40 +52,6 @@ public class Actions {
      */
     public Actions(Map<XmlNode.NodeKey, DecisionTreeRecord> records) {
         mRecords = records;
-    }
-
-    /**
-     * @param inputStream the input stream to deserialize from
-     * @return the {@link Actions} object deserialized from the input stream
-     * @throws IOException if the input stream cannot be read
-     */
-    @Nullable
-    public static Actions load(@NonNull InputStream inputStream) throws IOException {
-
-        return getGsonParser().fromJson(new InputStreamReader(inputStream), Actions.class);
-    }
-
-    /**
-     * Deserializes an {@link Actions} object from a string.
-     *
-     * @param xml the xml string to deserialize
-     * @return the {@link Actions} object deserialized from the xml string
-     */
-    @Nullable
-    public static Actions load(String xml) {
-        return getGsonParser().fromJson(xml, Actions.class);
-    }
-
-    /**
-     * @return a {@link Gson} instance that can be used to serialize and deserialize this object.
-     */
-    @NonNull
-    private static Gson getGsonParser() {
-        GsonBuilder gsonBuilder = new GsonBuilder();
-        gsonBuilder.enableComplexMapKeySerialization();
-        gsonBuilder.registerTypeAdapter(XmlNode.NodeName.class, new NodeNameDeserializer());
-        MessageJsonSerializer.registerTypeAdapters(gsonBuilder);
-        return gsonBuilder.create();
     }
 
     /**
@@ -130,17 +91,6 @@ public class Actions {
     }
 
     /**
-     * Returns a {@link com.google.common.collect.ImmutableSet} of all the element's keys that have
-     * at least one {@link NodeRecord}.
-     *
-     * @return the set of element keys with at least one node record.
-     */
-    @NonNull
-    public Set<XmlNode.NodeKey> getNodeKeys() {
-        return mRecords.keySet();
-    }
-
-    /**
      * Returns an {@link ImmutableList} of {@link NodeRecord} for the element identified with the
      * passed key.
      *
@@ -148,26 +98,10 @@ public class Actions {
      * @return the list of node records, or an empty list if none were found.
      */
     @NonNull
-    public ImmutableList<NodeRecord> getNodeRecords(XmlNode.NodeKey key) {
+    public List<NodeRecord> getNodeRecords(XmlNode.NodeKey key) {
         return mRecords.containsKey(key)
                 ? mRecords.get(key).getNodeRecords()
-                : ImmutableList.of();
-    }
-
-    /**
-     * Returns a {@link ImmutableList} of all attributes names that have at least one record for
-     * the element identified with the passed key.
-     *
-     * @param nodeKey the element key
-     * @return the list of attribute names, or an empty list if none were found.
-     */
-    @NonNull
-    public ImmutableList<XmlNode.NodeName> getRecordedAttributeNames(XmlNode.NodeKey nodeKey) {
-        DecisionTreeRecord decisionTreeRecord = mRecords.get(nodeKey);
-        if (decisionTreeRecord == null) {
-            return ImmutableList.of();
-        }
-        return decisionTreeRecord.getAttributesRecords().keySet().asList();
+                : java.util.List.of();
     }
 
     /**
@@ -179,12 +113,12 @@ public class Actions {
      * @return the list of attribute records, or an empty list if none were found.
      */
     @NonNull
-    public ImmutableList<AttributeRecord> getAttributeRecords(XmlNode.NodeKey elementKey,
+    public List<AttributeRecord> getAttributeRecords(XmlNode.NodeKey elementKey,
                                                               XmlNode.NodeName attributeName) {
 
         DecisionTreeRecord decisionTreeRecord = mRecords.get(elementKey);
         if (decisionTreeRecord == null) {
-            return ImmutableList.of();
+            return java.util.List.of();
         }
         return decisionTreeRecord.getAttributeRecords(attributeName);
     }
@@ -215,14 +149,14 @@ public class Actions {
     private String getLogs() {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append(HEADER);
-        for (Map.Entry<XmlNode.NodeKey, Actions.DecisionTreeRecord> record : mRecords.entrySet()) {
-            stringBuilder.append(record.getKey()).append("\n");
-            for (Actions.NodeRecord nodeRecord : record.getValue().getNodeRecords()) {
+        for (Map.Entry<XmlNode.NodeKey, Actions.DecisionTreeRecord> recordEntry : mRecords.entrySet()) {
+            stringBuilder.append(recordEntry.getKey()).append("\n");
+            for (Actions.NodeRecord nodeRecord : recordEntry.getValue().getNodeRecords()) {
                 nodeRecord.print(stringBuilder);
                 stringBuilder.append('\n');
             }
             for (Map.Entry<XmlNode.NodeName, List<Actions.AttributeRecord>> attributeRecords :
-                    record.getValue().mAttributeRecords.entrySet()) {
+                    recordEntry.getValue().mAttributeRecords.entrySet()) {
                 stringBuilder.append('\t').append(attributeRecords.getKey()).append('\n');
                 for (Actions.AttributeRecord attributeRecord : attributeRecords.getValue()) {
                     stringBuilder.append("\t\t");
@@ -232,17 +166,6 @@ public class Actions {
             }
         }
         return stringBuilder.toString();
-    }
-
-    /**
-     * @return the json representation of this object.
-     */
-    @NonNull
-    public String persist() {
-        GsonBuilder gson = new GsonBuilder().setPrettyPrinting();
-        gson.enableComplexMapKeySerialization();
-        MessageJsonSerializer.registerTypeAdapters(gson);
-        return gson.create().toJson(this);
     }
 
     /**
@@ -319,9 +242,9 @@ public class Actions {
         while ((line = lineReader.readLine()) != null) {
             actualMappings.append(count + 1).append(line).append("\n");
             if (resultingSourceMapping.containsKey(count)) {
-                for (Record record : resultingSourceMapping.get(count)) {
+                for (Record mapRecord : resultingSourceMapping.get(count)) {
                     actualMappings.append(count + 1).append("-->")
-                            .append(record.getActionLocation())
+                            .append(mapRecord.getActionLocation())
                             .append("\n");
                 }
             }
@@ -417,22 +340,6 @@ public class Actions {
         @NonNull
         public SourceFilePosition getActionLocation() {
             return mActionLocation;
-        }
-
-        /**
-         * @return the element key for this record
-         */
-        @NonNull
-        public XmlNode.NodeKey getTargetId() {
-            return mTargetId;
-        }
-
-        /**
-         * @return the reason for this action, or {@code null} if none was specified
-         */
-        @Nullable
-        public String getReason() {
-            return mReason;
         }
 
         /**
@@ -539,32 +446,6 @@ public class Actions {
     }
 
     /**
-     * Deserializer for {@link XmlNode.NodeName} that handles the case where the namespace is not
-     * present.
-     */
-    private static class NodeNameDeserializer implements JsonDeserializer<XmlNode.NodeName> {
-
-        /**
-         * Deserializes a {@link XmlNode.NodeName} from a JsonElement.
-         *
-         * @param json    The Json data being deserialized
-         * @param typeOfT The type of the Object to deserialize to
-         * @param context The JsonDeserializationContext
-         * @return the deserialized {@link XmlNode.NodeName}
-         * @throws JsonParseException if the json is not a valid representation of a XmlNode.NodeName
-         */
-        @Override
-        public XmlNode.NodeName deserialize(@NonNull JsonElement json, Type typeOfT,
-                                            @NonNull JsonDeserializationContext context) throws JsonParseException {
-            if (json.getAsJsonObject().get("mNamespaceURI") != null) {
-                return context.deserialize(json, XmlNode.NamespaceAwareName.class);
-            } else {
-                return context.deserialize(json, XmlNode.Name.class);
-            }
-        }
-    }
-
-    /**
      * Internal structure on how {@link com.android.manifmerger.Actions.Record}s are kept for an XML element.
      * <p>
      * Each xml element should have an associated DecisionTreeRecord which keeps a list of
@@ -597,11 +478,6 @@ public class Actions {
             return ImmutableList.copyOf(mNodeRecords);
         }
 
-        @NonNull
-        ImmutableMap<XmlNode.NodeName, List<AttributeRecord>> getAttributesRecords() {
-            return ImmutableMap.copyOf(mAttributeRecords);
-        }
-
         /**
          * Adds a node record to this decision tree record.
          *
@@ -618,11 +494,11 @@ public class Actions {
          * @return the list of all attribute records for this element and attribute name.
          */
         @NonNull
-        ImmutableList<AttributeRecord> getAttributeRecords(XmlNode.NodeName attributeName) {
+        List<AttributeRecord> getAttributeRecords(XmlNode.NodeName attributeName) {
             List<AttributeRecord> attributeRecords = mAttributeRecords.get(attributeName);
             return attributeRecords == null
-                    ? ImmutableList.of()
-                    : ImmutableList.copyOf(attributeRecords);
+                    ? List.of()
+                    : List.copyOf(attributeRecords);
         }
     }
 }

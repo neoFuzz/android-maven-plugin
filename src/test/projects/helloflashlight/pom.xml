@@ -10,7 +10,7 @@
   <name>HelloFlashLight</name>
   <properties>
     <!-- at test time this will be overridden with snapshot version -->
-    <it-plugin.version>4.4.1</it-plugin.version>
+    <it-plugin.version>4.7.0</it-plugin.version>
   </properties>
   <dependencies>
     <dependency>
@@ -30,6 +30,18 @@
           <artifactId>android-maven-plugin</artifactId>
           <version>${it-plugin.version}</version>
           <extensions>true</extensions>
+          <dependencies>
+            <dependency>
+              <groupId>javax.xml.bind</groupId>
+              <artifactId>jaxb-api</artifactId>
+              <version>2.3.1</version>
+            </dependency>
+            <dependency>
+              <groupId>org.glassfish.jaxb</groupId>
+              <artifactId>jaxb-runtime</artifactId>
+              <version>2.3.1</version>
+            </dependency>
+          </dependencies>
         </plugin>
       </plugins>
     </pluginManagement>

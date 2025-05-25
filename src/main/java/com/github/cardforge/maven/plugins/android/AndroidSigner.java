@@ -23,7 +23,7 @@ package com.github.cardforge.maven.plugins.android;
 public class AndroidSigner {
 
     /**
-     * @param debug the debug mode to use when signing the apk. Must be 'true', 'false', 'both' or 'auto'.
+     * the debug mode to use when signing the apk. Must be 'true', 'false', 'both' or 'auto'.
      */
     private final Debug debug;
 

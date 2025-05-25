@@ -41,7 +41,7 @@ public interface CommandExecutor {
     /**
      * Static string for logging
      */
-    String RESULT = ", Result = ";
+    String RESULT_E = ", Result = ";
 
     /**
      * Sets the plexus logger.
@@ -248,24 +248,20 @@ public interface CommandExecutor {
                     }
                 }
 
-                commandline.addArguments(commands.toArray(new String[commands.size()]));
+                commandline.addArguments(commands.toArray(String[]::new));
                 if (workingDirectory != null && workingDirectory.exists()) {
                     commandline.setWorkingDirectory(workingDirectory.getAbsolutePath());
                 }
                 try {
                     logger.debug("ANDROID-040-000: Executing command: Commandline = " + commandline);
+
+                    // Run the command and store the result
                     result = CommandLineUtils.executeCommandLine(commandline, stdOut, stdErr);
-                    if (logger != null) {
-                        logger.debug("ANDROID-040-000: Executed command: Commandline = " + commandline +
-                                RESULT
-                                + result);
-                    } else {
-                        System.out.println("ANDROID-040-000: Executed command: Commandline = " + commandline // NOSONAR
-                                + RESULT + result);
-                    }
+                    logger.debug("ANDROID-040-000: Executed command: Commandline = " + commandline +
+                            RESULT_E + result);
                     if (failsOnErrorOutput && stdErr.hasError() || result != 0) {
                         throw new ExecutionException("ANDROID-040-001: Could not execute: Command = "
-                                + commandline.toString() + RESULT + result);
+                                + commandline.toString() + RESULT_E + result);
                     }
                 } catch (CommandLineException e) {
                     throw new ExecutionException("ANDROID-040-002: Could not execute: Command = "
@@ -367,7 +363,7 @@ public interface CommandExecutor {
         static class StreamConsumerImpl implements StreamConsumer {
             private final Log logger;
             private final StringBuilder sb = new StringBuilder();
-            private boolean captureStdOut;
+            private final boolean captureStdOut;
 
             StreamConsumerImpl(Log logger, boolean captureStdOut) {
                 this.logger = logger;
@@ -411,7 +407,7 @@ public interface CommandExecutor {
              * Is true if there was anything consumed from the stream, otherwise false
              */
             private boolean error;
-            private boolean captureStdErr;
+            private final boolean captureStdErr;
 
             ErrorStreamConsumer(Log logger, ErrorListener errorListener, boolean captureStdErr) {
                 this.logger = logger;

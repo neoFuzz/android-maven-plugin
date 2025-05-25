@@ -191,7 +191,7 @@ public class PreValidator {
             @NonNull MergingReport.Builder mergingReport,
             @NonNull XmlElement xmlElement) {
         ManifestModel.NodeKeyResolver nodeKeyResolver = xmlElement.getType().getNodeKeyResolver();
-        ImmutableList<String> keyAttributesNames = nodeKeyResolver.getKeyAttributesNames();
+        List<String> keyAttributesNames = nodeKeyResolver.getKeyAttributesNames();
         if (keyAttributesNames.isEmpty()) {
             return false;
         }

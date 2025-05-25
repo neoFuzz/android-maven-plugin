@@ -149,14 +149,6 @@ public abstract class XmlNode {
     public abstract Node getXml();
 
     /**
-     * Returns the name of this xml element or attribute.
-     *
-     * @return the name of this xml element or attribute.
-     */
-    @NonNull
-    public abstract NodeName getName();
-
-    /**
      * Returns the position of this attribute in the original xml file. This may return an invalid
      * location as this xml fragment does not exist in any xml file but is the temporary result
      * of the merging process.
@@ -316,15 +308,6 @@ public abstract class XmlNode {
 
         NodeKey(@NonNull String key) {
             mKey = key;
-        }
-
-        /**
-         * @param element the xml element to create a key for.
-         * @return a new {@link NodeKey} instance representing the element.
-         */
-        @NonNull
-        public static NodeKey fromXml(@NonNull Element element) {
-            return new OrphanXmlElement(element).getId();
         }
 
         @NonNull

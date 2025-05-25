@@ -22,9 +22,9 @@ import com.android.annotations.Nullable;
 import com.android.ide.common.blame.SourceFile;
 import com.android.ide.common.blame.SourceFilePosition;
 import com.android.ide.common.blame.SourcePosition;
-import com.android.ide.common.xml.XmlFormatPreferences;
-import com.android.ide.common.xml.XmlFormatStyle;
-import com.android.ide.common.xml.XmlPrettyPrinter;
+import com.android.builder.xml.XmlFormatPreferences;
+import com.android.builder.xml.XmlFormatStyle;
+import com.android.builder.xml.XmlPrettyPrinter;
 import com.android.sdklib.SdkVersionInfo;
 import com.android.utils.Pair;
 import com.android.utils.PositionXmlParser;
@@ -37,6 +37,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
@@ -154,22 +155,6 @@ public class XmlDocument {
     /**
      * merge this higher priority document with a higher priority document.
      *
-     * @param lowerPriorityDocument the lower priority document to merge in.
-     * @param mergingReportBuilder  the merging report to record errors and actions.
-     * @return a new merged {@link com.android.manifmerger.XmlDocument} or
-     * {@link Optional#empty()} if there were errors during the merging activities.
-     */
-    @NonNull
-    public Optional<XmlDocument> merge(
-            @NonNull XmlDocument lowerPriorityDocument,
-            @NonNull MergingReport.Builder mergingReportBuilder) {
-        return merge(lowerPriorityDocument, mergingReportBuilder,
-                true /* addImplicitPermissions */);
-    }
-
-    /**
-     * merge this higher priority document with a higher priority document.
-     *
      * @param lowerPriorityDocument  the lower priority document to merge in.
      * @param mergingReportBuilder   the merging report to record errors and actions.
      * @param addImplicitPermissions whether to perform implicit permission addition.
@@ -232,19 +217,6 @@ public class XmlDocument {
     }
 
     /**
-     * Compares this document to another {@link com.android.manifmerger.XmlDocument} ignoring all
-     * attributes belonging to the {@link com.android.SdkConstants#TOOLS_URI} namespace.
-     *
-     * @param other the other document to compare against.
-     * @return a {@link String} describing the differences between the two XML elements or
-     * {@link Optional#empty()} if they are equals.
-     */
-    @SuppressWarnings("CovariantCompareTo")
-    public Optional<String> compareTo(@NonNull XmlDocument other) {
-        return getRootNode().compareTo(other.getRootNode());
-    }
-
-    /**
      * Returns the {@link SourceFile} associated with this XML document.
      * <p>
      * NOTE: You should <b>not</b> read the contents of the file directly; if you need to
@@ -288,15 +260,6 @@ public class XmlDocument {
      */
     public String getPackageName() {
         return mMainManifestPackageName.orElse(mRootElement.getAttribute(ATTRIBUTE_PACKAGE));
-    }
-
-    /**
-     * Returns the split name if this manifest file has one.
-     *
-     * @return the split name or empty string.
-     */
-    public String getSplitName() {
-        return mRootElement.getAttribute("split");
     }
 
     /**
@@ -481,7 +444,7 @@ public class XmlDocument {
         }
 
 
-        if (!checkUsesSdkMinVersion(lowerPriorityDocument, mergingReport)) {
+        if (!checkUsesSdkMinVersion(lowerPriorityDocument)) {
             String error = String.format(
                     """
                             uses-sdk:minSdkVersion %1$s cannot be smaller than version \
@@ -572,8 +535,7 @@ public class XmlDocument {
      * Returns true if the minSdkVersion of the application and the library are compatible, false
      * otherwise.
      */
-    private boolean checkUsesSdkMinVersion(@NonNull XmlDocument lowerPriorityDocument,
-                                           MergingReport.Builder mergingReport) {
+    private boolean checkUsesSdkMinVersion(@NonNull XmlDocument lowerPriorityDocument) {
 
         int thisMinSdk = getApiLevelFromAttribute(getMinSdkVersion());
         int libraryMinSdk = getApiLevelFromAttribute(
@@ -625,7 +587,7 @@ public class XmlDocument {
         }
         Element elementNS = getXml().createElement(nodeType.toXmlName());
 
-        ImmutableList<String> keyAttributesNames = nodeType.getNodeKeyResolver()
+        List<String> keyAttributesNames = nodeType.getNodeKeyResolver()
                 .getKeyAttributesNames();
         if (keyAttributesNames.size() == 1) {
             elementNS.setAttributeNS(

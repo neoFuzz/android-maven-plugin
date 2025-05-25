@@ -6,7 +6,6 @@ import com.github.cardforge.maven.plugins.android.standalonemojos.MonkeyMojo;
 import org.apache.maven.model.Build;
 import org.apache.maven.project.MavenProject;
 import org.junit.Ignore;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -15,8 +14,8 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import java.io.File;
-import java.util.Arrays;
 
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 
@@ -37,6 +36,11 @@ public class MonkeyMojoTest extends AbstractAndroidMojoTestCase<MonkeyMojo> {
     @Override
     public String getPluginGoalName() {
         return "monkey";
+    }
+
+    @Override
+    protected Class<MonkeyMojo> getMojoClass() {
+        return null;
     }
 
     @BeforeAll
@@ -60,7 +64,7 @@ public class MonkeyMojoTest extends AbstractAndroidMojoTestCase<MonkeyMojo> {
         Boolean automatorSkip = getFieldValue(mojo, "parsedSkip");
 
         // then
-        assertTrue("Monkey skip parameter should be true", automatorSkip);
+        assertTrue(automatorSkip, "Monkey skip parameter should be true");
     }
 
     /**
@@ -130,83 +134,111 @@ public class MonkeyMojoTest extends AbstractAndroidMojoTestCase<MonkeyMojo> {
         projectBuild.setSourceDirectory("src/");
         projectBuild.setOutputDirectory("classes/");
 
-        when(project.getBasedir()).thenReturn(new File(getBasedir()));
+        when(project.getBasedir()).thenReturn(new File(getBasedir().toURI()));
         when(project.getBuild()).thenReturn(projectBuild);
     }
 
     private void assertDefaultConfiguration(MonkeyMojo mojo) {
-        assertFalse("Monkey skip parameter should be false", getFieldValue(mojo, "parsedSkip"));
-        assertEquals("Monkey eventCount parameter should be 1000",
-                Integer.valueOf(1000), getFieldValue(mojo, "parsedEventCount"));
+        assertFalse(getFieldValue(mojo, "parsedSkip"), "Monkey skip parameter should be false");
+        assertEquals(Integer.valueOf(1000), getFieldValue(mojo, "parsedEventCount"),
+                "Monkey eventCount parameter should be 1000");
 
         // Verify null values
-        Assertions.assertNull(getFieldValue(mojo, "parsedSeed"),"Monkey seed should be null");
-        assertNull("Monkey throttle should be null", getFieldValue(mojo, "parsedThrottle"));
-        assertNull("Monkey percentTouch should be null", getFieldValue(mojo, "parsedPercentTouch"));
-        assertNull("Monkey percentMotion should be null", getFieldValue(mojo, "parsedPercentMotion"));
-        assertNull("Monkey percentTrackball should be null", getFieldValue(mojo, "parsedPercentTrackball"));
-        assertNull("Monkey percentNav should be null", getFieldValue(mojo, "parsedPercentNav"));
-        assertNull("Monkey percentMajorNav should be null", getFieldValue(mojo, "parsedPercentMajorNav"));
-        assertNull("Monkey percentSyskeys should be null", getFieldValue(mojo, "parsedPercentSyskeys"));
-        assertNull("Monkey percentAppswitch should be null", getFieldValue(mojo, "parsedPercentAppswitch"));
-        assertNull("Monkey percentAnyevent should be null", getFieldValue(mojo, "parsedPercentAnyevent"));
-        assertNull("Monkey packages should be null", getFieldValue(mojo, "parsedPackages"));
-        assertNull("Monkey categories should be null", getFieldValue(mojo, "parsedCategories"));
+        assertNull(getFieldValue(mojo, "parsedSeed"),
+                "Monkey seed should be null");
+        assertNull(getFieldValue(mojo, "parsedThrottle"),
+                "Monkey throttle should be null");
+        assertNull(getFieldValue(mojo, "parsedPercentTouch"),
+                "Monkey percentTouch should be null");
+        assertNull(getFieldValue(mojo, "parsedPercentMotion"),
+                "Monkey percentMotion should be null");
+        assertNull(getFieldValue(mojo, "parsedPercentTrackball"),
+                "Monkey percentTrackball should be null");
+        assertNull(getFieldValue(mojo, "parsedPercentNav"),
+                "Monkey percentNav should be null");
+        assertNull(getFieldValue(mojo, "parsedPercentMajorNav"),
+                "Monkey percentMajorNav should be null");
+        assertNull(getFieldValue(mojo, "parsedPercentSyskeys"),
+                "Monkey percentSyskeys should be null");
+        assertNull(getFieldValue(mojo, "parsedPercentAppswitch"),
+                "Monkey percentAppswitch should be null");
+        assertNull(getFieldValue(mojo, "parsedPercentAnyevent"),
+                "Monkey percentAnyevent should be null");
+        assertNull(getFieldValue(mojo, "parsedPackages"),
+                "Monkey packages should be null");
+        assertNull(getFieldValue(mojo, "parsedCategories"),
+                "Monkey categories should be null");
 
         // Verify boolean defaults
-        assertFalse("Monkey debugNoEvents should be false", getFieldValue(mojo, "parsedDebugNoEvents"));
-        assertFalse("Monkey hprof should be false", getFieldValue(mojo, "parsedHprof"));
-        assertFalse("Monkey ignoreCrashes should be false", getFieldValue(mojo, "parsedIgnoreCrashes"));
-        assertFalse("Monkey ignoreTimeouts should be false", getFieldValue(mojo, "parsedIgnoreTimeouts"));
-        assertFalse("Monkey ignoreSecurityExceptions should be false", getFieldValue(mojo, "parsedIgnoreSecurityExceptions"));
-        assertFalse("Monkey killProcessAfterError should be false", getFieldValue(mojo, "parsedKillProcessAfterError"));
-        assertFalse("Monkey monitorNativeCrashes should be false", getFieldValue(mojo, "parsedMonitorNativeCrashes"));
-        assertFalse("Monkey createReport should be false", getFieldValue(mojo, "parsedCreateReport"));
+        assertFalse(getFieldValue(mojo, "parsedDebugNoEvents"),
+                "Monkey debugNoEvents should be false");
+        assertFalse(getFieldValue(mojo, "parsedHprof"),
+                "Monkey hprof should be false");
+        assertFalse(getFieldValue(mojo, "parsedIgnoreCrashes"),
+                "Monkey ignoreCrashes should be false");
+        assertFalse(getFieldValue(mojo, "parsedIgnoreTimeouts"),
+                "Monkey ignoreTimeouts should be false");
+        assertFalse(getFieldValue(mojo, "parsedIgnoreSecurityExceptions"),
+                "Monkey ignoreSecurityExceptions should be false");
+        assertFalse(getFieldValue(mojo, "parsedKillProcessAfterError"),
+                "Monkey killProcessAfterError should be false");
+        assertFalse(getFieldValue(mojo, "parsedMonitorNativeCrashes"),
+                "Monkey monitorNativeCrashes should be false");
+        assertFalse(getFieldValue(mojo, "parsedCreateReport"),
+                "Monkey createReport should be false");
     }
 
     private void assertCustomConfiguration(MonkeyMojo mojo) {
-        assertFalse("Monkey skip parameter should be false", getFieldValue(mojo, "parsedSkip"));
-        assertEquals("Monkey eventCount parameter should be 5000",
-                Integer.valueOf(5000), getFieldValue(mojo, "parsedEventCount"));
-        assertEquals("Monkey seed should be 123456",
-                Long.valueOf(123456), getFieldValue(mojo, "parsedSeed"));
-        assertEquals("Monkey throttle should be 10",
-                Long.valueOf(10), getFieldValue(mojo, "parsedThrottle"));
+        assertFalse(getFieldValue(mojo, "parsedSkip"), "Monkey skip parameter should be false");
+        assertEquals(Integer.valueOf(5000), getFieldValue(mojo, "parsedEventCount"),
+                "Monkey eventCount parameter should be 5000");
+        assertEquals(Long.valueOf(123456), getFieldValue(mojo, "parsedSeed"),
+                "Monkey seed should be 123456");
+        assertEquals(Long.valueOf(10), getFieldValue(mojo, "parsedThrottle"),
+                "Monkey throttle should be 10");
 
         // Verify percentage values
-        assertEquals("Monkey percentTouch should be 10",
-                Integer.valueOf(10), getFieldValue(mojo, "parsedPercentTouch"));
-        assertEquals("Monkey percentMotion should be 10",
-                Integer.valueOf(10), getFieldValue(mojo, "parsedPercentMotion"));
-        assertEquals("Monkey percentTrackball should be 10",
-                Integer.valueOf(10), getFieldValue(mojo, "parsedPercentTrackball"));
-        assertEquals("Monkey percentNav should be 10",
-                Integer.valueOf(10), getFieldValue(mojo, "parsedPercentNav"));
-        assertEquals("Monkey percentMajorNav should be 10",
-                Integer.valueOf(10), getFieldValue(mojo, "parsedPercentMajorNav"));
-        assertEquals("Monkey percentSyskeys should be 10",
-                Integer.valueOf(10), getFieldValue(mojo, "parsedPercentSyskeys"));
-        assertEquals("Monkey percentAppswitch should be 10",
-                Integer.valueOf(10), getFieldValue(mojo, "parsedPercentAppswitch"));
-        assertEquals("Monkey percentAnyevent should be 10",
-                Integer.valueOf(10), getFieldValue(mojo, "parsedPercentAnyevent"));
+        assertEquals(Integer.valueOf(10), getFieldValue(mojo, "parsedPercentTouch"),
+                "Monkey percentTouch should be 10");
+        assertEquals(Integer.valueOf(10), getFieldValue(mojo, "parsedPercentMotion"),
+                "Monkey percentMotion should be 10");
+        assertEquals(Integer.valueOf(10), getFieldValue(mojo, "parsedPercentTrackball"),
+                "Monkey percentTrackball should be 10");
+        assertEquals(Integer.valueOf(10), getFieldValue(mojo, "parsedPercentNav"),
+                "Monkey percentNav should be 10");
+        assertEquals(Integer.valueOf(10), getFieldValue(mojo, "parsedPercentMajorNav"),
+                "Monkey percentMajorNav should be 10");
+        assertEquals(Integer.valueOf(10), getFieldValue(mojo, "parsedPercentSyskeys"),
+                "Monkey percentSyskeys should be 10");
+        assertEquals(Integer.valueOf(10), getFieldValue(mojo, "parsedPercentAppswitch"),
+                "Monkey percentAppswitch should be 10");
+        assertEquals(Integer.valueOf(10), getFieldValue(mojo, "parsedPercentAnyevent"),
+                "Monkey percentAnyevent should be 10");
 
         // Verify arrays
         String[] expectedPackages = {"com.foo", "com.bar"};
-        assertTrue("Monkey packages should be [com.foo,com.bar]",
-                Arrays.equals(expectedPackages, getFieldValue(mojo, "parsedPackages")));
+        assertArrayEquals(expectedPackages, getFieldValue(mojo, "parsedPackages"),
+                "Monkey packages should be [com.foo,com.bar]");
         String[] expectedCategories = {"foo", "bar"};
-        assertTrue("Monkey categories should be [foo,bar]",
-                Arrays.equals(expectedCategories, getFieldValue(mojo, "parsedCategories")));
+        assertArrayEquals(expectedCategories, getFieldValue(mojo, "parsedCategories"),
+                "Monkey categories should be [foo,bar]");
 
         // Verify boolean values
-        assertTrue("Monkey debugNoEvents should be true", getFieldValue(mojo, "parsedDebugNoEvents"));
-        assertTrue("Monkey hprof should be true", getFieldValue(mojo, "parsedHprof"));
-        assertTrue("Monkey ignoreCrashes should be true", getFieldValue(mojo, "parsedIgnoreCrashes"));
-        assertTrue("Monkey ignoreTimeouts should be true", getFieldValue(mojo, "parsedIgnoreTimeouts"));
-        assertTrue("Monkey ignoreSecurityExceptions should be true", getFieldValue(mojo, "parsedIgnoreSecurityExceptions"));
-        assertTrue("Monkey killProcessAfterError should be true", getFieldValue(mojo, "parsedKillProcessAfterError"));
-        assertTrue("Monkey monitorNativeCrashes should be true", getFieldValue(mojo, "parsedMonitorNativeCrashes"));
-        assertTrue("Monkey createReport should be true", getFieldValue(mojo, "parsedCreateReport"));
+        assertTrue(getFieldValue(mojo, "parsedDebugNoEvents"),
+                "Monkey debugNoEvents should be true");
+        assertTrue(getFieldValue(mojo, "parsedHprof"),
+                "Monkey hprof should be true");
+        assertTrue(getFieldValue(mojo, "parsedIgnoreCrashes"),
+                "Monkey ignoreCrashes should be true");
+        assertTrue(getFieldValue(mojo, "parsedIgnoreTimeouts"),
+                "Monkey ignoreTimeouts should be true");
+        assertTrue(getFieldValue(mojo, "parsedIgnoreSecurityExceptions"),
+                "Monkey ignoreSecurityExceptions should be true");
+        assertTrue(getFieldValue(mojo, "parsedKillProcessAfterError"),
+                "Monkey killProcessAfterError should be true");
+        assertTrue(getFieldValue(mojo, "parsedMonitorNativeCrashes"),
+                "Monkey monitorNativeCrashes should be true");
+        assertTrue(getFieldValue(mojo, "parsedCreateReport"),
+                "Monkey createReport should be true");
     }
 }

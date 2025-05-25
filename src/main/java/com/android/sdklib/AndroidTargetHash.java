@@ -18,20 +18,18 @@ package com.android.sdklib;
 
 import com.android.annotations.NonNull;
 import com.android.annotations.Nullable;
-import com.android.sdklib.repository.descriptors.IdDisplay;
+
 import com.google.common.base.Splitter;
 
 import java.util.List;
 
 
 /**
- * Helper methods to manipulate hash strings used by {@link IAndroidTarget#hashString()}.
+ * Helper methods to manipulate hash strings used by {@link IAndroidTarget}.
  */
 public abstract class AndroidTargetHash {
     /**
      * Prefix used to build hash strings for platform targets
-     *
-     * @see SdkManager#getTargetFromHashString(String)
      */
     public static final String PLATFORM_HASH_PREFIX = "android-";
     /**
@@ -158,10 +156,10 @@ public abstract class AndroidTargetHash {
     /**
      * Returns the hash string for a given add-on.
      *
-     * @param addonVendorDisplay A non-null vendor. When using an {@link IdDisplay} source,
-     *                           this parameter should be the {@link IdDisplay#getDisplay()}.
-     * @param addonNameDisplay   A non-null add-on name. When using an {@link IdDisplay} source,
-     *                           this parameter should be the {@link IdDisplay#getDisplay()}.
+     * @param addonVendorDisplay A non-null vendor. When using an IdDisplay source,
+     *                           this parameter should be the IdDisplay#getDisplay().
+     * @param addonNameDisplay   A non-null add-on name. When using an IdDisplay source,
+     *                           this parameter should be the IdDisplay#getDisplay().
      * @param version            A non-null platform version (the addon's base platform version)
      * @return A non-null hash string uniquely representing this add-on target.
      */

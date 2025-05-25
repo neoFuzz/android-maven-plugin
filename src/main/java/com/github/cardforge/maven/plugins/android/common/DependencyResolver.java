@@ -6,9 +6,7 @@ import org.apache.maven.artifact.resolver.ArtifactResolutionRequest;
 import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.execution.MavenSession;
-import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.project.MavenProject;
-import org.apache.maven.project.ProjectBuildingRequest;
+import org.apache.maven.project.*;
 import org.apache.maven.repository.RepositorySystem;
 import org.apache.maven.shared.dependency.graph.DependencyGraphBuilder;
 import org.apache.maven.shared.dependency.graph.DependencyGraphBuilderException;
@@ -60,7 +58,7 @@ public final class DependencyResolver {
      * @param project MavenProject for which to return the dependencies.
      * @param session MavenSession in which to look for reactor dependencies.
      * @return all the dependencies for a project.
-     * @throws DependencyGraphBuilderException if the dependency graph can't be built.
+     * @throws DependencyGraphBuilderException if the dependencies could not be resolved.
      */
     @NonNull
     public Set<Artifact> getProjectDependenciesFor(MavenProject project, @NonNull MavenSession session)
@@ -88,17 +86,15 @@ public final class DependencyResolver {
      * @param repositorySystem RepositorySystem with which to resolve the artifacts.
      * @param artifact         Artifact for whom to get the dependencies.
      * @return Set of APK, APKLIB and AAR dependencies.
-     * @throws org.apache.maven.plugin.MojoExecutionException if it couldn't resolve any of the dependencies.
      */
     @NonNull
     public Set<Artifact> getLibraryDependenciesFor(@NonNull MavenSession session,
                                                    @NonNull RepositorySystem repositorySystem,
-                                                   Artifact artifact)
-            throws MojoExecutionException {
+                                                   Artifact artifact) {
         // Set a filter that should only return interesting artifacts.
         final ArtifactFilter filter = found -> {
             final String type = found.getType();
-            return (type.equals(APKLIB) || type.equals(AAR) || type.equals(APK));
+            return (type.equals(AAR) || type.equals(APK));
         };
 
         log.debug("MavenSession = " + session + "  repositorySystem = " + repositorySystem);

@@ -1,9 +1,9 @@
 package com.github.cardforge.maven.plugins.android;
 
-import com.android.annotations.NonNull;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
 
+import javax.annotation.Nonnull;
 import java.util.*;
 
 /**
@@ -35,9 +35,10 @@ public class InstrumentationArgumentParser {
      * @return a map representation of the given key/value pair list, might be empty
      * @throws IllegalArgumentException when the given list contains unparseable entries
      */
+    @Nonnull
     public static Map<String, String> parse(final List<String> flatArgs) {
         if (flatArgs == null) {
-            return Collections.EMPTY_MAP;
+            return Collections.emptyMap();
         }
 
         final Map<String, String> mappedArgs = new HashMap<>();
@@ -50,7 +51,7 @@ public class InstrumentationArgumentParser {
         return mappedArgs;
     }
 
-    @NonNull
+    @Nonnull
     private static AbstractMap.SimpleEntry<String, String> parseKeyValuePair(final String arg) {
         final List<String> keyValueSplit = Lists.newArrayList(Splitter.on(SEPARATOR).limit(2).split(arg));
 

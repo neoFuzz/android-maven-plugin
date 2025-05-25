@@ -10,6 +10,7 @@ import org.junit.runners.MethodSorters;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
+import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,7 +23,16 @@ import java.util.List;
 public class UnpackMojoTest
         extends AbstractAndroidMojoTestCase<UnpackMojo> {
 
+    private final String projectName;
+    private final MetaInf expected;
+
+    public UnpackMojoTest(String projectName, MetaInf expected) {
+        this.projectName = projectName;
+        this.expected = expected;
+    }
+
     @Parameters
+    @Nonnull
     static public List<Object[]> suite() {
         final List<Object[]> suite = new ArrayList<Object[]>();
 
@@ -34,18 +44,14 @@ public class UnpackMojoTest
         return suite;
     }
 
-    private final String projectName;
-
-    private final MetaInf expected;
-
-    public UnpackMojoTest(String projectName, MetaInf expected) {
-        this.projectName = projectName;
-        this.expected = expected;
-    }
-
     @Override
     public String getPluginGoalName() {
         return "unpack";
+    }
+
+    @Override
+    protected Class<UnpackMojo> getMojoClass() {
+        return null;
     }
 
     @Override
@@ -55,11 +61,9 @@ public class UnpackMojoTest
         super.setUp();
     }
 
-    @Override
     @After
-    public void tearDown()
-            throws Exception {
-        super.tearDown();
+    public void tearDown() {
+        //unsure
     }
 
     @Test
@@ -78,7 +82,7 @@ public class UnpackMojoTest
     }
 
     protected <T> T getFieldValue(Object object, String fieldName)
-            throws IllegalAccessException {
+            throws Exception {
         return (T) super.getVariableValueFromObject(object, fieldName);
     }
 

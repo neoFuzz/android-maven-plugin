@@ -18,7 +18,6 @@ package com.android.manifmerger;
 
 import com.android.annotations.NonNull;
 import com.android.annotations.Nullable;
-import com.android.annotations.VisibleForTesting;
 import com.android.annotations.concurrency.Immutable;
 import com.android.ide.common.blame.SourceFile;
 import com.android.ide.common.blame.SourceFilePosition;
@@ -62,48 +61,30 @@ public class MergingReport {
     @NonNull
     private final ImmutableList<Record> records;
     /**
-     * the list of intermediary stages if
-     * {@link com.android.manifmerger.ManifestMerger2.Invoker.Feature#KEEP_INTERMEDIARY_STAGES}
-     * is set.
-     */
-    @NonNull
-    private final ImmutableList<String> intermediaryStages;
-    /**
      * the actions that were performed during the merging process.
      */
     @NonNull
     private final Actions actions;
-    /**
-     * the package name of the merged manifest.
-     */
-    @NonNull
-    private final String packageName;
 
     /**
      * @param mergedDocuments    the merged documents, keyed by their state.
      * @param mergedXmlDocuments the merged xml documents, keyed by their state.
      * @param result             the result of the merging process.
      * @param records            the list of logging events, ordered by their recording time.
-     * @param intermediaryStages the list of intermediary stages if
-     *                           {@link com.android.manifmerger.ManifestMerger2.Invoker.Feature#KEEP_INTERMEDIARY_STAGES}
-     *                           is set.
      * @param actions            the actions that were performed during the merging process.
-     * @param packageName        the package name of the merged manifest.
      */
     private MergingReport(@NonNull Map<MergedManifestKind, String> mergedDocuments,
                           @NonNull Map<MergedManifestKind, XmlDocument> mergedXmlDocuments,
                           @NonNull Result result,
                           @NonNull ImmutableList<Record> records,
-                          @NonNull ImmutableList<String> intermediaryStages,
-                          @NonNull Actions actions,
-                          @NonNull String packageName) {
+                          @NonNull Actions actions) {
         this.mergedDocuments = mergedDocuments;
         this.mergedXmlDocuments = mergedXmlDocuments;
         this.result = result;
         this.records = records;
-        this.intermediaryStages = intermediaryStages;
+
         this.actions = actions;
-        this.packageName = packageName;
+
     }
 
     /**
@@ -153,18 +134,6 @@ public class MergingReport {
     }
 
     /**
-     * Returns all the merging intermediary stages if
-     * {@link com.android.manifmerger.ManifestMerger2.Invoker.Feature#KEEP_INTERMEDIARY_STAGES}
-     * is set.
-     *
-     * @return the list of intermediary stages
-     */
-    @NonNull
-    public ImmutableList<String> getIntermediaryStages() {
-        return intermediaryStages;
-    }
-
-    /**
      * @return the result of the merging process.
      */
     @NonNull
@@ -203,14 +172,6 @@ public class MergingReport {
                     : "Manifest merger failed : " + records.get(0).mLog;
             default -> "Manifest merger returned an invalid result " + result;
         };
-    }
-
-    /**
-     * @return the package name of the merged manifest.
-     */
-    @NonNull
-    public String getPackageName() {
-        return packageName;
     }
 
     /**
@@ -262,19 +223,6 @@ public class MergingReport {
             return this == SUCCESS || this == WARNING;
         }
 
-        /**
-         * @return true if the merging completed with warnings, false otherwise.
-         */
-        public boolean isWarning() {
-            return this == WARNING;
-        }
-
-        /**
-         * @return true if the merging completed with errors, false otherwise.
-         */
-        public boolean isError() {
-            return this == ERROR;
-        }
     }
 
     /**
@@ -313,27 +261,11 @@ public class MergingReport {
         }
 
         /**
-         * @return the severity of the log message.
-         */
-        @NonNull
-        public Severity getSeverity() {
-            return mSeverity;
-        }
-
-        /**
          * @return the message from the log.
          */
         @NonNull
         public String getMessage() {
             return mLog;
-        }
-
-        /**
-         * @return the location of the log in the source file.
-         */
-        @NonNull
-        public SourceFilePosition getSourceLocation() {
-            return mSourceLocation;
         }
 
         @NonNull
@@ -425,14 +357,6 @@ public class MergingReport {
         private String packageName;
 
         /**
-         * @param logger the logger to use to log messages.
-         */
-        @VisibleForTesting
-        Builder(@NonNull ILogger logger) {
-            this(logger, null);
-        }
-
-        /**
          * @param logger         the logger to use to log messages.
          * @param manifestMerger the manifest merger, used to retrieve the merged manifest package name.
          */
@@ -459,28 +383,6 @@ public class MergingReport {
         Builder setMergedXmlDocument(@NonNull MergedManifestKind mergedManifestKind, @NonNull XmlDocument mergedDocument) {
             this.mergedXmlDocuments.put(mergedManifestKind, mergedDocument);
             return this;
-        }
-
-        /**
-         * @param sourceFile the location of the log in the source file.
-         * @param line       the line number of the log in the source file.
-         * @param column     the column number of the log in the source file.
-         * @param severity   the severity of the problem
-         * @param message    the log message
-         * @return the builder itself.
-         */
-        @NonNull
-        @VisibleForTesting
-        Builder addMessage(@NonNull SourceFile sourceFile,
-                           int line,
-                           int column,
-                           @NonNull Record.Severity severity,
-                           @NonNull String message) {
-            // The line and column used are 1-based, but SourcePosition uses zero-based.
-            return addMessage(
-                    new SourceFilePosition(sourceFile, new SourcePosition(line - 1, column - 1, -1)),
-                    severity,
-                    message);
         }
 
         /**
@@ -551,20 +453,22 @@ public class MergingReport {
          */
         @NonNull
         MergingReport build() {
-            Result result = mHasErrors
-                    ? Result.ERROR
-                    : mHasWarnings
-                    ? Result.WARNING
-                    : Result.SUCCESS;
+            Result result;
+            if (mHasErrors) {
+                result = Result.ERROR;
+            } else if (mHasWarnings) {
+                result = Result.WARNING;
+            } else {
+                result = Result.SUCCESS;
+            }
 
             return new MergingReport(
                     mergedDocuments,
                     mergedXmlDocuments,
                     result,
                     mRecordBuilder.build(),
-                    mIntermediaryStages.build(),
-                    mActionRecorder.build(),
-                    packageName);
+                    mActionRecorder.build()
+            );
         }
 
         /**

@@ -27,6 +27,8 @@ import org.junit.Test;
 import javax.annotation.Nonnull;
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.*;
 
 
@@ -42,6 +44,11 @@ public class InternalIntegrationTestMojoTest extends AbstractAndroidMojoTestCase
     @Override
     public String getPluginGoalName() {
         return "internal-integration-test";
+    }
+
+    @Override
+    protected Class<InternalIntegrationTestMojo> getMojoClass() {
+        return null;
     }
 
     @Test

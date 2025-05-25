@@ -198,6 +198,14 @@ public class ActionRecorder {
         updateRecordsIfNodeKeyChanged(mergedElement);
     }
 
+    /**
+     * Retrieves or creates a decision tree record for the given XML element.
+     *
+     * @param xmlElement The XML element for which to get or create a decision tree record.
+     *                   Must not be null.
+     * @return A {@link Actions.DecisionTreeRecord} associated with the XML element.
+     * A new record is created if one doesn't exist. Never returns null.
+     */
     @NonNull
     private synchronized Actions.DecisionTreeRecord getDecisionTreeRecord(
             @NonNull XmlElement xmlElement) {
@@ -319,6 +327,13 @@ public class ActionRecorder {
         return null;
     }
 
+    /**
+     * Returns the list of attribute records for an attribute. The list is created when the
+     * attribute is first added to the resulting merged xml document.
+     *
+     * @param attribute the attribute in question.
+     * @return the list of attribute records.
+     */
     @NonNull
     private synchronized List<Actions.AttributeRecord> getAttributeRecords(@NonNull XmlAttribute attribute) {
         XmlElement originElement = attribute.getOwnerElement();
@@ -330,6 +345,11 @@ public class ActionRecorder {
                 attribute.getName(), k -> new ArrayList<>());
     }
 
+    /**
+     * Builds the {@link com.android.manifmerger.Actions} object from the recorded actions.
+     *
+     * @return the actions object.
+     */
     @NonNull
     synchronized Actions build() {
         return new Actions(ImmutableMap.copyOf(mRecords));

@@ -444,8 +444,8 @@ public abstract class AbstractInstrumentationMojo extends AbstractAndroidMojo {
      * @return the value of `value` if it's not null/empty, otherwise the `fallback` value
      */
     public <T> T getOrFallback(T value, T fallback) {
-        if (value instanceof String) {
-            return (StringUtils.isNotEmpty((String) value)) ? value : fallback;
+        if (value instanceof String v) {
+            return StringUtils.isNotEmpty(v) ? value : fallback;
         } else if (value instanceof List) {
             return (value != null && !((List<?>) value).isEmpty()) ? value : fallback;
         } else if (value instanceof Boolean) {

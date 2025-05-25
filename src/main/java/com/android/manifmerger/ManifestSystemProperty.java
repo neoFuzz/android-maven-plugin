@@ -234,9 +234,9 @@ public enum ManifestSystemProperty implements ManifestMerger2.AutoAddingProperty
      * this could be made more generic by adding more metadata to the enum but since there is
      * only one case so far, keep it simple.
      *
-     * @param actionRecorder
-     * @param document
-     * @return
+     * @param actionRecorder the action recorder to record the action.
+     * @param document       the document to create or get the element from.
+     * @return the created or existing element
      */
     @NonNull
     private static XmlElement createOrGetUseSdk(

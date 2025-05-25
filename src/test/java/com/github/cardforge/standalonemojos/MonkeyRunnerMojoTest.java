@@ -6,7 +6,6 @@ import com.github.cardforge.maven.plugins.android.config.ConfigHandler;
 import com.github.cardforge.maven.plugins.android.configuration.Program;
 import com.github.cardforge.maven.plugins.android.standalonemojos.MonkeyRunnerMojo;
 import org.apache.maven.project.MavenProject;
-import org.junit.Ignore;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
@@ -21,7 +20,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Test the monkeyrunner mojo. Tests options' default values and parsing. Tests the parameters passed to monkeyrunner.
@@ -34,6 +33,11 @@ public class MonkeyRunnerMojoTest extends AbstractAndroidMojoTestCase<MonkeyRunn
     @Override
     public String getPluginGoalName() {
         return "monkeyrunner";
+    }
+
+    @Override
+    protected Class<MonkeyRunnerMojo> getMojoClass() {
+        return null;
     }
 
     /**
@@ -49,7 +53,7 @@ public class MonkeyRunnerMojoTest extends AbstractAndroidMojoTestCase<MonkeyRunn
 
         Boolean monkeyrunnerSkip = getPrivateField(mojo, "parsedSkip");
 
-        assertTrue("monkeyrunner skip parameter should be true", monkeyrunnerSkip);
+        assertTrue(monkeyrunnerSkip, "monkeyrunner skip parameter should be true");
     }
 
     /**
@@ -68,17 +72,16 @@ public class MonkeyRunnerMojoTest extends AbstractAndroidMojoTestCase<MonkeyRunn
         List<Program> monkeyrunnerPrograms = getPrivateField(mojo, "parsedPrograms");
         Boolean monkeyrunnerCreateReport = getPrivateField(mojo, "parsedCreateReport");
 
-        assertFalse("monkeyrunner skip parameter should be false", monkeyrunnerSkip);
-        assertNull("monkeyrunner plugins parameter should not contain plugins", monkeyrunnerPlugins);
-        assertNull("monkeyrunner programs parameter should not contain programs", monkeyrunnerPrograms);
-        assertFalse("monkeyrunner monkeyrunnerCreateReport parameter should be false", monkeyrunnerCreateReport);
+        assertFalse(monkeyrunnerSkip, "monkeyrunner skip parameter should be false");
+        assertNull(monkeyrunnerPlugins, "monkeyrunner plugins parameter should not contain plugins");
+        assertNull(monkeyrunnerPrograms, "monkeyrunner programs parameter should not contain programs");
+        assertFalse(monkeyrunnerCreateReport, "monkeyrunner monkeyrunnerCreateReport parameter should be false");
     }
 
     /**
      * Tests all options, checks if they are parsed correctly.
      *
      * @throws Exception if any error occurs
-     *
      */
     @Test
     public void testCustomMonkeyRunnerConfig() throws Exception {
@@ -91,16 +94,16 @@ public class MonkeyRunnerMojoTest extends AbstractAndroidMojoTestCase<MonkeyRunn
         List<Program> monkeyrunnerPrograms = getPrivateField(mojo, "parsedPrograms");
         Boolean monkeyrunnerCreateReport = getPrivateField(mojo, "parsedCreateReport");
 
-        assertFalse("monkeyrunner skip parameter should be false", monkeyrunnerSkip);
-        assertNotNull("monkeyrunner plugins parameter should not contain plugins", monkeyrunnerPlugins);
+        assertFalse(monkeyrunnerSkip, "monkeyrunner skip parameter should be false");
+        assertNotNull(monkeyrunnerPlugins, "monkeyrunner plugins parameter should not contain plugins");
         String[] expectedPlugins = {"foo"};
         assertArrayEquals(expectedPlugins, monkeyrunnerPlugins);
-        assertNotNull("monkeyrunner programs parameter should not contain programs", monkeyrunnerPrograms);
+        assertNotNull(monkeyrunnerPrograms, "monkeyrunner programs parameter should not contain programs");
         List<Program> expectedProgramList = new ArrayList<>();
         expectedProgramList.add(new Program("foo", null));
         expectedProgramList.add(new Program("bar", "qux"));
         assertEquals(expectedProgramList, monkeyrunnerPrograms);
-        assertTrue("monkeyrunner monkeyrunnerCreateReport parameter should be false", monkeyrunnerCreateReport);
+        assertTrue(monkeyrunnerCreateReport, "monkeyrunner monkeyrunnerCreateReport parameter should be false");
     }
 
     @Test

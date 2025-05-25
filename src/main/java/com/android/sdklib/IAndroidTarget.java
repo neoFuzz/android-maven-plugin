@@ -18,12 +18,8 @@ package com.android.sdklib;
 
 import com.android.annotations.NonNull;
 import com.android.annotations.Nullable;
-import com.android.repository.api.LocalPackage;
-import com.android.sdklib.repository.descriptors.IdDisplay;
 
 import java.io.File;
-import java.util.List;
-import java.util.Map;
 
 
 /**
@@ -38,83 +34,6 @@ public interface IAndroidTarget extends Comparable<IAndroidTarget> {
      * OS Path to the "framework.aidl" file.
      */
     int ANDROID_AIDL = 2;
-    /**
-     * OS Path to the "samples" folder which contains sample projects.
-     */
-    int SAMPLES = 4;
-    /**
-     * OS Path to the "skins" folder which contains the emulator skins.
-     */
-    int SKINS = 5;
-    /**
-     * OS Path to the "templates" folder which contains the templates for new projects.
-     */
-    int TEMPLATES = 6;
-    /**
-     * OS Path to the "data" folder which contains data &amp; libraries for the SDK tools.
-     */
-    int DATA = 7;
-    /**
-     * OS Path to the "attrs.xml" file.
-     */
-    int ATTRIBUTES = 8;
-    /**
-     * OS Path to the "attrs_manifest.xml" file.
-     */
-    int MANIFEST_ATTRIBUTES = 9;
-    /**
-     * OS Path to the "data/layoutlib.jar" library.
-     */
-    int LAYOUT_LIB = 10;
-    /**
-     * OS Path to the "data/res" folder.
-     */
-    int RESOURCES = 11;
-    /**
-     * OS Path to the "data/fonts" folder.
-     */
-    int FONTS = 12;
-    /**
-     * OS Path to the "data/widgets.txt" file.
-     */
-    int WIDGETS = 13;
-    /**
-     * OS Path to the "data/activity_actions.txt" file.
-     */
-    int ACTIONS_ACTIVITY = 14;
-    /**
-     * OS Path to the "data/broadcast_actions.txt" file.
-     */
-    int ACTIONS_BROADCAST = 15;
-    /**
-     * OS Path to the "data/service_actions.txt" file.
-     */
-    int ACTIONS_SERVICE = 16;
-    /**
-     * OS Path to the "data/categories.txt" file.
-     */
-    int CATEGORIES = 17;
-    /**
-     * OS Path to the "sources" folder.
-     */
-    int SOURCES = 18;
-    /**
-     * OS Path to the target specific docs
-     */
-    int DOCS = 19;
-    /**
-     * OS Path to the "ant" folder which contains the ant build rules (ver 2 and above)
-     */
-    int ANT = 24;
-    /**
-     * OS Path to the "uiautomator.jar" file.
-     */
-    int UI_AUTOMATOR_JAR = 27;
-    /**
-     * Return value for {@link #getUsbVendorId()} meaning no USB vendor IDs are defined by the
-     * Android target.
-     */
-    int NO_USB_ID = 0;
 
     /**
      * Returns the target location.
@@ -136,27 +55,6 @@ public interface IAndroidTarget extends Comparable<IAndroidTarget> {
      * @return the name of the target.
      */
     String getName();
-
-    /**
-     * Returns the full name of the target, possibly including vendor name.
-     *
-     * @return the full name of the target, possibly including vendor name.
-     */
-    String getFullName();
-
-    /**
-     * Returns the name to be displayed when representing all the libraries this target contains.
-     *
-     * @return the name to be displayed when representing all the libraries this target contains.
-     */
-    String getClasspathName();
-
-    /**
-     * Returns the name to be displayed when representing all the libraries this target contains.
-     *
-     * @return the name to be displayed when representing all the libraries this target contains.
-     */
-    String getShortClasspathName();
 
     /**
      * Returns the description of the target.
@@ -181,26 +79,11 @@ public interface IAndroidTarget extends Comparable<IAndroidTarget> {
     String getVersionName();
 
     /**
-     * Returns the revision number for the target.
-     *
-     * @return the revision number or 0 if there is none.
-     */
-    int getRevision();
-
-    /**
      * Returns true if the target is a standard Android platform.
      *
      * @return True if the target is a standard Android platform.
      */
     boolean isPlatform();
-
-    /**
-     * Returns the parent target. This is likely to only be non <code>null</code> if
-     * {@link #isPlatform()} returns <code>false</code>
-     *
-     * @return the parent target or null if this is a platform target
-     */
-    IAndroidTarget getParent();
 
     /**
      * Returns the path of a platform component.
@@ -212,17 +95,6 @@ public interface IAndroidTarget extends Comparable<IAndroidTarget> {
     String getPath(int pathId);
 
     /**
-     * Returns the path of a platform component.
-     * <p>
-     * This is like the legacy {@link #getPath(int)} method except it returns a {@link File}.
-     *
-     * @param pathId the id representing the path to return.
-     *               Any of the constants defined in the {@link IAndroidTarget} interface can be used.
-     * @return a {@link File} object or null if the path is not available.
-     */
-    File getFile(int pathId);
-
-    /**
      * Returns a BuildToolInfo for backward compatibility. If an older SDK is used this will return
      * paths located in the platform-tools, otherwise it'll return paths located in the latest
      * build-tools.
@@ -230,47 +102,6 @@ public interface IAndroidTarget extends Comparable<IAndroidTarget> {
      * @return a BuildToolInfo or null if none are available.
      */
     BuildToolInfo getBuildToolInfo();
-
-    /**
-     * Returns the boot classpath for this target.
-     * In most case, this is similar to calling {@link #getPath(int)} with
-     * {@link IAndroidTarget#ANDROID_JAR}.
-     *
-     * @return a non-null list of the boot classpath.
-     */
-    @NonNull
-    List<String> getBootClasspath();
-
-    /**
-     * Returns a list of optional libraries for this target.
-     * <p>
-     * These libraries are not automatically added to the classpath.
-     * Using them requires adding a <code>uses-library</code> entry in the manifest.
-     *
-     * @return a list of libraries.
-     * @see OptionalLibrary#getName()
-     */
-    @NonNull
-    List<OptionalLibrary> getOptionalLibraries();
-
-    /**
-     * Returns the additional libraries for this target.
-     * <p>
-     * These libraries are automatically added to the classpath, but using them requires
-     * adding a <code>uses-library</code> entry in the manifest.
-     *
-     * @return a list of libraries.
-     * @see OptionalLibrary#getName()
-     */
-    @NonNull
-    List<OptionalLibrary> getAdditionalLibraries();
-
-    /**
-     * Returns whether the target is able to render layouts.
-     *
-     * @return true if the target is able to render layouts.
-     */
-    boolean hasRenderingLibrary();
 
     /**
      * Returns the available skin folders for this target.
@@ -287,6 +118,7 @@ public interface IAndroidTarget extends Comparable<IAndroidTarget> {
      * @return an array of skin folders.
      */
     @NonNull
+    @SuppressWarnings("unused") // It is used somehow since it broke the Android Maven Plugin
     File[] getSkins();
 
     /**
@@ -297,152 +129,6 @@ public interface IAndroidTarget extends Comparable<IAndroidTarget> {
      * @return the default skin or <code>null</code> if there is none.
      */
     @Nullable
+    @SuppressWarnings("unused") // It is used somehow since it broke the Android Maven Plugin
     File getDefaultSkin();
-
-    /**
-     * Returns the list of libraries available for a given platform.
-     *
-     * @return an array of libraries provided by the platform or <code>null</code> if there is none.
-     */
-    String[] getPlatformLibraries();
-
-    /**
-     * Return the value of a given property for this target.
-     *
-     * @param name the name of the property to return
-     * @return the property value or <code>null</code> if it was not found.
-     */
-    String getProperty(String name);
-
-    /**
-     * Returns the value of a given property for this target as an Integer value.
-     * <p> If the value is missing or is not an integer, the method will return the given default
-     * value.
-     *
-     * @param name         the name of the property to return
-     * @param defaultValue the default value to return.
-     * @return the property value or <code>null</code> if it was not found.
-     * @see Integer#decode(String)
-     */
-    Integer getProperty(String name, Integer defaultValue);
-
-    /**
-     * Returns the value of a given property for this target as a Boolean value.
-     * <p> If the value is missing or is not a boolean, the method will return the given default
-     * value.
-     *
-     * @param name         the name of the property to return
-     * @param defaultValue the default value to return.
-     * @return the property value or <code>null</code> if it was not found.
-     * @see Boolean#valueOf(String)
-     */
-    Boolean getProperty(String name, Boolean defaultValue);
-
-    /**
-     * Returns all the properties associated with this target. This can be null if the target has
-     * no properties.
-     *
-     * @return a map of property name-value.
-     */
-    Map<String, String> getProperties();
-
-    /**
-     * Returns the USB Vendor ID for the vendor of this target.
-     * <p>If the target defines no USB Vendor ID, then the method return 0.
-     *
-     * @return the USB Vendor ID or 0 if none is defined.
-     */
-    int getUsbVendorId();
-
-    /**
-     * Returns an array of system images for this target.
-     * The array can be empty but not null.
-     *
-     * @return an array of {@link ISystemImage}.
-     */
-    ISystemImage[] getSystemImages();
-
-    /**
-     * Returns the system image information for the given {@code tag} and {@code abiType}.
-     *
-     * @param tag     A tag id-display.
-     * @param abiType An ABI type string.
-     * @return An existing {@link ISystemImage} for the requested {@code abiType}
-     * or null if none exists for this type.
-     */
-    @Nullable
-    ISystemImage getSystemImage(@NonNull IdDisplay tag, @NonNull String abiType);
-
-    /**
-     * Returns whether the given target is compatible with the receiver.
-     * <p>
-     * This means that a project using the receiver's target can run on the given target.
-     * <br/>
-     * Example:
-     * <pre>
-     * CupcakeTarget.canRunOn(DonutTarget) == true
-     * </pre>.
-     *
-     * @param target the IAndroidTarget to test.
-     * @return true if the target is compatible with the receiver.
-     */
-    boolean canRunOn(IAndroidTarget target);
-
-    /**
-     * Returns a string able to uniquely identify a target.
-     * Typically, the target will encode information such as api level, whether it's a platform
-     * or add-on, and if it's an add-on vendor and add-on name.
-     * <p>
-     * See {@link AndroidTargetHash} for helper methods to manipulate hash strings.
-     *
-     * @return a non-null string
-     */
-    String hashString();
-
-    /**
-     * An optional library provided by an Android Target
-     */
-    interface OptionalLibrary {
-        /**
-         * The name of the library, as used in the manifest (&lt;uses-library&gt;).
-         *
-         * @return the name of the library.
-         */
-        @NonNull
-        String getName();
-
-        /**
-         * Location of the jar file.
-         *
-         * @return the location of the jar file.
-         */
-        @NonNull
-        File getJar();
-
-        /**
-         * Description of the library.
-         *
-         * @return the description of the library.
-         */
-        @NonNull
-        String getDescription();
-
-        /**
-         * Whether the library requires a manifest entry
-         *
-         * @return true if the library requires a manifest entry, false otherwise.
-         */
-        boolean isManifestEntryRequired();
-
-        /**
-         * Path to the library jar file relative to the {@code libs} directory in the package.
-         * Can be {@code null} when retrieved from a {@link LocalPackage} that was installed from
-         * a legacy source.
-         *
-         * @return the path to the library jar file relative to the {@code libs} directory in the
-         * package.
-         */
-        @Nullable
-        String getLocalJarPath();
-    }
 }

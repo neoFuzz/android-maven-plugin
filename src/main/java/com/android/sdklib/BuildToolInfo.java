@@ -18,22 +18,13 @@ package com.android.sdklib;
 
 import com.android.SdkConstants;
 import com.android.annotations.NonNull;
-import com.android.annotations.Nullable;
-import com.android.annotations.VisibleForTesting;
-import com.android.annotations.VisibleForTesting.Visibility;
 import com.android.repository.Revision;
 import com.android.repository.api.LocalPackage;
-import com.android.sdklib.io.FileOp;
 import com.android.sdklib.repository.FullRevision;
-import com.android.sdklib.repository.NoPreviewRevision;
-import com.android.utils.ILogger;
 import com.google.common.collect.Maps;
 
 import java.io.File;
 import java.util.Map;
-import java.util.Properties;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import static com.android.SdkConstants.*;
 import static com.android.sdklib.BuildToolInfo.PathId.*;
@@ -51,19 +42,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public class BuildToolInfo {
 
-    /**
-     * First version with native multi-dex support.
-     */
-    public static final int SDK_LEVEL_FOR_MULTIDEX_NATIVE_SUPPORT = 21;
-    /**
-     * Name of the file read by {@link #getRuntimeProps()}
-     */
-    private static final String FN_RUNTIME_PROPS = "runtime.properties";
-    /**
-     * Property in {@link #FN_RUNTIME_PROPS} indicating the desired runtime JVM.
-     * Type: {@link NoPreviewRevision#toShortString()}, e.g. "1.7.0"
-     */
-    private static final String PROP_RUNTIME_JVM = "Runtime.Jvm";
     /**
      * The build-tool revision.
      */
@@ -103,72 +81,6 @@ public class BuildToolInfo {
         add(JACK, FN_JACK);
         add(JILL, FN_JILL);
         add(SPLIT_SELECT, FN_SPLIT_SELECT);
-    }
-
-    /**
-     * @param revision       the build-tool revision.
-     * @param mainPath       the path to the build-tool folder specific to this revision.
-     * @param aapt           the path to the {@code aapt} tool.
-     * @param aidl           the path to the {@code aidl} tool.
-     * @param dx             the DX tool
-     * @param dxJar          the DX jar file
-     * @param llmvRsCc       the path to the {@code renderscript} tool.
-     * @param androidRs      the path to the {@code android-rs-} tool.
-     * @param androidRsClang the path to the {@code android-rs-clang} tool.
-     * @param bccCompat      the path to the {@code bcc_compat} tool.
-     * @param ldArm          the path to the {@code ld-arm} tool.
-     * @param ldX86          the path to the {@code ld-x86} tool.
-     * @param ldMips         the path to the {@code ld-mips} tool.
-     * @param zipAlign       the path to the {@code zipalign} tool.
-     */
-    public BuildToolInfo(
-            @NonNull FullRevision revision,
-            @NonNull File mainPath,
-            @NonNull File aapt,
-            @NonNull File aidl,
-            @NonNull File dx,
-            @NonNull File dxJar,
-            @NonNull File llmvRsCc,
-            @NonNull File androidRs,
-            @NonNull File androidRsClang,
-            @Nullable File bccCompat,
-            @Nullable File ldArm,
-            @Nullable File ldX86,
-            @Nullable File ldMips,
-            @NonNull File zipAlign) {
-        mRevision = revision;
-        mPath = mainPath;
-        add(AAPT, aapt);
-        add(AIDL, aidl);
-        add(DX, dx);
-        add(DX_JAR, dxJar);
-        add(LLVM_RS_CC, llmvRsCc);
-        add(ANDROID_RS, androidRs);
-        add(ANDROID_RS_CLANG, androidRsClang);
-        add(ZIP_ALIGN, zipAlign);
-
-        if (bccCompat != null) {
-            add(BCC_COMPAT, bccCompat);
-        } else if (BCC_COMPAT.isPresentIn(revision)) {
-            throw new IllegalArgumentException("BCC_COMPAT required in " + revision);
-        }
-        if (ldArm != null) {
-            add(LD_ARM, ldArm);
-        } else if (LD_ARM.isPresentIn(revision)) {
-            throw new IllegalArgumentException("LD_ARM required in " + revision);
-        }
-
-        if (ldX86 != null) {
-            add(LD_X86, ldX86);
-        } else if (LD_X86.isPresentIn(revision)) {
-            throw new IllegalArgumentException("LD_X86 required in " + revision);
-        }
-
-        if (ldMips != null) {
-            add(LD_MIPS, ldMips);
-        } else if (LD_MIPS.isPresentIn(revision)) {
-            throw new IllegalArgumentException("LD_MIPS required in " + revision);
-        }
     }
 
     /**
@@ -257,87 +169,6 @@ public class BuildToolInfo {
         assert pathId.isPresentIn(mRevision);
 
         return mPaths.get(pathId);
-    }
-
-    /**
-     * Checks whether the build-tool is valid by verifying that the expected binaries
-     * are actually present. This checks that all known paths point to a valid file
-     * or directory.
-     *
-     * @param log An optional logger. If non-null, errors will be printed there.
-     * @return True if the build-tool folder contains all the expected tools.
-     */
-    public boolean isValid(@Nullable ILogger log) {
-        for (Map.Entry<PathId, String> entry : mPaths.entrySet()) {
-            File f = new File(entry.getValue());
-            // check if file is missing. It's only ok if the revision of the build-tools
-            // is lower than the min rev of the element.
-            if (!f.exists() && entry.getKey().isPresentIn(mRevision)) {
-                if (log != null) {
-                    log.warning("Build-tool %1$s is missing %2$s at %3$s",  //$NON-NLS-1$
-                            mRevision.toString(),
-                            entry.getKey(), f.getAbsolutePath());
-                }
-                return false;
-            }
-        }
-        return true;
-    }
-
-    /**
-     * Parses the build-tools {@code runtime.props} file, if present.
-     *
-     * @return The properties from {@code runtime.props} if present, otherwise an empty properties set.
-     */
-    @NonNull
-    public Properties getRuntimeProps() {
-        FileOp fop = new FileOp();
-        return fop.loadProperties(new File(mPath, FN_RUNTIME_PROPS));
-    }
-
-    /**
-     * Checks whether this build-tools package can run on the current JVM.
-     *
-     * @return True if the build-tools package has a Runtime.Jvm property and it is lesser or
-     * equal to the current JVM version.
-     * False if the property is present and the requirement is not met.
-     * True if there's an error parsing either versions and the comparison cannot be made.
-     */
-    public boolean canRunOnJvm() {
-        Properties props = getRuntimeProps();
-        String required = props.getProperty(PROP_RUNTIME_JVM);
-        if (required == null) {
-            // No requirement ==> accepts.
-            return true;
-        }
-        try {
-            NoPreviewRevision requiredVersion = NoPreviewRevision.parseRevision(required);
-            NoPreviewRevision currentVersion = getCurrentJvmVersion();
-            return currentVersion.compareTo(requiredVersion) >= 0;
-
-        } catch (NumberFormatException ignore) {
-            // Either we failed to parse the property version or the running JVM version.
-            // Right now take the relaxed policy of accepting it if we can't compare.
-            return true;
-        }
-    }
-
-    /**
-     * @return The current JVM version.
-     * @throws NumberFormatException If the current JVM version cannot be parsed.
-     */
-    @VisibleForTesting(visibility = Visibility.PRIVATE)
-    @Nullable
-    protected NoPreviewRevision getCurrentJvmVersion() throws NumberFormatException {
-        String javav = System.getProperty("java.version");              //$NON-NLS-1$
-        // java Version is typically in the form "1.2.3_45" and we just need to keep up to "1.2.3"
-        // since our revision numbers are in 3-parts form (1.2.3).
-        Pattern p = Pattern.compile("((\\d+)(\\.\\d+)?(\\.\\d+)?).*");  //$NON-NLS-1$
-        Matcher m = p.matcher(javav);
-        if (m.matches()) {
-            return NoPreviewRevision.parseRevision(m.group(1));
-        }
-        return null;
     }
 
     /**
@@ -450,7 +281,7 @@ public class BuildToolInfo {
 
         /**
          * min revision this element was introduced.
-         * Controls {@link BuildToolInfo#isValid(ILogger)}
+         *
          */
         private final FullRevision mMinRevision;
 

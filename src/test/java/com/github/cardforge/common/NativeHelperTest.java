@@ -1,17 +1,15 @@
 package com.github.cardforge.common;
 
 import com.github.cardforge.maven.plugins.android.AndroidNdk;
-import com.github.cardforge.maven.plugins.android.common.AndroidExtension;
 import com.github.cardforge.maven.plugins.android.common.Const;
 import com.github.cardforge.maven.plugins.android.common.NativeHelper;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.DefaultArtifact;
-import org.apache.maven.plugin.testing.SilentLog;
-import org.apache.maven.plugin.testing.stubs.ArtifactStub;
+import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.project.DefaultProjectDependenciesResolver;
 import org.apache.maven.project.MavenProject;
+import org.apache.maven.project.ProjectDependenciesResolver;
 import org.apache.maven.shared.dependency.graph.DependencyGraphBuilder;
-import org.apache.maven.shared.dependency.graph.internal.DefaultDependencyGraphBuilder;
 import org.junit.Rule;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
@@ -19,9 +17,10 @@ import org.junit.jupiter.api.Test;
 import org.junit.rules.TemporaryFolder;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.Collections;
 import java.util.Set;
+
+import static org.mockito.Mockito.mock;
 
 /**
  * @author Johan Lindquist
@@ -35,21 +34,22 @@ public class NativeHelperTest {
     @BeforeAll
     public static void setupNativeHelper() {
         MavenProject project = new MavenProject();
-        project.setDependencyArtifacts(Collections.<Artifact>emptySet());
+        project.setDependencyArtifacts(Collections.emptySet());
 
-        ArtifactStub apklib = new ArtifactStub() {
-            @Override
-            public String getId() {
-                return getArtifactId();
-            }
-        };
-        apklib.setArtifactId("some-apklib");
-        apklib.setGroupId("group");
-        apklib.setType(AndroidExtension.AAR);
+        Artifact apklib = new DefaultArtifact(
+                "group",
+                "some-apklib",
+                "version",
+                "scope",
+                "aar",
+                "classifier",
+                null);
         project.addAttachedArtifact(apklib);
 
-        final DependencyGraphBuilder dependencyGraphBuilder = new DefaultDependencyGraphBuilder(new DefaultProjectDependenciesResolver());
-        nativeHelper = new NativeHelper(project, dependencyGraphBuilder, new SilentLog());
+        Log mockLog = mock(Log.class);
+        final ProjectDependenciesResolver resolver = new DefaultProjectDependenciesResolver();
+        nativeHelper = new NativeHelper(project, (DependencyGraphBuilder) resolver, mockLog);
+
     }
 
     @Test
@@ -76,7 +76,7 @@ public class NativeHelperTest {
     }
 
     @Test
-    public void architectureResolutionForPlainArchitectureClassifier() throws IOException {
+    public void architectureResolutionForPlainArchitectureClassifier() {
         for (String ndkArchitecture : AndroidNdk.NDK_ARCHITECTURES) {
             Artifact artifact = new DefaultArtifact("acme", "acme", "1.0", "runtime", Const.ArtifactType.NATIVE_SYMBOL_OBJECT, ndkArchitecture, null);
             String architecture = NativeHelper.extractArchitectureFromArtifact(artifact, "armeabi");
@@ -87,7 +87,7 @@ public class NativeHelperTest {
     }
 
     @Test
-    public void architectureResolutionForMixedArchitectureClassifier() throws IOException {
+    public void architectureResolutionForMixedArchitectureClassifier() {
         for (String ndkArchitecture : AndroidNdk.NDK_ARCHITECTURES) {
             Artifact artifact = new DefaultArtifact("acme", "acme", "1.0", "runtime", Const.ArtifactType.NATIVE_SYMBOL_OBJECT, ndkArchitecture + "-acme", null);
             String architecture = NativeHelper.extractArchitectureFromArtifact(artifact, "armeabi");
@@ -97,7 +97,7 @@ public class NativeHelperTest {
     }
 
     @Test
-    public void architectureResolutionForDefaultLegacyArchitectureClassifier() throws IOException {
+    public void architectureResolutionForDefaultLegacyArchitectureClassifier() {
         Artifact artifact = new DefaultArtifact("acme", "acme", "1.0", "runtime", Const.ArtifactType.NATIVE_SYMBOL_OBJECT, "acme", null);
         String architecture = NativeHelper.extractArchitectureFromArtifact(artifact, "armeabi");
         Assertions.assertNotNull(architecture, "unexpected null architecture");
@@ -105,7 +105,7 @@ public class NativeHelperTest {
     }
 
     @Test
-    public void artifactHasHardwareArchitecture() throws IOException {
+    public void artifactHasHardwareArchitecture() {
         for (String ndkArchitecture : AndroidNdk.NDK_ARCHITECTURES) {
             Artifact artifact = new DefaultArtifact("acme", "acme", "1.0", "runtime", Const.ArtifactType.NATIVE_SYMBOL_OBJECT, ndkArchitecture, null);
             boolean value = NativeHelper.artifactHasHardwareArchitecture(artifact, ndkArchitecture, "armeabi");

@@ -22,7 +22,8 @@ import com.android.utils.ILogger;
 import com.android.utils.StdLogger;
 import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
-import com.google.common.io.Files;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -37,6 +38,8 @@ import java.util.StringTokenizer;
  * Command line interface to the {@link ManifestMerger2}
  */
 public class Merger {
+
+    private static final Logger log = LoggerFactory.getLogger(Merger.class);
 
     /**
      * @param args the command line arguments
@@ -65,7 +68,15 @@ public class Merger {
                 "=value]\n" +
                 "\t--placeholder [name=value]\n" +
                 "\t--out [path of the output file]";
-        System.out.println(sb);
+        System.out.println(sb); // NOSONAR - command line output
+    }
+
+    private static void tryWriteFile(@NonNull File outFile, String mergedDocument) {
+        try {
+            java.nio.file.Files.writeString(outFile.toPath(), mergedDocument, StandardCharsets.UTF_8);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     /**
@@ -133,14 +144,14 @@ public class Merger {
             }
             if ("--libs".equals(selector)) {
                 StringTokenizer stringTokenizer = new StringTokenizer(value, File.pathSeparator);
-                while (stringTokenizer.hasMoreElements()) {
+                while (stringTokenizer.hasMoreTokens()) {
                     File library = checkPath(stringTokenizer.nextToken());
                     invoker.addLibraryManifest(library);
                 }
             }
             if ("--overlays".equals(selector)) {
                 StringTokenizer stringTokenizer = new StringTokenizer(value, File.pathSeparator);
-                while (stringTokenizer.hasMoreElements()) {
+                while (stringTokenizer.hasMoreTokens()) {
                     File library = checkPath(stringTokenizer.nextToken());
                     invoker.addFlavorAndBuildTypeManifest(library);
                 }
@@ -183,11 +194,7 @@ public class Merger {
                 String mergedDocument = merge.getMergedDocument(MergingReport.MergedManifestKind.MERGED);
                 if (mergedDocument != null) {
                     if (outFile != null) {
-                        try {
-                            Files.write(mergedDocument, outFile, StandardCharsets.UTF_8);
-                        } catch (IOException e) {
-                            throw new RuntimeException(e);
-                        }
+                        tryWriteFile(outFile, mergedDocument);
                     } else {
                         logger.info("Merged manifest:\n%s", mergedDocument);
                     }
@@ -223,7 +230,7 @@ public class Merger {
     protected File checkPath(@NonNull String path) throws FileNotFoundException {
         @NonNull File file = new File(path);
         if (!file.exists()) {
-            System.err.println(path + " does not exist");
+            log.error("{} does not exist", path);
             throw new FileNotFoundException(path);
         }
         return file;

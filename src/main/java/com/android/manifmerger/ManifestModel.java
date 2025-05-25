@@ -80,8 +80,8 @@ class ManifestModel {
 
         @NonNull
         @Override
-        public ImmutableList<String> getKeyAttributesNames() {
-            return ImmutableList.of(SdkConstants.ATTR_NAME, ATTRIBUTE_GLESVERSION);
+        public List<String> getKeyAttributesNames() {
+            return List.of(SdkConstants.ATTR_NAME, ATTRIBUTE_GLESVERSION);
         }
     };
     /**
@@ -121,8 +121,8 @@ class ManifestModel {
 
         @NonNull
         @Override
-        public ImmutableList<String> getKeyAttributesNames() {
-            return ImmutableList.of("action#name", "category#name");
+        public List<String> getKeyAttributesNames() {
+            return List.of("action#name", "category#name");
         }
     };
     private static final AttributeModel.BooleanValidator BOOLEAN_VALIDATOR =
@@ -446,7 +446,7 @@ class ManifestModel {
          * Use-library Xml documentation</a>}
          */
         USES_LIBRARY(MergeType.MERGE, DEFAULT_NAME_ATTRIBUTE_RESOLVER,
-                AttributeModel.newModel("required")
+                AttributeModel.newModel(ATTRIBUTE_REQUIRED)
                         .setDefaultValue(SdkConstants.VALUE_TRUE)
                         .setOnReadValidator(BOOLEAN_VALIDATOR)
                         .setMergingPolicy(AttributeModel.OR_MERGING_POLICY)),
@@ -558,7 +558,7 @@ class ManifestModel {
 
         @NonNull
         ImmutableList<AttributeModel> getAttributeModels() {
-            return mAttributeModels.asList();
+            return (ImmutableList<AttributeModel>) mAttributeModels.stream().toList();
         }
 
         @Nullable
@@ -617,7 +617,7 @@ class ManifestModel {
          * @return the key attribute(s) name(s) or null of this element does not have a key.
          */
         @NonNull
-        ImmutableList<String> getKeyAttributesNames();
+        List<String> getKeyAttributesNames();
     }
 
     /**
@@ -634,8 +634,8 @@ class ManifestModel {
 
         @NonNull
         @Override
-        public ImmutableList<String> getKeyAttributesNames() {
-            return ImmutableList.of();
+        public List<String> getKeyAttributesNames() {
+            return List.of();
         }
     }
 
@@ -690,8 +690,8 @@ class ManifestModel {
 
         @NonNull
         @Override
-        public ImmutableList<String> getKeyAttributesNames() {
-            return ImmutableList.of(mAttributeName);
+        public List<String> getKeyAttributesNames() {
+            return List.of(mAttributeName);
         }
     }
 
@@ -715,17 +715,19 @@ class ManifestModel {
             @Nullable String firstKey = firstAttributeKeyResolver.getKey(xmlElement);
             @Nullable String secondKey = secondAttributeKeyResolver.getKey(xmlElement);
 
-            return Strings.isNullOrEmpty(firstKey)
-                    ? secondKey
-                    : Strings.isNullOrEmpty(secondKey)
-                    ? firstKey
-                    : firstKey + "+" + secondKey;
+            if (Strings.isNullOrEmpty(firstKey)) {
+                return secondKey;
+            } else if (Strings.isNullOrEmpty(secondKey)) {
+                return firstKey;
+            } else {
+                return firstKey + "+" + secondKey;
+            }
         }
 
         @NonNull
         @Override
-        public ImmutableList<String> getKeyAttributesNames() {
-            return ImmutableList.of(firstAttributeKeyResolver.getKeyAttributesNames().get(0),
+        public List<String> getKeyAttributesNames() {
+            return List.of(firstAttributeKeyResolver.getKeyAttributesNames().get(0),
                     secondAttributeKeyResolver.getKeyAttributesNames().get(0));
         }
     }

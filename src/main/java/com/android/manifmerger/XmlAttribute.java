@@ -84,9 +84,10 @@ public class XmlAttribute extends XmlNode {
 
     /**
      * Returns the attribute's name, providing isolation from details like namespaces handling.
+     *
+     * @return the attribute's name
      */
     @NonNull
-    @Override
     public NodeName getName() {
         return XmlNode.unwrapName(mXml);
     }

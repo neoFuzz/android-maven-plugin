@@ -106,8 +106,7 @@ public class OrphanXmlElement extends XmlNode {
      * @return the name of this xml element.
      */
     @NonNull
-    @Override
-    public NodeName getName() {
+    private NodeName getName() {
         return XmlNode.unwrapName(mXml);
     }
 

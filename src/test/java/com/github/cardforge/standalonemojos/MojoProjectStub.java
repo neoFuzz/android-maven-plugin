@@ -1,34 +1,51 @@
 package com.github.cardforge.standalonemojos;
 
 import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Resource;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
-import org.apache.maven.plugin.testing.stubs.MavenProjectStub;
-import org.junit.Assert;
+import org.apache.maven.project.MavenProject;
 
+import javax.annotation.Nonnull;
 import java.io.File;
 import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
-/**
- * Basic MavenProject implementation that can be used for testing.
- */
-public class MojoProjectStub extends MavenProjectStub {
-    private File basedir;
-    private Build build;
-    private Properties props = new Properties();
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
+/**
+ * Enhanced MavenProject implementation for testing with Maven 4.0.0+.
+ * This replaces the old MavenProjectStub which is no longer available.
+ */
+public class MojoProjectStub extends MavenProject {
+    private final File basedir;
+    private final Properties props = new Properties();
+
+    /**
+     * Create a new MojoProjectStub with the given project directory.
+     *
+     * @param projectDir The directory containing the test project
+     */
     public MojoProjectStub(File projectDir) {
+        super(new Model());
         this.basedir = projectDir;
         props.setProperty("basedir", this.basedir.getAbsolutePath());
 
-        File pom = new File(getBasedir(), "plugin-config.xml");
+        // Look for either pom.xml or plugin-config.xml
+        File pom = new File(getBasedir(), "pom.xml");
+        if (!pom.exists()) {
+            pom = new File(getBasedir(), "plugin-config.xml");
+        }
+
+        if (!pom.exists()) {
+            throw new IllegalStateException("Could not find pom.xml or plugin-config.xml in " + getBasedir());
+        }
+
         MavenXpp3Reader pomReader = new MavenXpp3Reader();
         Model model = null;
         FileReader fileReader = null;
@@ -38,11 +55,18 @@ public class MojoProjectStub extends MavenProjectStub {
             model = pomReader.read(fileReader);
             setModel(model);
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("Error reading project model: " + e.getMessage(), e);
         } finally {
-            IOUtils.closeQuietly(fileReader);
+            if (fileReader != null) {
+                try {
+                    fileReader.close();
+                } catch (IOException e) {
+                    // Ignore
+                }
+            }
         }
 
+        // Set basic project information from the model
         setGroupId(model.getGroupId());
         setArtifactId(model.getArtifactId());
         setVersion(model.getVersion());
@@ -51,39 +75,91 @@ public class MojoProjectStub extends MavenProjectStub {
         setPackaging(model.getPackaging());
         setFile(pom);
 
-        build = model.getBuild();
+        // Set up the build structure
+        Build build = model.getBuild();
         if (build == null) {
             build = new Build();
+            model.setBuild(build);
         }
 
-        File srcDir = getStandardDir(getBuild().getSourceDirectory(), "src/main/java");
-        getBuild().setSourceDirectory(srcDir.getAbsolutePath());
+        // Set standard directories
+        setupStandardDirectories(build);
 
-        File targetDir = getStandardDir(getBuild().getDirectory(), "target");
-        getBuild().setDirectory(targetDir.getAbsolutePath());
+        // Set resources
+        setupResources(build);
+    }
 
-        File outputDir = getStandardDir(getBuild().getOutputDirectory(), "target/classes");
-        getBuild().setOutputDirectory(outputDir.getAbsolutePath());
+    /**
+     * Set up standard project directories
+     */
+    private void setupStandardDirectories(@Nonnull Build build) {
+        // Source directory
+        File srcDir = getStandardDir(build.getSourceDirectory(), "src/main/java");
+        build.setSourceDirectory(srcDir.getAbsolutePath());
 
-        List<Resource> resources = new ArrayList<Resource>();
-        resources.addAll(getBuild().getResources());
+        // Build directory
+        File targetDir = getStandardDir(build.getDirectory(), "target");
+        build.setDirectory(targetDir.getAbsolutePath());
 
-        if (resources.isEmpty()) {
-            resources = new ArrayList<Resource>();
+        // Output directory
+        File outputDir = getStandardDir(build.getOutputDirectory(), "target/classes");
+        build.setOutputDirectory(outputDir.getAbsolutePath());
+
+        // Test directories
+        File testSrcDir = getStandardDir(build.getTestSourceDirectory(), "src/test/java");
+        build.setTestSourceDirectory(testSrcDir.getAbsolutePath());
+
+        File testOutputDir = getStandardDir(build.getTestOutputDirectory(), "target/test-classes");
+        build.setTestOutputDirectory(testOutputDir.getAbsolutePath());
+    }
+
+    /**
+     * Set up project resources
+     */
+    private void setupResources(@Nonnull Build build) {
+        List<Resource> resources = new ArrayList<>();
+
+        // Add existing resources
+        if (build.getResources() != null && !build.getResources().isEmpty()) {
+            resources.addAll(build.getResources());
+
+            // Normalize resource paths
+            for (Resource resource : resources) {
+                File dir = normalize(resource.getDirectory());
+                resource.setDirectory(dir.getAbsolutePath());
+                makeDirs(dir);
+            }
+        } else {
+            // Add default resources directory if none defined
             Resource resource = new Resource();
             File resourceDir = normalize("src/main/resources");
             resource.setDirectory(resourceDir.getAbsolutePath());
             makeDirs(resourceDir);
             resources.add(resource);
-        } else {
-            // Make this project work on windows ;-)
-            for (Resource resource : resources) {
-                File dir = normalize(resource.getDirectory());
-                resource.setDirectory(dir.getAbsolutePath());
-            }
         }
 
-        getBuild().setResources(resources);
+        build.setResources(resources);
+
+        // Set up test resources
+        List<Resource> testResources = new ArrayList<>();
+
+        if (build.getTestResources() != null && !build.getTestResources().isEmpty()) {
+            testResources.addAll(build.getTestResources());
+
+            for (Resource resource : testResources) {
+                File dir = normalize(resource.getDirectory());
+                resource.setDirectory(dir.getAbsolutePath());
+                makeDirs(dir);
+            }
+        } else {
+            Resource testResource = new Resource();
+            File testResourceDir = normalize("src/test/resources");
+            testResource.setDirectory(testResourceDir.getAbsolutePath());
+            makeDirs(testResourceDir);
+            testResources.add(testResource);
+        }
+
+        build.setTestResources(testResources);
     }
 
     @Override
@@ -92,10 +168,14 @@ public class MojoProjectStub extends MavenProjectStub {
     }
 
     @Override
-    public Build getBuild() {
-        return this.build;
+    public File getBasedir() {
+        return this.basedir;
     }
 
+    /**
+     * Get a standard directory, creating it if it doesn't exist
+     */
+    @Nonnull
     private File getStandardDir(String dirPath, String defaultPath) {
         File dir;
 
@@ -111,12 +191,12 @@ public class MojoProjectStub extends MavenProjectStub {
 
     /**
      * Normalize a path.
-     * <p>
      * Ensure path is absolute, and has proper system file separators.
      *
-     * @param path the raw path.
-     * @return
+     * @param path the raw path
+     * @return normalized File
      */
+    @Nonnull
     private File normalize(final String path) {
         String ospath = FilenameUtils.separatorsToSystem(path);
         File file = new File(ospath);
@@ -127,16 +207,15 @@ public class MojoProjectStub extends MavenProjectStub {
         }
     }
 
-    private void makeDirs(File dir) {
+    /**
+     * Create directories if they don't exist
+     */
+    private void makeDirs(@Nonnull File dir) {
         if (dir.exists()) {
             return;
         }
 
-        Assert.assertTrue("Unable to make directories: " + dir, dir.mkdirs());
-    }
-
-    @Override
-    public File getBasedir() {
-        return this.basedir;
+        boolean created = dir.mkdirs();
+        assertTrue(created, "Unable to create directories: " + dir);
     }
 }

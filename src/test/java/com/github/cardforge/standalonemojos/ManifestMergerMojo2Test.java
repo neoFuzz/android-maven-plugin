@@ -11,11 +11,18 @@ import org.junit.jupiter.api.Disabled;
 import java.io.File;
 import java.io.IOException;
 
+import static org.junit.jupiter.api.Assertions.fail;
+
 @Disabled("This test has to be migrated to be an IntegrationTest using AbstractAndroidMojoIntegrationTest")
 public class ManifestMergerMojo2Test extends AbstractAndroidMojoTestCase<ManifestMergerMojo> {
     @Override
     public String getPluginGoalName() {
         return "manifest-merger";
+    }
+
+    @Override
+    protected Class<ManifestMergerMojo> getMojoClass() {
+        return null;
     }
 
     public void testAndroidApplicationChanges() throws Exception {
@@ -47,7 +54,7 @@ public class ManifestMergerMojo2Test extends AbstractAndroidMojoTestCase<Manifes
         mojo.execute();
         File dir = getProjectDir(mojo);
         File manifestFile = new File(dir, "AndroidManifest.xml");
-        Assertions.assertFalse(manifestFile.exists(),"Should not have an AndroidManifest for a jar project");
+        Assertions.assertFalse(manifestFile.exists(), "Should not have an AndroidManifest for a jar project");
     }
 
     public void testVersionlessAndroidProject() throws Exception {
@@ -100,7 +107,7 @@ public class ManifestMergerMojo2Test extends AbstractAndroidMojoTestCase<Manifes
             Assertions.assertTrue(e.getMessage().startsWith("versionCodeAutoIncrement, versionCodeUpdateFromVersion and versionCode"));
             return;
         }
-        Assertions.fail("bad-android-project1 did not throw MojoFailureException");
+        fail("bad-android-project1 did not throw MojoFailureException");
     }
 
     public void testVersionCodeAndVersionCodeUpdateFail() throws Exception {

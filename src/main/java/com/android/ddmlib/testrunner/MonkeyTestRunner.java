@@ -6,6 +6,7 @@ import com.android.ddmlib.*;
 import java.io.IOException;
 import java.util.*;
 import java.util.Map.Entry;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Runs a Monkey test command remotely and reports results.
@@ -183,7 +184,7 @@ public class MonkeyTestRunner {
     }
 
     /**
-     * @param hprof if true, generate a hprof file
+     * @param hprof if true, generate a {@code hprof} file
      */
     public void setHprof(boolean hprof) {
         this.hprof = hprof;
@@ -274,7 +275,7 @@ public class MonkeyTestRunner {
         mParser = new MonkeyResultParser(mRunName, listeners);
 
         try {
-            mRemoteDevice.executeShellCommand(runCaseCommandStr, mParser, mMaxTimeToOutputResponse);
+            mRemoteDevice.executeShellCommand(runCaseCommandStr, mParser, mMaxTimeToOutputResponse, TimeUnit.SECONDS);
         } catch (IOException e) {
             Log.w(LOG_TAG,
                     String.format("IOException %1$s when running monkey tests on %3$s", e,
@@ -371,7 +372,7 @@ public class MonkeyTestRunner {
         private final String runName;
         private final HashMap<String, String> runMetrics = new HashMap<>();
         private boolean canceled;
-        private TestIdentifier mCurrentTestIndentifier;
+        private TestIdentifier mCurrentTestIdentifier;
         private long elapsedTime;
 
         /**
@@ -483,9 +484,9 @@ public class MonkeyTestRunner {
          * @param line the line containing the test identifier
          */
         private void handleTestStarted(String line) {
-            mCurrentTestIndentifier = new TestIdentifier("MonkeyTest", line);
+            mCurrentTestIdentifier = new TestIdentifier("MonkeyTest", line);
             for (ITestRunListener listener : mTestListeners) {
-                listener.testStarted(mCurrentTestIndentifier);
+                listener.testStarted(mCurrentTestIdentifier);
             }
         }
 
@@ -493,11 +494,11 @@ public class MonkeyTestRunner {
          * Notifies listeners of the end of the current test.
          */
         private void handleTestEnd() {
-            if (mCurrentTestIndentifier != null) {
+            if (mCurrentTestIdentifier != null) {
                 for (ITestRunListener listener : mTestListeners) {
-                    listener.testEnded(mCurrentTestIndentifier, new HashMap<>());
+                    listener.testEnded(mCurrentTestIdentifier, new HashMap<>());
                 }
-                mCurrentTestIndentifier = null;
+                mCurrentTestIdentifier = null;
             }
         }
 
@@ -536,9 +537,9 @@ public class MonkeyTestRunner {
             String trace = errorBuilder.toString();
 
             for (ITestRunListener listener : mTestListeners) {
-                listener.testFailed(mCurrentTestIndentifier, trace);
+                listener.testFailed(mCurrentTestIdentifier, trace);
             }
-            mCurrentTestIndentifier = null;
+            mCurrentTestIdentifier = null;
             return indexLine;
         }
     }

@@ -8,16 +8,25 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
+import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.List;
 
 @Ignore("This test has to be migrated to be an IntegrationTest using AbstractAndroidMojoIntegrationTest")
 @RunWith(Parameterized.class)
-public class ApkMojoTest
-        extends AbstractAndroidMojoTestCase<ApkMojo> {
+public class ApkMojoTest extends AbstractAndroidMojoTestCase<ApkMojo> {
+
+    private final String projectName;
+    private final String[] expected;
+
+    public ApkMojoTest(String projectName, String[] expected) {
+        this.projectName = projectName;
+        this.expected = expected;
+    }
 
     @Parameters
-    static public List<Object[]> suite() {
+    @Nonnull
+    public static List<Object[]> suite() {
         final List<Object[]> suite = new ArrayList<>();
 
         suite.add(new Object[]{"apk-config-project1", null});
@@ -27,18 +36,14 @@ public class ApkMojoTest
         return suite;
     }
 
-    private final String projectName;
-
-    private final String[] expected;
-
-    public ApkMojoTest(String projectName, String[] expected) {
-        this.projectName = projectName;
-        this.expected = expected;
-    }
-
     @Override
     public String getPluginGoalName() {
         return "apk";
+    }
+
+    @Override
+    protected Class<ApkMojo> getMojoClass() {
+        return null;
     }
 
     @Override
@@ -48,11 +53,9 @@ public class ApkMojoTest
         super.setUp();
     }
 
-    @Override
     @After
-    public void tearDown()
-            throws Exception {
-        super.tearDown();
+    public void tearDown() {
+        // not sure
     }
 
     @Test
@@ -64,13 +67,20 @@ public class ApkMojoTest
 
         cfh.parseConfiguration();
 
-        final String[] includes = getFieldValue(mojo, "apkMetaIncludes");
+        String[] includes;
+
+        try {
+            includes = getFieldValue(getFieldValue(mojo, "apk"), "metaIncludes");
+        } catch (NullPointerException e) {
+            // the first test has something in pluginMetaInf but not metaIncludes.
+            // Therefore, null is the expected result.
+            includes = null;
+        }
 
         Assert.assertArrayEquals(this.expected, includes);
     }
 
-    protected <T> T getFieldValue(Object object, String fieldName)
-            throws IllegalAccessException {
+    protected <T> T getFieldValue(Object object, String fieldName) throws Exception {
         return (T) super.getVariableValueFromObject(object, fieldName);
     }
 

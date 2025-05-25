@@ -21,7 +21,7 @@ import com.android.annotations.NonNull;
 import com.android.annotations.Nullable;
 import com.android.ide.common.blame.SourceFile;
 import com.android.ide.common.blame.SourcePosition;
-import com.android.ide.common.res2.MergingException;
+import com.android.builder.core.MergingException;
 import com.android.utils.ILogger;
 import com.android.utils.SdkUtils;
 import com.android.utils.XmlUtils;
@@ -765,14 +765,6 @@ public class XmlElement extends OrphanXmlElement {
      */
     public boolean isEquals(XmlElement otherNode) {
         return !compareTo(otherNode).isPresent();
-    }
-
-    /**
-     * @return a potentially null (if not present) selector decoration on this element.
-     */
-    @Nullable
-    public Selector getSelector() {
-        return mSelector;
     }
 
     /**
