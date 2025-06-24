@@ -33,7 +33,7 @@ public class UIAutomatorMojoTest extends AbstractAndroidMojoTestCase<UIAutomator
 
     @Override
     protected Class<UIAutomatorMojo> getMojoClass() {
-        return null;
+        return UIAutomatorMojo.class;
     }
 
     /**

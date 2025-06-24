@@ -44,7 +44,7 @@ public class UnpackMojoLazyTest
 
     @Override
     protected Class<UnpackMojo> getMojoClass() {
-        return null;
+        return UnpackMojo.class;
     }
 
     @Override

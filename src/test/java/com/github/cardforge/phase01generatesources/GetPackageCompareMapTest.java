@@ -1,16 +1,23 @@
 package com.github.cardforge.phase01generatesources;
 
+import com.android.builder.core.DefaultManifestParser;
 import com.github.cardforge.maven.plugins.android.phase01generatesources.GenerateSourcesMojo;
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.handler.ArtifactHandler;
+import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
+import org.apache.maven.project.MavenProjectHelper;
+import org.apache.maven.shared.dependency.graph.DependencyGraphBuilder;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
+import org.mockito.Mock;
 import org.mockito.Mockito;
 
 import javax.annotation.Nonnull;
+import javax.inject.Inject;
 import java.io.File;
 import java.lang.reflect.Field;
 import java.util.HashMap;
@@ -54,6 +61,18 @@ public class GetPackageCompareMapTest {
     private Artifact projectArtifact;
     private GenerateSourcesMojo mojo;
 
+    @Mock
+    private ArtifactResolver mockArtifactResolver;
+
+    @Mock
+    private ArtifactHandler mockArtifactHandler;
+
+    @Mock
+    private MavenProjectHelper mockProjectHelper;
+
+    @Mock
+    private DependencyGraphBuilder mockDependencyGraphBuilder;
+
     @Nonnull
     private static Artifact createArtifact(@Nonnull String artifactId) {
         Artifact artifactMock = Mockito.mock(Artifact.class);
@@ -62,10 +81,12 @@ public class GetPackageCompareMapTest {
     }
 
     @BeforeAll
-    public void setUp() throws Exception {
+    void setUp() throws Exception {
         //openMocks(this);
 
-        mojo = Mockito.spy(new TestableGenerateSourcesMojo());
+        mojo = Mockito.spy(new TestableGenerateSourcesMojo(
+                mockArtifactResolver, mockArtifactHandler, mockProjectHelper, mockDependencyGraphBuilder)
+        );
         setUpMainProject();
 
         // Inject the project field using reflection
@@ -81,7 +102,10 @@ public class GetPackageCompareMapTest {
     void testBasicManifest() {
         File basicManifest = new File(String.valueOf(getClass().getResource(
                 "/manifest-tests/basic-android-project-manifest/AndroidManifest.xml").getPath()));
-        GenerateSourcesMojo gsm = Mockito.spy(new GenerateSourcesMojo());
+        GenerateSourcesMojo gsm = Mockito.spy(new TestableGenerateSourcesMojo(
+                mockArtifactResolver, mockArtifactHandler, mockProjectHelper, mockDependencyGraphBuilder
+        ));
+        //GenerateSourcesMojo gsm1 = Mockito.spy(new GenerateSourcesMojo());
 
         String packageName = gsm.extractPackageNameFromAndroidManifest(basicManifest);
         assertNotNull(gsm);
@@ -199,9 +223,16 @@ public class GetPackageCompareMapTest {
      * Testing class to override the extractPackageNameFromAndroidManifest method.
      */
     class TestableGenerateSourcesMojo extends GenerateSourcesMojo {
+        @Inject
+        protected TestableGenerateSourcesMojo(ArtifactResolver artifactResolver, ArtifactHandler artHandler, MavenProjectHelper projectHelper, DependencyGraphBuilder dependencyGraphBuilder) {
+            super(artifactResolver, artHandler, projectHelper, dependencyGraphBuilder);
+        }
+
         @Override
         public String extractPackageNameFromAndroidManifest(File manifestFile) {
-            return PROJECT_PACKAGE_NAME;
+            return manifestFile == null ?
+                    PROJECT_PACKAGE_NAME :
+                    new DefaultManifestParser().getPackage(manifestFile);
         }
     }
 }

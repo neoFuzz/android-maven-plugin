@@ -17,11 +17,16 @@
 package com.github.cardforge.maven.plugins.android.phase12integrationtest;
 
 import com.github.cardforge.maven.plugins.android.AbstractInstrumentationMojo;
+import org.apache.maven.artifact.handler.ArtifactHandler;
+import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.project.MavenProjectHelper;
+import org.apache.maven.shared.dependency.graph.DependencyGraphBuilder;
 
+import javax.inject.Inject;
 import java.util.List;
 
 /**
@@ -33,6 +38,17 @@ import java.util.List;
  */
 @Mojo(name = "internal-integration-test", defaultPhase = LifecyclePhase.INTEGRATION_TEST)
 public class InternalIntegrationTestMojo extends AbstractInstrumentationMojo {
+
+    /**
+     * {@inheritDoc}
+     */
+    @Inject
+    protected InternalIntegrationTestMojo(ArtifactResolver artifactResolver,
+                                          ArtifactHandler artHandler,
+                                          MavenProjectHelper projectHelper,
+                                          DependencyGraphBuilder dependencyGraphBuilder) {
+        super(artifactResolver, artHandler, projectHelper, dependencyGraphBuilder);
+    }
 
     /**
      * Execute the mojo by parsing the config and actually doing the instrumentation.

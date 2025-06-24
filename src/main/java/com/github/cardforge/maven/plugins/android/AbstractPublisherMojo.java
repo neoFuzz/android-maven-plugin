@@ -4,9 +4,14 @@ import com.android.annotations.NonNull;
 import com.github.cardforge.maven.plugins.android.common.AndroidPublisherHelper;
 import com.google.api.services.androidpublisher.AndroidPublisher;
 import com.google.api.services.androidpublisher.model.AppEdit;
+import org.apache.maven.artifact.handler.ArtifactHandler;
+import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.Parameter;
+import org.apache.maven.project.MavenProjectHelper;
+import org.apache.maven.shared.dependency.graph.DependencyGraphBuilder;
 
+import javax.inject.Inject;
 import java.io.*;
 import java.nio.charset.Charset;
 import java.util.regex.Matcher;
@@ -55,6 +60,14 @@ public abstract class AbstractPublisherMojo extends AbstractAndroidMojo {
      */
     @Parameter(property = "android.publisher.google.p12", required = true)
     private File p12File;
+
+    /**
+     * {@inheritDoc}
+     */
+    @Inject
+    protected AbstractPublisherMojo(ArtifactResolver artifactResolver, ArtifactHandler artHandler, MavenProjectHelper projectHelper, DependencyGraphBuilder dependencyGraphBuilder) {
+        super(artifactResolver, artHandler, projectHelper, dependencyGraphBuilder);
+    }
 
     /**
      * Initializes the publisher for the given package name.

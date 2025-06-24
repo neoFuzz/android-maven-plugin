@@ -4,6 +4,7 @@ import com.github.cardforge.AbstractAndroidMojoTestCase;
 import com.github.cardforge.maven.plugins.android.config.ConfigHandler;
 import com.github.cardforge.maven.plugins.android.phase09package.ApkMojo;
 import org.junit.*;
+import org.junit.jupiter.api.Disabled;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
@@ -12,7 +13,7 @@ import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.List;
 
-@Ignore("This test has to be migrated to be an IntegrationTest using AbstractAndroidMojoIntegrationTest")
+@Disabled("This test has to be migrated to be an IntegrationTest using AbstractAndroidMojoIntegrationTest")
 @RunWith(Parameterized.class)
 public class ApkMojoTest extends AbstractAndroidMojoTestCase<ApkMojo> {
 
@@ -43,7 +44,7 @@ public class ApkMojoTest extends AbstractAndroidMojoTestCase<ApkMojo> {
 
     @Override
     protected Class<ApkMojo> getMojoClass() {
-        return null;
+        return ApkMojo.class;
     }
 
     @Override

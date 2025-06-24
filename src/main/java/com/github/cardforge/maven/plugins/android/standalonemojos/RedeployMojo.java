@@ -19,10 +19,16 @@ package com.github.cardforge.maven.plugins.android.standalonemojos;
 
 import com.github.cardforge.maven.plugins.android.AbstractAndroidMojo;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.maven.artifact.handler.ArtifactHandler;
+import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.ResolutionScope;
+import org.apache.maven.project.MavenProjectHelper;
+import org.apache.maven.shared.dependency.graph.DependencyGraphBuilder;
+
+import javax.inject.Inject;
 
 import static com.github.cardforge.maven.plugins.android.common.AndroidExtension.APK;
 
@@ -37,6 +43,15 @@ import static com.github.cardforge.maven.plugins.android.common.AndroidExtension
 @SuppressWarnings("unused") // Maven goal
 @Mojo(name = "redeploy", requiresDependencyResolution = ResolutionScope.RUNTIME)
 public class RedeployMojo extends AbstractAndroidMojo {
+
+    /**
+     * {@inheritDoc}
+     */
+    @Inject
+    protected RedeployMojo(ArtifactResolver artifactResolver, ArtifactHandler artHandler,
+                           MavenProjectHelper projectHelper, DependencyGraphBuilder dependencyGraphBuilder) {
+        super(artifactResolver, artHandler, projectHelper, dependencyGraphBuilder);
+    }
 
     public void execute() throws MojoExecutionException, MojoFailureException {
         if (project.getPackaging().equals(APK)) {

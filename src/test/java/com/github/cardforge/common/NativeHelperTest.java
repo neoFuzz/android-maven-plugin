@@ -8,8 +8,8 @@ import org.apache.maven.artifact.DefaultArtifact;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.project.DefaultProjectDependenciesResolver;
 import org.apache.maven.project.MavenProject;
-import org.apache.maven.project.ProjectDependenciesResolver;
 import org.apache.maven.shared.dependency.graph.DependencyGraphBuilder;
+import org.apache.maven.shared.dependency.graph.internal.DefaultDependencyGraphBuilder;
 import org.junit.Rule;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
@@ -25,14 +25,14 @@ import static org.mockito.Mockito.mock;
 /**
  * @author Johan Lindquist
  */
-public class NativeHelperTest {
+class NativeHelperTest {
     private static NativeHelper nativeHelper;
 
     @Rule
     public TemporaryFolder apklibDir = new TemporaryFolder();
 
     @BeforeAll
-    public static void setupNativeHelper() {
+    static void setupNativeHelper() {
         MavenProject project = new MavenProject();
         project.setDependencyArtifacts(Collections.emptySet());
 
@@ -47,13 +47,14 @@ public class NativeHelperTest {
         project.addAttachedArtifact(apklib);
 
         Log mockLog = mock(Log.class);
-        final ProjectDependenciesResolver resolver = new DefaultProjectDependenciesResolver();
-        nativeHelper = new NativeHelper(project, (DependencyGraphBuilder) resolver, mockLog);
+        final DependencyGraphBuilder builder =
+                new DefaultDependencyGraphBuilder(new DefaultProjectDependenciesResolver());
+        nativeHelper = new NativeHelper(project, builder, mockLog);
 
     }
 
     @Test
-    public void shouldNotIncludeLibsFolderAsNativeDependenciesSourceWhenNoNativeLibsInside() throws Exception {
+    void shouldNotIncludeLibsFolderAsNativeDependenciesSourceWhenNoNativeLibsInside() throws Exception {
         apklibDir.create();
         new File(apklibDir.getRoot(), "some-apklib/libs").mkdirs();
         new File(apklibDir.getRoot(), "some-apklib/libs/some.jar").createNewFile();
@@ -64,7 +65,7 @@ public class NativeHelperTest {
     }
 
     @Test
-    public void shouldIncludeLibsFolderAsNativeDependenciesSourceWhenNativeLibsInside() throws Exception {
+    void shouldIncludeLibsFolderAsNativeDependenciesSourceWhenNativeLibsInside() throws Exception {
         apklibDir.create();
         new File(apklibDir.getRoot(), "some-apklib/libs").mkdirs();
         new File(apklibDir.getRoot(), "some-apklib/libs/some.jar").createNewFile();
@@ -76,7 +77,7 @@ public class NativeHelperTest {
     }
 
     @Test
-    public void architectureResolutionForPlainArchitectureClassifier() {
+    void architectureResolutionForPlainArchitectureClassifier() {
         for (String ndkArchitecture : AndroidNdk.NDK_ARCHITECTURES) {
             Artifact artifact = new DefaultArtifact("acme", "acme", "1.0", "runtime", Const.ArtifactType.NATIVE_SYMBOL_OBJECT, ndkArchitecture, null);
             String architecture = NativeHelper.extractArchitectureFromArtifact(artifact, "armeabi");
@@ -87,7 +88,7 @@ public class NativeHelperTest {
     }
 
     @Test
-    public void architectureResolutionForMixedArchitectureClassifier() {
+    void architectureResolutionForMixedArchitectureClassifier() {
         for (String ndkArchitecture : AndroidNdk.NDK_ARCHITECTURES) {
             Artifact artifact = new DefaultArtifact("acme", "acme", "1.0", "runtime", Const.ArtifactType.NATIVE_SYMBOL_OBJECT, ndkArchitecture + "-acme", null);
             String architecture = NativeHelper.extractArchitectureFromArtifact(artifact, "armeabi");
@@ -97,7 +98,7 @@ public class NativeHelperTest {
     }
 
     @Test
-    public void architectureResolutionForDefaultLegacyArchitectureClassifier() {
+    void architectureResolutionForDefaultLegacyArchitectureClassifier() {
         Artifact artifact = new DefaultArtifact("acme", "acme", "1.0", "runtime", Const.ArtifactType.NATIVE_SYMBOL_OBJECT, "acme", null);
         String architecture = NativeHelper.extractArchitectureFromArtifact(artifact, "armeabi");
         Assertions.assertNotNull(architecture, "unexpected null architecture");
@@ -105,7 +106,7 @@ public class NativeHelperTest {
     }
 
     @Test
-    public void artifactHasHardwareArchitecture() {
+    void artifactHasHardwareArchitecture() {
         for (String ndkArchitecture : AndroidNdk.NDK_ARCHITECTURES) {
             Artifact artifact = new DefaultArtifact("acme", "acme", "1.0", "runtime", Const.ArtifactType.NATIVE_SYMBOL_OBJECT, ndkArchitecture, null);
             boolean value = NativeHelper.artifactHasHardwareArchitecture(artifact, ndkArchitecture, "armeabi");
@@ -114,7 +115,7 @@ public class NativeHelperTest {
     }
 
     @Test
-    public void artifactHasHardwareArchitectureWithClassifier() {
+    void artifactHasHardwareArchitectureWithClassifier() {
         for (String ndkArchitecture : AndroidNdk.NDK_ARCHITECTURES) {
             Artifact artifact = new DefaultArtifact("acme", "acme", "1.0", "runtime", Const.ArtifactType.NATIVE_SYMBOL_OBJECT, ndkArchitecture + "-acme", null);
             boolean value = NativeHelper.artifactHasHardwareArchitecture(artifact, ndkArchitecture, "armeabi");
@@ -123,14 +124,14 @@ public class NativeHelperTest {
     }
 
     @Test
-    public void artifactHasHardwareArchitectureWithDefaultLegacyClassifier() {
+    void artifactHasHardwareArchitectureWithDefaultLegacyClassifier() {
         Artifact artifact = new DefaultArtifact("acme", "acme", "1.0", "runtime", Const.ArtifactType.NATIVE_SYMBOL_OBJECT, "acme", null);
         boolean value = NativeHelper.artifactHasHardwareArchitecture(artifact, "armeabi", "armeabi");
         Assertions.assertTrue(value, "unexpected value");
     }
 
     @Test
-    public void artifactHasHardwareArchitectureNotNativeLibrary() {
+    void artifactHasHardwareArchitectureNotNativeLibrary() {
         Artifact artifact = new DefaultArtifact("acme", "acme", "1.0", "runtime", "jar", "armeabi", null);
         boolean value = NativeHelper.artifactHasHardwareArchitecture(artifact, "armeabi", "armeabi");
         Assertions.assertFalse(value, "unexpected value");

@@ -8,11 +8,16 @@ import com.google.api.client.http.AbstractInputStreamContent;
 import com.google.api.client.http.FileContent;
 import com.google.api.services.androidpublisher.AndroidPublisher;
 import com.google.api.services.androidpublisher.model.Listing;
+import org.apache.maven.artifact.handler.ArtifactHandler;
+import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
+import org.apache.maven.project.MavenProjectHelper;
+import org.apache.maven.shared.dependency.graph.DependencyGraphBuilder;
 
+import javax.inject.Inject;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -57,6 +62,15 @@ public class PublishListingMojo extends AbstractPublisherMojo {
 
     @Parameter(property = "android.publisher.upload.images", defaultValue = "false")
     private boolean uploadImages;
+
+    /**
+     * {@inheritDoc}
+     */
+    @Inject
+    protected PublishListingMojo(ArtifactResolver artifactResolver, ArtifactHandler artHandler,
+                                 MavenProjectHelper projectHelper, DependencyGraphBuilder dependencyGraphBuilder) {
+        super(artifactResolver, artHandler, projectHelper, dependencyGraphBuilder);
+    }
 
     /**
      * @throws org.apache.maven.plugin.MojoExecutionException If execution error occurs

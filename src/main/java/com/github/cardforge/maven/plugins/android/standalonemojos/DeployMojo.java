@@ -17,11 +17,17 @@
 package com.github.cardforge.maven.plugins.android.standalonemojos;
 
 import com.github.cardforge.maven.plugins.android.AbstractAndroidMojo;
+import org.apache.maven.artifact.handler.ArtifactHandler;
+import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.ResolutionScope;
+import org.apache.maven.project.MavenProjectHelper;
+import org.apache.maven.shared.dependency.graph.DependencyGraphBuilder;
+
+import javax.inject.Inject;
 
 /**
  * Deploys the apk(s) of the current project(s) to all attached devices and emulators.
@@ -41,6 +47,15 @@ import org.apache.maven.plugins.annotations.ResolutionScope;
         requiresDependencyResolution = ResolutionScope.RUNTIME
 )
 public class DeployMojo extends AbstractAndroidMojo {
+    /**
+     * {@inheritDoc}
+     */
+    @Inject
+    protected DeployMojo(ArtifactResolver artifactResolver, ArtifactHandler artHandler,
+                         MavenProjectHelper projectHelper, DependencyGraphBuilder dependencyGraphBuilder) {
+        super(artifactResolver, artHandler, projectHelper, dependencyGraphBuilder);
+    }
+
     /**
      * Deploy the apk built with the current projects to all attached devices and emulators.
      *

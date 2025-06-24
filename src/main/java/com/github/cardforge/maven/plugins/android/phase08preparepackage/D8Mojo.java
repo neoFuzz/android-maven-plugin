@@ -25,6 +25,8 @@ import com.github.cardforge.maven.plugins.android.configuration.D8;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.handler.ArtifactHandler;
+import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.model.Resource;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
@@ -32,10 +34,13 @@ import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.plugins.annotations.ResolutionScope;
+import org.apache.maven.project.MavenProjectHelper;
+import org.apache.maven.shared.dependency.graph.DependencyGraphBuilder;
 import org.codehaus.plexus.archiver.ArchiverException;
 import org.codehaus.plexus.archiver.jar.JarArchiver;
 import org.codehaus.plexus.archiver.util.DefaultFileSet;
 
+import javax.inject.Inject;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -47,7 +52,7 @@ import static com.github.cardforge.maven.plugins.android.InclusionExclusionResol
 
 /**
  * Converts compiled Java classes (including those containing Java 8 syntax) to the Android dex format.
- * It is a replacement for the {@link DexMojo}.
+ * It is a replacement for the {@code DexMojo}.
  * <p>
  * You should only run one or the other.
  * By default, D8 will run and Dex will not. But this is determined by the
@@ -66,9 +71,9 @@ public class D8Mojo extends AbstractAndroidMojo {
     private static final String JAR = "jar";
 
     /**
-     * The dex compiler to use. Allowed values are 'dex' (default) and 'd8'.
+     * The dex compiler to use. Allowed values are 'dex' and 'd8' (default).
      */
-    @Parameter(property = "android.dex.compiler", defaultValue = "dex")
+    @Parameter(property = "android.dex.compiler", defaultValue = "d8")
     private String dexCompiler;
 
     /**
@@ -195,6 +200,14 @@ public class D8Mojo extends AbstractAndroidMojo {
     private DexCompiler parsedDexCompiler;
     private boolean parsedRelease;
     private Integer parsedMinApi;
+
+    /**
+     * {@inheritDoc}
+     */
+    @Inject
+    protected D8Mojo(ArtifactResolver artifactResolver, ArtifactHandler artHandler, MavenProjectHelper projectHelper, DependencyGraphBuilder dependencyGraphBuilder) {
+        super(artifactResolver, artHandler, projectHelper, dependencyGraphBuilder);
+    }
 
     /**
      * Figure out the full path to the current java executable.

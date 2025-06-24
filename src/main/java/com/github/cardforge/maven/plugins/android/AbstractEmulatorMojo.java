@@ -25,9 +25,14 @@ import com.github.cardforge.maven.plugins.android.standalonemojos.EmulatorStartM
 import com.github.cardforge.maven.plugins.android.standalonemojos.EmulatorStopAllMojo;
 import com.github.cardforge.maven.plugins.android.standalonemojos.EmulatorStopMojo;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.maven.artifact.handler.ArtifactHandler;
+import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.Parameter;
+import org.apache.maven.project.MavenProjectHelper;
+import org.apache.maven.shared.dependency.graph.DependencyGraphBuilder;
 
+import javax.inject.Inject;
 import java.io.*;
 import java.net.Socket;
 import java.util.Arrays;
@@ -171,6 +176,14 @@ public abstract class AbstractEmulatorMojo extends AbstractAndroidMojo {
      * parsed value for location that will be used for the invocation.
      */
     private String parsedEmulatorLocation;
+
+    /**
+     * {@inheritDoc}
+     */
+    @Inject
+    protected AbstractEmulatorMojo(ArtifactResolver artifactResolver, ArtifactHandler artHandler, MavenProjectHelper projectHelper, DependencyGraphBuilder dependencyGraphBuilder) {
+        super(artifactResolver, artHandler, projectHelper, dependencyGraphBuilder);
+    }
 
     /**
      * Are we running on a flavour of Windows?
@@ -387,11 +400,9 @@ public abstract class AbstractEmulatorMojo extends AbstractAndroidMojo {
         IDevice existingEmulator = null;
 
         for (IDevice device : devices) {
-            if (device.isEmulator()) {
-                if (isExistingEmulator(device)) {
-                    existingEmulator = device;
-                    break;
-                }
+            if (device.isEmulator() && isExistingEmulator(device)) {
+                existingEmulator = device;
+                break;
             }
         }
         return existingEmulator;
@@ -421,11 +432,7 @@ public abstract class AbstractEmulatorMojo extends AbstractAndroidMojo {
         String filename = SCRIPT_FOLDER + "\\android-maven-plugin-emulator-start.vbs";
 
         File file = new File(filename);
-        PrintWriter writer = null;
-        try {
-            writer = new PrintWriter(new FileWriter(file));
-
-
+        try (PrintWriter writer = new PrintWriter(new FileWriter(file))) {
             // command needs to be assembled before unique window title since it parses settings and sets up parsedAvd
             // and others.
             String command = assembleStartCommandLine();
@@ -440,11 +447,6 @@ public abstract class AbstractEmulatorMojo extends AbstractAndroidMojo {
             writer.println("oShell.run \"" + cmd + "\"");
         } catch (IOException e) {
             getLog().error("Failure writing file " + filename);
-        } finally {
-            if (writer != null) {
-                writer.flush();
-                writer.close();
-            }
         }
         file.setExecutable(true);
         return filename;
@@ -471,21 +473,13 @@ public abstract class AbstractEmulatorMojo extends AbstractAndroidMojo {
         }
 
         File file = new File(filename);
-        PrintWriter writer = null;
-        try {
-            writer = new PrintWriter(new FileWriter(file));
+        try (PrintWriter writer = new PrintWriter(new FileWriter(file))) {
             writer.println("#!" + sh.getAbsolutePath());
             writer.print(assembleStartCommandLine());
             writer.print(" 1>/dev/null 2>&1 &"); // redirect outputs and run as background task
         } catch (IOException e) {
             getLog().error("Failure writing file " + filename);
-        } finally {
-            if (writer != null) {
-                writer.flush();
-                writer.close();
-            }
         }
-        file.setExecutable(true);
         return filename;
     }
 
@@ -663,35 +657,21 @@ public abstract class AbstractEmulatorMojo extends AbstractAndroidMojo {
         // <emulator> exist in pom file
         if (emulator != null) {
             // <emulator><avd> exists in pom file
-            if (emulator.getAvd() != null) {
-                parsedAvd = emulator.getAvd();
-            } else {
-                parsedAvd = determineAvd();
-            }
+            parsedAvd = emulator.getAvd() != null ? emulator.getAvd() : determineAvd();
+
             // <emulator><options> exists in pom file
-            if (emulator.getOptions() != null) {
-                parsedOptions = emulator.getOptions();
-            } else {
-                parsedOptions = determineOptions();
-            }
+            parsedOptions = emulator.getOptions() != null ? emulator.getOptions() : determineOptions();
+
             // <emulator><wait> exists in pom file
-            if (emulator.getWait() != null) {
-                parsedWait = emulator.getWait();
-            } else {
-                parsedWait = determineWait();
-            }
+            parsedWait = emulator.getWait() != null ? emulator.getWait() : determineWait();
+
             // <emulator><emulatorExecutable> exists in pom file
-            if (emulator.getExecutable() != null) {
-                parsedExecutable = emulator.getExecutable();
-            } else {
-                parsedExecutable = determineExecutable();
-            }
+            parsedExecutable = emulator.getExecutable() != null ? emulator.getExecutable() : determineExecutable();
+
             // <emulator><location> exists in pom file
-            if (emulator.getLocation() != null) {
-                parsedEmulatorLocation = emulator.getLocation();
-            } else {
-                parsedEmulatorLocation = determineEmulatorLocation();
-            }
+            parsedEmulatorLocation = emulator.getLocation() != null ?
+                    emulator.getLocation() :
+                    determineEmulatorLocation();
         }
         // commandline options
         else {

@@ -6,9 +6,13 @@ import com.github.cardforge.maven.plugins.android.AndroidSdk;
 import com.github.cardforge.maven.plugins.android.CommandExecutor;
 import com.github.cardforge.maven.plugins.android.config.ConfigHandler;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.maven.artifact.handler.ArtifactHandler;
+import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.model.Build;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.project.MavenProject;
+import org.apache.maven.project.MavenProjectHelper;
+import org.apache.maven.shared.dependency.graph.DependencyGraphBuilder;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
@@ -42,6 +46,18 @@ public class LintMojoTest extends AbstractAndroidMojoTestCase<LintMojo> {
     @Mock
     private ConfigHandler configHandler;
 
+    @Mock
+    private ArtifactResolver mockArtifactResolver;
+
+    @Mock
+    private ArtifactHandler mockArtifactHandler;
+
+    @Mock
+    private MavenProjectHelper mockProjectHelper;
+
+    @Mock
+    private DependencyGraphBuilder mockDependencyGraphBuilder;
+
     @Override
     public String getPluginGoalName() {
         return "lint";
@@ -49,7 +65,7 @@ public class LintMojoTest extends AbstractAndroidMojoTestCase<LintMojo> {
 
     @Override
     protected Class<LintMojo> getMojoClass() {
-        return null;
+        return LintMojo.class;
     }
 
     /**
@@ -183,7 +199,8 @@ public class LintMojoTest extends AbstractAndroidMojoTestCase<LintMojo> {
 
     @Test
     public void testAllParametersOffConfig() throws Exception {
-        LintMojo mojo = new LintMojo() {
+        LintMojo mojo = new LintMojo(
+                mockArtifactResolver, mockArtifactHandler, mockProjectHelper, mockDependencyGraphBuilder) {
             @Override
             public AndroidSdk getAndroidSdk() {
                 return new SdkTestSupport().getSdkWithPlatformDefault();

@@ -15,7 +15,8 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>org.jboss.aerogear</groupId>
@@ -24,18 +25,18 @@
     <packaging>pom</packaging>
     <name>Project</name>
     <url>http://aerogear.org</url>
-    
-    
+
+
     <modules>
         <module>aar-child-library</module>
         <module>aar-child-test</module>
     </modules>
- 
+
     <properties>
         <!-- Plugins versions -->
-        <it-plugin.version>4.4.1</it-plugin.version>
+        <it-plugin.version>4.7.1</it-plugin.version>
         <!-- Android configs -->
-        <android.platform>19</android.platform>
+        <android.platform>26</android.platform>
         <android.debug>false</android.debug>
         <proguard.skip>true</proguard.skip>
     </properties>
@@ -44,10 +45,10 @@
 
         <!-- Project dependencies -->
         <dependency>
-          <groupId>com.google.android</groupId>
-          <artifactId>android</artifactId>
-          <version>4.1.1.4</version>
-          <scope>provided</scope>
+            <groupId>com.google.android</groupId>
+            <artifactId>android</artifactId>
+            <version>4.1.1.4</version>
+            <scope>provided</scope>
         </dependency>
 
     </dependencies>
@@ -60,6 +61,12 @@
                     <artifactId>android-maven-plugin</artifactId>
                     <version>${it-plugin.version}</version>
                     <extensions>true</extensions>
+                    <configuration>
+                        <dexCompiler>d8</dexCompiler>
+                        <d8>
+                            <minApi>26</minApi>
+                        </d8>
+                    </configuration>
                 </plugin>
             </plugins>
         </pluginManagement>

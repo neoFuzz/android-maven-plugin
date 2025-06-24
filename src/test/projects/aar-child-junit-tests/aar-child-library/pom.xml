@@ -28,7 +28,23 @@
     <artifactId>aar-child-library</artifactId>
     <packaging>aar</packaging>
     <name>Library</name>
-  
+
+    <repositories>
+        <repository>
+            <id>google</id>
+            <url>https://maven.google.com</url>
+        </repository>
+    </repositories>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.android.support.test</groupId>
+            <artifactId>monitor</artifactId>
+            <version>1.0.2</version>
+            <type>aar</type>
+            <scope>compile</scope>
+        </dependency>
+    </dependencies>
 
     <build>
         <plugins>

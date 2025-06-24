@@ -19,19 +19,25 @@ import com.android.ddmlib.DdmPreferences;
 import com.github.cardforge.maven.plugins.android.AbstractAndroidMojo;
 import com.github.cardforge.maven.plugins.android.AndroidSdk;
 import org.apache.commons.io.IOUtils;
+import org.apache.maven.artifact.handler.ArtifactHandler;
+import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.project.MavenProjectHelper;
+import org.apache.maven.shared.dependency.graph.DependencyGraphBuilder;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mock;
 
 import javax.annotation.Nonnull;
+import javax.inject.Inject;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Field;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.lang.reflect.Field;
 
 /**
  * @author hugo.josefson@jayway.com
@@ -39,16 +45,26 @@ import java.lang.reflect.Field;
 public class AbstractAndroidMojoTest {
     public static final String BASE_PATH = "maven/plugins/android/";
     protected AbstractAndroidMojo androidMojo;
+    @Mock
+    private ArtifactResolver mockArtifactResolver;
+    @Mock
+    private ArtifactHandler mockArtifactHandler;
+    @Mock
+    private MavenProjectHelper mockProjectHelper;
+    @Mock
+    private DependencyGraphBuilder mockDependencyGraphBuilder;
 
     @Before
     public void setUp() {
-        androidMojo = new DefaultTestAndroidMojo();
+        androidMojo = new DefaultTestAndroidMojo(mockArtifactResolver, mockArtifactHandler,
+                mockProjectHelper, mockDependencyGraphBuilder);
     }
 
     @Test
     public void givenNoPathThenUseAndroidHomePath() throws Exception {
         SdkTestSupport testSupport = new SdkTestSupport();
-        androidMojo = new EmptyAndroidMojo();
+        androidMojo = new EmptyAndroidMojo(
+                mockArtifactResolver,mockArtifactHandler,mockProjectHelper,mockDependencyGraphBuilder);
 
         setField(androidMojo, "sdkPath", null);
         setField(androidMojo, "sdkPlatform", "19");
@@ -135,6 +151,11 @@ public class AbstractAndroidMojoTest {
 
     private class DefaultTestAndroidMojo extends AbstractAndroidMojo {
 
+        @Inject
+        protected DefaultTestAndroidMojo(ArtifactResolver artifactResolver, ArtifactHandler artHandler, MavenProjectHelper projectHelper, DependencyGraphBuilder dependencyGraphBuilder) {
+            super(artifactResolver, artHandler, projectHelper, dependencyGraphBuilder);
+        }
+
         @Override
         public AndroidSdk getAndroidSdk() {
             return new SdkTestSupport().getSdkWithPlatformDefault();
@@ -146,6 +167,11 @@ public class AbstractAndroidMojoTest {
     }
 
     private class EmptyAndroidMojo extends AbstractAndroidMojo {
+        @Inject
+        protected EmptyAndroidMojo(ArtifactResolver artifactResolver, ArtifactHandler artHandler, MavenProjectHelper projectHelper, DependencyGraphBuilder dependencyGraphBuilder) {
+            super(artifactResolver, artHandler, projectHelper, dependencyGraphBuilder);
+        }
+
         public void execute() {
             // Empty by design
         }

@@ -1,6 +1,7 @@
 package com.github.cardforge.maven.plugins.android.standalonemojos;
 
 import com.android.annotations.NonNull;
+import com.android.annotations.VisibleForTesting;
 import com.github.cardforge.maven.plugins.android.AbstractAndroidMojo;
 import com.github.cardforge.maven.plugins.android.CommandExecutor;
 import com.github.cardforge.maven.plugins.android.ExecutionException;
@@ -9,12 +10,17 @@ import com.github.cardforge.maven.plugins.android.config.ConfigPojo;
 import com.github.cardforge.maven.plugins.android.config.PullParameter;
 import com.github.cardforge.maven.plugins.android.configuration.Zipalign;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.maven.artifact.handler.ArtifactHandler;
+import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
+import org.apache.maven.project.MavenProjectHelper;
+import org.apache.maven.shared.dependency.graph.DependencyGraphBuilder;
 import org.codehaus.plexus.util.FileUtils;
 
+import javax.inject.Inject;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -115,6 +121,15 @@ public class ZipalignMojo extends AbstractAndroidMojo {
 
     @PullParameter(defaultValue = "aligned")
     private String parsedClassifier;
+
+    /**
+     * {@inheritDoc}
+     */
+    @Inject
+    protected ZipalignMojo(ArtifactResolver artifactResolver, ArtifactHandler artHandler,
+                           MavenProjectHelper projectHelper, DependencyGraphBuilder dependencyGraphBuilder) {
+        super(artifactResolver, artHandler, projectHelper, dependencyGraphBuilder);
+    }
 
     /**
      * Execute the mojo by parsing the config and actually doing the zipalign.

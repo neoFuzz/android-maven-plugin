@@ -17,10 +17,16 @@
 package com.github.cardforge.maven.plugins.android.phase11preintegrationtest;
 
 import com.github.cardforge.maven.plugins.android.AbstractInstrumentationMojo;
+import org.apache.maven.artifact.handler.ArtifactHandler;
+import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.project.MavenProjectHelper;
+import org.apache.maven.shared.dependency.graph.DependencyGraphBuilder;
+
+import javax.inject.Inject;
 
 /**
  * Internal. Do not use.<br>
@@ -32,6 +38,17 @@ import org.apache.maven.plugins.annotations.Mojo;
 @SuppressWarnings("unused") // if it works as documented
 @Mojo(name = "internal-pre-integration-test", defaultPhase = LifecyclePhase.PRE_INTEGRATION_TEST)
 public class InternalPreIntegrationTestMojo extends AbstractInstrumentationMojo {
+
+    /**
+     * {@inheritDoc}
+     */
+    @Inject
+    protected InternalPreIntegrationTestMojo(ArtifactResolver artifactResolver,
+                                             ArtifactHandler artHandler,
+                                             MavenProjectHelper projectHelper,
+                                             DependencyGraphBuilder dependencyGraphBuilder) {
+        super(artifactResolver, artHandler, projectHelper, dependencyGraphBuilder);
+    }
 
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {

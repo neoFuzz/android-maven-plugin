@@ -8,11 +8,16 @@ import com.google.api.services.androidpublisher.AndroidPublisher;
 import com.google.api.services.androidpublisher.model.Apk;
 import com.google.api.services.androidpublisher.model.ApkListing;
 import com.google.api.services.androidpublisher.model.Track;
+import org.apache.maven.artifact.handler.ArtifactHandler;
+import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
+import org.apache.maven.project.MavenProjectHelper;
+import org.apache.maven.shared.dependency.graph.DependencyGraphBuilder;
 
+import javax.inject.Inject;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -38,6 +43,15 @@ public class PublishApkMojo extends AbstractPublisherMojo {
 
     @Parameter(property = "android.publisher.filename.whatsnew", defaultValue = "whatsnew.txt")
     private String fileNameWhatsnew;
+
+    /**
+     * {@inheritDoc}
+     */
+    @Inject
+    protected PublishApkMojo(ArtifactResolver artifactResolver, ArtifactHandler artHandler,
+                             MavenProjectHelper projectHelper, DependencyGraphBuilder dependencyGraphBuilder) {
+        super(artifactResolver, artHandler, projectHelper, dependencyGraphBuilder);
+    }
 
     /**
      * Executes this mojo.

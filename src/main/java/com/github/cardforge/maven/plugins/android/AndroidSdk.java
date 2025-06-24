@@ -33,6 +33,7 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.Collection;
 import java.util.Properties;
 import java.util.function.Predicate;
 
@@ -212,7 +213,7 @@ public class AndroidSdk {
 
         // fallback to searching for platform on standard Android platforms (isPlatform() is true)
         for (IAndroidTarget t : sdkManager.getAndroidTargetManager(null).getTargets(null)) {
-            if (t.isPlatform() && apiLevel.equals(t.getVersionName())) {
+            if (t.isPlatform() && apiLevel.equals(t.getVersion().getApiString())) {
                 return t;
             }
         }

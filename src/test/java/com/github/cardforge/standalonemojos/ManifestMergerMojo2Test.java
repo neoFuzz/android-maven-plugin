@@ -22,7 +22,7 @@ public class ManifestMergerMojo2Test extends AbstractAndroidMojoTestCase<Manifes
 
     @Override
     protected Class<ManifestMergerMojo> getMojoClass() {
-        return null;
+        return ManifestMergerMojo.class;
     }
 
     public void testAndroidApplicationChanges() throws Exception {

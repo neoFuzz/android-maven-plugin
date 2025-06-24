@@ -5,14 +5,19 @@ import com.github.cardforge.maven.plugins.android.AbstractAndroidMojo;
 import com.github.cardforge.maven.plugins.android.configuration.Emma;
 import com.vladium.emma.instr.InstrProcessor;
 import com.vladium.emma.instr.InstrProcessor.OutMode;
+import org.apache.maven.artifact.handler.ArtifactHandler;
+import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.plugins.annotations.ResolutionScope;
+import org.apache.maven.project.MavenProjectHelper;
+import org.apache.maven.shared.dependency.graph.DependencyGraphBuilder;
 import org.codehaus.plexus.util.StringUtils;
 
+import javax.inject.Inject;
 import java.io.File;
 import java.util.ArrayList;
 
@@ -78,6 +83,15 @@ public class EmmaMojo extends AbstractAndroidMojo {
     private String[] parsedEmmaClassFolders;
     private String parsedOutputMetadataFile;
     private String parsedFilters;
+
+    /**
+     * {@inheritDoc}
+     */
+    @Inject
+    protected EmmaMojo(ArtifactResolver artifactResolver, ArtifactHandler artHandler,
+                       MavenProjectHelper projectHelper, DependencyGraphBuilder dependencyGraphBuilder) {
+        super(artifactResolver, artHandler, projectHelper, dependencyGraphBuilder);
+    }
 
     /**
      * Executes the EmmaMojo by creating an InstrProcessor and running it with the parsed configuration.

@@ -37,7 +37,7 @@ public class ZipalignMojoTest extends AbstractAndroidMojoTestCase<ZipalignMojo> 
 
     @Override
     protected Class<ZipalignMojo> getMojoClass() {
-        return null;
+        return ZipalignMojo.class;
     }
 
     /**

@@ -44,15 +44,14 @@ import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
-import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectHelper;
-import org.apache.maven.project.ProjectDependenciesResolver;
 import org.apache.maven.shared.dependency.graph.DependencyGraphBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.inject.Inject;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
@@ -62,6 +61,7 @@ import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.stream.Collectors;
 
 import static com.github.cardforge.maven.plugins.android.common.AndroidExtension.APK;
 import static org.apache.commons.lang3.StringUtils.isBlank;
@@ -79,31 +79,26 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 public abstract class AbstractAndroidMojo extends AbstractMojo {
 
     /**
-     * The supported package types list
-     */
-    public static final List<String> SUPPORTED_PACKAGING_TYPES = new ArrayList<>();
-
-    /**
      * The <code>ANDROID_NDK_HOME</code> environment variable name.
      */
     public static final String ENV_ANDROID_NDK_HOME = "ANDROID_NDK_HOME";
-
     /**
      * The <code>ANDROID_HOME</code> environment variable name.
      */
     public static final String ENV_ANDROID_HOME = "ANDROID_HOME";
-
+    /**
+     * The supported package types list
+     */
+    protected static final List<String> SUPPORTED_PACKAGING_TYPES = new ArrayList<>();
     /**
      * Android Debug Bridge initialization timeout in milliseconds.
      */
     private static final long ADB_TIMEOUT_MS = 60L * 1000;
-
     /**
      * Lock for ADB initialization
      */
     private static final Object ADB_LOCK = new Object();
     private static final Logger log = LoggerFactory.getLogger(AbstractAndroidMojo.class);
-
     /**
      * Flag to indicate if ADB has been initialized
      */
@@ -113,6 +108,14 @@ public abstract class AbstractAndroidMojo extends AbstractMojo {
         SUPPORTED_PACKAGING_TYPES.add(AndroidExtension.APK);
     }
 
+    /**
+     * Artifact resolver component.
+     */
+    private final ArtifactResolver artifactResolver;
+    /**
+     * Artifact handler
+     */
+    private final ArtifactHandler artifactHandler;
     /**
      * The maven project.
      */
@@ -229,7 +232,6 @@ public abstract class AbstractAndroidMojo extends AbstractMojo {
             readonly = true
     )
     protected File extractedDependenciesJavaSources;
-
     /**
      * File with the extracted Java resources' dependencies
      */
@@ -244,7 +246,6 @@ public abstract class AbstractAndroidMojo extends AbstractMojo {
      */
     @Parameter(defaultValue = "${project.build.directory}/generated-sources/combined-assets", readonly = true)
     protected File combinedAssets;
-
     /**
      * Specifies which the serial number of the device to connect to. Using the special values "usb" or
      * "emulator" is also valid. "usb" will connect to all actual devices connected (via usb). "emulator" will
@@ -254,7 +255,6 @@ public abstract class AbstractAndroidMojo extends AbstractMojo {
      */
     @Parameter(property = "android.device")
     protected String device;
-
     /**
      * <p>Specifies a list of serial numbers of each device you want to connect to. Using the special values "usb" or
      * "emulator" is also valid. "usb" will connect to all actual devices connected (via usb). "emulator" will
@@ -272,7 +272,6 @@ public abstract class AbstractAndroidMojo extends AbstractMojo {
      */
     @Parameter(property = "android.devices")
     protected String[] devices;
-
     /**
      * <p>Specifies the number of threads to use for deploying and testing on attached devices.
      *
@@ -281,7 +280,6 @@ public abstract class AbstractAndroidMojo extends AbstractMojo {
      */
     @Parameter(property = "android.deviceThreads")
     protected int deviceThreads;
-
     /**
      * <p>External IP addresses. The connect goal of the android maven plugin  will execute an adb connect on
      * each IP address. If you have external device, you should call this connect goal before any other goal :
@@ -298,7 +296,6 @@ public abstract class AbstractAndroidMojo extends AbstractMojo {
      */
     @Parameter(property = "android.ips")
     protected String[] ips;
-
     /**
      * A selection of configurations to be included in the APK as a comma separated list. This will limit the
      * configurations for a certain type. For example, specifying <code>hdpi</code> will exclude all resource folders
@@ -307,19 +304,16 @@ public abstract class AbstractAndroidMojo extends AbstractMojo {
      */
     @Parameter(property = "android.configurations")
     protected String configurations;
-
     /**
      * A list of extra arguments that must be passed to aapt.
      */
     @Parameter(property = "android.aaptExtraArgs")
     protected String[] aaptExtraArgs;
-
     /**
      * Activate verbose output for the aapt execution in Maven debug mode. Defaults to "false"
      */
     @Parameter(property = "android.aaptVerbose")
     protected boolean aaptVerbose;
-
     /**
      * Automatically create a ProGuard configuration file that will guard Activity classes and the like that are
      * defined in the AndroidManifest.xml. These files are then automatically used in the proguard mojo execution,
@@ -327,7 +321,6 @@ public abstract class AbstractAndroidMojo extends AbstractMojo {
      */
     @Parameter(property = "android.proguardFile")
     protected File proguardFile;
-
     /**
      * Decides whether the Apk should be generated or not. If set to false, dx and apkBuilder will not run. This is
      * probably most useful for a project used to generate apk sources to be inherited into another application
@@ -343,7 +336,6 @@ public abstract class AbstractAndroidMojo extends AbstractMojo {
     /**
      * Maven ProjectHelper.
      */
-    @Component
     protected MavenProjectHelper projectHelper;
     /**
      * <p>Whether to undeploy an apk from the device before deploying it.</p>
@@ -388,7 +380,6 @@ public abstract class AbstractAndroidMojo extends AbstractMojo {
     /**
      * Dependency graph builder component.
      */
-    @Component(hint = "default")
     protected DependencyGraphBuilder dependencyGraphBuilder;
     /**
      * <p>The Android NDK to use.</p>
@@ -429,16 +420,6 @@ public abstract class AbstractAndroidMojo extends AbstractMojo {
     @Parameter(defaultValue = "true")
     private boolean includeLibsJarsFromAar;
     /**
-     * Artifact resolver component.
-     */
-    @Component
-    private ArtifactResolver artifactResolver;
-    /**
-     * Artifact handler
-     */
-    @Component
-    private ArtifactHandler artifactHandler;
-    /**
      * <p>The Android SDK to use.</p>
      * <p>Looks like this:</p>
      * <pre>
@@ -466,7 +447,6 @@ public abstract class AbstractAndroidMojo extends AbstractMojo {
      */
     @Parameter
     private Sdk sdk;
-
     /**
      * <p>Parameter designed to pick up <code>-Dandroid.sdk.path</code> in case there is no pom with an
      * <code>&lt;sdk&gt;</code> configuration tag.</p>
@@ -474,14 +454,12 @@ public abstract class AbstractAndroidMojo extends AbstractMojo {
      */
     @Parameter(property = "android.sdk.path", readonly = true)
     private File sdkPath;
-
     /**
      * <p>Parameter designed to pick up environment variable <code>ANDROID_HOME</code> in case
      * <code>android.sdk.path</code> is not configured.</p>
      */
     @Parameter(defaultValue = "${env.ANDROID_HOME}", readonly = true)
     private String envAndroidHome;
-
     /**
      * <p>Parameter designed to pick up <code>-Dandroid.sdk.platform</code> in case there is no pom with an
      * <code>&lt;sdk&gt;</code> configuration tag.</p>
@@ -489,7 +467,6 @@ public abstract class AbstractAndroidMojo extends AbstractMojo {
      */
     @Parameter(property = "android.sdk.platform", readonly = true)
     private String sdkPlatform;
-
     /**
      * <p>Parameter designed to pick up <code>-Dandroid.ndk.path</code> in case there is no pom with an
      * <code>&lt;ndk&gt;</code> configuration tag.</p>
@@ -497,13 +474,11 @@ public abstract class AbstractAndroidMojo extends AbstractMojo {
      */
     @Parameter(property = "android.ndk.path", readonly = true)
     private File ndkPath;
-
     /**
      * Folder in which AAR library dependencies will be unpacked.
      */
     @Parameter(property = "unpackedLibsFolder", defaultValue = "${project.build.directory}/unpacked-libs")
     private File unpackedLibsFolder;
-
     /**
      * Whether the plugin should show a warning if conflicting dependencies with the Android provided ones exist.
      *
@@ -511,27 +486,35 @@ public abstract class AbstractAndroidMojo extends AbstractMojo {
      */
     @Parameter(defaultValue = "false")
     private File disableConflictingDependenciesWarning;
-
     /**
      * configure the Jack compiler
      */
     @Parameter
     private Jack jack;
-
     /**
      * Helper for unpacking libraries.
      */
     private UnpackedLibHelper unpackedLibHelper;
-
     /**
      * Helper for artifact resolver.
      */
     private ArtifactResolverHelper artifactResolverHelper;
-
     /**
      * Helper for native libraries.
      */
     private NativeHelper nativeHelper;
+
+    /**
+     * {@inheritDoc}
+     */
+    @Inject
+    protected AbstractAndroidMojo(ArtifactResolver artifactResolver, ArtifactHandler artHandler,
+                                  MavenProjectHelper projectHelper, DependencyGraphBuilder dependencyGraphBuilder) {
+        this.artifactHandler = artHandler;
+        this.artifactResolver = artifactResolver;
+        this.projectHelper = projectHelper;
+        this.dependencyGraphBuilder = dependencyGraphBuilder;
+    }
 
     /**
      * @return a {@code DependencyResolver} which can be used to resolve dependencies. Never {@code null}.
@@ -545,8 +528,13 @@ public abstract class AbstractAndroidMojo extends AbstractMojo {
      * @return a {@code Set} of dependencies which may be extracted and otherwise included in other artifacts. Never
      * {@code null}. This excludes artifacts of the {@code EXCLUDED_DEPENDENCY_SCOPES} scopes.
      */
+    @NonNull
     protected Set<Artifact> getRelevantCompileArtifacts() {
-        final List<Artifact> allArtifacts = project.getCompileArtifacts();
+        final List<Artifact> allArtifacts = project.getArtifacts().stream()
+                .filter(a -> a.getArtifactHandler().isAddedToClasspath())
+                .filter(a -> Set.of("compile", "provided", "system").contains(a.getScope()))
+                .toList();
+
         return getArtifactResolverHelper().getFilteredArtifacts(allArtifacts);
     }
 
@@ -554,8 +542,11 @@ public abstract class AbstractAndroidMojo extends AbstractMojo {
      * @return a {@code Set} of direct project dependencies. Never {@code null}. This excludes artifacts of the {@code
      * EXCLUDED_DEPENDENCY_SCOPES} scopes.
      */
+    @NonNull
     protected Set<Artifact> getDirectDependencyArtifacts() {
-        final Set<Artifact> allArtifacts = project.getDependencyArtifacts();
+        final Set<Artifact> allArtifacts = project.getArtifacts().stream()
+                .filter(artifact -> !artifact.hasClassifier())
+                .collect(Collectors.toSet());
         return getArtifactResolverHelper().getFilteredArtifacts(allArtifacts);
     }
 
@@ -693,16 +684,17 @@ public abstract class AbstractAndroidMojo extends AbstractMojo {
      * @throws MojoFailureException   If there is a problem with the undeploy of the apk file.
      */
     protected void deployDependencies() throws MojoExecutionException, MojoFailureException {
-        Set<Artifact> directDependentArtifacts = project.getDependencyArtifacts();
-        if (directDependentArtifacts != null) {
-            for (Artifact artifact : directDependentArtifacts) {
-                String type = artifact.getType();
-                if (type.equals(APK)) {
-                    getLog().debug("Detected apk dependency " + artifact + ". Will resolve and deploy to device...");
-                    final File targetApkFile = resolveArtifactToFile(artifact);
-                    getLog().debug("Deploying " + targetApkFile + " to device...");
-                    deployApk(targetApkFile);
-                }
+        Set<Artifact> directDependentArtifacts = project.getArtifacts().stream()
+                .filter(artifact -> artifact.getDependencyTrail().size() == 2) // Size 2 means direct dependency (first is the project itself)
+                .collect(Collectors.toSet());
+
+        for (Artifact artifact : directDependentArtifacts) {
+            String type = artifact.getType();
+            if (type.equals(APK)) {
+                getLog().debug("Detected apk dependency " + artifact + ". Will resolve and deploy to device...");
+                final File targetApkFile = resolveArtifactToFile(artifact);
+                getLog().debug("Deploying " + targetApkFile + " to device...");
+                deployApk(targetApkFile);
             }
         }
     }
@@ -762,7 +754,18 @@ public abstract class AbstractAndroidMojo extends AbstractMojo {
             getLog().info("android.devices parameter set to " + getDevices());
         }
 
-        ArrayList<DoThread> doThreads = new ArrayList<>();
+        ArrayList<ActionRunnable> doThreads = getThreads(deviceCallback, threadCount, deviceList, shouldRunOnAllDevices);
+        throwAnyDoThreadErrors(doThreads);
+
+        if (!shouldRunOnAllDevices && doThreads.isEmpty()) {
+            throw new MojoExecutionException("No device found for android.device=" + getDevices());
+        }
+    }
+
+    @NonNull
+    private ArrayList<ActionRunnable> getThreads(DeviceCallback deviceCallback, int threadCount,
+                                                 @NonNull List<IDevice> deviceList, boolean shouldRunOnAllDevices) {
+        ArrayList<ActionRunnable> doThreads = new ArrayList<>();
         ExecutorService executor = Executors.newFixedThreadPool(threadCount);
         for (final IDevice idevice : deviceList) {
             if (shouldRunOnAllDevices) {
@@ -770,7 +773,7 @@ public abstract class AbstractAndroidMojo extends AbstractMojo {
                 getLog().info(deviceType + DeviceHelper.getDescriptiveName(idevice) + " found.");
             }
             if (shouldRunOnAllDevices || shouldDoWithThisDevice(idevice)) {
-                DoThread deviceDoThread = new DoThread() {
+                ActionRunnable deviceDoThread = new ActionRunnable() {
                     public void runDo() throws MojoFailureException, MojoExecutionException {
                         deviceCallback.doWithDevice(idevice);
                     }
@@ -784,16 +787,12 @@ public abstract class AbstractAndroidMojo extends AbstractMojo {
         while (!executor.isTerminated()) { // NOSONAR
             // waiting for threads finish
         }
-        throwAnyDoThreadErrors(doThreads);
-
-        if (!shouldRunOnAllDevices && doThreads.isEmpty()) {
-            throw new MojoExecutionException("No device found for android.device=" + getDevices());
-        }
+        return doThreads;
     }
 
-    private void throwAnyDoThreadErrors(@NonNull ArrayList<DoThread> doThreads) throws MojoExecutionException,
+    private void throwAnyDoThreadErrors(@NonNull ArrayList<ActionRunnable> doThreads) throws MojoExecutionException,
             MojoFailureException {
-        for (DoThread deviceDoThread : doThreads) {
+        for (ActionRunnable deviceDoThread : doThreads) {
             if (deviceDoThread.failure != null) {
                 throw deviceDoThread.failure;
             }
@@ -922,13 +921,16 @@ public abstract class AbstractAndroidMojo extends AbstractMojo {
      * @return the package name from inside the apkFile.
      */
     public String extractPackageNameFromAndroidManifestXmlTree(String aaptDumpXmlTree) {
-        final Scanner scanner = new Scanner(aaptDumpXmlTree);
-        // Finds the root element named "manifest".
-        scanner.findWithinHorizon("^E: manifest", 0);
-        // Finds the manifest element's attribute named "package".
-        scanner.findWithinHorizon("  A: package=\"", 0); // NOSONAR : must be important to have the double space
-        // Extracts the package value including the trailing double quote.
-        String packageName = scanner.next(".*?\"");
+        String packageName;
+        try (Scanner scanner = new Scanner(aaptDumpXmlTree)) {
+            // Finds the root element named "manifest".
+            scanner.findWithinHorizon("^E: manifest", 0);
+            // Finds the manifest element's attribute named "package".
+            // noinspection RegExpRepeatedSpace
+            scanner.findWithinHorizon("  A: package=\"", 0); // NOSONAR : must be important to have the double space
+            // Extracts the package value including the trailing double quote.
+            packageName = scanner.next(".*?\"");
+        }
         // Removes the double quote.
         packageName = packageName.substring(0, packageName.length() - 1);
         return packageName;
@@ -1345,7 +1347,7 @@ public abstract class AbstractAndroidMojo extends AbstractMojo {
     /**
      * Helper class for running threads.
      */
-    private abstract static class DoThread extends Thread {
+    private abstract static class ActionRunnable implements Runnable {
         private MojoFailureException failure;
         private MojoExecutionException execution;
 

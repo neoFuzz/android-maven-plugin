@@ -27,6 +27,7 @@ import org.slf4j.LoggerFactory;
 import javax.annotation.Nonnull;
 import java.io.File;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Properties;
@@ -99,13 +100,19 @@ public abstract class AbstractAndroidMojoTestCase<T extends AbstractAndroidMojo>
 
         // Create the mojo instance via reflection
         Class<T> mojoClass = getMojoClass();
-        T mojo = mojoClass.getDeclaredConstructor().newInstance();
+        T mojo;
+        try {
+            mojo = mojoClass.getDeclaredConstructor().newInstance();
+        } catch (InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
+            System.out.println("Failed to create mojo instance: " + mojoClass.getName());
+            mojo = (T) mojoClass.getDeclaredConstructors()[0].newInstance();
+        }
 
         // Set up the plugin descriptor and mojo descriptor
         PluginDescriptor pluginDescriptor = new PluginDescriptor();
         pluginDescriptor.setGroupId("com.github.cardforge");
         pluginDescriptor.setArtifactId("android-maven-plugin");
-        pluginDescriptor.setVersion("4.0.0");
+        pluginDescriptor.setVersion("4.7.1");
 
         MojoDescriptor mojoDescriptor = new MojoDescriptor();
         mojoDescriptor.setGoal(getPluginGoalName());

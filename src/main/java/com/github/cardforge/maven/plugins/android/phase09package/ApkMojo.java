@@ -16,8 +16,6 @@
  */
 package com.github.cardforge.maven.plugins.android.phase09package;
 
-import com.android.annotations.NonNull;
-import com.android.annotations.Nullable;
 import com.android.sdklib.build.ApkBuilder;
 import com.android.sdklib.build.ApkCreationException;
 import com.android.sdklib.build.DuplicateFileException;
@@ -35,18 +33,26 @@ import com.google.common.graph.Traverser;
 import com.google.common.io.Files;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.DirectoryFileFilter;
-import org.apache.commons.io.filefilter.FileFileFilter;
 import org.apache.commons.io.filefilter.FileFilterUtils;
 import org.apache.commons.io.filefilter.IOFileFilter;
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.handler.ArtifactHandler;
+import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.plugins.annotations.ResolutionScope;
+import org.apache.maven.plugins.shade.resource.ReproducibleResourceTransformer;
 import org.apache.maven.plugins.shade.resource.ResourceTransformer;
+import org.apache.maven.project.MavenProjectHelper;
+import org.apache.maven.shared.dependency.graph.DependencyGraphBuilder;
+import org.jetbrains.annotations.NotNull;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import javax.inject.Inject;
 import java.io.*;
 import java.util.*;
 import java.util.jar.JarOutputStream;
@@ -57,7 +63,8 @@ import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
 
 import static com.github.cardforge.maven.plugins.android.InclusionExclusionResolver.filterArtifacts;
-import static com.github.cardforge.maven.plugins.android.common.AndroidExtension.*;
+import static com.github.cardforge.maven.plugins.android.common.AndroidExtension.AAR;
+import static com.github.cardforge.maven.plugins.android.common.AndroidExtension.APK;
 
 /**
  * Creates the apk file. By default, signs it with debug keystore.<br>
@@ -66,6 +73,7 @@ import static com.github.cardforge.maven.plugins.android.common.AndroidExtension
  *
  * @author hugo.josefson@jayway.com
  */
+@SuppressWarnings("unused")
 @Mojo(name = "apk",
         defaultPhase = LifecyclePhase.PACKAGE,
         requiresDependencyResolution = ResolutionScope.COMPILE)
@@ -74,6 +82,7 @@ public class ApkMojo extends AbstractAndroidMojo {
     private static final Pattern PATTERN_JAR_EXT = Pattern.compile("^.+\\.jar$", Pattern.CASE_INSENSITIVE);
     private static final String DEX_SUFFIX = ".dex";
     private static final String CLASSES = "classes";
+    private final Map<String, List<File>> jars = new HashMap<>();
     /**
      * <p>How to sign the apk.</p>
      * <p>Looks like this:</p>
@@ -103,14 +112,12 @@ public class ApkMojo extends AbstractAndroidMojo {
     @Parameter(property = "android.sign.debug", defaultValue = "auto", readonly = true)
     private String signDebug;
     /**
-     * <p>Rewrite the manifest so that all of its instrumentation components target the given package.
+     * Rewrite the manifest so that all of its instrumentation components target the given package.
      * This value will be passed on to the aapt parameter --rename-instrumentation-target-package.
-     * Look to aapt for more help on this. </p>
-     * <p>
-     * TODO pass this into AaptExecutor
+     * Look to aapt for more help on this.
      */
     @Parameter(property = "android.renameInstrumentationTargetPackage")
-    private String renameInstrumentationTargetPackage;
+    private String renameInstrumentationTargetPackage; // is this passed into AaptExecutor? it appears to be
     /**
      * <p>Allows to detect and extract the duplicate files from embedded jars. In that case, the plugin analyzes
      * the content of all embedded dependencies and checks they are no duplicates inside those dependencies. Indeed,
@@ -149,7 +156,6 @@ public class ApkMojo extends AbstractAndroidMojo {
      */
     @Parameter(property = "android.sourceDirectories")
     private File[] sourceDirectories;
-
     @Parameter(alias = "metaInf")
     private MetaInf pluginMetaInf;
     /**
@@ -234,10 +240,17 @@ public class ApkMojo extends AbstractAndroidMojo {
      */
     @Parameter(property = "android.nativeLibrariesDependenciesHardwareArchitectureDefault", defaultValue = "armeabi")
     private String nativeLibrariesDependenciesHardwareArchitectureDefault;
-
     @Parameter
-    private ResourceTransformer[] transformers;
-    private Map<String, List<File>> jars = new HashMap<>();
+    private ReproducibleResourceTransformer[] transformers;
+
+    /**
+     * {@inheritDoc}
+     */
+    @Inject
+    protected ApkMojo(ArtifactResolver artifactResolver, ArtifactHandler artHandler,
+                      MavenProjectHelper projectHelper, DependencyGraphBuilder dependencyGraphBuilder) {
+        super(artifactResolver, artHandler, projectHelper, dependencyGraphBuilder);
+    }
 
     /**
      * Copies an input stream into an output stream but does not close the streams.
@@ -246,7 +259,7 @@ public class ApkMojo extends AbstractAndroidMojo {
      * @param out the output stream
      * @throws IOException if the stream cannot be copied
      */
-    private static void copyStreamWithoutClosing(@NonNull InputStream in, OutputStream out) throws IOException {
+    private static void copyStreamWithoutClosing(@Nonnull InputStream in, OutputStream out) throws IOException {
         final int bufferSize = 4096;
         byte[] b = new byte[bufferSize];
         int n;
@@ -262,7 +275,8 @@ public class ApkMojo extends AbstractAndroidMojo {
      *     <li>If APK generation is enabled, calls {@code #execute()} to generate the APK.</li>
      * </ul>
      * <p>
-     * This method is typically invoked during the execution of a Maven build to handle APK compilation and artifact attachment tasks.
+     * This method is typically invoked during the execution of a Maven build to handle APK compilation and
+     * artifact attachment tasks.
      * </p>
      *
      * @throws MojoExecutionException If there is an error executing the Mojo.
@@ -294,7 +308,7 @@ public class ApkMojo extends AbstractAndroidMojo {
 
         // Initialize apk build configuration
         File outputFile = new File(outputApk);
-        final boolean signWithDebugKeyStore = getAndroidSigner().isSignWithDebugKeyStore();
+        final boolean signAsDebug = getAndroidSigner().isSignWithDebugKeyStore();
 
         if (getAndroidSigner().shouldCreateBothSignedAndUnsignedApk()) {
             getLog().info("Creating debug key signed apk file " + outputFile);
@@ -306,7 +320,7 @@ public class ApkMojo extends AbstractAndroidMojo {
             projectHelper.attachArtifact(project, unsignedOutputFile,
                     classifier == null ? "unsigned" : classifier + "_unsigned");
         } else {
-            createApkFile(outputFile, signWithDebugKeyStore);
+            createApkFile(outputFile, signAsDebug);
         }
 
         if (classifier == null) {
@@ -357,7 +371,7 @@ public class ApkMojo extends AbstractAndroidMojo {
     }
 
 
-    private void computeDuplicateFilesInSource(@NonNull File folder) {
+    private void computeDuplicateFilesInSource(@Nonnull File folder) {
         String rPath = folder.getAbsolutePath();
 
         // Create a traverser for the file tree
@@ -383,14 +397,19 @@ public class ApkMojo extends AbstractAndroidMojo {
             lPath = lPath.substring(rPath.length() + 1);
 
             // Store files by relative path in the `jars` map
-            if (jars.get(lPath) == null) {
-                jars.put(lPath, new ArrayList<>());
-            }
+            jars.computeIfAbsent(lPath, k -> new ArrayList<>());
             jars.get(lPath).add(file);
         }
     }
 
-    private void extractDuplicateFiles(List<File> jarFiles, Collection<File> sourceFolders) throws IOException {
+    /**
+     * Extracts duplicate files from the given JAR files and source folders and adds them to the APK builder.
+     *
+     * @param jarFiles      the list of JAR files to process
+     * @param sourceFolders the list of source folders to process
+     * @throws IOException if an I/O error occurs
+     */
+    private void extractDuplicateFiles(List<File> jarFiles, Collection<File> sourceFolders) throws IOException { // NOSONAR check on later
         getLog().debug("Extracting duplicates");
         List<String> duplicates = new ArrayList<>();
         List<File> jarToModify = new ArrayList<>();
@@ -410,38 +429,56 @@ public class ApkMojo extends AbstractAndroidMojo {
 
         // Rebuild jars.  Remove duplicates from ALL jars, then add them back into a duplicate-resources.jar
         File tmp = new File(targetDirectory.getAbsolutePath(), "unpacked-embedded-jars");
-        tmp.mkdirs();
+        boolean md = tmp.mkdirs();
+        if (md) getLog().debug("Directory unpacked-embedded-jars created");
         File duplicatesJar = new File(tmp, "duplicate-resources.jar");
         Set<String> duplicatesAdded = new HashSet<>();
+        boolean b = duplicatesJar.createNewFile();
+        if (b) getLog().debug("File duplicate-resources.jar created");
 
-        duplicatesJar.createNewFile();
         try (FileOutputStream fos = new FileOutputStream(duplicatesJar);
              JarOutputStream zos = new JarOutputStream(fos)) {
-            for (File file : jarToModify) {
-                final int index = jarFiles.indexOf(file);
-                if (index != -1) {
-                    final File newJar = removeDuplicatesFromJar(file, duplicates, duplicatesAdded, zos, index);
-                    getLog().debug("Removed duplicates from JAR " + newJar);
-                    if (newJar != null) {
-                        jarFiles.set(index, newJar);
-                    }
-                } else {
-                    removeDuplicatesFromFolder(file, file, duplicates, duplicatesAdded, zos);
-                    getLog().debug("Removed duplicates from FILE " + file);
-                }
-            }
-            //add transformed resources to duplicate-resources.jar
-            if (transformers != null) {
-                for (ResourceTransformer transformer : transformers) {
-                    if (transformer.hasTransformedResource()) {
-                        transformer.modifyOutputStream(zos);
-                    }
-                }
-            }
+            findAndExtract(jarFiles, jarToModify, duplicates, duplicatesAdded, zos);
         }
 
         if (!jarToModify.isEmpty() && duplicatesJar.length() > 0) {
             jarFiles.add(duplicatesJar);
+        }
+    }
+
+    /**
+     * Finds and extracts duplicate files from the given JAR files and source folders, and adds them to the APK builder.
+     *
+     * @param jarFiles        the list of JAR files to process
+     * @param jarToModify     the list of JAR files to modify
+     * @param duplicates      the list of duplicate file names
+     * @param duplicatesAdded the set of duplicate file names that have already been added
+     * @param zos             the JarOutputStream to write the modified files to
+     * @throws IOException if an I/O error occurs
+     */
+    private void findAndExtract(List<File> jarFiles, @Nonnull List<File> jarToModify, List<String> duplicates,
+                                Set<String> duplicatesAdded, JarOutputStream zos)
+            throws IOException {
+        for (File file : jarToModify) {
+            final int index = jarFiles.indexOf(file);
+            if (index != -1) {
+                final File newJar = removeDuplicatesFromJar(file, duplicates, duplicatesAdded, zos, index);
+                getLog().debug("Removed duplicates from JAR " + newJar);
+                if (newJar != null) {
+                    jarFiles.set(index, newJar);
+                }
+            } else {
+                removeDuplicatesFromFolder(file, file, duplicates, duplicatesAdded, zos);
+                getLog().debug("Removed duplicates from FILE " + file);
+            }
+        }
+        //add transformed resources to duplicate-resources.jar
+        if (transformers != null) {
+            for (ResourceTransformer transformer : transformers) {
+                if (transformer.hasTransformedResource()) {
+                    transformer.modifyOutputStream(zos);
+                }
+            }
         }
     }
 
@@ -458,30 +495,17 @@ public class ApkMojo extends AbstractAndroidMojo {
      * @throws MojoExecutionException if the APK cannot be created.
      */
     private void doAPKWithAPKBuilder(File outputFile, File dexFile, File zipArchive, Collection<File> sourceFolders,
-                                     List<File> jarFiles, Collection<File> nativeFolders,
-                                     boolean signWithDebugKeyStore) throws MojoExecutionException {
+                                     List<File> jarFiles, Collection<File> nativeFolders, boolean signWithDebugKeyStore)
+            throws MojoExecutionException {
         getLog().debug("Building APK with internal APKBuilder");
 
         //A when jack is running the classes directory will not get filled (usually)
         // so let's skip it if it wasn't created by something else
-        if (projectOutputDirectory.exists() || !getJack().isEnabled()) {
+        if (projectOutputDirectory.exists() || !getJack().isEnabled()) { // NOSONAR : Yes IntelliJ
             sourceFolders.add(projectOutputDirectory);
         }
 
-        for (Artifact artifact : filterArtifacts(getRelevantCompileArtifacts(), skipDependencies,
-                artifactTypeSet.getIncludes(), artifactTypeSet.getExcludes(), artifactSet.getIncludes(),
-                artifactSet.getExcludes())) {
-
-            getLog().debug("Found artifact for APK :" + artifact);
-            if (extractDuplicates) {
-                try {
-                    computeDuplicateFiles(artifact.getFile());
-                } catch (Exception e) {
-                    getLog().warn("Cannot compute duplicates files from " + artifact.getFile().getAbsolutePath(), e);
-                }
-            }
-            jarFiles.add(artifact.getFile());
-        }
+        collectApkArtifacts(jarFiles);
 
         for (File src : sourceFolders) {
             computeDuplicateFilesInSource(src);
@@ -504,60 +528,15 @@ public class ApkMojo extends AbstractAndroidMojo {
             }
 
             for (File sourceFolder : sourceFolders) {
-
                 getLog().debug("Adding source folder : " + sourceFolder);
                 // Use ApkBuilder#addFile() to explicitly add resource files so that we can add META-INF/services.
                 addResourcesFromFolder(apkBuilder, sourceFolder);
             }
 
-            for (File jarFile : jarFiles) {
-                boolean excluded = false;
-
-                if (excludeJarResourcesPatterns != null) {
-                    final String name = jarFile.getName();
-
-                    getLog().debug("Checking " + name + " against patterns");
-                    for (Pattern pattern : excludeJarResourcesPatterns) {
-                        final Matcher matcher = pattern.matcher(name);
-                        if (matcher.matches()) {
-
-                            getLog().debug("Jar " + name + " excluded by pattern " + pattern);
-                            excluded = true;
-                            break;
-                        } else {
-
-                            getLog().debug("Jar " + name + " not excluded by pattern " + pattern);
-                        }
-                    }
-                }
-
-                if (excluded) {
-                    continue;
-                }
-
-                if (jarFile.isDirectory()) {
-
-                    getLog().debug("Adding resources from jar folder : " + jarFile);
-                    final String[] filenames = jarFile.list((dir, name) ->
-                            PATTERN_JAR_EXT.matcher(name).matches());
-
-                    for (String filename : Objects.requireNonNull(filenames)) {
-                        final File innerJar = new File(jarFile, filename);
-
-                        getLog().debug("Adding resources from innerJar : " + innerJar);
-                        apkBuilder.addResourcesFromJar(innerJar);
-                    }
-                } else {
-
-                    getLog().debug("Adding resources from : " + jarFile);
-                    apkBuilder.addResourcesFromJar(jarFile);
-                }
-            }
-
+            addJarResourcesToAPK(jarFiles, apkBuilder);
             addSecondaryDexes(dexFile, apkBuilder);
 
             for (File nativeFolder : nativeFolders) {
-
                 getLog().debug("Adding native library : " + nativeFolder);
                 apkBuilder.addNativeLibraries(nativeFolder);
             }
@@ -572,12 +551,93 @@ public class ApkMojo extends AbstractAndroidMojo {
     }
 
     /**
+     * Adds jar resources to the APK builder.
+     *
+     * @param jarFiles   the jar files
+     * @param apkBuilder the APK builder
+     * @throws ApkCreationException   if an error occurs while creating the APK
+     * @throws SealedApkException     if the APK is sealed
+     * @throws DuplicateFileException if a duplicate file is found
+     */
+    private void addJarResourcesToAPK(@Nonnull List<File> jarFiles, ApkBuilder apkBuilder)
+            throws ApkCreationException, SealedApkException, DuplicateFileException {
+        for (File jarFile : jarFiles) {
+            boolean excluded = false;
+
+            if (excludeJarResourcesPatterns != null) {
+                excluded = processExclusionPatterns(jarFile);
+            }
+
+            if (excluded) {
+                continue;
+            }
+
+            if (jarFile.isDirectory()) {
+                getLog().debug("Adding resources from jar folder : " + jarFile);
+                final String[] filenames = jarFile.list((dir, name) ->
+                        PATTERN_JAR_EXT.matcher(name).matches());
+
+                for (String filename : Objects.requireNonNull(filenames)) {
+                    final File innerJar = new File(jarFile, filename);
+
+                    getLog().debug("Adding resources from innerJar : " + innerJar);
+                    apkBuilder.addResourcesFromJar(innerJar);
+                }
+            } else {
+                getLog().debug("Adding resources from : " + jarFile);
+                apkBuilder.addResourcesFromJar(jarFile);
+            }
+        }
+    }
+
+    private boolean processExclusionPatterns(@Nonnull File jarFile) {
+        boolean excluded = false;
+        final String name = jarFile.getName();
+
+        getLog().debug("Checking " + name + " against patterns");
+        for (Pattern pattern : excludeJarResourcesPatterns) {
+            final Matcher matcher = pattern.matcher(name);
+            if (matcher.matches()) {
+                getLog().debug("Jar " + name + " excluded by pattern " + pattern);
+                excluded = true;
+                break;
+            } else {
+                getLog().debug("Jar " + name + " not excluded by pattern " + pattern);
+            }
+        }
+        return excluded;
+    }
+
+    /**
+     * Collects all APK artifacts.
+     *
+     * @param jarFiles the jar files
+     */
+    private void collectApkArtifacts(List<File> jarFiles) {
+        for (Artifact artifact : filterArtifacts(getRelevantCompileArtifacts(), skipDependencies,
+                artifactTypeSet.getIncludes(), artifactTypeSet.getExcludes(), artifactSet.getIncludes(),
+                artifactSet.getExcludes())) {
+            getLog().debug("Found artifact for APK :" + artifact);
+            if (extractDuplicates) {
+                try {
+                    computeDuplicateFiles(artifact.getFile());
+                } catch (Exception e) {
+                    getLog().warn("Cannot compute duplicates files from " +
+                            artifact.getFile().getAbsolutePath(), e);
+                }
+            }
+            jarFiles.add(artifact.getFile());
+        }
+    }
+
+    /**
      * Collect all Files from Folder (recursively) that are not class files.
      *
      * @param folder         the folder
      * @param collectedFiles the collected files
      */
-    private void collectFiles(@NonNull File folder, final List<File> collectedFiles) {
+    private void collectFiles(@Nonnull File folder, final List<File> collectedFiles) {
+        //noinspection ResultOfMethodCallIgnored
         folder.listFiles(file -> {
             if (file.isDirectory()) {
                 collectFiles(file, collectedFiles);
@@ -588,7 +648,6 @@ public class ApkMojo extends AbstractAndroidMojo {
 
             return false;
         });
-
     }
 
     /**
@@ -601,7 +660,7 @@ public class ApkMojo extends AbstractAndroidMojo {
      * @throws DuplicateFileException if a duplicate file is found
      * @throws IOException            if an I/O error occurs
      */
-    private void addResourcesFromFolder(ApkBuilder builder, @NonNull File folder)
+    private void addResourcesFromFolder(ApkBuilder builder, @Nonnull File folder)
             throws SealedApkException, DuplicateFileException, ApkCreationException, IOException {
         final int folderPathLength = folder.getCanonicalPath().length();
 
@@ -612,7 +671,7 @@ public class ApkMojo extends AbstractAndroidMojo {
             final String resourceName = resourceFile
                     .getCanonicalPath()
                     .substring(folderPathLength + 1)
-                    .replaceAll("\\\\", "/");
+                    .replace("\\\\", "/");
             getLog().info("Adding resource " + resourceFile + " : " + resourceName);
             builder.addFile(resourceFile, resourceName);
         }
@@ -643,8 +702,8 @@ public class ApkMojo extends AbstractAndroidMojo {
      * @param dexFileName the name of the dex file
      * @return the next dex file
      */
-    @NonNull
-    private File createNextDexFile(@NonNull File dexFile, String dexFileName) {
+    @Nonnull
+    private File createNextDexFile(@Nonnull File dexFile, String dexFileName) {
         return new File(dexFile.getParentFile(), dexFileName);
     }
 
@@ -652,7 +711,7 @@ public class ApkMojo extends AbstractAndroidMojo {
      * @param dexNumber the number of the dex file
      * @return the name of the dex file
      */
-    @NonNull
+    @Nonnull
     private String getNextDexFileName(int dexNumber) {
         return CLASSES + dexNumber + DEX_SUFFIX;
     }
@@ -666,11 +725,12 @@ public class ApkMojo extends AbstractAndroidMojo {
      * @return the new jar file or null if the output file already exists
      */
     @Nullable
-    private File removeDuplicatesFromJar(@NonNull File in, List<String> duplicates,
+    private File removeDuplicatesFromJar(@Nonnull File in, List<String> duplicates,
                                          Set<String> duplicatesAdded, ZipOutputStream duplicateZos, int num) {
         String target = targetDirectory.getAbsolutePath();
         File tmp = new File(target, "unpacked-embedded-jars");
-        tmp.mkdirs();
+        boolean d = tmp.mkdirs();
+        if (d) getLog().debug("Directory unpacked-embedded-jars created");
         String jarName = String.format("%s-%d.%s",
                 Files.getNameWithoutExtension(in.getName()), num,
                 Files.getFileExtension(in.getName()));
@@ -680,79 +740,122 @@ public class ApkMojo extends AbstractAndroidMojo {
             return out;
         } else {
             try {
-                out.createNewFile();
+                boolean b = out.createNewFile();
+                if (b) {
+                    getLog().debug(String.format("Remove Duplicates: %s created", out.getAbsolutePath()));
+                }
             } catch (IOException e) {
-                e.printStackTrace();
+                getLog().warn("removeDuplicatesFromJar: " + Arrays.toString(e.getStackTrace()));
             }
         }
 
         // Create a new Jar file
-        final FileOutputStream fos;
-        final ZipOutputStream jos;
-        try {
-            fos = new FileOutputStream(out);
-            jos = new ZipOutputStream(fos);
-        } catch (FileNotFoundException e1) {
-            getLog().error("Cannot remove duplicates : the output file " + out.getAbsolutePath() + " does not found");
-            return null;
-        }
+        return createNewJarFile(in, duplicates, duplicatesAdded, duplicateZos, out);
+    }
 
-        try (ZipFile inZip = new ZipFile(in)) {
-            Enumeration<? extends ZipEntry> entries = inZip.entries();
-            while (entries.hasMoreElements()) {
-                ZipEntry entry = entries.nextElement();
-                // If the entry is not a duplicate, copy.
-                if (!duplicates.contains(entry.getName())) {
-                    // copy the entry header to jos
-                    jos.putNextEntry(entry);
-                    InputStream currIn = inZip.getInputStream(entry);
-                    copyStreamWithoutClosing(currIn, jos);
-                    currIn.close();
-                    jos.closeEntry();
-                }
-                //if it is duplicate, check the resource transformers
-                else {
-                    boolean resourceTransformed = false;
-                    if (transformers != null) {
-                        for (ResourceTransformer transformer : transformers) {
-                            if (transformer.canTransformResource(entry.getName())) {
-                                getLog().info("Transforming " + entry.getName()
-                                        + " using " + transformer.getClass().getName());
-                                InputStream currIn = inZip.getInputStream(entry);
-                                transformer.processResource(entry.getName(), currIn, null);
-                                currIn.close();
-                                resourceTransformed = true;
-                                break;
-                            }
-                        }
-                    }
-                    //if not handled by transformer, add (once) to duplicates jar
-                    if (!resourceTransformed &&
-                            !duplicatesAdded.contains(entry.getName())) {
-                        duplicatesAdded.add(entry.getName());
-                        duplicateZos.putNextEntry(entry);
-                        InputStream currIn = inZip.getInputStream(entry);
-                        copyStreamWithoutClosing(currIn, duplicateZos);
-                        currIn.close();
-                        duplicateZos.closeEntry();
-                    }
+    @Nullable
+    private File createNewJarFile(@NotNull File in, List<String> duplicates, Set<String> duplicatesAdded,
+                                  ZipOutputStream duplicateZos, File out) {
+        try (FileOutputStream fos = new FileOutputStream(out);
+             ZipOutputStream jos = new ZipOutputStream(new BufferedOutputStream(fos));
+             ZipFile inZip = new ZipFile(in)) {
 
+            // Use List instead of Enumeration for better performance and modern syntax
+            List<? extends ZipEntry> entries = Collections.list(inZip.entries());
+
+            for (ZipEntry entry : entries) {
+                String entryName = entry.getName();
+
+                if (duplicates.contains(entryName)) {
+                    // Process duplicate entries
+                    processDuplicateEntry(inZip, entry,
+                            (transformers != null ? List.of(transformers) : null),
+                            duplicatesAdded, duplicateZos);
+                } else {
+                    // Process non-duplicate entries
+                    processNonDuplicateEntry(jos, inZip, entry);
                 }
             }
+
+            getLog().info(String.format("%s rewritten without duplicates: %s", in.getName(), out.getAbsolutePath()));
+            return out;
+
+        } catch (FileNotFoundException e) {
+            getLog().error(String.format("Cannot remove duplicates: the output file %s not found", out.getAbsolutePath()));
+            return null;
         } catch (IOException e) {
-            getLog().error("Cannot removing duplicates : " + e.getMessage());
+            getLog().error("Cannot remove duplicates: " + e.getMessage());
             return null;
         }
-
-        try {
-            jos.close();
-            fos.close();
-        } catch (IOException e) {
-            // ignore it.
-        }
-        getLog().info(in.getName() + " rewritten without duplicates : " + out.getAbsolutePath());
-        return out;
     }
+
+    /**
+     * Process a non-duplicate entry in the jar file.
+     *
+     * @param jos   The ZipOutputStream to write the entry to.
+     * @param inZip The input jar file.
+     * @param entry The entry to process.
+     * @throws IOException If an I/O error occurs.
+     */
+    private void processNonDuplicateEntry(@Nonnull ZipOutputStream jos, @Nonnull ZipFile inZip, ZipEntry entry)
+            throws IOException {
+        jos.putNextEntry(entry);
+        try (InputStream currIn = inZip.getInputStream(entry)) {
+            copyStreamWithoutClosing(currIn, jos);
+        }
+        jos.closeEntry();
+    }
+
+    /**
+     * Process a duplicate entry in the jar file.
+     *
+     * @param inZip           The input jar file.
+     * @param entry           The duplicate entry.
+     * @param transformers    The list of transformers to apply to the resource.
+     * @param duplicatesAdded The set of duplicates already added to the duplicates jar.
+     * @param duplicateZos    The ZipOutputStream to write the duplicates to.
+     * @throws IOException If an I/O error occurs.
+     */
+    private void processDuplicateEntry(ZipFile inZip, @Nonnull ZipEntry entry,
+                                       List<ReproducibleResourceTransformer> transformers, Set<String> duplicatesAdded,
+                                       ZipOutputStream duplicateZos) throws IOException {
+
+        String entryName = entry.getName();
+
+        // Try to transform the resource
+        if (transformers != null && tryTransformResource(inZip, entry, transformers)) {
+            return;
+        }
+
+        // Handle untransformed duplicates
+        if (!duplicatesAdded.contains(entryName)) {
+            duplicatesAdded.add(entryName);
+            duplicateZos.putNextEntry(entry);
+            try (InputStream currIn = inZip.getInputStream(entry)) {
+                copyStreamWithoutClosing(currIn, duplicateZos);
+            }
+            duplicateZos.closeEntry();
+        }
+    }
+
+    private boolean tryTransformResource(ZipFile inZip, ZipEntry entry,
+                                         @Nonnull List<ReproducibleResourceTransformer> transformers)
+            throws IOException {
+
+        for (ReproducibleResourceTransformer transformer : transformers) {
+            if (transformer.canTransformResource(entry.getName())) {
+                getLog().info(String.format("Transforming %s using %s",
+                        entry.getName(), transformer.getClass().getName()));
+
+                try (InputStream currIn = inZip.getInputStream(entry)) {
+                    transformer.processResource(entry.getName(), currIn, null, 0);
+                }
+                return true;
+            }
+        }
+        return false;
+    }
+
 
     /**
      * @param root            The root folder to remove duplicates from.
@@ -761,7 +864,7 @@ public class ApkMojo extends AbstractAndroidMojo {
      * @param duplicatesAdded The set of duplicates already added to the duplicates jar.
      * @param duplicateZos    The ZipOutputStream to write the duplicates to.
      */
-    private void removeDuplicatesFromFolder(@NonNull File root, @NonNull File in, List<String> duplicates,
+    private void removeDuplicatesFromFolder(@Nonnull File root, @Nonnull File in, List<String> duplicates,
                                             Set<String> duplicatesAdded, ZipOutputStream duplicateZos) {
         String rPath = root.getAbsolutePath();
         try {
@@ -769,36 +872,7 @@ public class ApkMojo extends AbstractAndroidMojo {
                 if (f.isDirectory()) {
                     removeDuplicatesFromFolder(root, f, duplicates, duplicatesAdded, duplicateZos);
                 } else {
-                    String lName = f.getAbsolutePath();
-                    lName = lName.substring(rPath.length() + 1); //make relative path
-                    if (duplicates.contains(lName)) {
-                        boolean resourceTransformed = false;
-                        if (transformers != null) {
-                            for (ResourceTransformer transformer : transformers) {
-                                if (transformer.canTransformResource(lName)) {
-                                    getLog().info("Transforming " + lName
-                                            + " using " + transformer.getClass().getName());
-                                    try (FileInputStream currIn = new FileInputStream(f)) {
-                                        transformer.processResource(lName, currIn, null);
-                                        resourceTransformed = true;
-                                    }
-                                    break;
-                                }
-                            }
-                        }
-                        //if not handled by transformer, add (once) to duplicates jar
-                        if (!resourceTransformed &&
-                                !duplicatesAdded.contains(lName)) {
-                            duplicatesAdded.add(lName);
-                            ZipEntry entry = new ZipEntry(lName);
-                            duplicateZos.putNextEntry(entry);
-                            try (FileInputStream currIn = new FileInputStream(f)) {
-                                copyStreamWithoutClosing(currIn, duplicateZos);
-                            }
-                            duplicateZos.closeEntry();
-                        }
-                        java.nio.file.Files.delete(f.toPath());
-                    }
+                    handleDuplicateFile(duplicates, duplicatesAdded, duplicateZos, f, rPath);
                 }
             }
         } catch (IOException e) {
@@ -806,11 +880,46 @@ public class ApkMojo extends AbstractAndroidMojo {
         }
     }
 
+    private void handleDuplicateFile(@Nonnull List<String> duplicates, Set<String> duplicatesAdded,
+                                     ZipOutputStream duplicateZos, @Nonnull File f, @Nonnull String rPath)
+            throws IOException {
+        String lName = f.getAbsolutePath();
+        lName = lName.substring(rPath.length() + 1); //make relative path
+        if (duplicates.contains(lName)) {
+            boolean resourceTransformed = false;
+            if (transformers != null) {
+                for (ReproducibleResourceTransformer transformer : transformers) {
+                    if (transformer.canTransformResource(lName)) {
+                        getLog().info("Transforming " + lName
+                                + " using " + transformer.getClass().getName());
+                        try (FileInputStream currIn = new FileInputStream(f)) {
+                            transformer.processResource(lName, currIn, null, 0);
+                            resourceTransformed = true;
+                        }
+                        break;
+                    }
+                }
+            }
+            //if not handled by transformer, add (once) to duplicates jar
+            if (!resourceTransformed &&
+                    !duplicatesAdded.contains(lName)) {
+                duplicatesAdded.add(lName);
+                ZipEntry entry = new ZipEntry(lName);
+                duplicateZos.putNextEntry(entry);
+                try (FileInputStream currIn = new FileInputStream(f)) {
+                    copyStreamWithoutClosing(currIn, duplicateZos);
+                }
+                duplicateZos.closeEntry();
+            }
+            java.nio.file.Files.delete(f.toPath());
+        }
+    }
+
     /**
      * @return The collection of native folders to be included in the APK.
      * @throws MojoExecutionException if there is a problem resolving the artifacts.
      */
-    @NonNull
+    @Nonnull
     private Collection<File> getNativeLibraryFolders() throws MojoExecutionException {
         final List<File> natives = new ArrayList<>();
         final boolean isDebugEnabled = getLog().isDebugEnabled();
@@ -822,12 +931,31 @@ public class ApkMojo extends AbstractAndroidMojo {
         }
 
         final Set<Artifact> artifacts = getNativeLibraryArtifacts();
+        processNativeLibraries(artifacts, isDebugEnabled, natives);
+
+        return natives;
+    }
+
+    /**
+     * Process the native libraries for the Android APK build. This includes collecting native libraries
+     * from AAR artifacts, copying architecture-specific native dependencies, and setting up
+     * debug-related native components.
+     *
+     * @param artifacts      The set of artifacts to process for native libraries. Must not be null.
+     * @param isDebugEnabled Whether debug logging is enabled. If true, additional debug information
+     *                       will be logged during processing.
+     * @param natives        The list to which native library folders will be added. This list is modified
+     *                       during execution to include all discovered native library locations.
+     * @throws MojoExecutionException if there is a problem processing the native libraries, such as
+     *                                IO errors during file copying or invalid artifact configurations.
+     */
+    private void processNativeLibraries(@Nonnull Set<Artifact> artifacts, boolean isDebugEnabled, List<File> natives)
+            throws MojoExecutionException {
         for (Artifact resolvedArtifact : artifacts) {
-            if (APKLIB.equals(resolvedArtifact.getType()) || AAR.equals(resolvedArtifact.getType())) {
+            if (AAR.equals(resolvedArtifact.getType())) {
                 // If the artifact is an AAR or APKLIB then add their native libs folder to the result.
                 final File folder = getUnpackedLibNativesFolder(resolvedArtifact);
-                if (isDebugEnabled)
-                    getLog().debug("Adding native library folder " + folder);
+                getLog().debug("Adding native library folder " + folder);
                 natives.add(folder);
             }
 
@@ -844,7 +972,7 @@ public class ApkMojo extends AbstractAndroidMojo {
         if (Boolean.TRUE.equals(apkDebug)) {
             // Copy the gdbserver binary into the native libs output folder (for each architecture).
             for (String ndkArchitecture : AndroidNdk.NDK_ARCHITECTURES) {
-                copyGdbServer(ndkOutputDirectory, ndkArchitecture, isDebugEnabled);
+                copyGdbServer(ndkOutputDirectory, ndkArchitecture);
             }
         }
 
@@ -854,8 +982,6 @@ public class ApkMojo extends AbstractAndroidMojo {
                 getLog().debug("Adding built native library folder " + ndkOutputDirectory);
             natives.add(ndkOutputDirectory);
         }
-
-        return natives;
     }
 
     /**
@@ -907,7 +1033,8 @@ public class ApkMojo extends AbstractAndroidMojo {
      * @param architecture         The architecture to copy the gdbserver binary for.
      * @throws MojoExecutionException if an error occurs during the copy process
      */
-    private void copyGdbServer(File destinationDirectory, String architecture, final boolean debug) throws MojoExecutionException {
+    private void copyGdbServer(File destinationDirectory, String architecture)
+            throws MojoExecutionException {
 
         try {
             final File destDir = new File(destinationDirectory, architecture);
@@ -916,8 +1043,7 @@ public class ApkMojo extends AbstractAndroidMojo {
                 final File gdbServerFile = getAndroidNdk().getGdbServer(architecture);
                 final File destFile = new File(destDir, "gdbserver");
                 if (!destFile.exists()) {
-                    if (debug)
-                        getLog().debug("Copying gdbServer to " + destFile);
+                    getLog().debug("Copying gdbServer to " + destFile);
                     FileUtils.copyFile(gdbServerFile, destFile);
                 } else {
                     getLog().info("Note: gdbserver binary already exists at destination, will not copy over");
@@ -947,7 +1073,7 @@ public class ApkMojo extends AbstractAndroidMojo {
             IOFileFilter gdbserverNameFilter = FileFilterUtils.nameFileFilter("gdbserver");
             IOFileFilter orFilter = FileFilterUtils.or(libSuffixFilter, gdbserverNameFilter);
 
-            IOFileFilter libFiles = FileFilterUtils.and(FileFileFilter.FILE, orFilter);
+            IOFileFilter libFiles = FileFilterUtils.and(FileFilterUtils.fileFileFilter(), orFilter);
             FileFilter filter = FileFilterUtils.or(DirectoryFileFilter.DIRECTORY, libFiles);
             FileUtils
                     .copyDirectory(localNativeLibrariesDirectory, destinationDirectory, filter);
@@ -972,7 +1098,7 @@ public class ApkMojo extends AbstractAndroidMojo {
         File outputFile = new File(targetDirectory, finalName + ".ap_");
 
         List<File> dependencyArtifactResDirectoryList = new ArrayList<>();
-        for (Artifact libraryArtifact : getTransitiveDependencyArtifacts(APKLIB, AAR)) {
+        for (Artifact libraryArtifact : getTransitiveDependencyArtifacts(AAR)) {
             final File libraryResDir = getUnpackedLibResourceFolder(libraryArtifact);
             if (libraryResDir.exists()) {
                 dependencyArtifactResDirectoryList.add(libraryResDir);

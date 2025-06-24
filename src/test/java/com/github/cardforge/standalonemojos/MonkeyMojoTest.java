@@ -5,8 +5,8 @@ import com.github.cardforge.maven.plugins.android.config.ConfigHandler;
 import com.github.cardforge.maven.plugins.android.standalonemojos.MonkeyMojo;
 import org.apache.maven.model.Build;
 import org.apache.maven.project.MavenProject;
-import org.junit.Ignore;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.runner.RunWith;
@@ -26,9 +26,9 @@ import static org.mockito.MockitoAnnotations.openMocks;
  * @author Stéphane Nicolas - snicolas@octo.com
  */
 @RunWith(MockitoJUnitRunner.class)
-@Ignore("This test has to be migrated to be an IntegrationTest using AbstractAndroidMojoIntegrationTest")
+@Disabled("This test has to be migrated to be an IntegrationTest using AbstractAndroidMojoIntegrationTest")
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public class MonkeyMojoTest extends AbstractAndroidMojoTestCase<MonkeyMojo> {
+class MonkeyMojoTest extends AbstractAndroidMojoTestCase<MonkeyMojo> {
     @Mock
     private MavenProject project;
 
@@ -40,11 +40,11 @@ public class MonkeyMojoTest extends AbstractAndroidMojoTestCase<MonkeyMojo> {
 
     @Override
     protected Class<MonkeyMojo> getMojoClass() {
-        return null;
+        return MonkeyMojo.class;
     }
 
     @BeforeAll
-    public void setup() {
+    void setup() {
         openMocks(this);
     }
 
@@ -54,7 +54,7 @@ public class MonkeyMojoTest extends AbstractAndroidMojoTestCase<MonkeyMojo> {
      * @throws Exception if any error occurs during the test execution
      */
     @Test
-    public void testDefaultMonkeyConfig() throws Exception {
+    void testDefaultMonkeyConfig() throws Exception {
         // given
         MonkeyMojo mojo = createMojo("monkey-config-project0");
         final ConfigHandler cfh = new ConfigHandler(mojo, this.session, this.execution);
@@ -73,7 +73,7 @@ public class MonkeyMojoTest extends AbstractAndroidMojoTestCase<MonkeyMojo> {
      * @throws Exception if any error occurs during the test execution
      */
     @Test
-    public void testDefaultUnskippedMonkeyConfig() throws Exception {
+    void testDefaultUnskippedMonkeyConfig() throws Exception {
         // given
         MonkeyMojo mojo = createMojo("monkey-config-project1");
 
@@ -94,7 +94,7 @@ public class MonkeyMojoTest extends AbstractAndroidMojoTestCase<MonkeyMojo> {
      * @throws Exception if any error occurs during the test execution
      */
     @Test
-    public void testCustomMonkeyConfig() throws Exception {
+    void testCustomMonkeyConfig() throws Exception {
         // given
         MonkeyMojo mojo = createMojo("monkey-config-project2");
         setupProjectMock("ui-automator-config-project1-15.4.3.1011");

@@ -23,6 +23,7 @@ import com.github.cardforge.maven.plugins.android.DeviceCallback;
 import com.github.cardforge.maven.plugins.android.phase12integrationtest.InternalIntegrationTestMojo;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
 
 import javax.annotation.Nonnull;
 import java.util.List;
@@ -38,7 +39,7 @@ import static org.mockito.Mockito.*;
  *
  * @author Erik Ogenvik
  */
-@Ignore("This test has to be migrated to be an IntegrationTest using AbstractAndroidMojoIntegrationTest")
+@Disabled("This test has to be migrated to be an IntegrationTest using AbstractAndroidMojoIntegrationTest")
 public class InternalIntegrationTestMojoTest extends AbstractAndroidMojoTestCase<InternalIntegrationTestMojo> {
 
     @Override

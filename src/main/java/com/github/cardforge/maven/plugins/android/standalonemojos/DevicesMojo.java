@@ -5,10 +5,16 @@ import com.android.ddmlib.AndroidDebugBridge;
 import com.android.ddmlib.IDevice;
 import com.github.cardforge.maven.plugins.android.AbstractAndroidMojo;
 import com.github.cardforge.maven.plugins.android.common.DeviceHelper;
+import org.apache.maven.artifact.handler.ArtifactHandler;
+import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
+import org.apache.maven.project.MavenProjectHelper;
+import org.apache.maven.shared.dependency.graph.DependencyGraphBuilder;
+
+import javax.inject.Inject;
 
 /**
  * DevicesMojo lists all attached devices and emulators found with the android debug bridge. It uses the same
@@ -31,6 +37,15 @@ public class DevicesMojo extends AbstractAndroidMojo {
      */
     @Parameter(property = "android.device")
     private String targetDevice;
+
+    /**
+     * {@inheritDoc}
+     */
+    @Inject
+    protected DevicesMojo(ArtifactResolver artifactResolver, ArtifactHandler artHandler,
+                          MavenProjectHelper projectHelper, DependencyGraphBuilder dependencyGraphBuilder) {
+        super(artifactResolver, artHandler, projectHelper, dependencyGraphBuilder);
+    }
 
     /**
      * Display a list of attached devices.

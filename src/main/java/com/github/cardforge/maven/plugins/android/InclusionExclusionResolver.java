@@ -2,13 +2,14 @@ package com.github.cardforge.maven.plugins.android;
 
 import com.android.annotations.NonNull;
 import com.android.annotations.Nullable;
-import com.google.common.base.Function;
-import com.google.common.base.Predicate;
 import com.google.common.base.Splitter;
 import org.apache.maven.artifact.Artifact;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 import static com.google.common.collect.FluentIterable.from;
 
@@ -30,40 +31,6 @@ public class InclusionExclusionResolver {
      * Splitter that splits on ':' and trims the resulting strings.
      */
     private static final Splitter COLON_SPLITTER = Splitter.on(':');
-    /**
-     * Function that trims a string using {@link String#trim()}.
-     * <p>
-     * This is a {@link Function} implementation that is equivalent to the following:
-     * <pre>
-     * new Function&lt;
-     */
-    private static final Function<String, String> TRIMMER = String::trim;
-    /**
-     * Predicate that returns {@code true} if the input argument is not blank.
-     * <p>
-     * This is a {@link Predicate} implementation that is equivalent to the following:
-     * <pre>
-     * new Predicate&lt;
-     */
-    private static final Predicate<String> MUST_NOT_BE_BLANK = new Predicate<>() {
-        /**
-         * @param value the value to test
-         * @return {@code true} if the value is not blank, {@code false} otherwise
-         */
-        @Override
-        public boolean apply(@NonNull String value) {
-            return !value.trim().isEmpty();
-        }
-
-        /**
-         * @param input the input argument
-         * @return {@code true} if the input argument matches the predicate, {@code false} otherwise
-         */
-        @Override
-        public boolean test(@Nullable String input) {
-            return this.apply(input);
-        }
-    };
 
     /**
      * Private constructor to prevent instantiation.
@@ -95,64 +62,53 @@ public class InclusionExclusionResolver {
         final boolean hasExcludeTypes = excludeArtifactTypes != null;
         final boolean hasIncludeQualifier = includeArtifactQualifiers != null;
         final boolean hasExcludeQualifier = excludeArtifactQualifiers != null;
-        return from(artifacts)
-                .filter(new Predicate<>() {
-                    @Override
-                    public boolean apply(Artifact artifact) {
-                        final boolean includedByType = hasIncludeTypes &&
-                                includeArtifactTypes.contains(artifact.getType());
-                        final boolean includedByQualifier = hasIncludeQualifier
-                                && match(artifact, includeArtifactQualifiers);
-                        final boolean excludedByType = hasExcludeTypes
-                                && excludeArtifactTypes.contains(artifact.getType());
-                        final boolean excludedByQualifier = hasExcludeQualifier
-                                && match(artifact, excludeArtifactQualifiers);
 
-                        if (!skipDependencies) {
-                            return !excludedByType && !excludedByQualifier
-                                    || includedByQualifier
-                                    || includedByType && !excludedByQualifier;
-                        } else {
-                            return includedByQualifier || includedByType;
-                        }
-                    }
+        Predicate<Artifact> artifactFilter = artifact -> {
+            final boolean includedByType = hasIncludeTypes &&
+                    includeArtifactTypes.contains(artifact.getType());
+            final boolean includedByQualifier = hasIncludeQualifier
+                    && match(artifact, includeArtifactQualifiers);
+            final boolean excludedByType = hasExcludeTypes
+                    && excludeArtifactTypes.contains(artifact.getType());
+            final boolean excludedByQualifier = hasExcludeQualifier
+                    && match(artifact, excludeArtifactQualifiers);
 
-                    @Override
-                    public boolean test(@Nullable Artifact input) {
-                        return this.apply(input);
-                    }
-                })
-                .toSet();
+            if (!skipDependencies) {
+                return !excludedByType && !excludedByQualifier
+                        || includedByQualifier
+                        || includedByType && !excludedByQualifier;
+            } else {
+                return includedByQualifier || includedByType;
+            }
+        };
+
+        return StreamSupport.stream(artifacts.spliterator(), false)
+                .filter(artifactFilter)
+                .collect(Collectors.toSet());
     }
 
     /**
+     * Checks if the given artifact matches any of the artifact qualifiers.
+     *
      * @param artifact           The artifact to match against the artifact qualifiers.
      * @param artifactQualifiers Artifact qualifiers in the format {@code groupId:artifactId:version}.
      * @return <code>true</code> if the artifact matches any of the artifact qualifiers, <code>false</code> otherwise
      */
-    private static boolean match(final Artifact artifact, Iterable<String> artifactQualifiers) {
-        return from(artifactQualifiers)
-                .filter(MUST_NOT_BE_BLANK)
-                .anyMatch(new Predicate<>() {
-                    @Override
-                    public boolean apply(String artifactQualifier) {
-                        return match(artifact, artifactQualifier);
-                    }
-
-                    @Override
-                    public boolean test(@Nullable String input) {
-                        return this.apply(input);
-                    }
-                });
+    private static boolean match(final Artifact artifact, @NonNull Iterable<String> artifactQualifiers) {
+        return StreamSupport.stream(artifactQualifiers.spliterator(), false)
+                .filter(qualifier -> qualifier != null && !qualifier.trim().isEmpty())  // MUST_NOT_BE_BLANK
+                .anyMatch(artifactQualifier -> match(artifact, artifactQualifier));
     }
 
     /**
+     * Checks if the given artifact matches the specified artifact qualifier.
+     *
      * @param artifact          The artifact to match against the artifact qualifier.
      * @param artifactQualifier The artifact qualifier in the format {@code groupId:artifactId:version}.
      * @return <code>true</code> if the artifact matches the artifact qualifier, <code>false</code> otherwise
      */
     private static boolean match(Artifact artifact, String artifactQualifier) {
-        final List<String> split = from(COLON_SPLITTER.split(artifactQualifier)).transform(TRIMMER).toList();
+        final List<String> split = from(COLON_SPLITTER.split(artifactQualifier)).transform(String::trim).toList();
         final int count = split.size();
         if (split.isEmpty() || count > 3) {
             throw new IllegalArgumentException("Invalid artifact qualifier: " + artifactQualifier);

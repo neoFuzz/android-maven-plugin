@@ -4,7 +4,11 @@ import com.android.ddmlib.*;
 import com.github.cardforge.maven.plugins.android.AbstractEmulatorMojo;
 import com.github.cardforge.maven.plugins.android.AndroidSdk;
 import com.github.cardforge.maven.plugins.android.CommandExecutor;
+import org.apache.maven.artifact.handler.ArtifactHandler;
+import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.project.MavenProjectHelper;
+import org.apache.maven.shared.dependency.graph.DependencyGraphBuilder;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
@@ -12,6 +16,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 
 import javax.annotation.Nonnull;
+import javax.inject.Inject;
 import java.io.IOException;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -20,7 +25,7 @@ import static org.mockito.Mockito.*;
 import static org.mockito.MockitoAnnotations.openMocks;
 
 @Disabled("Does not work anymore with new sdk")
-public class AbstractEmulatorMojoTest {
+class AbstractEmulatorMojoTest {
     private static final String AVD_NAME = "emulator";
     private static final long DEFAULT_TIMEOUT = 500;
     private AbstractEmulatorMojoToTest abstractEmulatorMojo;
@@ -31,8 +36,21 @@ public class AbstractEmulatorMojoTest {
     @Mock
     private AndroidDebugBridge mockAndroidDebugBridge;
 
+    @Mock
+    private ArtifactResolver mockArtifactResolver;
+
+    @Mock
+    private ArtifactHandler mockArtifactHandler;
+
+    @Mock
+    private MavenProjectHelper mockProjectHelper;
+
+    @Mock
+    private DependencyGraphBuilder mockDependencyGraphBuilder;
+
+
     @BeforeEach
-    public void setUp() throws Exception {
+    void setUp() throws Exception {
         openMocks(this);
         doNothing().when(mockExecutor).executeCommand(any(String.class), isNull());
 
@@ -42,12 +60,17 @@ public class AbstractEmulatorMojoTest {
                     .thenReturn(mockExecutor);
         }
 
-        abstractEmulatorMojo = new AbstractEmulatorMojoToTest();
+        abstractEmulatorMojo = new AbstractEmulatorMojoToTest(
+                mockArtifactResolver,
+                mockArtifactHandler,
+                mockProjectHelper,
+                mockDependencyGraphBuilder
+        );
     }
 
     @Test
     @Disabled("Not working")
-    public void testStartAndroidEmulatorWithTimeoutToConnect() {
+    void testStartAndroidEmulatorWithTimeoutToConnect() {
         boolean onlineAtSecondTry = false;
         int extraBootStatusPollCycles = -1;//ignored
         abstractEmulatorMojo.setWait(DEFAULT_TIMEOUT);
@@ -66,7 +89,7 @@ public class AbstractEmulatorMojoTest {
 
     @Test
     @Disabled("Does not work anymore with new sdk")
-    public void testStartAndroidEmulatorAlreadyBooted() throws MojoExecutionException {
+    void testStartAndroidEmulatorAlreadyBooted() throws MojoExecutionException {
         boolean onlineAtSecondTry = true;
         int extraBootStatusPollCycles = 0;
         abstractEmulatorMojo.setWait(DEFAULT_TIMEOUT);
@@ -81,7 +104,7 @@ public class AbstractEmulatorMojoTest {
 
     @Test
     @Disabled("Does not work anymore with new sdk")
-    public void testStartAndroidEmulatorWithOngoingBoot() throws MojoExecutionException {
+    void testStartAndroidEmulatorWithOngoingBoot() throws MojoExecutionException {
         boolean onlineAtSecondTry = true;
         int extraBootStatusPollCycles = 1;
         abstractEmulatorMojo.setWait(extraBootStatusPollCycles * 5000 + 500);
@@ -95,7 +118,7 @@ public class AbstractEmulatorMojoTest {
     }
 
     @Test
-    public void testStartAndroidEmulatorWithBootTimeout() {
+    void testStartAndroidEmulatorWithBootTimeout() {
         boolean onlineAtSecondTry = true;
         int extraBootStatusPollCycles = -1;
         abstractEmulatorMojo.setWait(DEFAULT_TIMEOUT);
@@ -196,6 +219,11 @@ public class AbstractEmulatorMojoTest {
 
     private class AbstractEmulatorMojoToTest extends AbstractEmulatorMojo {
         private long wait = DEFAULT_TIMEOUT;
+
+        @Inject
+        protected AbstractEmulatorMojoToTest(ArtifactResolver artifactResolver, ArtifactHandler artHandler, MavenProjectHelper projectHelper, DependencyGraphBuilder dependencyGraphBuilder) {
+            super(artifactResolver, artHandler, projectHelper, dependencyGraphBuilder);
+        }
 
         public long getWait() {
             return wait;

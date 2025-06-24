@@ -17,9 +17,15 @@
 package com.github.cardforge.maven.plugins.android.standalonemojos;
 
 import com.github.cardforge.maven.plugins.android.AbstractInstrumentationMojo;
+import org.apache.maven.artifact.handler.ArtifactHandler;
+import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.project.MavenProjectHelper;
+import org.apache.maven.shared.dependency.graph.DependencyGraphBuilder;
+
+import javax.inject.Inject;
 
 /**
  * Runs the instrumentation apk on device.
@@ -29,6 +35,15 @@ import org.apache.maven.plugins.annotations.Mojo;
 @SuppressWarnings("unused") // used in Maven goals
 @Mojo(name = "instrument")
 public class InstrumentMojo extends AbstractInstrumentationMojo {
+
+    /**
+     * {@inheritDoc}
+     */
+    @Inject
+    protected InstrumentMojo(ArtifactResolver artifactResolver, ArtifactHandler artHandler,
+                             MavenProjectHelper projectHelper, DependencyGraphBuilder dependencyGraphBuilder) {
+        super(artifactResolver, artHandler, projectHelper, dependencyGraphBuilder);
+    }
 
     /**
      * @throws MojoExecutionException if the execution fails

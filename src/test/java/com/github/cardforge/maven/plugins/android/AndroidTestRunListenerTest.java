@@ -29,7 +29,7 @@ import static org.mockito.Mockito.*;
 import static org.mockito.MockitoAnnotations.openMocks;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public class AndroidTestRunListenerTest {
+class AndroidTestRunListenerTest {
 
     private final String suffix = RandomStringUtils.randomAlphabetic(10);
     private final String serial = RandomStringUtils.randomAlphabetic(10);
@@ -48,7 +48,7 @@ public class AndroidTestRunListenerTest {
     private IDevice device;
 
     @BeforeAll
-    public void setUp() {
+    void setUp() {
         openMocks(this);
         when(device.getSerialNumber()).thenReturn(serial);
         when(device.getAvdName()).thenReturn(avd);
@@ -63,7 +63,7 @@ public class AndroidTestRunListenerTest {
     }
 
     @Test
-    public void validReport() throws IOException {
+    void validReport() throws IOException {
         target.create();
         // Instantiate the listener using the pre-configured mock device
         final ITestRunListener listener = new AndroidTestRunListener(

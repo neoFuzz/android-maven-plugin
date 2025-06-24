@@ -29,11 +29,16 @@ import com.github.cardforge.maven.plugins.android.config.ConfigPojo;
 import com.github.cardforge.maven.plugins.android.config.PullParameter;
 import com.github.cardforge.maven.plugins.android.configuration.Push;
 import org.apache.commons.io.FileUtils;
+import org.apache.maven.artifact.handler.ArtifactHandler;
+import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
+import org.apache.maven.project.MavenProjectHelper;
+import org.apache.maven.shared.dependency.graph.DependencyGraphBuilder;
 
+import javax.inject.Inject;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
@@ -96,6 +101,15 @@ public class PushMojo extends AbstractAndroidMojo {
 
     @PullParameter(required = true)
     private String parsedDestination;
+
+    /**
+     * {@inheritDoc}
+     */
+    @Inject
+    protected PushMojo(ArtifactResolver artifactResolver, ArtifactHandler artHandler,
+                       MavenProjectHelper projectHelper, DependencyGraphBuilder dependencyGraphBuilder) {
+        super(artifactResolver, artHandler, projectHelper, dependencyGraphBuilder);
+    }
 
     public void execute() throws MojoExecutionException, MojoFailureException {
 

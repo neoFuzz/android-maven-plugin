@@ -24,7 +24,13 @@
     <packaging>pom</packaging>
     <name>Project</name>
     <url>http://aerogear.org</url>
-    
+
+    <repositories>
+        <repository>
+            <id>google</id>
+            <url>https://maven.google.com</url>
+        </repository>
+    </repositories>
     
     <modules>
         <module>aar-child-library</module>
@@ -33,9 +39,9 @@
  
     <properties>
         <!-- Plugins versions -->
-        <it-plugin.version>4.2.1-SNAPSHOT</it-plugin.version>
+        <it-plugin.version>4.7.1</it-plugin.version>
         <!-- Android configs -->
-        <android.platform>22</android.platform>
+        <android.platform>23</android.platform>
         <android.debug>false</android.debug>
         <proguard.skip>true</proguard.skip>
     </properties>
@@ -60,6 +66,9 @@
                     <artifactId>android-maven-plugin</artifactId>
                     <version>${it-plugin.version}</version>
                     <extensions>true</extensions>
+                    <configuration>
+                        <failOnDuplicatePackages>false</failOnDuplicatePackages>
+                    </configuration>
                 </plugin>
             </plugins>
         </pluginManagement>

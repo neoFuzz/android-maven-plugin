@@ -37,7 +37,7 @@ public class MonkeyRunnerMojoTest extends AbstractAndroidMojoTestCase<MonkeyRunn
 
     @Override
     protected Class<MonkeyRunnerMojo> getMojoClass() {
-        return null;
+        return MonkeyRunnerMojo.class;
     }
 
     /**

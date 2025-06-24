@@ -27,11 +27,15 @@ import com.github.cardforge.maven.plugins.android.configuration.MetaInf;
 import com.github.cardforge.maven.plugins.android.configuration.Unpack;
 import org.apache.commons.io.FileUtils;
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.handler.ArtifactHandler;
+import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.plugins.annotations.ResolutionScope;
+import org.apache.maven.project.MavenProjectHelper;
+import org.apache.maven.shared.dependency.graph.DependencyGraphBuilder;
 
 import java.io.File;
 import java.io.IOException;
@@ -79,6 +83,14 @@ public class UnpackMojo extends AbstractAndroidMojo {
 
     @Parameter(defaultValue = "false", readonly = true)
     private boolean includeNonClassFiles;
+
+    /**
+     * {@inheritDoc}
+     */
+    protected UnpackMojo(ArtifactResolver artifactResolver, ArtifactHandler artHandler,
+                         MavenProjectHelper projectHelper, DependencyGraphBuilder dependencyGraphBuilder) {
+        super(artifactResolver, artHandler, projectHelper, dependencyGraphBuilder);
+    }
 
     public void execute() throws MojoExecutionException, MojoFailureException {
 

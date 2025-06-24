@@ -28,11 +28,16 @@ import com.github.cardforge.maven.plugins.android.config.PullParameter;
 import com.github.cardforge.maven.plugins.android.configuration.Pull;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.maven.artifact.handler.ArtifactHandler;
+import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
+import org.apache.maven.project.MavenProjectHelper;
+import org.apache.maven.shared.dependency.graph.DependencyGraphBuilder;
 
+import javax.inject.Inject;
 import java.io.File;
 import java.io.IOException;
 
@@ -95,6 +100,15 @@ public class PullMojo extends AbstractAndroidMojo {
 
     @PullParameter(required = true)
     private String parsedDestination;
+
+    /**
+     * {@inheritDoc}
+     */
+    @Inject
+    protected PullMojo(ArtifactResolver artifactResolver, ArtifactHandler artHandler,
+                       MavenProjectHelper projectHelper, DependencyGraphBuilder dependencyGraphBuilder) {
+        super(artifactResolver, artHandler, projectHelper, dependencyGraphBuilder);
+    }
 
     public void execute() throws MojoExecutionException, MojoFailureException {
 

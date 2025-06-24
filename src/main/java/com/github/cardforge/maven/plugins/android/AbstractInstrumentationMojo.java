@@ -18,6 +18,7 @@ package com.github.cardforge.maven.plugins.android;
 
 import com.android.annotations.NonNull;
 import com.android.ddmlib.AdbCommandRejectedException;
+import com.android.ddmlib.IDevice;
 import com.android.ddmlib.ShellCommandUnresponsiveException;
 import com.android.ddmlib.TimeoutException;
 import com.android.ddmlib.testrunner.IRemoteAndroidTestRunner;
@@ -26,10 +27,15 @@ import com.github.cardforge.maven.plugins.android.asm.AndroidTestFinder;
 import com.github.cardforge.maven.plugins.android.common.DeviceHelper;
 import com.github.cardforge.maven.plugins.android.configuration.Test;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.maven.artifact.handler.ArtifactHandler;
+import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Parameter;
+import org.apache.maven.project.MavenProjectHelper;
+import org.apache.maven.shared.dependency.graph.DependencyGraphBuilder;
 
+import javax.annotation.Nonnull;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -253,6 +259,15 @@ public abstract class AbstractInstrumentationMojo extends AbstractAndroidMojo {
     private String packagesList;
 
     /**
+     * {@inheritDoc}
+     */
+    protected AbstractInstrumentationMojo(ArtifactResolver artifactResolver, ArtifactHandler artHandler,
+                                          MavenProjectHelper projectHelper, DependencyGraphBuilder dependencyGraphBuilder) {
+        super(artifactResolver, artHandler, projectHelper, dependencyGraphBuilder);
+    }
+
+
+    /**
      * Helper method to build a comma separated string from a list.
      * Blank strings are filtered out
      *
@@ -281,6 +296,99 @@ public abstract class AbstractInstrumentationMojo extends AbstractAndroidMojo {
     protected void instrument() throws MojoExecutionException, MojoFailureException {
         parseConfiguration();
 
+        prepareInstrumentationSettings();
+
+        DeviceCallback instrumentationTestExecutor = device -> {
+            String deviceLogLinePrefix = DeviceHelper.getDeviceLogLinePrefix(device);
+
+            RemoteAndroidTestRunner remoteAndroidTestRunner = getRemoteAndroidTestRunner(device, deviceLogLinePrefix);
+
+            remoteAndroidTestRunner.setDebug(parsedDebug);
+            remoteAndroidTestRunner.setCoverage(parsedCoverage);
+            if (StringUtils.isNotBlank(parsedCoverageFile)) {
+                remoteAndroidTestRunner.addInstrumentationArg("coverageFile", parsedCoverageFile);
+            }
+            remoteAndroidTestRunner.setLogOnly(parsedLogOnly);
+
+            if (StringUtils.isNotBlank(parsedTestSize)) {
+                IRemoteAndroidTestRunner.TestSize validSize = IRemoteAndroidTestRunner.TestSize
+                        .getTestSize(parsedTestSize);
+                remoteAndroidTestRunner.setTestSize(validSize);
+            }
+
+            addAllInstrumentationArgs(remoteAndroidTestRunner, parsedInstrumentationArgs);
+
+            getLog().info(deviceLogLinePrefix + "Running instrumentation tests in "
+                    + parsedInstrumentationPackage);
+            executeAndroidTests(device, remoteAndroidTestRunner, deviceLogLinePrefix);
+        };
+
+        instrumentationTestExecutor = new ScreenshotServiceWrapper(instrumentationTestExecutor, project, getLog());
+
+        doWithDevices(instrumentationTestExecutor);
+    }
+
+    @Nonnull
+    private RemoteAndroidTestRunner getRemoteAndroidTestRunner(IDevice device, String deviceLogLinePrefix) {
+        RemoteAndroidTestRunner remoteAndroidTestRunner = new RemoteAndroidTestRunner(
+                parsedInstrumentationPackage, parsedInstrumentationRunner, device);
+
+        if (packagesExists) {
+            for (String str : packagesList.split(",")) {
+                remoteAndroidTestRunner.setTestPackageName(str);
+                getLog().info(deviceLogLinePrefix + "Running tests for specified test package: " + str);
+            }
+        }
+
+        if (classesExists) {
+            remoteAndroidTestRunner
+                    .setClassNames(parsedClasses.toArray(new String[parsedClasses.size()]));
+            getLog().info(deviceLogLinePrefix + "Running tests for specified test classes/methods: "
+                    + parsedClasses);
+        }
+
+        if (parsedAnnotations != null) {
+            for (String annotation : parsedAnnotations) {
+                remoteAndroidTestRunner.addInstrumentationArg("annotation", annotation);
+            }
+        }
+
+        if (parsedExcludeAnnotations != null) {
+            for (String annotation : parsedExcludeAnnotations) {
+                remoteAndroidTestRunner.addInstrumentationArg("notAnnotation", annotation);
+            }
+
+        }
+        return remoteAndroidTestRunner;
+    }
+
+    private void executeAndroidTests(IDevice device, @Nonnull RemoteAndroidTestRunner remoteAndroidTestRunner, String deviceLogLinePrefix) throws MojoFailureException, MojoExecutionException {
+        try {
+            AndroidTestRunListener testRunListener = new AndroidTestRunListener(device, getLog(),
+                    parsedCreateReport, false, "", "", targetDirectory);
+            remoteAndroidTestRunner.run(testRunListener);
+            if (testRunListener.hasFailuresOrErrors() && Boolean.TRUE.equals(!testFailSafe)) {
+                throw new MojoFailureException(deviceLogLinePrefix + "Tests failed on device.");
+            }
+            if (testRunListener.testRunFailed() && Boolean.TRUE.equals(!testFailSafe)) {
+                throw new MojoFailureException(deviceLogLinePrefix + "Test run failed to complete: "
+                        + testRunListener.getTestRunFailureCause());
+            }
+            if (testRunListener.threwException() && Boolean.TRUE.equals(!testFailSafe)) {
+                throw new MojoFailureException(deviceLogLinePrefix + testRunListener.getExceptionMessages());
+            }
+        } catch (TimeoutException e) {
+            throw new MojoExecutionException(deviceLogLinePrefix + "timeout", e);
+        } catch (AdbCommandRejectedException e) {
+            throw new MojoExecutionException(deviceLogLinePrefix + "adb command rejected", e);
+        } catch (ShellCommandUnresponsiveException e) {
+            throw new MojoExecutionException(deviceLogLinePrefix + "shell command " + "unresponsive", e);
+        } catch (IOException e) {
+            throw new MojoExecutionException(deviceLogLinePrefix + "IO problem", e);
+        }
+    }
+
+    private void prepareInstrumentationSettings() throws MojoExecutionException, MojoFailureException {
         if (parsedInstrumentationPackage == null) {
             parsedInstrumentationPackage = extractPackageNameFromAndroidManifest(destinationManifestFile);
         }
@@ -305,85 +413,6 @@ public abstract class AbstractInstrumentationMojo extends AbstractAndroidMojo {
                     + " the same time. Please specify either packages or classes. For details, see "
                     + "http://developer.android.com/guide/developing/testing/testing_otheride.html");
         }
-
-        DeviceCallback instrumentationTestExecutor = device -> {
-            String deviceLogLinePrefix = DeviceHelper.getDeviceLogLinePrefix(device);
-
-            RemoteAndroidTestRunner remoteAndroidTestRunner = new RemoteAndroidTestRunner(
-                    parsedInstrumentationPackage, parsedInstrumentationRunner, device);
-
-            if (packagesExists) {
-                for (String str : packagesList.split(",")) {
-                    remoteAndroidTestRunner.setTestPackageName(str);
-                    getLog().info(deviceLogLinePrefix + "Running tests for specified test package: " + str);
-                }
-            }
-
-            if (classesExists) {
-                remoteAndroidTestRunner
-                        .setClassNames(parsedClasses.toArray(new String[parsedClasses.size()]));
-                getLog().info(deviceLogLinePrefix + "Running tests for specified test classes/methods: "
-                        + parsedClasses);
-            }
-
-            if (parsedAnnotations != null) {
-                for (String annotation : parsedAnnotations) {
-                    remoteAndroidTestRunner.addInstrumentationArg("annotation", annotation);
-                }
-            }
-
-            if (parsedExcludeAnnotations != null) {
-                for (String annotation : parsedExcludeAnnotations) {
-                    remoteAndroidTestRunner.addInstrumentationArg("notAnnotation", annotation);
-                }
-
-            }
-
-            remoteAndroidTestRunner.setDebug(parsedDebug);
-            remoteAndroidTestRunner.setCoverage(parsedCoverage);
-            if (StringUtils.isNotBlank(parsedCoverageFile)) {
-                remoteAndroidTestRunner.addInstrumentationArg("coverageFile", parsedCoverageFile);
-            }
-            remoteAndroidTestRunner.setLogOnly(parsedLogOnly);
-
-            if (StringUtils.isNotBlank(parsedTestSize)) {
-                IRemoteAndroidTestRunner.TestSize validSize = IRemoteAndroidTestRunner.TestSize
-                        .getTestSize(parsedTestSize);
-                remoteAndroidTestRunner.setTestSize(validSize);
-            }
-
-            addAllInstrumentationArgs(remoteAndroidTestRunner, parsedInstrumentationArgs);
-
-            getLog().info(deviceLogLinePrefix + "Running instrumentation tests in "
-                    + parsedInstrumentationPackage);
-            try {
-                AndroidTestRunListener testRunListener = new AndroidTestRunListener(device, getLog(),
-                        parsedCreateReport, false, "", "", targetDirectory);
-                remoteAndroidTestRunner.run(testRunListener);
-                if (testRunListener.hasFailuresOrErrors() && Boolean.TRUE.equals(!testFailSafe)) {
-                    throw new MojoFailureException(deviceLogLinePrefix + "Tests failed on device.");
-                }
-                if (testRunListener.testRunFailed() && Boolean.TRUE.equals(!testFailSafe)) {
-                    throw new MojoFailureException(deviceLogLinePrefix + "Test run failed to complete: "
-                            + testRunListener.getTestRunFailureCause());
-                }
-                if (testRunListener.threwException() && Boolean.TRUE.equals(!testFailSafe)) {
-                    throw new MojoFailureException(deviceLogLinePrefix + testRunListener.getExceptionMessages());
-                }
-            } catch (TimeoutException e) {
-                throw new MojoExecutionException(deviceLogLinePrefix + "timeout", e);
-            } catch (AdbCommandRejectedException e) {
-                throw new MojoExecutionException(deviceLogLinePrefix + "adb command rejected", e);
-            } catch (ShellCommandUnresponsiveException e) {
-                throw new MojoExecutionException(deviceLogLinePrefix + "shell command " + "unresponsive", e);
-            } catch (IOException e) {
-                throw new MojoExecutionException(deviceLogLinePrefix + "IO problem", e);
-            }
-        };
-
-        instrumentationTestExecutor = new ScreenshotServiceWrapper(instrumentationTestExecutor, project, getLog());
-
-        doWithDevices(instrumentationTestExecutor);
     }
 
     private void addAllInstrumentationArgs(

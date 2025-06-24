@@ -4,62 +4,62 @@ package com.github.cardforge.maven.plugins.android.configuration;
 /**
  * Configuration for the dex  test execution. This class is only the definition of the parameters that are
  * shadowed in
- * {@link com.github.cardforge.maven.plugins.android.phase08preparepackage.DexMojo} and used there.
+ * {@code com.github.cardforge.maven.plugins.android.phase08preparepackage.DexMojo} and used there.
  *
  * @author Manfred Moser - manfred@simpligility.com
  */
 public class Dex {
     /**
-     * Mirror of {@link com.github.cardforge.maven.plugins.android.phase08preparepackage.DexMojo#dexJvmArguments}
+     * Mirror of {@code com.github.cardforge.maven.plugins.android.phase08preparepackage.DexMojo#dexJvmArguments}
      */
     private String[] jvmArguments;
     /**
-     * Mirror of {@link com.github.cardforge.maven.plugins.android.phase08preparepackage.DexMojo#dexCoreLibrary}
+     * Mirror of {@code com.github.cardforge.maven.plugins.android.phase08preparepackage.DexMojo#dexCoreLibrary}
      */
     private Boolean coreLibrary;
     /**
-     * Mirror of {@link com.github.cardforge.maven.plugins.android.phase08preparepackage.DexMojo#dexNoLocals}
+     * Mirror of {@code com.github.cardforge.maven.plugins.android.phase08preparepackage.DexMojo#dexNoLocals}
      */
     private Boolean noLocals;
     /**
-     * Mirror of {@link com.github.cardforge.maven.plugins.android.phase08preparepackage.DexMojo#dexOptimize}
+     * Mirror of {@code com.github.cardforge.maven.plugins.android.phase08preparepackage.DexMojo#dexOptimize}
      */
     private Boolean optimize;
     /**
-     * Mirror of {@link com.github.cardforge.maven.plugins.android.phase08preparepackage.DexMojo#dexPreDex}
+     * Mirror of {@code com.github.cardforge.maven.plugins.android.phase08preparepackage.DexMojo#dexPreDex}
      */
     private Boolean preDex;
     /**
-     * Mirror of {@link com.github.cardforge.maven.plugins.android.phase08preparepackage.DexMojo#dexPreDexLibLocation}
+     * Mirror of {@code com.github.cardforge.maven.plugins.android.phase08preparepackage.DexMojo#dexPreDexLibLocation}
      */
     private String preDexLibLocation;
     /**
-     * Mirror of {@link com.github.cardforge.maven.plugins.android.phase08preparepackage.DexMojo#dexIncremental}
+     * Mirror of {@code com.github.cardforge.maven.plugins.android.phase08preparepackage.DexMojo#dexIncremental}
      */
     private Boolean incremental;
     /**
-     * Mirror of {@link com.github.cardforge.maven.plugins.android.phase08preparepackage.DexMojo#forceJumbo}
+     * Mirror of {@code com.github.cardforge.maven.plugins.android.phase08preparepackage.DexMojo#forceJumbo}
      */
     private Boolean forceJumbo;
     /**
-     * Mirror of {@link com.github.cardforge.maven.plugins.android.phase08preparepackage.DexMojo#multiDex}
+     * Mirror of {@code com.github.cardforge.maven.plugins.android.phase08preparepackage.DexMojo#multiDex}
      */
     private Boolean multiDex;
     /**
-     * Mirror of {@link com.github.cardforge.maven.plugins.android.phase08preparepackage.DexMojo#mainDexList}
+     * Mirror of {@code com.github.cardforge.maven.plugins.android.phase08preparepackage.DexMojo#mainDexList}
      */
     private String mainDexList;
     /**
-     * Mirror of {@link com.github.cardforge.maven.plugins.android.phase08preparepackage.DexMojo#minimalMainDex}
+     * Mirror of {@code com.github.cardforge.maven.plugins.android.phase08preparepackage.DexMojo#minimalMainDex}
      */
     private Boolean minimalMainDex;
     /**
-     * Mirror of {@link com.github.cardforge.maven.plugins.android.phase08preparepackage.DexMojo#generateMainDexList}
+     * Mirror of {@code com.github.cardforge.maven.plugins.android.phase08preparepackage.DexMojo#generateMainDexList}
      */
     private Boolean generateMainDexList;
 
     /**
-     * Mirror of {@link com.github.cardforge.maven.plugins.android.phase08preparepackage.DexMojo#dexArguments}
+     * Mirror of {@code com.github.cardforge.maven.plugins.android.phase08preparepackage.DexMojo#dexArguments}
      */
     private String dexArguments;
 

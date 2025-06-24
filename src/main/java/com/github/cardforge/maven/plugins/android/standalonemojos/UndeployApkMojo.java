@@ -23,11 +23,16 @@ import com.github.cardforge.maven.plugins.android.config.PullParameter;
 import com.github.cardforge.maven.plugins.android.configuration.DeployApk;
 import com.github.cardforge.maven.plugins.android.configuration.ValidationResponse;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.maven.artifact.handler.ArtifactHandler;
+import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
+import org.apache.maven.project.MavenProjectHelper;
+import org.apache.maven.shared.dependency.graph.DependencyGraphBuilder;
 
+import javax.inject.Inject;
 import java.io.File;
 
 /**
@@ -67,6 +72,15 @@ public class UndeployApkMojo extends AbstractAndroidMojo {
 
     @PullParameter
     private String parsedPackagename;
+
+    /**
+     * {@inheritDoc}
+     */
+    @Inject
+    protected UndeployApkMojo(ArtifactResolver artifactResolver, ArtifactHandler artHandler,
+                              MavenProjectHelper projectHelper, DependencyGraphBuilder dependencyGraphBuilder) {
+        super(artifactResolver, artHandler, projectHelper, dependencyGraphBuilder);
+    }
 
     /**
      * Executes the undeploy apk goal.

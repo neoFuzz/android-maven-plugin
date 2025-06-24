@@ -1,6 +1,8 @@
 package com.github.cardforge.maven.plugins.android;
 
 import com.android.annotations.NonNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -19,9 +21,11 @@ public class PluginInfo {
      * Colon character.
      */
     private static final String COLON = ":";
+    private static final Logger log = LoggerFactory.getLogger(PluginInfo.class);
     /**
      * Properties loaded from plugin.properties.
      */
+    @SuppressWarnings("FieldCanBeLocal") // suppress in case it's needed
     private static Properties prop;
     /**
      * Group ID of the plugin.
@@ -54,7 +58,7 @@ public class PluginInfo {
         prop = new Properties();
         try (InputStream in = PluginInfo.class.getResourceAsStream("plugin.properties")) {
             if (in == null) {
-                System.err.println("Could not load plugin.properties");
+                log.error("Could not load plugin.properties");
                 return;
             }
             prop.load(in);
@@ -62,7 +66,7 @@ public class PluginInfo {
             artifactId = prop.getProperty("artifactId");
             version = prop.getProperty("version");
         } catch (IOException e) {
-            e.printStackTrace();
+            log.error("Error loading plugin.properties >> ", e);
         }
     }
 

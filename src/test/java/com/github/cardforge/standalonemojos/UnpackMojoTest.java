@@ -51,7 +51,7 @@ public class UnpackMojoTest
 
     @Override
     protected Class<UnpackMojo> getMojoClass() {
-        return null;
+        return UnpackMojo.class;
     }
 
     @Override
