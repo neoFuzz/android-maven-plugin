@@ -34,7 +34,7 @@
     <pluginManagement>
       <plugins>
         <plugin>
-          <groupId>com.simpligility.maven.plugins</groupId>
+          <groupId>com.github.cardforge.maven.plugins</groupId>
 
           <artifactId>android-maven-plugin</artifactId>
           <version>${it-plugin.version}</version>
@@ -44,7 +44,7 @@
     </pluginManagement>
     <plugins>
       <plugin>
-        <groupId>com.simpligility.maven.plugins</groupId>
+        <groupId>com.github.cardforge.maven.plugins</groupId>
 
         <artifactId>android-maven-plugin</artifactId>
         <configuration>

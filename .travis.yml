@@ -14,10 +14,12 @@ android:
     - android-23
     - android-25
     - android-28
+    - android-35
     - build-tools-24.0.1
     - build-tools-24.0.3
     - build-tools-25.0.3
     - build-tools-28.0.3
+    - build-tools-35.0.0
     - sys-img-armeabi-v7a-android-22
     - extra-android-m2repository
 

@@ -67,7 +67,7 @@
     <build>
         <plugins>
             <plugin>
-                <groupId>com.simpligility.maven.plugins</groupId>
+                <groupId>com.github.cardforge.maven.plugins</groupId>
                 <artifactId>android-maven-plugin</artifactId>
                <configuration>
                     <test>
