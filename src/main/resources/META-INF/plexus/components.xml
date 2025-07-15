@@ -85,7 +85,13 @@
         <component>
             <role>org.apache.maven.plugin.Mojo</role>
             <role-hint>monkey</role-hint>
-            <implementation>com.github.cardforge.maven.plugins.MonkeyMojo</implementation>
+            <implementation>com.github.cardforge.maven.plugins.android.standalonemojos.MonkeyMojo</implementation>
+        </component>
+
+        <component>
+            <role>org.apache.maven.plugin.Mojo</role>
+            <role-hint>zipalign</role-hint>
+            <implementation>com.github.cardforge.maven.plugins.android.standalonemojos.ZipalignMojo</implementation>
         </component>
 
         <component>
