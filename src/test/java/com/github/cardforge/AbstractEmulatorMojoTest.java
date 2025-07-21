@@ -1,9 +1,9 @@
 package com.github.cardforge;
 
 import com.android.ddmlib.*;
-import com.github.cardforge.maven.plugins.android.AbstractEmulatorMojo;
-import com.github.cardforge.maven.plugins.android.AndroidSdk;
-import com.github.cardforge.maven.plugins.android.CommandExecutor;
+import com.github.neofuzz.AbstractEmulatorMojo;
+import com.github.neofuzz.AndroidSdk;
+import com.github.neofuzz.CommandExecutor;
 import org.apache.maven.artifact.handler.ArtifactHandler;
 import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.plugin.MojoExecutionException;

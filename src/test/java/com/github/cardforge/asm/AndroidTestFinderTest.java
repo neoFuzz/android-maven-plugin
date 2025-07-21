@@ -15,7 +15,7 @@
  */
 package com.github.cardforge.asm;
 
-import com.github.cardforge.maven.plugins.android.asm.AndroidTestFinder;
+import com.github.neofuzz.asm.AndroidTestFinder;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.junit.Assert;
 import org.junit.Test;

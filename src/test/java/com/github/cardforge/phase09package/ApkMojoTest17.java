@@ -1,7 +1,7 @@
 package com.github.cardforge.phase09package;
 
 import com.github.cardforge.AbstractAndroidMojoTestCase;
-import com.github.cardforge.maven.plugins.android.phase09package.ApkMojo;
+import com.github.neofuzz.phase09package.ApkMojo;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;

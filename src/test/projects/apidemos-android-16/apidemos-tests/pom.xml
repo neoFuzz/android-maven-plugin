@@ -63,7 +63,7 @@
         <!--<finalName>${project.artifactId}</finalName>-->
     <plugins>
       <plugin>
-        <groupId>com.github.cardforge.maven.plugins</groupId>
+        <groupId>com.github.neofuzz</groupId>
 
         <artifactId>android-maven-plugin</artifactId>
         <configuration>
@@ -123,7 +123,7 @@
           </plugin>
 
           <plugin>
-            <groupId>com.github.cardforge.maven.plugins</groupId>
+            <groupId>com.github.neofuzz</groupId>
 
             <artifactId>android-maven-plugin</artifactId>
             <configuration>

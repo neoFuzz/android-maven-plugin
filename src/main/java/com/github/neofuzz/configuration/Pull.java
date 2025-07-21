@@ -1,0 +1,36 @@
+package com.github.neofuzz.configuration;
+
+import com.github.neofuzz.AbstractInstrumentationMojo;
+import com.github.neofuzz.standalonemojos.PullMojo;
+
+/**
+ * Configuration for the integration test runs. This class is only the definition of the parameters that are
+ * shadowed in
+ * {@link AbstractInstrumentationMojo} and used there.
+ *
+ * @author Manfred Moser - manfred@simpligility.com
+ */
+public class Pull {
+    /**
+     * Mirror of {@link PullMojo}#source
+     */
+    private String source;
+    /**
+     * Mirror of {@link PullMojo}#destination
+     */
+    private String destination;
+
+    /**
+     * @return Mirror of {@link PullMojo}#source
+     */
+    public String getSource() {
+        return source;
+    }
+
+    /**
+     * @return Mirror of {@link PullMojo}#destination
+     */
+    public String getDestination() {
+        return destination;
+    }
+}

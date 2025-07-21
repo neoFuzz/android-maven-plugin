@@ -1,8 +1,8 @@
 package com.github.cardforge.standalonemojos;
 
 import com.github.cardforge.AbstractAndroidMojoTestCase;
-import com.github.cardforge.maven.plugins.android.config.ConfigHandler;
-import com.github.cardforge.maven.plugins.android.standalonemojos.MonkeyMojo;
+import com.github.neofuzz.config.ConfigHandler;
+import com.github.neofuzz.standalonemojos.MonkeyMojo;
 import org.apache.maven.model.Build;
 import org.apache.maven.project.MavenProject;
 import org.junit.jupiter.api.BeforeAll;

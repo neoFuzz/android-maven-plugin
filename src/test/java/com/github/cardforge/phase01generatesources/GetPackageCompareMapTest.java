@@ -1,7 +1,7 @@
 package com.github.cardforge.phase01generatesources;
 
 import com.android.builder.core.DefaultManifestParser;
-import com.github.cardforge.maven.plugins.android.phase01generatesources.GenerateSourcesMojo;
+import com.github.neofuzz.phase01generatesources.GenerateSourcesMojo;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.handler.ArtifactHandler;
 import org.apache.maven.artifact.resolver.ArtifactResolver;

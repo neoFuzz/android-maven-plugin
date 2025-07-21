@@ -1,10 +1,10 @@
 package com.github.cardforge.standalonemojos;
 
 import com.github.cardforge.AbstractAndroidMojoTestCase;
-import com.github.cardforge.maven.plugins.android.CommandExecutor;
-import com.github.cardforge.maven.plugins.android.common.AndroidExtension;
-import com.github.cardforge.maven.plugins.android.config.ConfigHandler;
-import com.github.cardforge.maven.plugins.android.standalonemojos.ZipalignMojo;
+import com.github.neofuzz.CommandExecutor;
+import com.github.neofuzz.common.AndroidExtension;
+import com.github.neofuzz.config.ConfigHandler;
+import com.github.neofuzz.standalonemojos.ZipalignMojo;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectHelper;

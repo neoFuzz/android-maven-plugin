@@ -1,9 +1,9 @@
 package com.github.cardforge.standalonemojos;
 
 import com.github.cardforge.AbstractAndroidMojoTestCase;
-import com.github.cardforge.maven.plugins.android.config.ConfigHandler;
-import com.github.cardforge.maven.plugins.android.configuration.MetaInf;
-import com.github.cardforge.maven.plugins.android.standalonemojos.UnpackMojo;
+import com.github.neofuzz.config.ConfigHandler;
+import com.github.neofuzz.configuration.MetaInf;
+import com.github.neofuzz.standalonemojos.UnpackMojo;
 import org.junit.*;
 import org.junit.runner.RunWith;
 import org.junit.runners.MethodSorters;

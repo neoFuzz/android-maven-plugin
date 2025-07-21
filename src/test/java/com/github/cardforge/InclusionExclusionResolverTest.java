@@ -7,7 +7,7 @@ import javax.annotation.Nonnull;
 import java.util.Collection;
 import java.util.LinkedHashSet;
 
-import static com.github.cardforge.maven.plugins.android.InclusionExclusionResolver.filterArtifacts;
+import static com.github.neofuzz.InclusionExclusionResolver.filterArtifacts;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptySet;
 import static java.util.Collections.singleton;

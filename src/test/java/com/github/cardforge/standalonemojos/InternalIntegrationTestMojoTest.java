@@ -18,9 +18,9 @@ package com.github.cardforge.standalonemojos;
 
 import com.android.ddmlib.IDevice;
 import com.github.cardforge.AbstractAndroidMojoTestCase;
-import com.github.cardforge.maven.plugins.android.AbstractAndroidMojo;
-import com.github.cardforge.maven.plugins.android.DeviceCallback;
-import com.github.cardforge.maven.plugins.android.phase12integrationtest.InternalIntegrationTestMojo;
+import com.github.neofuzz.AbstractAndroidMojo;
+import com.github.neofuzz.DeviceCallback;
+import com.github.neofuzz.phase12integrationtest.InternalIntegrationTestMojo;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.jupiter.api.Disabled;

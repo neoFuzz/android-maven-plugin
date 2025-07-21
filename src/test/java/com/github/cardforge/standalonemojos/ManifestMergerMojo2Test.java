@@ -1,7 +1,7 @@
 package com.github.cardforge.standalonemojos;
 
 import com.github.cardforge.AbstractAndroidMojoTestCase;
-import com.github.cardforge.maven.plugins.android.standalonemojos.ManifestMergerMojo;
+import com.github.neofuzz.standalonemojos.ManifestMergerMojo;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.plugin.MojoFailureException;

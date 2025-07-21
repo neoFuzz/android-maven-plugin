@@ -1,8 +1,8 @@
 package com.github.cardforge.common;
 
-import com.github.cardforge.maven.plugins.android.AndroidNdk;
-import com.github.cardforge.maven.plugins.android.common.Const;
-import com.github.cardforge.maven.plugins.android.common.NativeHelper;
+import com.github.neofuzz.AndroidNdk;
+import com.github.neofuzz.common.Const;
+import com.github.neofuzz.common.NativeHelper;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.DefaultArtifact;
 import org.apache.maven.plugin.logging.Log;

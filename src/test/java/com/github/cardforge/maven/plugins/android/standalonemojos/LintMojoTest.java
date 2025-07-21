@@ -1,10 +1,10 @@
-package com.github.cardforge.maven.plugins.android.standalonemojos;
+package com.github.neofuzz.standalonemojos;
 
 import com.github.cardforge.AbstractAndroidMojoTestCase;
 import com.github.cardforge.SdkTestSupport;
-import com.github.cardforge.maven.plugins.android.AndroidSdk;
-import com.github.cardforge.maven.plugins.android.CommandExecutor;
-import com.github.cardforge.maven.plugins.android.config.ConfigHandler;
+import com.github.neofuzz.AndroidSdk;
+import com.github.neofuzz.CommandExecutor;
+import com.github.neofuzz.config.ConfigHandler;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.maven.artifact.handler.ArtifactHandler;
 import org.apache.maven.artifact.resolver.ArtifactResolver;

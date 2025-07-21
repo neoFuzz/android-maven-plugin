@@ -1,6 +1,6 @@
 package com.github.cardforge.configuration;
 
-import com.github.cardforge.maven.plugins.android.configuration.SimpleVersionElementParser;
+import com.github.neofuzz.configuration.SimpleVersionElementParser;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.junit.Test;
 

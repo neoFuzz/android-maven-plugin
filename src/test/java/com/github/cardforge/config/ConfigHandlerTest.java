@@ -1,6 +1,6 @@
 package com.github.cardforge.config;
 
-import com.github.cardforge.maven.plugins.android.config.ConfigHandler;
+import com.github.neofuzz.config.ConfigHandler;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.MojoExecution;

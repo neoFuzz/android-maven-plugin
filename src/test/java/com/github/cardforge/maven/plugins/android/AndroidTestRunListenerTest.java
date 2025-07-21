@@ -1,4 +1,4 @@
-package com.github.cardforge.maven.plugins.android;
+package com.github.neofuzz;
 
 import com.android.ddmlib.IDevice;
 import com.android.ddmlib.testrunner.ITestRunListener;

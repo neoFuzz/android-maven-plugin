@@ -16,8 +16,8 @@
 package com.github.cardforge;
 
 import com.android.ddmlib.DdmPreferences;
-import com.github.cardforge.maven.plugins.android.AbstractAndroidMojo;
-import com.github.cardforge.maven.plugins.android.AndroidSdk;
+import com.github.neofuzz.AbstractAndroidMojo;
+import com.github.neofuzz.AndroidSdk;
 import org.apache.commons.io.IOUtils;
 import org.apache.maven.artifact.handler.ArtifactHandler;
 import org.apache.maven.artifact.resolver.ArtifactResolver;

@@ -1,10 +1,10 @@
 package com.github.cardforge.standalonemojos;
 
 import com.github.cardforge.AbstractAndroidMojoTestCase;
-import com.github.cardforge.maven.plugins.android.CommandExecutor;
-import com.github.cardforge.maven.plugins.android.config.ConfigHandler;
-import com.github.cardforge.maven.plugins.android.configuration.Program;
-import com.github.cardforge.maven.plugins.android.standalonemojos.MonkeyRunnerMojo;
+import com.github.neofuzz.CommandExecutor;
+import com.github.neofuzz.config.ConfigHandler;
+import com.github.neofuzz.configuration.Program;
+import com.github.neofuzz.standalonemojos.MonkeyRunnerMojo;
 import org.apache.maven.project.MavenProject;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;

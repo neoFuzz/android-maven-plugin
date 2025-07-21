@@ -25,13 +25,13 @@
             <implementation>org.apache.maven.lifecycle.mapping.DefaultLifecycleMapping</implementation>
             <configuration>
                 <phases>
-                    <generate-sources>com.github.cardforge.maven.plugins:android-maven-plugin:generate-sources
+                    <generate-sources>com.github.neofuzz:android-maven-plugin:generate-sources
                     </generate-sources>
                     <process-resources>org.apache.maven.plugins:maven-resources-plugin:resources</process-resources>
                     <compile>org.apache.maven.plugins:maven-compiler-plugin:compile</compile>
                     <process-classes>
-                        com.github.cardforge.maven.plugins:android-maven-plugin:emma,
-                        com.github.cardforge.maven.plugins:android-maven-plugin:proguard
+                        com.github.neofuzz:android-maven-plugin:emma,
+                        com.github.neofuzz:android-maven-plugin:proguard
                     </process-classes>
                     <process-test-resources>org.apache.maven.plugins:maven-resources-plugin:testResources
                     </process-test-resources>
@@ -39,15 +39,15 @@
                     <test>org.apache.maven.plugins:maven-surefire-plugin:test</test>
                     <package>
                         org.apache.maven.plugins:maven-jar-plugin:jar,
-                        com.github.cardforge.maven.plugins:android-maven-plugin:d8,
-                        com.github.cardforge.maven.plugins:android-maven-plugin:apk
+                        com.github.neofuzz:android-maven-plugin:d8,
+                        com.github.neofuzz:android-maven-plugin:apk
                     </package>
                     <install>org.apache.maven.plugins:maven-install-plugin:install</install>
                     <pre-integration-test>
-                        com.github.cardforge.maven.plugins:android-maven-plugin:internal-pre-integration-test
+                        com.github.neofuzz:android-maven-plugin:internal-pre-integration-test
                     </pre-integration-test>
                     <integration-test>
-                        com.github.cardforge.maven.plugins:android-maven-plugin:internal-integration-test
+                        com.github.neofuzz:android-maven-plugin:internal-integration-test
                     </integration-test>
                     <deploy>org.apache.maven.plugins:maven-deploy-plugin:deploy</deploy>
                 </phases>
@@ -61,12 +61,12 @@
             <implementation>org.apache.maven.lifecycle.mapping.DefaultLifecycleMapping</implementation>
             <configuration>
                 <phases>
-                    <generate-sources>com.github.cardforge.maven.plugins:android-maven-plugin:generate-sources
+                    <generate-sources>com.github.neofuzz:android-maven-plugin:generate-sources
                     </generate-sources>
                     <process-resources>org.apache.maven.plugins:maven-resources-plugin:resources</process-resources>
                     <compile>org.apache.maven.plugins:maven-compiler-plugin:compile</compile>
-                    <process-classes>com.github.cardforge.maven.plugins:android-maven-plugin:emma,
-                        com.github.cardforge.maven.plugins:android-maven-plugin:proguard
+                    <process-classes>com.github.neofuzz:android-maven-plugin:emma,
+                        com.github.neofuzz:android-maven-plugin:proguard
                     </process-classes>
                     <process-test-resources>org.apache.maven.plugins:maven-resources-plugin:testResources
                     </process-test-resources>
@@ -74,7 +74,7 @@
                     <test>org.apache.maven.plugins:maven-surefire-plugin:test</test>
                     <package>
                         org.apache.maven.plugins:maven-jar-plugin:jar,
-                        com.github.cardforge.maven.plugins:android-maven-plugin:aar
+                        com.github.neofuzz:android-maven-plugin:aar
                     </package>
                     <install>org.apache.maven.plugins:maven-install-plugin:install</install>
                     <deploy>org.apache.maven.plugins:maven-deploy-plugin:deploy</deploy>
@@ -85,13 +85,13 @@
         <component>
             <role>org.apache.maven.plugin.Mojo</role>
             <role-hint>monkey</role-hint>
-            <implementation>com.github.cardforge.maven.plugins.android.standalonemojos.MonkeyMojo</implementation>
+            <implementation>com.github.neofuzz.standalonemojos.MonkeyMojo</implementation>
         </component>
 
         <component>
             <role>org.apache.maven.plugin.Mojo</role>
             <role-hint>zipalign</role-hint>
-            <implementation>com.github.cardforge.maven.plugins.android.standalonemojos.ZipalignMojo</implementation>
+            <implementation>com.github.neofuzz.standalonemojos.ZipalignMojo</implementation>
         </component>
 
         <component>
@@ -108,7 +108,7 @@
         <component>
             <role>org.codehaus.plexus.component.annotations.Component</role>
             <role-hint>jack</role-hint>
-            <implementation>com.github.cardforge.maven.plugins.android.compiler.JackCompiler</implementation>
+            <implementation>com.github.neofuzz.compiler.JackCompiler</implementation>
         </component>
 
         <component>

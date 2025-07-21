@@ -1,6 +1,6 @@
 package com.github.cardforge.standalonemojos;
 
-import com.github.cardforge.maven.plugins.android.PluginInfo;
+import com.github.neofuzz.PluginInfo;
 import io.takari.maven.testing.TestResources;
 import io.takari.maven.testing.executor.MavenExecutionResult;
 import io.takari.maven.testing.executor.MavenRuntime;

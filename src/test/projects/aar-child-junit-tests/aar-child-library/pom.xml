@@ -49,7 +49,7 @@
     <build>
         <plugins>
             <plugin>
-                <groupId>com.github.cardforge.maven.plugins</groupId>
+                <groupId>com.github.neofuzz</groupId>
                 <artifactId>android-maven-plugin</artifactId>
             </plugin>
             <plugin>

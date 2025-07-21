@@ -1,6 +1,6 @@
 package com.github.cardforge;
 
-import com.github.cardforge.maven.plugins.android.InstrumentationArgumentParser;
+import com.github.neofuzz.InstrumentationArgumentParser;
 import com.google.common.collect.Lists;
 import org.junit.Rule;
 import org.junit.Test;

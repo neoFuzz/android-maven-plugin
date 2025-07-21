@@ -1,6 +1,6 @@
 package com.github.cardforge.configuration;
 
-import com.github.cardforge.maven.plugins.android.configuration.VersionGenerator;
+import com.github.neofuzz.configuration.VersionGenerator;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.junit.Test;
 

@@ -45,7 +45,7 @@
     <finalName>${project.artifactId}</finalName>
     <plugins>
       <plugin>
-        <groupId>com.github.cardforge.maven.plugins</groupId>
+        <groupId>com.github.neofuzz</groupId>
         <artifactId>android-maven-plugin</artifactId>
         <extensions>true</extensions>
         <configuration>
@@ -61,10 +61,10 @@
           </apk>
           <transformers>
             <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer" />
-            <transformer implementation="com.github.cardforge.maven.plugins.android.resource.XpathAppendingTransformer">
+            <transformer implementation="com.github.neofuzz.resource.XpathAppendingTransformer">
               <resource>META-INF/kmodule.xml</resource>
             </transformer>
-            <transformer implementation="com.github.cardforge.maven.plugins.android.resource.XpathAppendingTransformer">
+            <transformer implementation="com.github.neofuzz.resource.XpathAppendingTransformer">
               <resource>kmodule.info</resource>
               <elements>
                 <element>/org.drools.core.rule.KieModuleMetaInfo/typeMetaInfos</element>

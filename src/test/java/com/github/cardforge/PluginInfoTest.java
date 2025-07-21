@@ -1,6 +1,6 @@
 package com.github.cardforge;
 
-import com.github.cardforge.maven.plugins.android.PluginInfo;
+import com.github.neofuzz.PluginInfo;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
@@ -9,7 +9,7 @@ public class PluginInfoTest {
 
     @Test
     public void confirmGroupId() {
-        assertEquals("com.github.cardforge.maven.plugins", PluginInfo.getGroupId());
+        assertEquals("com.github.neofuzz", PluginInfo.getGroupId());
     }
 
     @Test
@@ -25,6 +25,6 @@ public class PluginInfoTest {
     @Test
     public void confirmGav() {
         assertTrue(PluginInfo.getGAV()
-                .startsWith("com.github.cardforge.maven.plugins:android-maven-plugin:"));
+                .startsWith("com.github.neofuzz:android-maven-plugin:"));
     }
 }

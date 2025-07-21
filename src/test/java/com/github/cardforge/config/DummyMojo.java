@@ -1,7 +1,7 @@
 package com.github.cardforge.config;
 
-import com.github.cardforge.maven.plugins.android.config.ConfigPojo;
-import com.github.cardforge.maven.plugins.android.config.PullParameter;
+import com.github.neofuzz.config.ConfigPojo;
+import com.github.neofuzz.config.PullParameter;
 
 public class DummyMojo {
 

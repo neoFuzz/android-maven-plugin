@@ -1,7 +1,7 @@
 package com.github.cardforge;
 
-import com.github.cardforge.maven.plugins.android.AbstractAndroidMojo;
-import com.github.cardforge.maven.plugins.android.standalonemojos.ManifestMergerMojo;
+import com.github.neofuzz.AbstractAndroidMojo;
+import com.github.neofuzz.standalonemojos.ManifestMergerMojo;
 import com.github.cardforge.standalonemojos.MojoProjectStub;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;

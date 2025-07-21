@@ -15,8 +15,8 @@
  */
 package com.github.cardforge;
 
-import com.github.cardforge.maven.plugins.android.AndroidSdk;
-import com.github.cardforge.maven.plugins.android.InvalidSdkException;
+import com.github.neofuzz.AndroidSdk;
+import com.github.neofuzz.InvalidSdkException;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.codehaus.plexus.util.ReflectionUtils;
 import org.junit.Assert;

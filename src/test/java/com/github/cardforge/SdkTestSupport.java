@@ -15,7 +15,7 @@
  */
 package com.github.cardforge;
 
-import com.github.cardforge.maven.plugins.android.AndroidSdk;
+import com.github.neofuzz.AndroidSdk;
 import org.junit.Assert;
 
 import java.io.File;
